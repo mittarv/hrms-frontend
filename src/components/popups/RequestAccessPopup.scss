@@ -1,0 +1,140 @@
+@use "../../design/colors/Colors";
+
+
+
+.dialog_title {
+    color: Colors.$c14;
+    font-size: 20px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    height: 66px;
+    padding: 20px;
+}
+
+.dialog_content {
+    padding: 25px;
+}
+
+.dialog_title {
+    display: flex;
+}
+
+.key_value_pair {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.key {
+    font-weight: 600;
+    margin-right: 8px;
+    font-family: "Inter", sans-serif;
+    color: Colors.$c2;
+    font-size: 14px;
+    padding: 8px;
+    // setting width according to the design
+    width: 24%;
+}
+
+.value {
+    flex-grow: 1;
+    /* Allows the value to take up remaining space */
+    font-weight: 400;
+    margin-right: 8px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: Colors.$c2;
+    font-size: 14px;
+    padding: 8px;
+}
+
+.value_textfield {
+    flex-grow: 1;
+    /* Allows the value to take up remaining space */
+    font-weight: 400;
+    margin-right: 8px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: Colors.$c2;
+    font-size: 14px;
+    //padding: 8px;
+    background-color: #F9F9FB;
+    padding: 0%;
+    border-radius: 6px;
+    margin: 0;
+
+    // textfield width and space updation 
+    margin-left: 15px;
+    width: 440px;
+}
+
+#value_current_access {
+    padding: 8px;
+    flex-grow: 1;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: Colors.$c2;
+}
+
+#remark_textfield {
+    // width according the design
+    width: 350px;
+    color: #033348;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    border: none;
+}
+
+#remark_textfield ::placeholder {
+    color: #BCBCBD;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.custom-char-limit {
+    margin-top: 30px;
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    color: #B7BFC6;
+    /* Add any other styles as needed */
+}
+
+
+#close_button {
+    color: #FF8B8B;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: initial !important;
+    height: 38px;
+    width: 111px;
+}
+
+#req_button_disabled {
+    background-color: #0333480D;
+    height: 38px;
+    width: 111px;
+    color: #AEAEAF;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: initial !important;
+
+}
+
+#req_button_enabled {
+    background-color: #0333480D;
+    height: 38px;
+    width: 111px;
+    color: #033348;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: initial !important;
+}
+
+.action_button {
+    margin: 20px;
+}

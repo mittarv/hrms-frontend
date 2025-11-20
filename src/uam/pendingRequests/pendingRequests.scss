@@ -1,0 +1,29 @@
+@use '../../design/colors/Colors';
+.heading{
+    display: flex;
+    // background-color: aquamarine;
+    padding:30px 40px;
+
+    .left__options{
+        display: flex;
+        gap: 30px;
+
+        .left__options__buttons{
+            background-color: transparent;
+            border: none;
+            outline: none;
+            padding: 10px 0px;
+            font-size: 16px;
+            font-weight: 600;
+            color: Colors.$c2;
+            border-bottom: 3px solid Colors.$c2;
+
+            &.disable{
+                border: none;
+                color:Colors.$c26 ;
+            }
+        }
+
+
+    }
+}

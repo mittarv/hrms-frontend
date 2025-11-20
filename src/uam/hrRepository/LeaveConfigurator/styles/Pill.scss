@@ -1,0 +1,38 @@
+.pill-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .pill {
+        background-color: #FFFFFF;
+        border: 1px solid #AEB0BC;
+        border-radius: 30px;
+        color: #454754;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: 'Plus Jakarta Sans';
+        padding: 4px 16px;
+        transition: all 0.2s ease-in-out;
+        outline: none;
+        
+        &:hover {
+          background-color: #e8e8e8;
+        }
+        
+        &.selected {
+          background-color: #003950;
+          border-color: #003950;
+          color: white;
+        }
+        
+        &.disabled {
+          background-color: #F1F1F4;
+          color:#2E3038;
+          cursor: not-allowed !important;
+          opacity: 0.5;
+        }
+      
+      }
+  }
+  

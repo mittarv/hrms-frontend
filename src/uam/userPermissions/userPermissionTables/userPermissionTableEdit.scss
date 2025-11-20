@@ -1,0 +1,57 @@
+@use '../../../design/colors/Colors';
+
+.tableedit_main_div{
+    width: 100%;
+    margin-bottom: 4.4709vh;
+    height: 100vh;
+}
+.deleteButtons_section{
+    display: flex;
+    margin-left: 6.0vh;
+    margin-top: 2.9806vh;
+    
+    gap: 2.9806vh;
+    align-items: center;
+    .delete_button{
+        border: 2px solid Colors.$c37;
+        padding: 7px 14px;
+        // background-color: ;
+        background-color: transparent;
+        color:Colors.$c37;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 5px;
+        cursor: pointer;
+        &:disabled{
+            // border: 2px solid #B7BFC6 ;
+            border: 2px solid Colors.$c32;
+            color:Colors.$c32;
+            cursor: not-allowed;
+        }
+    }
+    .undo_button{
+        height: 2.98062vh;
+        background-color: transparent;
+        border: none;
+        color:Colors.$c33;
+        padding: 0;
+        border-bottom: 2px solid Colors.$c33;
+        cursor: pointer;
+    }
+}
+
+.create_new_button{
+    background-color: transparent;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    margin-left: 35px;
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 18.9px;
+    color: Colors.$c31;
+    cursor: pointer;
+}

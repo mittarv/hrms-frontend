@@ -1,0 +1,155 @@
+.payslip_filter_main_container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .payroll_month_filter,
+    .payroll_year_filter {
+        position: relative;
+        display: inline-block;
+
+        .payroll_month_filter_title,
+        .payroll_year_filter_title {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+                "Helvetica Neue", Arial;
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 20px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            -webkit-user-select: none;
+            user-select: none;
+            min-width: 120px;
+            justify-content: flex-start;
+
+            &:hover {
+                background: #e9ecef;
+                border-color: #ced4da;
+            }
+
+            &.active {
+                background: #e7f3f8;
+                border-color: #c3e1ef;
+                color: #045071;
+            }
+
+            .selected_month,
+            .selected_year {
+                flex: 1;
+                text-align: left;
+            }
+
+            .dropdown_icon {
+                width: 12px;
+                height: 12px;
+                margin-left: auto;
+                transition: transform 0.2s ease;
+
+                &.rotated {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        .payroll_month_options,
+        .payroll_year_options {
+            position: absolute;
+            width: 200px;
+            top: 100%;
+            left: 0;
+            background: #ffffff;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            box-shadow: 0 6px 16px rgba(18, 38, 63, 0.08);
+            z-index: 20;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 6px;
+            display: none;
+
+            &.show {
+                display: block;
+            }
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: #f1f3f4;
+                border-radius: 4px;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: #c1c8cd;
+                border-radius: 4px;
+
+                &:hover {
+                    background: #a8b2ba;
+                }
+            }
+
+            .payroll_month_option,
+            .payroll_year_option {
+                padding: 10px 14px;
+                font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+                    "Helvetica Neue", Arial;
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 20px;
+                color: #495057;
+                cursor: pointer;
+                transition: background-color 0.15s ease;
+                border-bottom: 1px solid #f1f3f4;
+
+                &:hover {
+                    background: #f8f9fa;
+                    color: #212529;
+                }
+
+                &:first-child {
+                    border-top-left-radius: 6px;
+                    border-top-right-radius: 6px;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                    border-bottom-left-radius: 6px;
+                    border-bottom-right-radius: 6px;
+                }
+            }
+        }
+    }
+
+    /* Small screens: let items wrap */
+    @media (max-width: 520px) {
+        flex-wrap: wrap;
+
+        .payroll_month_filter,
+        .payroll_year_filter {
+            width: 100%;
+
+            .payroll_month_filter_title,
+            .payroll_year_filter_title {
+                min-width: 0;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .payroll_month_options,
+            .payroll_year_options {
+                width: calc(100% - 0px);
+                left: 0;
+            }
+        }
+    }
+}

@@ -1,0 +1,235 @@
+@use "../../design/colors/Colors";
+@media only screen and (min-width: 600px) {
+  .tool_box_main_container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-bottom: 3rem;
+  }
+  .home_logo {
+    width: 59vw;
+    height: auto;
+    margin-top: 4vh;
+  }
+  .home_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: Colors.$c31;
+    padding: 1.5vh 3vw;
+    position: fixed;
+
+    img {
+      width: auto;
+      height: 5vh;
+      color: Colors.$c12;
+      transition: all 0.3s ease-out;
+      cursor: pointer;
+      &:hover {
+        transform: scale(1.07);
+      }
+    }
+  }
+
+  .home_header__right {
+    display: flex;
+    align-items: center;
+    max-width: 50%;
+    min-height: 30%;
+    gap: 50px;
+
+    .user_name_div {
+      display: flex;
+      align-items: center;
+    }
+    p {
+      color: Colors.$c12;
+      text-align: center;
+      font-family: "Plus Jakarta Sans", "sans-serif";
+      font-size: 1.02vw;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+      letter-spacing: 0.01875rem;
+      padding-left: 10px;
+      transition: all 0.3s ease-out;
+
+      &:hover {
+        opacity: 0.8;
+        cursor: pointer;
+      }
+    }
+  }
+  .tool_box_main_container__right {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 35px;
+    margin-top: 20vh;
+    height: 100vh;
+    padding-bottom: 2vh;
+    
+    .tool_navigation_grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; 
+    }
+    
+    .tool_navigation_row {
+      display: flex; 
+      gap: 20px; 
+    }
+
+    .toolbox_home_heading {
+      color: #022737;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.8vw;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 2.725rem; /* 121.111% */
+      letter-spacing: 0.0675rem;
+      color: Colors.$c30;
+      margin-top: 3vh;
+    }
+  }
+  .toggle_div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 12vw;
+    background-color: Colors.$c12;
+    border: 1px solid Colors.$c6;
+    border-radius: 54px;
+    position: absolute;
+    top: auto;
+    bottom: 18px;
+    margin-left: 2.5vw;
+    // margin-top:-1.5vh;
+  }
+  .monthly_div {
+    cursor: pointer;
+    font-size: 0.9vw;
+    font-weight: 500;
+    position: relative;
+  }
+  .home_referral_board {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 45vw;
+    border: 1px solid Colors.$c38;
+    border-radius: 15px;
+    height: 191px;
+    padding-bottom: 5%;
+    margin-top: 6.5vh;
+    margin-left: -7vw;
+    position: relative;
+    .home_referral_top_left {
+      display: flex;
+    }
+
+    .home_referral_top_section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      // justify-content: space-between;
+      margin-top: -4vh;
+
+      img:nth-child(1) {
+        margin-top: -5vh;
+        margin-left: 2vw;
+        max-width: 9.32vw;
+        height: 20vh;
+        z-index: 100;
+        // position: absolute;
+      }
+
+      .home_referral_title {
+        font-family: "Inter", sans-serif;
+        color: Colors.$c22;
+        font-size: 1.45vw;
+        font-weight: 700;
+        // margin-left: 11vw;
+      }
+    }
+  }
+  .show_rank {
+    display: flex;
+    position: absolute;
+    gap: 2vw;
+    margin-left: 14vw;
+    top: 0;
+    bottom: 0;
+    justify-content: space-between;
+    // top:initial;
+    .display_rank {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-left: 2vw;
+      // gap: 5px;
+
+      p:nth-child(1) {
+        font-size: 1.04vw;
+        font-weight: 800;
+        color: Colors.$c31;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      p:nth-child(2) {
+        font-size: 1.14vw;
+        font-weight: 800;
+        color: Colors.$c31;
+        text-align: center;
+        margin-top: 1.66vh;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      p:nth-child(3) {
+        font-size: 1.14vw;
+        font-weight: 700;
+        color: Colors.$c3;
+        text-align: center;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      p:nth-child(4) {
+        font-size: 0.73vw;
+        font-weight: 400;
+        color: Colors.$c3;
+        text-align: center;
+        margin-top: 1.45vh;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      p:nth-child(5) {
+        font-size: 0.73vw;
+        font-weight: 400;
+        color: Colors.$c3;
+        text-align: center;
+        margin-top: 0.05vh;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+    }
+  }
+  .go_to_leaderboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    // margin-top: 5px;
+    img {
+      margin-top: 1px;
+    }
+
+    p:nth-child(1) {
+      font-size: 0.85vw;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-weight: 500;
+      color: Colors.$c30;
+      margin-left: -10px;
+    }
+  }
+}

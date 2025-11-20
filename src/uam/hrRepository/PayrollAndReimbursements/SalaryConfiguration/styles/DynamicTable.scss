@@ -1,0 +1,329 @@
+.dynamic-table {
+  margin: 20px 0;
+
+  p {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #2E3038;
+    font-weight: 600;
+  }
+
+  .salary_table{
+    width: 100%;
+    border: 0.5px solid #aeb0bc;
+    border-radius: 8px;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      th,
+      td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+      }
+
+      th {
+        font-weight: 600;
+        color: #033348;
+        background-color: #f9f9f9;
+        
+      }
+
+      td {
+        color: #333;
+      }
+      tr:nth-child(even) {
+        background-color: #f7f7f8;
+      }
+
+      // Focused row styling
+      tr.focused-row {
+        border: 3px solid #4FA8CF;
+        background-color: #f8fbff;
+        border-top: none;
+        border-bottom: none;
+      }
+
+      // Deleted row styling with line-through effect
+      tr.deleted {
+        opacity: 0.6;
+        
+        td {
+          background-color: #f8f8f8;
+        }
+
+        // Apply line-through to text inputs and spans, but exclude checkboxes and action buttons
+        input[type="text"], 
+        input[type="number"], 
+        input[type="date"] {
+          text-decoration: line-through;
+          color: #999;
+          background-color: #f0f0f0;
+          cursor: not-allowed;
+        }
+        
+        .deleted-text{
+            text-decoration: line-through;
+            color: #999;
+            background-color: #f0f0f0;
+            padding: 2px 12px;
+            border-radius: 32px;
+            border: 1px solid #8F92A3;
+            cursor: not-allowed;
+        }
+        // Keep checkboxes normal but faded (will be replaced with dummy later)
+        input[type="checkbox"] {
+          background: url("../../../../../assets/icons/checkbox_disabled.svg") no-repeat center center;
+          background-size: contain;
+          border: none;
+          cursor: not-allowed;
+          width: 20px;
+          height: 20px;
+        }
+
+        // Keep action buttons normal (no line-through)
+        .salary_delete_btn,
+        .salary_undo_btn {
+          opacity: 1;
+        }
+      }
+    }
+
+    input[type="text"]{
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    
+        &:disabled {
+            background-color: #f5f5f5;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+    input[type ="number"]{
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    
+        &:disabled {
+            background-color: #f5f5f5;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+    input[type ="date"]{
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    
+        &:disabled {
+            background-color: #f5f5f5;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+     input[type="checkbox"] {
+        cursor: pointer;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #454754;
+        border-radius: 4px;
+        background-color: #fff;
+        position: relative;
+
+        &:checked {
+          background: url("../../../../../assets/icons/checkbox_checked.svg") no-repeat center center;
+          background-size: contain;
+          border: none;
+        }
+
+        &:not(:checked) {
+          background: url("../../../../../assets/icons/checkbox_unchecked.svg") no-repeat center center;
+          background-size: contain;
+          border: none;
+        }
+
+        &:disabled {
+          cursor: not-allowed;
+        }
+
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    }
+
+    .variable_checkbox{
+        border: 1px solid #8F92A3;
+        padding: 2px 12px;
+        border-radius: 32px;
+        background-color: #F7F7F8;
+        color:#2E3038;
+        font-family: 'Plus Jakarta Sans';
+    }
+
+    .salary_delete_btn{
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+       
+        span{
+            border: none;
+            
+            color: #C73D45;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans';
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        img {
+            width: 16px;
+            height: 16px;
+        }
+
+        &:hover span {
+            border-bottom: 1px solid #C73D45;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+
+            span {
+                color: #999;
+                cursor: not-allowed;
+            }
+
+            img {
+                opacity: 0.6;
+            }
+
+            &:hover span {
+                border-bottom: none;
+            }
+        }
+    }
+
+    .salary_undo_btn{
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+       
+        span{
+            border: none;   
+            color: #2E3038;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans';
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        img {
+            width: 16px;
+            height: 16px;
+        }
+
+        &:hover span {
+            border-bottom: 1px solid #2E3038;
+        }
+    }
+
+    .add_row_btn{
+        width: 100%;     
+        text-align: center;
+        padding: 6px 15px;
+        cursor: pointer;
+        
+        &:hover {
+            background-color: #f5f5f5;
+        }
+
+        &.disabled {
+            cursor: not-allowed;
+            
+            &:hover {
+                background-color: transparent;
+            }
+        }
+
+        .add-btn {
+            border: none;
+            color: #045071;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            background: transparent;
+            font-weight: 600;
+
+            span {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            &:disabled {
+                color: #999;
+                cursor: not-allowed;
+                opacity: 0.6;
+
+                img {
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
+
+    // Required field indicator styles
+    .required-field {
+        &::after {
+            content: " *";
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+    }
+
+    // Validation styles for input fields
+    input.validation-error {
+        border-color: #ff6b6b !important;
+        border-width: 2px !important;
+        box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+    }
+    
+    .variable_span{
+        border: 1px solid #8F92A3;
+        padding: 2px 12px;
+        border-radius: 32px;
+        background-color: #F7F7F8;
+        color:#2E3038;
+        font-family: 'Plus Jakarta Sans';
+    }
+  }
+}

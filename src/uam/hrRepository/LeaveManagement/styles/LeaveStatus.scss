@@ -1,0 +1,227 @@
+.leave_status_main_container, .leave_status_main_container * {
+    font-family: 'Plus Jakarta Sans';
+}
+
+.leave_status_main_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    gap: 1.5rem;
+    .leave_status_header_container {
+        width: 100%;
+        height: auto;
+        border: 0.5px solid #aeb0bc;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 16px;
+        gap: 2px;
+
+        .leave_status_header {
+            font-family: "Plus Jakarta Sans";
+
+            .leave_status_header_title {
+                font-weight: 700;
+                font-size: 12px;
+                line-height: 20px;
+                color: #676b7e;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .leave_status_header_subtitle {
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 24px;
+                color: #2e3038;
+                letter-spacing: 0.005em;
+            }
+        }
+
+        .leave_status_header_button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            background-color: #045071;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+
+    .applied_leaves_container {
+        .applied_leaves_header {
+            padding:0px 0px 16px 0px;
+            p {
+                margin: 0;
+                font-family: "Plus Jakarta Sans";
+                font-weight: 600;
+                font-size: 18px;
+                font-weight: 600;
+                line-height: 24px;
+                letter-spacing: 0.005em;
+                color: #2e3038;
+            }
+        }
+        .leaves_table_container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+            .leaves_table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 14px;
+
+                thead {
+                    background-color: #f7f7f8;
+
+                    th {
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-family: "Plus Jakarta Sans";
+                        font-weight: 700;
+                        font-size: 14px;
+                        color: #033348;
+                        line-height: 20px;
+                        border-bottom: 0.5px solid #e6e7eb;
+                    }
+                }
+
+                tbody {
+                    tr {
+                        border-bottom: 0.5px solid #e6e7eb;
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        &.selected {
+                            border: 2px solid #1888b9;
+                            background-color: #e7f3f8;
+                            border-radius: 8px;
+                        }
+
+                        td {
+                            padding: 12px 16px;
+                            font-family: "Plus Jakarta Sans";
+                            font-size: 14px;
+                            color: #2e3038;
+                        }
+                    }
+
+                    tr:nth-child(even) {
+                        background-color: #f7f7f8;
+                    }
+                }
+            }
+        }
+    }
+
+    // Status badges
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: capitalize;
+
+        &.status-accepted {
+            background-color: #ebfaf3;
+            border: 1px solid #1eab69;
+            color: #2e3038;
+        }
+
+        &.status-pending {
+            background-color: #fdfbe7;
+            color: #2e3038;
+            border: 1px solid #c6b410;
+        }
+
+        &.status-rejected {
+            background-color: #faebec;
+            color: #2e3038;
+            border: 1px solid #d4545c;
+        }
+
+        &.status-proof-required {
+            background-color: #fdfbe7;
+            color: #2e3038;
+            border: 1px solid #c6b410;
+        }
+    }
+
+    // Upload button and no proof required text
+    .upload-button {
+        background: none;
+        border: 1px solid #045071;
+        border-radius: 8px;
+        color: #045071;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+
+        &:hover {
+            background-color: #eff6ff;
+        }
+    }
+
+    .upload_button_disable {
+       background: none;
+       border: 1px solid #AEB0BC;
+       border-radius: 8px;
+       padding: 8px;
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       font-weight: 600;
+       font-size: 14px;
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+        .applied_leaves_container {
+            .leaves_table_container {
+                .leaves_table {
+                    font-size: 12px;
+
+                    th,
+                    td {
+                        padding: 8px 12px;
+
+                        &:first-child {
+                            padding-left: 16px;
+                        }
+
+                        &:last-child {
+                            padding-right: 16px;
+                        }
+                    }
+
+                    .reason-cell {
+                        max-width: 200px;
+                    }
+                }
+            }
+        }
+    }
+}

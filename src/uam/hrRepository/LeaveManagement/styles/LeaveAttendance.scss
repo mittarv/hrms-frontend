@@ -1,0 +1,266 @@
+.leave_attendance_main_container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    .leave_attendance_header_container {
+        width: 100%;
+        height: auto;
+        border: 0.5px solid #aeb0bc;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 16px;
+        gap: 2px;
+        flex-shrink: 0;
+
+        .leave_attendance_header {
+            font-family: "Plus Jakarta Sans";
+
+            .leave_attendance_header_title {
+                font-weight: 700;
+                font-size: 12px;
+                line-height: 20px;
+                color: #676b7e;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .leave_attendance_header_subtitle {
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 24px;
+                color: #2e3038;
+                letter-spacing: 0.005em;
+            }
+        }
+
+        .leave_attendance_header_button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            background-color: #045071;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+
+    .leave_attendance_search_container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        max-width: 430px;
+        position: relative;
+
+        .leave_attendance_search_input {
+            width: 100%;
+            height: auto;
+            border: none;
+            border-bottom: 0.5px solid #aeb0bc;
+            padding: 12px 16px 12px 32px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 500;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #8f92a3;
+
+            &:focus {
+                outline: none;
+            }
+            &::placeholder {
+                color: #8f92a3;
+                font-family: "Plus Jakarta Sans";
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 20px;
+                letter-spacing: 0.01em;
+            }
+        }
+
+        .leave_attendance_search_button {
+            position: absolute;
+            right: 0;
+            padding: 8px 12px;
+            background-color: #045071;
+            color: #ffffff;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .leave_attendance_search_icon {
+            position: absolute;
+            left: 0;
+            padding: 12px 0px;
+        }
+
+        .leave_attendance_search_result{
+            position: absolute;
+            top: 120%;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            max-height: 200px;
+            overflow-y: auto;
+
+            .leave_attendance_search_result_container{
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                align-items: center;
+                padding: 12px 16px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #F1F1F4;
+                }
+
+                img {
+                    width: 24px;
+                    height: 24px;
+                    margin-right: 8px;
+                    border-radius: 50%;
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                }
+
+                span {
+                    font-family: "Plus Jakarta Sans";
+                    font-weight: 600;
+                    font-size: 12px;
+                    color: #454754;
+                    letter-spacing: 0.01em;
+                }
+            }
+        }
+
+        .no_result_found{
+            width: 100%;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            padding: 12px 16px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #8f92a3;
+        }
+    }
+
+    .attendance_records_container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .attendance_records_title {
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 20px;
+            color: #676b7e;
+            letter-spacing: 0.01em;
+        }
+
+        .attendance_records_employee_container {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            align-items: center;
+
+            span {
+                font-family: "Plus Jakarta Sans";
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 24px;
+                color: #2e3038;
+                letter-spacing: 0.01em;
+                padding: 4px 0px;
+            }
+
+            .profile_picture_container {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+
+            .reset_slected_employee{
+                margin-left: 16px;
+                background-color: #F1F1F4;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 10px;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .leave_attendance_calendar_subtitle{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: "Plus Jakarta Sans";
+        margin-top: 8px;
+        border: 0.5px solid #aeb0bc;
+        border-radius: 8px;
+        padding: 16px;
+
+        p {
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            color: #2e3038;
+            letter-spacing: 0.01em;
+        }
+
+        .rotated {
+            transform: rotate(180deg);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .default_image {
+            transform: rotate(0deg);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: #f2f2f6;
+        }
+
+    }
+
+    .leave_attendance_calendar_container {
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        flex-shrink: 0;
+    }
+
+}

@@ -1,0 +1,63 @@
+@use '../../design/colors/Colors';
+
+.add_user_popup {
+    width: fit-content;
+    height: fit-content;
+    padding: 20px;
+
+    .add_user_heading {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 18.9px;
+        color: Colors.$c31;
+        margin-bottom: 15px;
+    }
+
+    .add_user_form {
+        margin: 10px 0px;
+        display: flex;
+
+        flex-direction: column;
+        gap: 10px;
+
+        input {
+            padding: 7px 15px;
+            width: 300px;
+        }
+    }
+
+    .add_user_buttons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 15px;
+        gap: 10px;
+
+        .cancel_add_user {
+            border: 2px solid Colors.$c37;
+            padding: 5px 14px;
+            // background-color: ;
+            background-color: transparent;
+            color: Colors.$c37;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 5px;
+            cursor: pointer;
+
+        }
+
+        .save_add_user {
+            border:  2px solid Colors.$c35;
+            padding: 5px 14px;
+            background-color:Colors.$c35 ;
+            // background-color: transparent;
+            color: Colors.$c12;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    }
+
+}

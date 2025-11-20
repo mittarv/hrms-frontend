@@ -1,0 +1,502 @@
+.edit-attendance-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(119, 184, 207, 0.39);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  .edit-attendance-modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 32px 40px;
+
+    .edit-attendance-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+
+      p {
+        font-family: "Plus Jakarta Sans";
+        font-size: 18px;
+        font-weight: 700;
+        color: #2e3038;
+        line-height: 28px;
+        letter-spacing: 0.05%;
+        border-bottom: 2px solid #2e3038;
+      }
+
+      .edit-attendance-close-button {
+        background: #f1f1f4;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      font-family: "Plus Jakarta Sans";
+
+        .application-status {
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        padding: 16px;
+
+        &.info {
+          background-color: #c3e1ef;
+        }
+
+        &.warning {
+          background-color: #f0c2c5;
+        }
+
+        &.error {
+          border-left-color: #f5222d;
+          background-color: #fff1f0;
+        }
+        
+        .status-header{
+          .status-message{
+           font-weight: 600;
+           margin: 0 0 5px 0; 
+          }
+        }
+
+        .status-info{
+            .balance-summary{
+                margin: 0;
+                font-size: 13px;
+                color: #676b7e;
+                font-weight: 500;
+            }     
+
+            .success-text{
+             color: #045071;
+              margin: 5px 0 0 0;
+              font-size: 13px;
+              font-weight: 600;
+            }
+          }
+
+          .status-alert{
+            .warning-text{
+              font-weight: 600;
+              margin: 0 0 5px 0;  
+              color: #93252c;
+              margin: 5px 0 0 0;
+              font-size: 13px;
+              font-weight: 600;
+            }
+          }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+
+          &.status-title {
+            font-weight: 600;
+            margin: 0 0 5px 0;
+          }
+
+          &.status-details {
+            margin: 0;
+            font-size: 13px;
+            color: #676b7e;
+            font-weight: 500;
+          }
+
+          &.status-warning {
+            color: #93252c;
+            margin: 5px 0 0 0;
+            font-size: 13px;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .form-group {
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .employee-field {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 8px 12px;
+
+          .employee-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            margin-right: 10px;
+          }
+
+          input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+          }
+        }
+
+        .date-field {
+          display: flex;
+          align-items: center;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 12px;
+          background-color: #f5f5f5;
+          font-size: 14px;
+        }
+
+        .status-options {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+
+          button {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 32px;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: "Plus Jakarta Sans";
+            line-height: 20px;
+            letter-spacing: 0.01%;
+            font-weight: 500;
+            transition: all 0.2s;
+
+            &:hover {
+              background-color: #f5f5f5;
+            }
+
+            &.active {
+              background-color: #045071;
+              border-color: none;
+              color: #ffffff;
+              font-weight: 600;
+            }
+
+            &.error {
+              border-color: #f5222d;
+            }
+          }
+        }
+
+        input[type="text"] {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid #c7c9d1;
+          border-radius: 4px;
+          resize: vertical;
+          font-size: 14px;
+          font-family: "Plus Jakarta Sans";
+          font-weight: 600;
+
+          &::placeholder {
+            color: #8f92a3;
+            font-size: 14px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 500;
+            line-height: 20px;
+          }
+
+          &:focus {
+            outline: none;
+          }
+        }
+
+        input[type="time"] {
+          &.error {
+            border-color: #f5222d;
+          }
+        }
+
+        .leave-options {
+          .leave-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+
+            button {
+              padding: 8px;
+              border: 1px solid #ddd;
+              border-radius: 32px;
+              background-color: #fff;
+              cursor: pointer;
+              font-size: 14px;
+              font-family: "Plus Jakarta Sans";
+              line-height: 20px;
+              letter-spacing: 0.01%;
+              font-weight: 500;
+              transition: all 0.2s;
+
+              &:hover {
+                background-color: #f5f5f5;
+              }
+
+              &.active {
+                background-color: #045071;
+                border-color: none;
+                color: #ffffff;
+                font-weight: 600;
+              }
+
+              &.error {
+                border-color: #f5222d;
+              }
+            }
+          }
+        }
+
+        .no-leaves-available{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 10px;
+          border: 0.5px solid #dd787f;
+          border-radius: 4px;
+          color: #dd787f;
+          margin-bottom: 10px;
+        }
+
+        .validation-error {
+          color: #f5222d;
+          font-size: 12px;
+          margin-top: 5px;
+          font-weight: 500;
+        }
+
+        .profile-update-note{
+          font-size: 0.9rem;
+          color: #64748b;
+
+          text-decoration: none;
+
+          .update-link {
+            color: #045071;
+            text-decoration: none;
+            font-weight: 600;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      .file_upload_container {
+          margin-bottom: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          // Add to your LeaveApplication.scss
+            .custom_file_Upload {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              border: 0.5px solid #AEB0BC;
+              padding: 8px 12px;
+              border-radius: 8px;
+
+              &.clickable {
+                cursor: pointer;
+              }
+              
+              .uploaded-file-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+              }
+
+              .file-icon-container{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .file-icon {
+                  width: 24px;
+                  height: 24px;
+                  background-size: contain;
+                  background-repeat: no-repeat;
+                }
+
+                .file-name {
+                  font-size: 14px;
+                  color: #454754;
+                  font-weight: 600;
+                  flex-grow: 1;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+              }
+
+              .file-name{
+                font-size: 14px;
+                color: #454754;
+                font-weight: 600;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+
+              .file-meta{
+                color:#676B7E;
+                font-size: 12px;
+                font-weight: 500;
+              }
+
+              .delete-file-btn{
+                background: none;
+                border: none;
+                color: #f5222d;
+                cursor: pointer;
+                font-size: 14px;
+                padding: 0;
+                margin-left: 10px;
+                display: flex;
+                align-items: center;
+              }
+            }
+            .file-upload-label {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #454754;
+              font-size: 14px;
+              cursor: pointer;
+              transition: all 0.2s;
+
+              .upload-icon{
+                width: 20px;
+                height: 20px;
+                margin-right: 8px;
+                background-size: contain;
+                background-repeat: no-repeat;
+              }
+            }
+
+            .file-upload-label:hover {
+              border: none;
+              background: none;
+              cursor: pointer;
+              text-decoration: underline;
+              color: #066893;
+
+            }
+
+            .file-info {
+              margin-top: 6px;
+              font-size: 13px;
+              color: #066893;
+            }
+        }
+
+      .time-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+
+        .form-group {
+          margin-bottom: 0;
+
+          input[type="time"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: "Plus Jakarta Sans";
+
+            &:focus {
+              outline: none;
+              border-color: #1890ff;
+            }
+
+            &.error {
+              border-color: #f5222d;
+            }
+          }
+        }
+
+     
+      }
+
+     
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 8px;
+
+        button {
+          padding: 10px 20px;
+          border-radius: 4px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-family: "Plus Jakarta Sans";
+          line-height: 20px;
+          letter-spacing: 0.01%;
+          font-weight: 600;
+
+          &.delete-button {
+            background-color: #fff;
+            border: 1px solid #C73D45;
+            color: #C73D45;
+            cursor: pointer;
+
+          &.disabled {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            color: #bfbfbf;
+            cursor: not-allowed;
+          }
+
+          }
+
+          &.update-button {
+            background-color: #045071;
+            border: none;
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}
