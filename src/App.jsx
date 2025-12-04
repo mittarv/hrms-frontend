@@ -55,24 +55,16 @@ const App = () => {
   const isHeaderlessRoute = useMemo(() => {
     const noHeaderPaths = [
       "/",
-      "/referral-board",
       "/hr-repo",
-      "/partner-tool",
-      "/notification-tool",
       "/policies",
       "/imp-link",
       "/employee-repo",
-      "/known-issues",
-      "/known-issues/imp-link",
-      "/analytical-dashboard",
       "/leave-configurator",
       "/leave-attendance",
       "/hr-repo-requests",
-      "/analytics",
     ];
     return (
-      noHeaderPaths.some((path) => location.pathname === path) ||
-      location.pathname.includes("/language-text-editor")
+      noHeaderPaths.some((path) => location.pathname === path)
     );
   }, [location.pathname]);
 
