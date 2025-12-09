@@ -1,0 +1,94 @@
+.joining_popup_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: checkout-popup-fade-in 0.2s ease-out;
+
+    .joining_popup {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        background: white;
+        border-radius: 1rem;
+        padding: 1rem;
+        font-family: 'Plus Jakarta Sans';
+        min-width: 15rem;
+        width: 30%;
+        height: 15rem;
+
+        .joining_header {
+            text-decoration: underline;
+            text-underline-offset: 0.5rem;
+            text-decoration-thickness: 2px;
+            text-decoration-color: #2E3038;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .joining_body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            label {
+                font-weight: 700;
+                font-size: 14px;
+            }
+            input {
+                padding: 0.5rem 1rem;
+                border-radius: 0.4rem;
+                border: 1px solid #C7C9D1;
+                cursor: pointer;
+                font-family: 'Plus Jakarta Sans';
+            }
+        }
+
+        .joining_footer {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+
+            .joining_button_block {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+
+                button{
+                    font-size: 14px;
+                    font-weight: 700;
+                    padding: 12px 16px;
+                    border: 1px solid #8F92A3;
+                    border-radius: 0.4rem;
+                    cursor: pointer;
+                    font-family: 'Plus Jakarta Sans';
+                }
+
+                .joining_cancel_button{
+                    background: white;
+                    color: #C73D45;
+                    border-color: #C73D45;
+                }
+                .joining_save_button {
+                    background: #8F92A3;
+                    color: #E3E4E8;
+
+                    &.save_enabled {
+                        background: #045071;
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
+}

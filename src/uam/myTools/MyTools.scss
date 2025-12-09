@@ -1,0 +1,113 @@
+@use "../../design/colors/Colors";
+
+// added font-family in parent class 
+// instead of repeating it in child class
+.welcome_div {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    padding: 40px;
+}
+
+.welcome_div h1 {
+    color: Colors.$c2;
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 2vh;
+    margin-bottom: 1.5vh;
+}
+
+.welcome_div p {
+    color: #525252;
+    font-size: 16px;
+    font-weight: 400;
+}
+.tableCell_name_tool{
+    font-size: 16px;
+    color: #033348;
+    font-weight: 500;
+}
+
+
+
+
+
+// pending viewer having same conf as 
+// access viewer as only color need to change
+#access_viewer,#pending_viewer {
+    background-color: #054A680D;
+    width: 100px;
+    height: 34px;
+    text-align: center;
+    border-radius: 5px;
+    padding-top: 5px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 600;
+    color: #054A68;
+}
+
+// added new id css for pending request
+#pending_viewer{
+    width: fit-content;
+    padding-left: 4px;
+    padding-right: 4px;
+    background-color: #FD93200D;
+    color: #FD9320;
+}
+
+#Action_button {
+    border-radius: 25px;
+    background-color: #054A680D;
+    width: 110px;
+    height: 34px;
+    color: black;
+    border: 1px solid #054A68;
+    text-transform: initial !important;
+}
+
+#Action_button p {
+    color: #054A68;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    text-transform: initial !important;
+
+}
+
+#Action_button_pending {
+    border-radius: 25px;
+    background-color: #054A680D;
+    width: 110px;
+    height: 34px;
+    color: #FD9320;
+    border: 1px solid #FD9320;
+    text-transform: initial !important;
+}
+
+#Action_button_pending p {
+    color: #FD9320;
+    font-size: 14px;
+    font-weight: 500px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    text-transform: initial !important;
+
+}
+
+
+
+.table_header th {
+    padding: 10px;
+    background-color: #FBFBFB;
+    height: 60px;
+    text-align: left;
+    color: #033348;
+    font-size: 18px;
+    font-weight: 500px;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    padding-left: 80px;
+}
+
+
+
+// added some space btw svg and heading
+th img{
+    padding-left: 10px;
+}

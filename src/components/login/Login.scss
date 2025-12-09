@@ -1,0 +1,76 @@
+@use "../../design//colors/Colors";
+
+@media only screen and (min-width: 600px) {
+  .main_login__div {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    align-items: center;
+  }
+
+  .login_left__section {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    height: 100%;
+    padding: 3.5vh 2.5vw;
+
+    .mittarv_logo {
+      width: 10vw;
+      transition: all 0.3s ease-out;
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.02);
+      }
+    }
+    .login_image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      width: 47.5vw;
+      margin-top: 8vh;
+      margin-left: 7vw;
+    }
+  }
+  .login_right__section {
+    background-color: #022737;
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .mittarv_second_logo {
+      width: 5.5vw;
+      height: 10vh;
+      margin-bottom: 4.5vh;
+    }
+    .login_into__para {
+      color: white;
+      font-size: 1.56rem;
+      font-weight: 800;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+  }
+  .toolbox_login__title {
+    color: white;
+    font-size: 2.35vw;
+    font-weight: 800;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin-top: 2vh;
+    margin-bottom: 5vh;
+  }
+
+  
+}
+
+// /* Small devices (portrait tablets and large phones, 600px and up) */
+// @media only screen and (min-width: 600px) {
+// }
+// /* Medium devices (landscape tablets, 768px and up) */
+// @media only screen and (min-width: 768px) {
+// }
+// /* Extra large devices (large laptops and desktops, 1200px and up) */
+// @media only screen and (min-width: 1200px) {
+// }

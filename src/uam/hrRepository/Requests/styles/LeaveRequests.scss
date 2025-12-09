@@ -1,0 +1,354 @@
+
+.leave_requests_main_container {
+  display: flex;
+  flex-direction: column;
+  height: 67vh; /* Take full viewport height */
+  max-height: 70vh; /* Ensure it doesn't exceed viewport height */
+  overflow: hidden; 
+  box-sizing: border-box;
+//   padding: 20px; /* Add padding to the main container */
+
+  .leave_requests_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    flex-shrink: 0; /* Prevent header from shrinking */
+    margin-bottom: 20px; /* Space between header and table */
+  }
+
+  .date-filter {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+
+    .date-input {
+      width: fit-content;
+      object-fit: contain;
+      display: flex;
+      gap: 9px;
+      align-items: center;
+
+      label {
+        font-size: 14px;
+        font-weight: 600;
+        font-family: "Plus Jakarta Sans";
+        color: #054a68;
+      }
+
+      .custom-date-input {
+        position: relative;
+        width: 100%;
+      }
+
+      .custom-date-input input[type="text"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: url("../../../../assets/icons/calendar_new_icon.svg") no-repeat right 10px center;
+        color: #054a68;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans";
+      }
+
+      /* Hide the calendar icon if needed */
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .leave_requests_action_buttons {
+    display: flex;
+    gap: 10px;
+
+    button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &.leave_requests_approve_button {
+        background-color: #045071;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #033348;
+        }
+
+        span {
+          color: #fff;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: "Plus Jakarta Sans";
+        }
+
+        &.disabled {
+          cursor: not-allowed;
+          background-color: rgba(4, 80, 113, 0.65);
+        }
+      }
+
+      &.leave_requests_reject_button {
+        background-color: #f1f1f4;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #2e3038;
+
+        &:hover {
+          background-color: #e3e4e8;
+        }
+
+        span {
+          font-size: 14px;
+          font-weight: 600;
+          font-family: "Plus Jakarta Sans";
+        }
+
+        &.disabled {
+          cursor: not-allowed;
+          background-color: rgba(241, 241, 244, 0.65);
+          color: rgba(46, 48, 56, 0.65);
+        }
+      }
+    }
+  }
+
+  .leave_requests_table_container {
+    width: 100%;
+    flex: 1; /* Take remaining space */
+    min-height: 0; /* Allow flex item to shrink below content size */
+    overflow: auto; /* Hide overflow on container */
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+
+       &::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #054a68;
+          border-radius: 3px;
+
+          &:hover {
+            background: #033348;
+          }
+        }
+
+    .leave_requests_table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+      flex: 1;
+      display: block; /* Make table block to control overflow */
+
+      thead {
+        display: block;
+        width: 100%;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f9fafb;
+      }
+
+      tbody {
+        display: block;
+        width: 100%;
+        max-height: calc(100vh - 200px);
+        
+      }
+
+      thead tr,
+      tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      .employee_name {
+        color: #033348;
+        font-weight: 700;
+        font-size: 16px;
+        font-family: "Plus Jakarta Sans";
+        text-decoration: underline;
+      }
+
+      input[type="checkbox"] {
+        width: 21px;
+        height: 21px;
+        cursor: pointer;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: none;
+        background-image: url("../../../../assets/icons/checkbox_unchecked.svg");
+        background-size: 18px;
+      }
+
+      input[type="checkbox"]:checked {
+        background-image: url("../../../../assets/icons/checkbox_checked.svg");
+        background-size: 18px;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: none;
+      }
+
+      th {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        font-family: "Plus Jakarta Sans";
+        font-weight: 700;
+        color: #033348;
+        background-color: #f9fafb;
+        font-size: 16px;
+      }
+
+      td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+        color: #454754;
+        font-size: 16px;
+        font-weight: 500;
+        font-family: "Plus Jakarta Sans";
+      }
+
+      tbody tr {
+        cursor: pointer;
+        
+        &:nth-child(even) {
+          background-color: #f9fafb;
+        }
+
+        &:hover {
+          background-color: #f3f4f6;
+        }
+      }
+
+      .leave-duration {
+        .leave-days-info {
+          font-size: 12px;
+          color: #666;
+          font-style: italic;
+          margin-top: 2px;
+        }
+      }
+
+      .view-proof-button {
+        background: none;
+        border: 1px solid #045071;
+        padding: 8px 16px;
+        color: #045071;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &:hover {
+          background-color: #f0f9ff;
+        }
+
+        &:focus {
+          outline: none;
+          text-decoration: underline;
+          background-color: #f0f9ff;
+        }
+      }
+
+      .request-proof-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #045071;
+        border: none;
+        padding: 8px 16px;
+        color: #FFFFFF;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: #033348;
+          color: white;
+        }
+
+        &:focus {
+          outline: none;
+          background-color: #033348;
+          color: white;
+        }
+      }
+
+      .proof-requested-button {
+        background: #045071;
+        border: none ;
+        padding: 8px 16px;
+        color: #FFFFFF;
+        font-size: 14px;
+        cursor: not-allowed;
+        font-weight: 600;
+        border-radius: 8px;
+        opacity: 0.7;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+
+  .no_leave_requests_message {
+      flex: 1;
+      width: 100%;
+      text-align: center;
+      top: 400px;
+      font-size: 1.2rem;
+      color: #999;
+      font-family: "Plus Jakarta Sans";
+      font-weight: 500;
+      margin-top: 8%;
+  }
+
+  .loading_message {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; /* Minimum height for the loading */
+  }
+}

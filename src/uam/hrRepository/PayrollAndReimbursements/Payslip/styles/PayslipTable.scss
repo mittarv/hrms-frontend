@@ -1,0 +1,159 @@
+.payslip-table-container {
+    background: #fff;
+    border-radius: 8px;
+
+    .payslip-table-header {
+        margin-bottom: 20px;
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+    }
+
+    .payslip-table-wrapper {
+        border: 1px solid #c7c9d1;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .payslip-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border: 1px solid #0e50d5;
+        border-radius: 8px;
+        overflow: hidden;
+
+        thead {
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+
+            tr {
+                th {
+                    padding: 12px 16px;
+                    text-align: left;
+                    font-weight: 600;
+                    font-size: 14px;
+                    color: #374151;
+                    white-space: nowrap;
+
+                    &:last-child {
+                        text-align: center;
+                    }
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                border-bottom: 1px solid #e5e7eb;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background: #f9fafb;
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                &:nth-child(even) {
+                    background-color: #F7F7F8;
+                }
+
+                td {
+                    padding: 16px;
+                    font-size: 14px;
+                    color: #1f2937;
+
+                    &:last-child {
+                        text-align: center;
+                    }
+
+                    &.no-data {
+                        text-align: center;
+                        padding: 40px;
+                        color: #6b7280;
+                        font-size: 16px;
+                    }
+                }
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+
+            button {
+                padding: 4px 8px;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+
+                .icon {
+                    font-size: 16px;
+                }
+
+                &.btn-preview {
+                    background: #fff;
+                    color: #374151;
+                    border: 1px solid #045071;
+
+                    &:hover {
+                        background: #f9fafb;
+                        border-color: #9ca3af;
+                    }
+                }
+
+                &.btn-download {
+                    background: #1e3a5f;
+                    color: #fff;
+
+                    &:hover {
+                        background: #2c5282;
+                    }
+
+                    .icon {
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive design
+@media screen and (max-width: 1024px) {
+    .payslip-table-container {
+        padding: 16px;
+        overflow-x: auto;
+
+        .payslip-table {
+            min-width: 800px;
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .payslip-table-container {
+        .action-buttons {
+            flex-direction: column;
+
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+}

@@ -1,0 +1,185 @@
+@use '../../design/colors/Colors';
+
+@media only screen and (min-width: 600px) {
+
+  .main_table_header_div {
+    height: 8.9418vh;
+    width: 90%;
+    // background-color: pink;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5.96vh;
+    margin-left: 40px;
+
+
+    // overflow: hidden;
+    .inner-div-left-section {
+
+      height: 90%;
+
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+
+      // justify-content: flex-start;
+      .inner-div-left-title {
+        // background-color: aqua;
+        font-size: 20px;
+        line-height: 25.2px;
+        font-weight: 600;
+        color: Colors.$c31;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        // color: bisque;
+      }
+
+      .inner-div-left-subtitle {
+        line-height: 20.16px;
+        font-size: 16px;
+        font-weight: 400;
+        color: Colors.$c36;
+
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      .inner-div-left-section-isEdit-suggestions {
+        // width: 300px;
+        // width: fit-content;
+        // width: 700px;
+        width: max-content;
+        display: flex;
+        align-items: center;
+        // justify-content: space-between;
+        gap: 25px;
+
+        .error_message {
+          color: Colors.$c37;
+          font-family: Plus Jakarta Sans;
+          font-size: 16px;
+          font-weight: 600;
+          line-height: 15px;
+          letter-spacing: 0px;
+          text-align: left;
+
+        }
+
+        .suggestions-1 {
+          display: flex;
+          align-items: center;
+
+
+          .suggestion1-color {
+            width: 17px;
+            height: 17px;
+
+            // border: 3px solid Colors.$c34;
+            background-color: Colors.$c34;
+            margin-right: 10px;
+            border-radius: 2px;
+
+
+          }
+        }
+
+        .suggestions2 {
+          display: flex;
+          align-items: center;
+
+          .suggestion2-color {
+            width: 17px;
+            height: 17px;
+            // border: 3px solid Colors.$c37;
+            background-color: Colors.$c37;
+            margin-right: 10px;
+            border-radius: 2px;
+
+          }
+
+
+        }
+
+        .suggestions3 {
+          display: flex;
+          align-items: baseline;
+
+
+          .suggestion3 {
+
+            // border: 3px solid Colors.$c37;
+            font-size: 14px;
+            color: Colors.$c37;
+            margin-right: 10px;
+            // border-radius: 2px;
+
+          }
+
+
+        }
+
+      }
+
+
+    }
+
+    .inner-div-right-section {
+      margin: auto 0px;
+      // align-items: center;
+      // justify-content: center;
+
+      .edit_button {
+        width: 100px;
+        height: 40px;
+        background-color: Colors.$c31;
+        color: Colors.$c12;
+        // font-family: Plus Jakarta Sans;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+        letter-spacing: 0px;
+        cursor: pointer;
+        // text-align: left;
+
+      }
+
+      .save_button {
+
+        width: 100px;
+        height: 35px;
+        background-color: Colors.$c35;
+
+        color: Colors.$c12;
+        border: none;
+        margin-right: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+        text-transform: none;
+        letter-spacing: 0px;
+        cursor: pointer;
+
+      }
+
+      .cancel_button {
+        width: 100px;
+        height: 35px;
+        color: Colors.$c37;
+        border: none;
+        background-color: transparent;
+        text-transform: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: 0px;
+        cursor: pointer;
+
+
+      }
+    }
+  }
+
+}

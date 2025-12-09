@@ -1,0 +1,85 @@
+.salary_configuration_main_container{
+    margin-top: 1.5rem;
+    font-family: 'Plus Jakarta Sans';
+
+    .salary_configuration_header_container{
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+
+        .salary_configuration_header_dropdown_container{
+            width: 100%;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+
+            .custom-dropdown-container {
+                max-width: 205px;
+            }
+
+            .salary_configuration_reset_button{
+                background: transparent;
+                color: #045071;
+                border: none;
+                padding: 0.6rem 1rem;
+                border: 1px solid #045071;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-weight: 600;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background: #045071;
+                    color: #FFFFFF;
+                }
+
+                &:disabled {
+                    background: #ccc;
+                    cursor: not-allowed;
+                }
+            }
+        }
+
+        .header_action_button_container{
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+
+            .salary_configuration_save_button,
+            .salary_configuration_edit_button{
+                background: #045071;
+                color: #FFFFFF;
+                border: none;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-weight: 600;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background: #02303F;
+                }
+            }
+
+            .salary_configuration_cancel_button{
+                background: transparent;
+                color: #C73D45;
+                border: 1px solid #C73D45;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 0.875rem;
+                font-weight: 600;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    background: #C73D45;
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+}

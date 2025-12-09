@@ -1,0 +1,153 @@
+.payroll_pagination_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  margin-top: 20px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 8px 8px;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.pagination_info {
+  flex: 1;
+  min-width: 200px;
+
+  .pagination_text {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+.pagination_controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination_button {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(.disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    color: #111827;
+  }
+
+  &:active:not(.disabled) {
+    background: #e5e7eb;
+  }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: #f9fafb;
+    color: #9ca3af;
+  }
+
+  &.active {
+    background: #3b82f6;
+    color: #ffffff;
+    border-color: #3b82f6;
+    font-weight: 600;
+
+    &:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+  }
+
+  &.page_number {
+    min-width: 36px;
+  }
+}
+
+.pagination_ellipsis {
+  padding: 0 8px;
+  color: #9ca3af;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.pagination_page_size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  justify-content: flex-end;
+
+  .page_size_label {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .page_size_value {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+    padding: 4px 12px;
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+}
+
+// Loading state for pagination
+.pagination_loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .payroll_pagination_container {
+    padding: 16px;
+  }
+
+  .pagination_info {
+    width: 100%;
+    text-align: center;
+  }
+
+  .pagination_controls {
+    width: 100%;
+  }
+
+  .pagination_page_size {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagination_button {
+    min-width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+}

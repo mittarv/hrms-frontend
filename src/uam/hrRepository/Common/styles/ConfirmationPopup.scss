@@ -1,0 +1,117 @@
+.modal_overlay_confirmation_popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(158, 185, 197, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .modal_container_confirmation_popup {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 24px;
+        width: 353px;
+        height: 224px;
+        position: relative;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .close_button_confirmation_popup {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 4px;
+
+        &:hover {
+            color: #374151;
+        }
+    }
+
+    .modal_content_confirmation_popup {
+        text-align: center;
+        margin-bottom: 24px;
+        font-size: 16px;
+        font-weight: 800;
+        font-family: "Plus Jakarta Sans";
+        color: #033348;
+
+        .heading_confirmation_popup{
+            font-size: 18px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-family: "Plus Jakarta Sans";
+        }
+
+        .message_confirmation_popup{
+            font-size: 15px;
+            font-weight: 500;
+            font-family: "Plus Jakarta Sans";
+            color: #4b5563;
+        }
+
+    }
+
+    .modal_actions_confirmation_popup {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+
+        button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.btn_primary_confirmation_popup{
+                width: auto;
+                height: 29px;
+                background-color: #045071;
+                color: white;
+                font-size: 14px;
+                font-weight: 800;
+                font-family: "Plus Jakarta Sans";
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    background-color: #03405a;
+                }
+            }
+
+            &.btn_secondary_confirmation_popup {
+                width: auto;
+                height: 29px;
+                font-size: 14px;
+                font-weight: 800;
+                font-family: "Plus Jakarta Sans";
+                background-color: #c3e1ef;
+                color: #2e3038;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                    background-color: #e5e7eb;
+                }
+            }
+        }
+    }
+}

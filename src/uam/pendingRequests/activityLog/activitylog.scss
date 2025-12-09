@@ -1,0 +1,16 @@
+@use '../../../design//colors/Colors';
+
+.activity_log_status {
+    padding: 5px 10px;
+    border: 1px solid black;
+    text-align: center;
+    max-width: fit-content;
+    border-radius: 20px;
+    border: 1px solid Colors.$c35;
+    background-color: #e6f7df;
+
+    &.rejected {
+        border: 1px solid Colors.$c37;
+        background-color: #f5d5d5;
+    }
+}

@@ -1,0 +1,323 @@
+.holiday-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  
+    .holiday-popup-container {
+      background-color: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-family: 'Plus Jakarta Sans';
+      padding: 5px 15px;
+  
+      .holiday-popup-content {
+
+        .holiday-type-selector {
+            margin-bottom: 24px;
+          
+            .holiday-dropdown {
+              position: relative;
+
+              .holiday_dropdown_container{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .dropdown-header {
+                    width: auto;
+                    max-width: 400px;
+                    padding: 10px 12px;
+                    border-bottom: 2px solid #2E3038;
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    cursor: pointer;
+                    background-color: white;
+                    gap:0.5rem;
+
+                    .holiday_dropdown_title{
+                        font-size: 18px;
+                        font-weight: 600;
+                        line-height: 28px;
+                        color: #2E3038;
+                    }
+                    
+                    .dropdown-arrow {
+                      background-color: #F1F1F4;
+                      border-radius: 50%;
+                      width: 28px;
+                      height: 28px;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+
+                      &.open{
+                        transform: rotate(180deg);
+                        transition: transform 0.3s ease-in-out;
+                      }
+                      &.close{
+                        transform: rotate(0deg);
+                        transition: transform 0.3s ease-in-out;
+                      }
+                    }
+                  }
+
+                  .holiday_close_button {
+                    background: #F1F1F4;
+                    border: none;
+                    cursor: pointer;
+                    border-radius: 8px;
+                    padding: 12px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                  }
+              }
+              
+             
+              
+              .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 10;
+                background-color: white;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                margin-top: 4px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                max-width: 350px;
+                
+                .dropdown-item {
+                  padding: 10px 12px;
+                  cursor: pointer;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  
+                  &:hover {
+                    background-color: #f5f5f5;
+                  }
+                  
+                  &.active {
+                    color: #045071;
+                    font-weight: 500;
+                  }
+                }
+              }
+            }
+          }
+        padding: 24px;
+        
+        .holiday-entries {
+          margin-top: 16px;
+
+          .optional_event_container{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 2rem;
+          }
+          
+          .entries-container{
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 42px;
+          }
+          .entry-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            align-items: flex-end;
+  
+            &.to-delete {
+              input {
+                text-decoration: line-through;
+                color: #999;
+              }
+            }
+  
+            .entry-field {
+              flex: 1;
+  
+              &.event-field {
+                flex: 2;
+              }
+  
+              label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                color: #2E3038;
+                font-weight: 600;
+              }
+  
+              input {
+                width: 100%;
+                padding: 12px 16px;
+                border: 1px solid #C7C9D1;
+                border-radius: 4px;
+                font-size: 14px;
+                font-family: 'Plus Jakarta Sans';
+              }
+
+              input[type="date"] {
+                position: relative;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: url('../../../../assets/icons/Calendar_enable_grey_icon.svg') no-repeat right 10px center;
+                padding-right: 35px;
+                cursor: pointer;
+              }
+              
+              input[type="date"]:disabled {
+                background: url('../../../../assets/icons/Calendar_disabled_icon.svg') no-repeat right 10px center; /* Use your disabled image here */
+                background-size: 20px;
+                cursor: not-allowed;
+                border: 1px solid #8F92A3;
+                text-decoration: line-through;
+              }
+              
+              input[type="date"]::-webkit-calendar-picker-indicator {
+                cursor: pointer;
+                opacity: 0;
+                position: absolute;
+                width: 100%;
+              }
+              
+              input[type="date"]:disabled::-webkit-calendar-picker-indicator {
+                cursor: not-allowed;
+              }
+          }
+  
+            .entry-actions {
+              display: flex;
+              align-items: center;
+              padding-bottom: 8px;
+  
+              .remove-button,
+              .restore-button {
+                background: none;
+                cursor: pointer;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+  
+                &.remove-button {
+                  border : none;
+                }
+  
+                &.restore-button {
+                    border : 1.5px solid #2E3038;
+                    border-radius: 8px
+                }
+              }
+            }
+          }
+  
+          .add-entry-row {
+            margin-top: 16px;
+            width:auto;
+  
+            .add-entry-button {      
+              background: none;
+              border : none;
+              border-bottom: 1px solid #066893;
+              color: #066893;
+              font-size: 14px;
+              font-weight: 600;
+              cursor: pointer;
+  
+              &:disabled {
+                color: #999;
+                border-bottom: 1px solid #999;
+                cursor: not-allowed;
+              }
+            }
+          }
+
+          .entry-labels {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 8px;
+          
+            .date-label {
+              flex: 1;
+              font-size: 14px;
+              font-weight: 600;
+              color: #2E3038;
+            }
+          
+            .event-label {
+              flex: 2;
+              font-size: 14px;
+              font-weight: 600;
+              color: #2E3038;
+            }
+          }
+  
+          .error-message {
+            color: #ff3b30;
+            font-size: 14px;
+            margin-top: 16px;
+          }
+        }
+      }
+  
+      .holiday-popup-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 16px 24px;
+        gap: 12px;
+  
+        .cancel-button {
+          background: none;
+          border: 1px solid #045071;
+          color: #045071;
+          border-radius: 8px;
+          padding: 12px 20px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+
+        .create-button-disabled{
+          background-color: #8F92A3;
+          color: #E3E4E8;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 20px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: not-allowed;
+        }
+  
+        .create-button {
+          background-color: #045071;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          padding: 12px 20px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+

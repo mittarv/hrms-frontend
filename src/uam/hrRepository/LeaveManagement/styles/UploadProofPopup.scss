@@ -1,0 +1,301 @@
+.upload_proof_overlay, .upload_proof_overlay * {
+  font-family: 'Plus Jakarta Sans';
+}
+
+.upload_proof_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+
+  .upload_proof_popup {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    font-family: "Plus Jakarta Sans";
+    padding: 32px 40px;
+    scrollbar-width: none;
+
+
+    .upload_proof_header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0px 0px 26px 0px;
+
+      p {
+        color: #2e3038;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 28px;
+        letter-spacing: 0.01em;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #2e3038;
+      }
+
+      .close_button {
+        background: #F1F1F4;
+        border: none;
+        cursor: pointer;
+        padding: 12px;
+        border-radius: 8px;
+
+        &:hover {
+          background-color: #f3f4f6;
+        }
+      }
+    }
+
+    .upload_proof_content {
+      .leave_details_section {
+        margin-bottom: 32px;
+
+        h4 {
+          margin: 0 0 12px 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .leave_info {
+          p {
+            margin: 4px 0;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+
+            strong {
+              color: #676b7e;
+            }
+          }
+        }
+      }
+
+      .file_upload_section {
+        margin-bottom: 32px;
+
+        h4 {
+          margin: 0 0 16px 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .selected_files {
+          width: 100%;
+          max-height: 200px;
+          overflow-y: auto;
+          margin-bottom: 20px;
+          padding-right: 10px;
+
+          &::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: none;
+            border-radius: 100px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: #AEB0BC;
+            border-radius: 100px;
+
+            &:hover {
+              background: #a8a8a8;
+            }
+          }
+
+          .selected_file_item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 0.5px solid #aeb0bc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+
+            .file_info_1 {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .file_name {
+                font-size: 14px;
+                color: #2e3038;
+                font-weight: 600;
+              }
+
+              .file_type_icon {
+                background-color: #f7f7f8;
+                padding: 8px;
+                border: none;
+                border-radius: 8px;
+              }
+            }
+
+            .file_info_2 {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .file_size{
+                font-size: 12px;
+                color: #676B7E;
+                line-height: 20px;
+                font-weight: 500;
+              }
+              .remove_file_button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                font-size: 16px;
+                display: flex;
+                align-items: center;
+              }
+            }
+          }
+        }
+
+        .select_file_button {
+          background: #f1f1f4;
+          border: none;
+          color: #045071;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          padding: 12px 16px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .remarks_section {
+        h4 {
+          margin: 0 0 12px 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .remarks_textarea {
+          width: 100%;
+          border: 1px solid #d1d5db;
+          border-radius: 6px;
+          padding: 12px;
+          font-size: 14px;
+          color: #374151;
+          resize: vertical;
+          font-family: inherit;
+
+          &:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          }
+
+          &::placeholder {
+            color: #9ca3af;
+          }
+        }
+      }
+    }
+
+    .upload_proof_actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 32px 0px 24px 24px;
+
+      .cancel_button {
+        background: white;
+        border: 1px solid #045071;
+        color: #045071;
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+      }
+
+      .upload_button_primary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #045071;
+        border: none;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #033f5a;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          background-color: #8f92a3;
+          border-color: #e3e4e8;
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .upload_proof_overlay {
+    padding: 10px;
+
+    .upload_proof_popup {
+      max-width: 100%;
+
+      .upload_proof_header,
+      .upload_proof_content,
+      .upload_proof_actions {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .upload_proof_actions {
+        flex-direction: column;
+
+        .cancel_button,
+        .upload_button_primary {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

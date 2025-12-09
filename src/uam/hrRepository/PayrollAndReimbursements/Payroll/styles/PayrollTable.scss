@@ -1,0 +1,404 @@
+.payroll-container {
+    background: transparent;
+
+    .payroll-summary-header {
+        margin-bottom: 20px;
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+    }
+}
+
+.log-table {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #c7c9d1;
+    overflow: hidden;
+
+    .no-data-message {
+        text-align: center;
+        padding: 60px 20px;
+
+        p {
+            font-size: 16px;
+            color: #6b7280;
+            margin: 0 0 8px 0;
+        }
+
+        .no-data-subtext {
+            font-size: 14px;
+            color: #9ca3af;
+            margin: 0;
+        }
+    }
+}
+
+.payroll_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+
+    thead {
+        tr {
+            background-color: #f8f9fa;
+
+            th {
+                padding: 16px 12px;
+                text-align: left;
+                font-weight: 600;
+                color: #374151;
+                border-bottom: 2px solid #e5e7eb;
+                font-size: 13px;
+                vertical-align: middle;
+
+                .sort-icon,
+                .filter-icon {
+                    object-fit: contain;
+                    vertical-align: middle;
+                    margin-left: 6px;
+                }
+
+                .edit-icon {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                &.checkbox-column {
+                    width: 50px;
+                    text-align: center;
+
+                    input[type="checkbox"] {
+                        width: 21px;
+                        height: 21px;
+                        cursor: pointer;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        appearance: none;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border: none;
+                        background-image: url("../../../../../assets/icons/checkbox_unchecked.svg");
+                        background-size: 18px;
+                    }
+
+                    input[type="checkbox"]:checked {
+                        background-image: url("../../../../../assets/icons/checkbox_checked.svg");
+                        background-size: 18px;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border: none;
+                    }
+                }
+
+                &.name-column {
+                    width: 180px;
+                }
+
+                &.additions-column,
+                &.lop-deductions-column,
+                &.deductions-column,
+                &.reimbursements-column {
+                    width: 130px;
+                }
+
+                &.net-pay-column {
+                    width: 120px;
+                }
+
+                &.status-column {
+                    width: 140px;
+                }
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background-color: #f8fafc;
+            }
+
+            &.selected-row {
+                background-color: #eff6ff;
+
+                &:hover {
+                    background-color: #dbeafe;
+                }
+            }
+            &:nth-child(even) {
+                    background-color: #F7F7F8;
+            }
+
+            td {
+                padding: 16px 12px;
+                color: #374151;
+                vertical-align: middle;
+                position: relative;
+
+               
+
+                &.monthly-ctc-column {
+                    width: 120px;
+                    
+                    .clickable-cell-container {
+                        width: 100%;
+                        padding: 2px 0;
+                        cursor: pointer !important;
+                        transition: all 0.2s ease;
+                        color:red !important;
+
+                        .cell-value {
+                            color: #045071;
+                            font-weight: 600;
+                            text-decoration: underline;
+                            text-decoration-style: dotted;
+                            text-underline-offset: 3px;
+                        }
+
+                        &:disabled {
+                            cursor: default;
+                            color: #9ca3af !important;
+
+                            .cell-value {
+                                text-decoration: none;
+                            }
+                        }
+                    }
+                }
+
+                &.checkbox-column {
+                    text-align: center;
+
+                    input[type="checkbox"] {
+                        width: 21px;
+                        height: 21px;
+                        cursor: pointer;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        appearance: none;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border: none;
+                        background-image: url("../../../../../assets/icons/checkbox_unchecked.svg");
+                        background-size: 18px;
+                    }
+
+                    input[type="checkbox"]:checked {
+                        background-image: url("../../../../../assets/icons/checkbox_checked.svg");
+                        background-size: 18px;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border: none;
+                    }
+                }
+
+                &.name-column {
+                    font-weight: 500;
+                    color: #1f2937;
+                }
+
+                &.additions-column,
+                &.deductions-column,
+                &.reimbursements-column {
+                    .editable-cell-container {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 100%;
+
+                        .cell-value {
+                            flex: 1;
+                        }
+
+                        .edit-icon {
+                            cursor: pointer;
+                            transition: opacity 0.2s ease;
+                            display: inline-flex;
+                            align-items: center;
+                            margin-left: 8px;
+
+                            img {
+                                width: 14px;
+                                height: 14px;
+                                object-fit: contain;
+                            }
+
+                            &.clickable {
+                                cursor: pointer;
+                                
+                                &:hover {
+                                    opacity: 0.7;
+                                    transform: scale(1.1);
+                                }
+                            }
+
+                            &:not(.clickable) {
+                                cursor: default;
+                            }
+
+                            &:hover {
+                                opacity: 1;
+                            }
+                        }
+                    }
+                }
+
+                &.taxes-deductions-column {
+                    .clickable-cell-container {
+                        width: 100%;
+                        padding: 2px 0;
+                        cursor: pointer !important;
+                        transition: all 0.2s ease;
+                        font-weight: 600;
+                        color:red !important;
+
+                        .cell-value {
+                            color: #045071;
+                            text-decoration: underline;
+                            text-decoration-style: dotted;
+                            text-underline-offset: 3px;
+                        }
+
+                        &:disabled {
+                            cursor: default;
+                            color: #9ca3af !important;
+
+                            .cell-value {
+                                text-decoration: none;
+                            }
+                        }
+                    }
+                }
+
+                &.lop-deductions-column {
+                    .cursor-icon {
+                        margin-left: 8px;
+                        font-size: 14px;
+                        opacity: 0.7;
+                    }
+                }
+
+                &.net-pay-column {
+                    .net-pay-value {
+                        font-weight: 600;
+                        color: #059669;
+                    }
+                }
+
+                &.status-column {
+                    .status-badge {
+                        display: inline-block;
+                        padding: 6px 10px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        text-align: center;
+                        text-transform: capitalize;
+
+                        &.status-pending {
+                            background-color: #fef3c7;
+                            color: #92400e;
+                            border: 1px solid #fbbf24;
+                        }
+
+                        &.status-finalized {
+                            background-color: #d1fae5;
+                            color: #065f46;
+                            border: 1px solid #10b981;
+                        }
+
+                        &.status-generated {
+                            background-color: #dbeafe;
+                            color: #1e40af;
+                            border: 1px solid #3b82f6;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+    .payroll_table {
+        font-size: 13px;
+
+        th,
+        td {
+            padding: 12px 8px;
+        }
+
+        .payroll-summary-header h2 {
+            font-size: 18px;
+        }
+
+        .status-badge {
+            padding: 4px 10px !important;
+            font-size: 11px !important;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .payroll-container {
+        padding: 16px;
+
+        .payroll_table {
+            font-size: 12px;
+
+            th,
+            td {
+                padding: 10px 6px;
+            }
+
+            .status-badge {
+                padding: 3px 8px !important;
+                font-size: 10px !important;
+            }
+
+            th,
+            td {
+                &.name-column {
+                    width: 140px;
+                }
+
+                &.monthly-ctc-column,
+                &.additions-column,
+                &.lop-deductions-column,
+                &.deductions-column,
+                &.reimbursements-column,
+                &.net-pay-column {
+                    width: 100px;
+                }
+
+                &.status-column {
+                    width: 120px;
+                }
+            }
+        }
+    }
+
+    .log-table {
+        .no-data-message {
+            padding: 40px 15px;
+
+            p {
+                font-size: 14px;
+            }
+
+            .no-data-subtext {
+                font-size: 12px;
+            }
+        }
+    }
+}

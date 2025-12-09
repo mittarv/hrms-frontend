@@ -1,0 +1,334 @@
+.employee_repository_search_bar_container {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  padding: 35px 0px;
+  gap: 10px;
+  position: relative;
+
+  .search_icon {
+    position: absolute;
+    left: 20px;
+  }
+
+  .filter_icon {
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    width: 400px;
+    height: 48px;
+    padding: 0px 45px;
+    border: 1px solid #84b5d24d;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #033348;
+    font-family: "Plus Jakarta Sans";
+
+    &::placeholder {
+      color: #225676;
+      font-size: 12px;
+      font-family: "Plus Jakarta Sans";
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .employee_repository_filter_container {
+    position: relative;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 15px;
+    box-shadow: -2px 7px 20.5px -3px #03334833;
+    position: absolute;
+    right: 20px;
+    width: 300px;
+    height: 170px;
+    top: 90px;
+    z-index: 5;
+
+    .filter_dropdown {
+      padding: 20px 16px;
+
+      .filter_header {
+        color: #054a68;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: "Plus Jakarta Sans";
+      }
+      .filter_options {
+        display: flex;
+        gap: 8px;
+        padding-top: 16px;
+      }
+
+      .filter_actions {
+        display: flex;
+        justify-content: center;
+        padding-top: 25px;
+
+        .apply_button {
+          padding: 10px 24px;
+          border: none;
+          border-radius: 10px;
+          cursor: pointer;
+          background-color: #04507199;
+          transition: all 0.3s ease;
+          &:hover {
+            background-color: #045071;
+          }
+
+          p {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: "Plus Jakarta Sans";
+          }
+        }
+      }
+    }
+  }
+
+  .custom-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f2f4f6;
+    color: #033348;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    width: 130px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    &:hover {
+      background-color: #e8e9eb;
+    }
+  }
+  
+  .dropdown-content {
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 135px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px;
+    color: #033348;
+    font-size: 12px;
+    font-weight: 400;
+    font-family: "Plus Jakarta Sans";
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    span{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+  
+  .checkbox-label:hover {
+    background-color: #e8e9eb;
+  }
+  
+  /* Hide the default checkbox */
+  .checkbox-label input[type="checkbox"] {
+    display: none;
+  }
+  
+  /* Custom checkbox */
+  .checkbox-label span::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    background-size: 18px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* Unchecked state with border SVG */
+  .checkbox-label span::before {
+    background-image: url("../../../../assets/icons/checkbox_unchecked.svg");
+    background-size: 13px !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+  }
+  
+  /* Checked state */
+  .checkbox-label input[type="checkbox"]:checked + span::before {
+    background-image: url("../../../../assets/icons/checkbox_checked.svg");
+    background-size: 14px !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: none;
+    padding-left: 4px;
+  }
+  
+  /* Selected item background */
+  .checkbox-label input[type="checkbox"]:checked + span {
+    background-color: #e7f3f8;
+    width: 135px;
+    padding: 7px;
+    margin: -8px;
+    border-radius: 4px;
+  }
+  
+}
+
+.employee_table_container {
+  width: 100%;
+  overflow-x: auto;
+  background: #fff;
+  overflow-y: auto;
+  max-height: 50vh;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background:#D2D9DF;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #054A68;
+    border-radius: 4px;
+
+    &:hover {
+      background: #bbb;
+    }
+  }
+
+  .employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+    font-size: 160px;
+  
+    .employee_name{
+      color: #033348;
+      font-weight: 700;
+      font-size: 16px;
+      font-family: "Plus Jakarta Sans";
+      text-decoration: underline;
+    }
+  
+    th{
+      position: -webkit-sticky;
+      position: sticky;
+      top:0;
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 0;
+      
+  
+    }
+    td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    
+    }
+  
+    th {  
+      font-family: "Plus Jakarta Sans";
+      font-weight: 700;
+      color: #033348;
+      background-color: #f9fafb;
+      font-size: 16px;
+    }
+  
+    td {
+      color: #454754;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: "Plus Jakarta Sans";
+    }
+  
+    tr {
+      cursor: pointer;
+      &:nth-child(even) {
+        background-color: #f9fafb;
+      }
+  
+      &:hover {
+        background-color: #f3f4f6;
+      }
+    }
+  
+    .name-button {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #2563eb;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 500;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+  
+      &:focus {
+        outline: none;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.no_employees_found{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #9ca3af;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Plus Jakarta Sans";
+  margin-top: 5rem;
+}
+
+
+// Responsive styles
+@media screen and (max-width: 768px) {
+  .table-container {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .employee-table {
+    th,
+    td {
+      padding: 12px;
+    }
+  }
+}
+

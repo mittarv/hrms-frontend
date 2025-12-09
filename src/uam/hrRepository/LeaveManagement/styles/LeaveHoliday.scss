@@ -1,0 +1,310 @@
+.Leave_holiday_main_container {
+    height: 100%;
+    width: 100%;
+
+    .leave_holiday_header_container {
+        width: 100%;
+        height: auto;
+        border: 0.5px solid #aeb0bc;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 16px;
+        gap: 2px;
+        margin-bottom: 24px;
+
+        .leave_holiday_header {
+            font-family: "Plus Jakarta Sans";
+
+            .leave_holiday_header_title {
+                font-weight: 700;
+                font-size: 12px;
+                line-height: 20px;
+                color: #676b7e;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+            }
+
+            .leave_holiday_header_subtitle {
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 24px;
+                color: #2e3038;
+                letter-spacing: 0.005em;
+            }
+        }
+
+        .leave_holiday_header_button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            background-color: #045071;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+
+    .leave_holiday_search_container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        max-width: 430px;
+        position: relative;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+
+        .leave_holiday_search_input {
+            width: 100%;
+            height: auto;
+            border: none;
+            border-bottom: 0.5px solid #aeb0bc;
+            padding: 12px 16px 12px 32px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #656b8a;
+
+            &:focus {
+                outline: none;
+            }
+            &::placeholder {
+                color: #8f92a3;
+                font-family: "Plus Jakarta Sans";
+                font-weight: 400;
+                font-size: 14px;
+                line-height: 20px;
+                letter-spacing: 0.01em;
+            }
+        }
+
+        .leave_holiday_search_button {
+            position: absolute;
+            right: 0;
+            padding: 8px 12px;
+            background-color: #045071;
+            color: #ffffff;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .leave_holiday_search_icon {
+            position: absolute;
+            left: 0;
+            padding: 12px 0px;
+        }
+
+        .leave_holiday_search_result {
+            position: absolute;
+            top: 120%;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            max-height: 200px;
+            overflow-y: auto;
+
+            .leave_holiday_search_result_container {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                align-items: center;
+                padding: 12px 16px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: #f1f1f4;
+                }
+
+                span {
+                    font-family: "Plus Jakarta Sans";
+                    font-weight: 600;
+                    font-size: 12px;
+                    color: #454754;
+                    letter-spacing: 0.01em;
+                }
+            }
+        }
+
+        .no_result_found {
+            width: 100%;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            padding: 12px 16px;
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0.01em;
+            color: #8f92a3;
+        }
+    }
+
+    .yearly_holidays_section {
+        margin-bottom: 2rem;
+        
+
+        .holiday_title {
+            font-family: "Plus Jakarta Sans";
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 24px;
+            color: #2e3038;
+            margin-bottom: 0.8rem;
+
+            span {
+                font-weight: 600;
+                font-size: 12px;
+                line-height: 20px;
+                color: #045071;
+                margin-left: 12px;
+                border:1px solid #045071 ;
+                padding: 6px 14px;
+                border-radius: 8px;
+                cursor: pointer;
+                
+                img {
+                    margin-right: 4px;
+                }
+            }
+        }
+
+        .policy_reference {
+            font-family: "Plus Jakarta Sans";
+            font-size: 12px;
+            color: #676b7e;
+            margin-bottom: 1rem;
+
+            .policy_link {
+                color: #045071;
+                text-decoration: none;
+                font-weight: 600;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        .mandatory_holiday_table_container{
+            width: 450px;
+            margin-top: 1rem;
+            overflow: hidden;
+            border-radius: 8px; 
+            border: 0.5px solid #AEB0BC;
+
+            .mandatory_holidays_table {
+                width: 100%;
+                border-collapse: collapse;            
+                border: none;
+    
+                thead {
+                    background-color: #F7F7F8;
+                    
+                    th {
+                        padding: 12px 16px;
+                        text-align: left;
+                        font-family: "Plus Jakarta Sans";
+                        font-weight: 700;
+                        font-size: 12px;
+                        color: #676b7e;
+                        border-bottom: 0.5px solid #e6e7eb;
+                    }
+                }
+    
+                tbody {
+                    tr {
+                        border-bottom: 0.5px solid #e6e7eb;
+                        
+                        &:last-child {
+                            border-bottom: none;
+                        }
+    
+                        &.selected {
+                            border: 2px solid #1888B9;
+                            background-color: #E7F3F8;
+                            border-radius: 8px;
+                        }
+    
+                        td {
+                            padding: 12px 16px;
+                            font-family: "Plus Jakarta Sans";
+                            font-size: 14px;
+                            color: #2e3038;
+                        }
+                    }
+    
+                    tr:nth-child(even) {
+                        background-color: #f7f7f8;
+                      }
+                }
+            }
+        }
+       
+
+        .optional_holidays_table_container {
+            width: 100%;
+            margin-top: 1rem;
+            overflow: hidden;
+            border-radius: 8px; 
+            border: 0.5px solid #AEB0BC;
+            
+            .optional_holidays_table {
+                width: 100%;
+                border-collapse: collapse;            
+                border: none;
+                
+                thead {
+                    background-color: #F7F7F8;
+                }
+                
+                th {
+                    padding: 10px;
+                    text-align: left;
+                    font-family: "Plus Jakarta Sans";
+                    font-weight: 700;
+                    font-size: 12px;
+                    color: #676b7e;                   
+                }
+                
+                td {
+                    padding: 8px 12px;
+                    font-family: "Plus Jakarta Sans";
+                    font-size: 14px;
+                    color: #2e3038;
+                    cursor: pointer;
+                    
+                    &.selected {
+                        border: 2px solid #1888B9;
+                        background-color: #E7F3F8;
+                    }
+                }
+        
+                tr:nth-child(even) {
+                    background-color: #f7f7f8;
+                }
+            }
+        }
+    }
+}

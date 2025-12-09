@@ -1,0 +1,270 @@
+.modal_overlay_monthly_ctc {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; // Higher z-index to ensure it's above other modals
+  animation: fadeIn 0.2s ease-in-out;
+
+  .monthly-ctc-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 750px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+
+  .modal_header_monthly_ctc {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 32px 20px 32px;
+    background: transparent;
+
+    .header-content {
+      flex: 1;
+      gap:4px;
+      display: flex;
+      flex-direction: column;
+
+      .header_name {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #2E3038;
+        line-height: 28px;
+      }
+
+      .employee-name {
+        margin: 0;
+        font-size: 16px;
+        color: #676B7E;
+        font-weight: 500;
+        text-decoration: underline;
+        -webkit-text-decoration-color: #2E3038;
+        text-decoration-color: #2E3038;
+
+        /* Provide a small bottom padding as a fallback for browsers (like Safari on iOS <12.2)
+           that don't support text-underline-offset so the underline appears visually offset. */
+        padding-bottom: 2px;
+
+        /* Apply native underline offset where supported */
+        @supports (text-underline-offset: 0.5rem) {
+          text-underline-offset: 0.5rem;
+          /* remove fallback spacing when native offset is available */
+          padding-bottom: 0;
+        }
+
+        /* Use native thickness when supported */
+        @supports (text-decoration-thickness: 2px) {
+          text-decoration-thickness: 2px;
+        }
+
+        /* Fallback for Safari on iOS <12.2 and other browsers without text-decoration-thickness:
+           remove the native underline and simulate a thicker underline with a bottom border.
+           The padding-bottom helps keep the visual spacing similar. */
+        @supports not (text-decoration-thickness: 2px) {
+          text-decoration: none;
+          padding-bottom: 2px;
+          border-bottom: 2px solid #676B7E;
+        }
+      }
+    }
+
+    .close_button_monthly_ctc {
+      background: #f3f4f6;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+
+      img {
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        background: #e5e7eb;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 28px 32px;
+    overflow-y: auto;
+    flex: 1;
+
+    // Additions List
+    .additions-list {
+      margin-bottom: 24px;
+      border-bottom: 1px solid #C7C9D1;
+      padding-bottom: 14px;
+
+      .addition-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        background: white;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+          transform: translateX(4px);
+        }
+
+        .component-name {
+          font-size: 16px;
+          font-weight: 500;
+          color: #374151;
+          flex: 1;
+        }
+
+        .addition-amount {
+          font-size: 16px;
+          font-weight: 600;
+          color: #454754;
+          margin-left: 16px;
+        }
+      }
+
+      .no-additions {
+        padding: 40px;
+        text-align: center;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px dashed #d1d5db;
+
+        p {
+          margin: 0;
+          color: #9ca3af;
+          font-size: 14px;
+        }
+      }
+    }
+
+    // Total Section
+    .total-section {
+      padding: 20px 24px;
+      background: #EBFAF3;
+      border-radius: 10px;
+      border: 1px solid #A9EACC;
+
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .label {
+          font-size: 16px;
+          font-weight: 600;
+          color: #374151;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .total-amount {
+          font-size: 18px;
+          font-weight: 600;
+          color: #1EAB69;
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 32px;
+    border-top: 2px solid #e5e7eb;
+    background: #f9fafb;
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-ctc-modal {
+    width: 95%;
+    max-height: 90vh;
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .modal-body {
+      .additions-list {
+        .addition-item {
+          padding: 14px 16px;
+
+          .component-name {
+            font-size: 14px;
+          }
+
+          .addition-amount {
+            font-size: 15px;
+          }
+        }
+      }
+
+      .total-section .total-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+
+        .total-amount {
+          font-size: 22px;
+        }
+      }
+    }
+  }
+}
+
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+// Responsive design
+

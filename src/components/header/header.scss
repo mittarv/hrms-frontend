@@ -1,0 +1,59 @@
+@use "../../design/colors/Colors";
+.uam_main__header {
+  width: 100%;
+  background-color: Colors.$c12;
+  height: 93px;
+  border-bottom: 1px solid Colors.$c8;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 3.9vw;
+  padding-right: 1vw;
+  .uam_main__header_left > p {
+    font-size: 1.24vw;
+    font-weight: 500;
+    color: Colors.$c31;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    cursor: pointer;
+  }
+  .av-tool-link{
+    font-size: 1.24vw;
+    font-weight: 500;
+    color: Colors.$c31;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    a{
+      color: Colors.$c31;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
+  .uam_main__header__right {
+    display: flex;
+    width: 30%;
+    max-width: 30%;
+    gap: 20px;
+
+    img {
+      cursor: pointer;
+    }
+    .user_role__div {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      p:nth-child(1) {
+        font-size: 1vw;
+        color: Colors.$c31;
+        font-weight: 700;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      p:nth-child(2) {
+        font-size: 0.83vw;
+        color: Colors.$c20;
+        font-weight: 400;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+    }
+  }
+}
