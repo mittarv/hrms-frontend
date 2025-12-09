@@ -1,9 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
-
 import Login from "./components/login/Login";
 import PrivateRoute from "./PrivateRoute";
-
+import PageNotFound from "./components/pageNotFound/PageNotFound";
 import UserGroups from "./uam/userGroups/userGroups";
 import MyTools from "./uam/myTools/MyTools";
 import UserPermissions from "./uam/userPermissions/UserPermissions";
@@ -89,6 +88,9 @@ const AllRoutes = ({ isAuthenticated }) => {
             <Route path={path} element={element} />
           </Route>
         ))}
+
+      {/* Catch-all route for 404 Page Not Found */}
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };

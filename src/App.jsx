@@ -1,16 +1,14 @@
 import { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, Routes, Route } from "react-router-dom";
-
 import "./App.scss";
 import Login from "./components/login/Login";
 import Layout from "./uam/uamHome/Layout";
 import PrivateRoute from "./PrivateRoute";
 import useDynamicTitle from "./uam/hrRepository/hooks/useDynamicTitle";
-
 import { loadUserInfo } from "./actions/userActions";
 import { toolHomePageData } from "./constant/data";
-
+import PageNotFound from "./components/pageNotFound/PageNotFound";
 import ToolHome from "./tools/toolHome/ToolHome";
 import HrHome from "./uam/hrRepository/HrHome";
 import PolicyPage from "./uam/hrRepository/PolicyPage";
@@ -64,7 +62,10 @@ const App = () => {
       "/hr-repo-requests",
     ];
     return (
-      noHeaderPaths.some((path) => location.pathname === path)
+      noHeaderPaths.some((path) => location.pathname === path) ||
+      !basicRoutes.some(({ path }) => path === location.pathname) &&
+      !accessBasedRoutes.some(({ path }) => path === location.pathname) &&
+      location.pathname !== "/login"
     );
   }, [location.pathname]);
 
@@ -96,6 +97,9 @@ const App = () => {
                   <Route path={path} element={element} />
                 </Route>
               ))}
+
+            {/* Catch-all route for 404 Page Not Found */}
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         ) : (
           <Layout isAuthenticated={isAuthenticated} />

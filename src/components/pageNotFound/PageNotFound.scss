@@ -1,0 +1,118 @@
+@use "../../design/colors/Colors";
+
+.page-not-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, Colors.$c2 0%, Colors.$c3 100%);
+  padding: 20px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+
+  .content {
+    text-align: center;
+    color: white;
+    max-width: 600px;
+
+    .error-code {
+      font-size: 120px;
+      font-weight: 900;
+      margin: 0;
+      line-height: 1;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .error-title {
+      font-size: 36px;
+      font-weight: 600;
+      margin: 20px 0;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .error-message {
+      font-size: 18px;
+      margin: 20px 0 40px;
+      opacity: 0.9;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .home-button {
+      background-color: white;
+      color: Colors.$c2;
+      border: none;
+      padding: 15px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      animation: fadeInUp 1.2s ease-out;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        background-color: Colors.$c9;
+      }
+
+      &:active {
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-not-found {
+    .content {
+      .error-code {
+        font-size: 80px;
+      }
+
+      .error-title {
+        font-size: 28px;
+      }
+
+      .error-message {
+        font-size: 16px;
+      }
+
+      .home-button {
+        padding: 12px 30px;
+        font-size: 14px;
+      }
+    }
+  }
+}
