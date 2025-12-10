@@ -384,9 +384,9 @@ const buildCategoryDetails = (selectedOptions, componentTypeData) => {
     categoryDetails.department = findMatchingKey(componentTypeData.department_type_dropdown, selectedOptions.department);
     categoryDetails.yearOfStudy = findMatchingKey(componentTypeData.year_of_study, selectedOptions.yearOfStudy);
   } else {
-    // Add employee level for FTE/OFTE
-    const isFteOrOfte = ['FTE', 'OFTE'].includes(selectedOptions.employeeType);
-    if (isFteOrOfte && selectedOptions.employeeLevel) {
+    // Add employee level for FTE/OFTE/PTE
+    const isFteOrOfteOrPte = ['FTE', 'OFTE', 'PTE'].includes(selectedOptions.employeeType);
+    if (isFteOrOfteOrPte && selectedOptions.employeeLevel) {
       categoryDetails.employeeLevel = findMatchingKey(
         componentTypeData.level_dropdown, 
         selectedOptions.employeeLevel

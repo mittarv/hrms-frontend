@@ -1,0 +1,132 @@
+.employee-card {
+  display: inline-block; 
+  width: 100%;           
+  margin-bottom: 16px;   
+  break-inside: avoid;
+  height: auto;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 12px 12px;
+  padding-right: 28px;
+  background: #ffffff;
+  border-radius: 10px;
+  
+  cursor: pointer;
+  border: 1px solid #c7c9d1;
+  .employee-default-details{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  .emp-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    .emp-img {
+      border: none;
+      width: 80px;
+      height: 80px;
+      border-radius: 10.67px;
+      object-fit: cover;
+      
+    }
+
+    .emp-placeholder {
+      width: 80px;
+      height: 80px;
+      border: none;
+      border-radius: 10.67px;
+      background: #f1f1f4;
+      color: #066893;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 38px;
+      font-weight: 600;
+    }
+
+    .emp-info {
+      display: flex;
+      flex-direction: column;
+      gap:12px;
+      .emp-name-status{
+        display: flex;
+        align-items: center;
+        gap:8px;
+        .emp-name {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #2e3038;
+        }
+        
+        p{
+          border: 1px solid #1eab69;
+          padding: 8px 12px;
+          font-size: 12px;
+          color: #2e3038;
+          font-weight: 500;
+          border-radius: 32px;
+          background-color: #ebfaf3;
+        }
+      }
+
+      
+
+      .emp-subinfo {
+        
+        font-size: 14px;
+        font-weight: 600;
+        color: #8f92a3;
+      }
+    }
+  }
+
+  .emp-right {
+    display: flex;
+    align-items: center;
+    .employees_icon {
+      
+  transition: transform 0.2s ease-in-out;
+    }
+    .employees_icon.rotate {
+  transform: rotate(180deg);
+}
+    
+  }
+  }
+  .employee-details{
+    margin-top: 8px;
+     
+    
+      hr {
+        border: none;
+        border-top: 0.5px solid #e3e4e8;
+       
+      }
+    
+    
+    .details{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); 
+      
+      gap: 16px;
+      .each{
+        margin-top: 8px;;
+        h3{
+          font-size: 12px;
+          font-weight: 500;
+          color: #676b7e;
+        }
+        p{
+          font-size: 14px;
+          font-weight: 500;
+          color: #454754;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
+        }
+      }
+    }
+  }
+  
+}

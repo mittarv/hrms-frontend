@@ -28,9 +28,9 @@ const Sidebar = () => {
   };
 
   //Filter the hrRepoRouterData to remove the Employee-Repo tab for non-admin
-  const filteredHrRepoRouterData = allToolsAccessDetails?.[selectedToolName] >= 500 ? [...hrRepoRouterData] : 
-      hrRepoRouterData.filter((tab) => tab.path !== "/employee-repo" && tab.path !== "/leave-configurator" && tab.path!== "/hr-repo-requests");
-
+   const filteredHrRepoRouterData = allToolsAccessDetails?.[selectedToolName] >= 500 ? hrRepoRouterData.filter((tab) => tab.path !== "/employee-directory")  : 
+       hrRepoRouterData.filter((tab) =>  tab.path !== "/leave-configurator" && tab.path!== "/hr-repo-requests" && tab.path!== "/employee-repo");
+ 
   const renderLinks = (content, customClass = "") => {
     return content.map((data) => (
       <div
@@ -59,7 +59,7 @@ const Sidebar = () => {
   
 
   const renderSidebarContent = () => {
-    if (currentPath === "/hr-repo" || currentPath === "/policies" || currentPath === "/imp-link" || currentPath === "/employee-repo" || currentPath === "/dashboard" || currentPath === "/leave-configurator" || currentPath === "/hr-repo-requests" || currentPath === "/leave-attendance" || currentPath === "/payroll-reimbursements") {
+    if (currentPath === "/hr-repo" || currentPath === "/policies" || currentPath === "/imp-link" || currentPath === "/employee-repo" || currentPath === "/dashboard" || currentPath === "/leave-configurator" || currentPath === "/hr-repo-requests" || currentPath === "/leave-attendance" || currentPath === "/payroll-reimbursements" || currentPath === "/employee-directory") {
       return renderLinks(filteredHrRepoRouterData);
     } else if (user?.userType === 900) {
       return renderLinks(adminsidebarContent);

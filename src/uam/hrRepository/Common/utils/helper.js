@@ -7,12 +7,19 @@ export const removeAppendedSasToken = (url) => {
     }
 }
 
-export const formatDate = (dateString) => {
+export const formatDate = (dateString, DDMM = false) => {
   if (!dateString) return "";
   try {
     // Handle both ISO string format and regular date strings
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return "";
+
+    // This will format date as "DD Mon" if DDMM is true, else "YYYY-MM-DD"
+    if (DDMM) {
+      const formatted = date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+      const result = formatted.split(' ').reverse().join(' ').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+      return result;
+    }
     return date.toISOString().split('T')[0];
   } catch {
     return "";

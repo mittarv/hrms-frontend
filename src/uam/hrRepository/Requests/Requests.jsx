@@ -5,6 +5,10 @@ import EmployeeDetailsRequests from "./components/EmployeeDetailsRequests";
 import LeaveRequests from "./components/LeaveRequests";
 import { useSelector, useDispatch } from "react-redux";
 import "./styles/Requests.scss";
+import Active_employee_details_request from "../../../assets/icons/Active_employee_details_request.svg";
+import Inactive_employee_details_request from "../../../assets/icons/Inactive_employee_details_request.svg";
+import Active_calendar_icon from "../../../assets/icons/Active_calendar_icon.svg";
+import Inactive_calendar_icon from "../../../assets/icons/Inactive_calendar_icon.svg";
 import { 
   getAllPendingLeaveRequests,
   checkOutstandingCheckout,
@@ -82,17 +86,36 @@ const Requests = () => {
             <div className="requests_tabs" data-active={activeTab}>
               <span
                 onClick={() => setActiveTab("tab1")}
-                className={activeTab === "tab1" ? "active_tab" : ""}
+                className={activeTab === "tab1" ? "active_tab" : "inactive_tab"}
               >
+                <img
+                  src={
+                  activeTab === "tab1"
+                  ? Active_employee_details_request
+                  : Inactive_employee_details_request
+                  }
+                  alt="Leave Calendar Icon"
+                  className="leave_calendar_icon"
+                />
                 {`Employee Details Requests (${pendingRequests.length})`}
               </span>
               <span
                 onClick={() => setActiveTab("tab2")}
-                className={activeTab === "tab2" ? "active_tab" : ""}
+                className={activeTab === "tab2" ? "active_tab" : "inactive_tab"}
               >
+                <img
+                  src={
+                  activeTab === "tab2"
+                  ? Active_calendar_icon
+                  : Inactive_calendar_icon
+                  }
+                  alt="Leave Calendar Icon"
+                  className="leave_calendar_icon"
+                />
                 {`Leave Requests (${leavePendingRequests.length})`}
               </span>
             </div>
+            <hr/>
             <div className="requests_header_title_container">
               <p>Here, you can view and approve/reject requests.</p>
             </div>
