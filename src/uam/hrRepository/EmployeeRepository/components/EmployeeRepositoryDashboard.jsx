@@ -1,34 +1,29 @@
-import Sidebar from "../../../components/sidebar/Sidebar";
-import Header from "../../../components/header/Header";
+
 import { useSelector, useDispatch } from "react-redux";
-import "./styles/EmployeeRepositoryDashboard.scss";
-import Add_icon from "../../../assets/icons/add_icon_without_background.svg";
-import { useEffect, useState } from "react";
-import EmployeeRepositoryTable from "./components/EmployeeRepositoryTable";
+import "../styles/EmployeeRepositoryDashboard.scss";
+import Add_icon from "../../../../assets/icons/add_icon_without_background.svg";
+import { useEffect } from "react";
+import EmployeeRepositoryTable from "./EmployeeRepositoryTable";
 import {
-  getAllEmployee,
-  getAllComponentTypes,
+  
   getAllManagers,
   getAllCountriesDetails,
-  checkOutstandingCheckout,
-  getCheckInCheckOutStatus,
-  updateEmployeeOutstandingCheckout,
-} from "../../../actions/hrRepositoryAction";
+} from "../../../../actions/hrRepositoryAction";
 import { useSearchParams } from "react-router-dom";
-import EmployeeOnBoardingForm from "./components/EmployeeOnBoardingForm";
-import EmployeeDetailsPage from "./components/EmployeeDetailsPage";
-import Snackbar from "../Common/components/Snackbar";
-import CheckoutPopup from "../Common/components/CheckoutPopup";
-import LoadingSpinner from "../Common/components/LoadingSpinner";
-import { toolHomePageData } from "../../../constant/data";
+import EmployeeOnBoardingForm from "./EmployeeOnBoardingForm";
+import EmployeeDetailsPage from "./EmployeeDetailsPage";
+import Snackbar from "../../Common/components/Snackbar";
+
+import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import { toolHomePageData } from "../../../../constant/data";
 
 const EmployeeRepositoryDashboard = () => {
+  
   const { user } = useSelector((state) => state.user);
   const { 
         loading,
-        checkInCheckOutStatus,
-        outStandingCheckOut,
-        getAllComponentType,  
+        getAllComponentType
+        
       } = useSelector((state) => state.hrRepositoryReducer);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,7 +31,7 @@ const EmployeeRepositoryDashboard = () => {
     searchParams.get("EmployeeOnBoardingForm") === "true";
   const showEmployeeDetails =
     searchParams.get("showEmployeeDetails") === "true";
-  const [checkOutPopup, setCheckOutPopup] = useState(false);
+
   const handleAddEmployeeForm = () => {
     setSearchParams((prev) => {
       if (showEmployeeOnBOardingForm) {
@@ -50,21 +45,9 @@ const EmployeeRepositoryDashboard = () => {
 
   //Fetching all employees and dropdowns values with key
   useEffect(() => {
-    if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
-        dispatch(getAllComponentTypes());
-    }
-    dispatch(getAllEmployee());
+    
     dispatch(getAllManagers());
     dispatch(getAllCountriesDetails());
-
-    if (Array.isArray(outStandingCheckOut) && outStandingCheckOut.length === 0) {
-          dispatch(checkOutstandingCheckout(user.employeeUuid));
-    }
-    
-    if (Array.isArray(checkInCheckOutStatus) && checkInCheckOutStatus.length === 0) {
-          dispatch(getCheckInCheckOutStatus(user.employeeUuid));
-    }
-
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
       payload: toolHomePageData.toot_title2
@@ -72,26 +55,11 @@ const EmployeeRepositoryDashboard = () => {
 
   }, [dispatch]);
 
-  useEffect(() => {
-    if (outStandingCheckOut && outStandingCheckOut.isShowCheckoutPopup) {
-        setCheckOutPopup(true);
-    }
-  }, [outStandingCheckOut]);
 
-  const handleOustandingCheckout = (checkOutTime) => {
-      const updatedData = {
-          attendanceDate: outStandingCheckOut?.outstandingDate,
-          checkOutTime,
-      }
-      dispatch(updateEmployeeOutstandingCheckout(outStandingCheckOut.attendanceId, updatedData, user.employeeUuid));
-      setCheckOutPopup(false);   
-  }
   return ( 
     <>
-      <div className="employee_repository_dashboard_main_container">
-        <Sidebar />
-        <div className="employee_repository_dashboard_header_container">
-          <Header />
+   
+          
           {showEmployeeOnBOardingForm ? (
             <EmployeeOnBoardingForm />
           ) : showEmployeeDetails ? (
@@ -126,16 +94,9 @@ const EmployeeRepositoryDashboard = () => {
               )}
             </div>
           )}
-        </div>
-      </div>
+        
       <Snackbar />
-      <CheckoutPopup 
-        isOpen={checkOutPopup}
-        outstandingDate={outStandingCheckOut?.outstandingDate}
-        checkInTime={outStandingCheckOut?.checkInTime}
-        isLoading={loading}
-        handleOustandingCheckout={handleOustandingCheckout}
-      />
+      
     </>
   );
 };

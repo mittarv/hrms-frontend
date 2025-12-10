@@ -9,7 +9,7 @@ import UserPermissions from "./uam/userPermissions/UserPermissions";
 import MittArvTools from "./uam/mittarvTools/MittarvTools";
 import PendingRequests from "./uam/pendingRequests/PendingRequests";
 import Dashboard from "./uam/hrRepository/Dashboard/Dashboard";
-import EmployeeRepositoryDashboard from "./uam/hrRepository/EmployeeRepository/EmployeeRepositoryDashboard";
+import EmployeeRepositoryDashboard from "./uam/hrRepository/EmployeeRepository/EmployeeRepo";
 import LeaveConfiguratorDashboard from "./uam/hrRepository/LeaveConfigurator/LeaveConfiguratorDashboard";
 import Requests from "./uam/hrRepository/Requests/Requests";
 import LeaveManagement from "./uam/hrRepository/LeaveManagement/LeaveManagement";
@@ -60,6 +60,11 @@ const AllRoutes = ({ isAuthenticated }) => {
       path: "/leave-attendance",
       element: <LeaveManagement />,
       condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
+    },
+    {
+      path: "/employee-directory", 
+      element: <EmployeeRepositoryDashboard />, 
+      condition: isEmployee && !hasAdvancedAccess(toolHomePageData?.toot_title2), 
     },
   ];
 

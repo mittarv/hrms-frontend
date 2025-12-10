@@ -14,7 +14,7 @@ import HrHome from "./uam/hrRepository/HrHome";
 import PolicyPage from "./uam/hrRepository/PolicyPage";
 import ImportantLink from "./uam/hrRepository/ImportantLink";
 import Dashboard from "./uam/hrRepository/Dashboard/Dashboard";
-import EmployeeRepositoryDashboard from "./uam/hrRepository/EmployeeRepository/EmployeeRepositoryDashboard";
+import EmployeeRepositoryDashboard from "./uam/hrRepository/EmployeeRepository/EmployeeRepo";
 import LeaveConfiguratorDashboard from "./uam/hrRepository/LeaveConfigurator/LeaveConfiguratorDashboard";
 import Requests from "./uam/hrRepository/Requests/Requests";
 import LeaveManagement from "./uam/hrRepository/LeaveManagement/LeaveManagement";
@@ -28,6 +28,7 @@ const basicRoutes = [
   { path: "/imp-link", element: <ImportantLink /> },
   { path: "/leave-attendance", element: <LeaveManagement /> },
   { path: "/payroll-reimbursements", element: <PayrollAndReimbursements /> },
+  { path: "/employee-directory", element: <EmployeeRepositoryDashboard /> },
 ];
 
 const accessBasedRoutes = [
@@ -60,13 +61,9 @@ const App = () => {
       "/leave-configurator",
       "/leave-attendance",
       "/hr-repo-requests",
+      "/employee-directory",
     ];
-    return (
-      noHeaderPaths.some((path) => location.pathname === path) ||
-      !basicRoutes.some(({ path }) => path === location.pathname) &&
-      !accessBasedRoutes.some(({ path }) => path === location.pathname) &&
-      location.pathname !== "/login"
-    );
+    return noHeaderPaths.some((path) => location.pathname === path);
   }, [location.pathname]);
 
   const hasAccessToAdvancedTools =

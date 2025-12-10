@@ -1,0 +1,54 @@
+.sort-container {
+  position: relative;
+
+  // The filter-button (which acts as the Sort Icon button) styles should be defined elsewhere,
+  // but we ensure the dropdown is correctly positioned relative to it.
+
+  .dropdown-menu.sort-menu {
+    // --- DROPDOWN CONTAINER STYLES ---
+
+    position: absolute;
+
+    // Positioning relative to the filter-button
+    top: 56px; // ~56px below the button (based on common design systems)
+    right: 0; // Align dropdown to the right edge of the sort button
+
+    // Standard dropdown appearance
+    background-color:#ffffff;
+    width: 253px; // Fixed width matching your reference
+    border: 0.5px solid #c7c9d1;
+    border-radius: 4px;
+
+    z-index: 100; // Ensure it appears above other content
+
+    // Handling for smaller screens
+    @media screen and (max-width: 500px) {
+      right: auto;
+      left: 0; // Or adjust as needed for centered placement on mobile
+    }
+
+    // --- DROPDOWN ITEM STYLES ---
+
+    .dropdown-item {
+      display: flex;
+      justify-content: space-between; // Aligns text left, checkmark right
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #454754; // Assuming a dark text color
+
+      // Style when the option is active/selected
+    }
+
+    // --- TICK MARK STYLES ---
+
+    .selected-tick-mark {
+      // Adjust the color and size of the checkmark
+      color: #454754; // Should match the selected item text color
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}

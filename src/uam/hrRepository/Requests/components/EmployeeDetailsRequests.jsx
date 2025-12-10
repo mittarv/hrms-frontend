@@ -1,10 +1,20 @@
 import { useState, useEffect } from "react";
 import { RequestsTableHeader } from "../utils/RequestsData";
-import { getPendingRequests, approveOrRejectRequest, getAllComponentTypes } from "../../../../actions/hrRepositoryAction";
+import {
+  getPendingRequests,
+  approveOrRejectRequest,
+  getAllComponentTypes,
+} from "../../../../actions/hrRepositoryAction";
 import { useSelector, useDispatch } from "react-redux";
-import { formSectionKeyValues, sectionFieldMapping } from "../../EmployeeRepository/utils/EmployeeRepositoryData";
+import {
+  formSectionKeyValues,
+  sectionFieldMapping,
+} from "../../EmployeeRepository/utils/EmployeeRepositoryData";
 import "../styles/EmployeeDetailsRequests.scss";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import approve_icon from "../../../../assets/icons/approve_icon.svg";
+import reject_icon_enable from "../../../../assets/icons/reject_icon_enable.svg";
+import reject_icon_disable from "../../../../assets/icons/reject_icon_disable.svg";
 
 // Define the ENUM for status
 export const RequestStatus = {
@@ -20,20 +30,24 @@ const EmployeeDetailsRequests = () => {
   const [checkedRequestIds, setCheckedRequestIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [filteredRequests, setFilteredRequests] = useState([]);
-  const hrRepositoryReducer = useSelector((state) => state?.hrRepositoryReducer);
+  const hrRepositoryReducer = useSelector(
+    (state) => state?.hrRepositoryReducer
+  );
   const loading = hrRepositoryReducer?.loading ?? false;
   const pendingRequests = hrRepositoryReducer?.pendingRequests ?? [];
   const componentTypes = hrRepositoryReducer?.getAllComponentType ?? {};
   const getAllComponentType = hrRepositoryReducer?.getAllComponentType ?? [];
   const { user } = useSelector((state) => state.user);
-  
+
   const dispatch = useDispatch();
 
   // Safely parse JSON with error handling
   const safeJsonParse = (jsonString) => {
     if (jsonString === null || jsonString === undefined) return {};
     try {
-      return typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+      return typeof jsonString === "string"
+        ? JSON.parse(jsonString)
+        : jsonString;
     } catch (error) {
       console.error("Error parsing JSON:", error);
       return {};
@@ -45,23 +59,23 @@ const EmployeeDetailsRequests = () => {
     if (sectionKey === null || sectionKey === undefined || sectionKey === "") {
       return "Unknown";
     }
-    
+
     return formSectionKeyValues[sectionKey] ?? sectionKey;
   };
 
   // Helper function to get field label from field name based on section
   const getFieldLabel = (fieldName, sectionKey) => {
     if (!fieldName || !sectionKey) return fieldName ?? "";
-    
+
     try {
       // Handle case where sectionKey doesn't exist in mapping
       const sectionFields = sectionFieldMapping[sectionKey] ?? [];
-      
+
       if (!Array.isArray(sectionFields)) return fieldName;
-      
+
       // Find the field in the section's field mapping
-      const field = sectionFields.find(f => f?.name === fieldName);
-      
+      const field = sectionFields.find((f) => f?.name === fieldName);
+
       // Return the label if found, otherwise return the field name
       return field?.label ?? fieldName;
     } catch (error) {
@@ -73,7 +87,7 @@ const EmployeeDetailsRequests = () => {
   // Helper function to get human-readable value from component types
   const getDisplayValue = (fieldName, value, componentTypes) => {
     if (value === null || value === undefined) return "N/A";
-    
+
     // Map field names to their respective dropdown types
     const fieldDropdownMap = {
       empType: "emp_type_dropdown",
@@ -88,7 +102,7 @@ const EmployeeDetailsRequests = () => {
       state: "location_dropdown",
       empYearOfStudy: "year_of_study",
     };
-    
+
     // Check if this field has a dropdown mapping
     const dropdownType = fieldDropdownMap[fieldName];
     if (!dropdownType || !componentTypes[dropdownType]) {
@@ -103,13 +117,14 @@ const EmployeeDetailsRequests = () => {
           console.error("Error formatting date:", e);
         }
       }
-      
+
       // For government ID field, format the JSON data properly
       if (fieldName === "empGovId" && value) {
         try {
           // Try to parse as JSON if it's a string
-          const govIdData = typeof value === 'string' ? JSON.parse(value) : value;
-          if (govIdData && typeof govIdData === 'object') {
+          const govIdData =
+            typeof value === "string" ? JSON.parse(value) : value;
+          if (govIdData && typeof govIdData === "object") {
             const { govIdType, govIdNumber } = govIdData;
             if (govIdType && govIdNumber) {
               return `${govIdType}: ${govIdNumber}`;
@@ -119,14 +134,14 @@ const EmployeeDetailsRequests = () => {
           console.error("Error parsing government ID data:", e);
         }
       }
-      
+
       // Return the raw value if no mapping exists
       return String(value);
     }
-    
+
     // Get the dropdown values
     const dropdown = componentTypes[dropdownType];
-    
+
     // Return the mapped value or the original if not found
     return dropdown[value] !== undefined ? dropdown[value] : String(value);
   };
@@ -136,45 +151,56 @@ const EmployeeDetailsRequests = () => {
     if (!Array.isArray(pendingRequests) || pendingRequests.length === 0) {
       return [];
     }
-    
+
     try {
-      return pendingRequests.map(request => {
-        if (!request) return null;
-        
-        // Parse JSON strings to objects with safe fallbacks
-        const oldData = safeJsonParse(request?.oldData);
-        const newData = safeJsonParse(request?.newData);
-        
-        // Extract date from createdAt with fallbacks
-        let formattedDate = "N/A";
-        try {
-          if (request?.createdAt) {
-            const createdDate = new Date(request.createdAt);
-            if (!isNaN(createdDate?.getTime())) { // Check if date is valid
-              formattedDate = `${String(createdDate.getDate()).padStart(2, '0')}-${String(createdDate.getMonth() + 1).padStart(2, '0')}-${createdDate.getFullYear()}`;
+      return pendingRequests
+        .map((request) => {
+          if (!request) return null;
+
+          // Parse JSON strings to objects with safe fallbacks
+          const oldData = safeJsonParse(request?.oldData);
+          const newData = safeJsonParse(request?.newData);
+
+          // Extract date from createdAt with fallbacks
+          let formattedDate = "N/A";
+          try {
+            if (request?.createdAt) {
+              const createdDate = new Date(request.createdAt);
+              if (!isNaN(createdDate?.getTime())) {
+                // Check if date is valid
+                formattedDate = `${String(createdDate.getDate()).padStart(
+                  2,
+                  "0"
+                )}-${String(createdDate.getMonth() + 1).padStart(
+                  2,
+                  "0"
+                )}-${createdDate.getFullYear()}`;
+              }
             }
+          } catch (error) {
+            console.error("Error formatting date:", error);
           }
-        } catch (error) {
-          console.error("Error formatting date:", error);
-        }
-        
-        // Determine the request type based on sectionChanged
-        const sectionKey = request?.sectionChanged ?? "";
-        const requestType = getSectionName(sectionKey);
-        
-        return {
-          id: request?.requestId ?? `unknown-${Math.random().toString(36).substring(2, 11)}`, // Generate a unique ID if none exists
-          person: request?.requestedFor ?? "Unknown",
-          requestedBy: request?.requestedBy ?? "Unknown",
-          requestedOn: formattedDate ?? "N/A",
-          type: requestType ?? "Unknown",
-          oldData: oldData ?? {},
-          newData: newData ?? {},
-          sectionKey: sectionKey,
-          // Keep the original request data for later use if needed
-          originalRequest: request ?? {}
-        };
-      }).filter(Boolean); // Remove any null items that may have resulted from errors
+
+          // Determine the request type based on sectionChanged
+          const sectionKey = request?.sectionChanged ?? "";
+          const requestType = getSectionName(sectionKey);
+
+          return {
+            id:
+              request?.requestId ??
+              `unknown-${Math.random().toString(36).substring(2, 11)}`, // Generate a unique ID if none exists
+            person: request?.requestedFor ?? "Unknown",
+            requestedBy: request?.requestedBy ?? "Unknown",
+            requestedOn: formattedDate ?? "N/A",
+            type: requestType ?? "Unknown",
+            oldData: oldData ?? {},
+            newData: newData ?? {},
+            sectionKey: sectionKey,
+            // Keep the original request data for later use if needed
+            originalRequest: request ?? {},
+          };
+        })
+        .filter(Boolean); // Remove any null items that may have resulted from errors
     } catch (error) {
       console.error("Error in formatPendingRequests:", error);
       return [];
@@ -214,10 +240,13 @@ const EmployeeDetailsRequests = () => {
   // Fetch data when component mounts
   useEffect(() => {
     try {
-      if (typeof dispatch === 'function') {
+      if (typeof dispatch === "function") {
         dispatch(getPendingRequests());
-        if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
-            dispatch(getAllComponentTypes());
+        if (
+          Array.isArray(getAllComponentType) &&
+          getAllComponentType.length === 0
+        ) {
+          dispatch(getAllComponentTypes());
         }
       }
     } catch (error) {
@@ -229,7 +258,9 @@ const EmployeeDetailsRequests = () => {
   useEffect(() => {
     try {
       const formattedRequests = formatPendingRequests();
-      setFilteredRequests(Array.isArray(formattedRequests) ? formattedRequests : []);
+      setFilteredRequests(
+        Array.isArray(formattedRequests) ? formattedRequests : []
+      );
     } catch (error) {
       console.error("Error processing pending requests:", error);
       setFilteredRequests([]);
@@ -252,37 +283,40 @@ const EmployeeDetailsRequests = () => {
   useEffect(() => {
     try {
       const formattedRequests = formatPendingRequests();
-      
-      const filtered = Array.isArray(formattedRequests) ? formattedRequests.filter((request) => {
-        if (!request) return false;
-        if (!startDate && !endDate) return true;
-        
-        try {
-          const requestDate = formatDateForComparison(request?.requestedOn);
-          if (!requestDate) return true; // Include if we can't determine the date
-          
-          const start = startDate ? startDate : "0000-00-00";
-          const end = endDate ? endDate : "9999-12-31";
-          return requestDate >= start && requestDate <= end;
-        } catch (error) {
-          console.error("Error filtering request date:", error);
-          return true; // Include in case of error
-        }
-      }) : [];
-      
+
+      const filtered = Array.isArray(formattedRequests)
+        ? formattedRequests.filter((request) => {
+            if (!request) return false;
+            if (!startDate && !endDate) return true;
+
+            try {
+              const requestDate = formatDateForComparison(request?.requestedOn);
+              if (!requestDate) return true; // Include if we can't determine the date
+
+              const start = startDate ? startDate : "0000-00-00";
+              const end = endDate ? endDate : "9999-12-31";
+              return requestDate >= start && requestDate <= end;
+            } catch (error) {
+              console.error("Error filtering request date:", error);
+              return true; // Include in case of error
+            }
+          })
+        : [];
+
       setFilteredRequests(filtered ?? []);
 
       // Update selectAll state based on filtered requests
-      const filteredIds = Array.isArray(filtered) ? 
-        filtered
-          .filter(request => request && request.id)
-          .map(request => request.id) : 
-        [];
-      
-      const allSelected = filteredIds.length > 0 && 
+      const filteredIds = Array.isArray(filtered)
+        ? filtered
+            .filter((request) => request && request.id)
+            .map((request) => request.id)
+        : [];
+
+      const allSelected =
+        filteredIds.length > 0 &&
         Array.isArray(checkedRequestIds) &&
-        filteredIds.every(id => checkedRequestIds.includes(id));
-      
+        filteredIds.every((id) => checkedRequestIds.includes(id));
+
       setSelectAll(allSelected);
     } catch (error) {
       console.error("Error filtering requests:", error);
@@ -317,29 +351,36 @@ const EmployeeDetailsRequests = () => {
   const handleCheck = (request) => {
     try {
       if (!request || !request.id) return;
-      
-      setCheckedRequestIds(prevCheckedIds => {
-        const safeCheckedIds = Array.isArray(prevCheckedIds) ? prevCheckedIds : [];
-        
+
+      setCheckedRequestIds((prevCheckedIds) => {
+        const safeCheckedIds = Array.isArray(prevCheckedIds)
+          ? prevCheckedIds
+          : [];
+
         const requestId = request.id;
-        
+
         // Check if this request ID is already in the checked list
         const isAlreadyChecked = safeCheckedIds.includes(requestId);
-        
+
         // If it's already checked, remove it; otherwise, add it
         const newCheckedIds = isAlreadyChecked
-          ? safeCheckedIds.filter(id => id !== requestId)
+          ? safeCheckedIds.filter((id) => id !== requestId)
           : [...safeCheckedIds, requestId];
-        
+
         // Update selectAll state
-        const safeFilteredRequests = Array.isArray(filteredRequests) ? filteredRequests : [];
-        const validFilteredRequests = safeFilteredRequests.filter(req => req && req.id);
-        
-        const allSelected = validFilteredRequests.length > 0 && 
-          validFilteredRequests.every(req => newCheckedIds.includes(req.id));
-        
+        const safeFilteredRequests = Array.isArray(filteredRequests)
+          ? filteredRequests
+          : [];
+        const validFilteredRequests = safeFilteredRequests.filter(
+          (req) => req && req.id
+        );
+
+        const allSelected =
+          validFilteredRequests.length > 0 &&
+          validFilteredRequests.every((req) => newCheckedIds.includes(req.id));
+
         setSelectAll(allSelected);
-        
+
         return newCheckedIds;
       });
     } catch (error) {
@@ -354,11 +395,13 @@ const EmployeeDetailsRequests = () => {
         setCheckedRequestIds([]);
       } else {
         // Check all filtered requests
-        const safeFilteredRequests = Array.isArray(filteredRequests) ? filteredRequests : [];
+        const safeFilteredRequests = Array.isArray(filteredRequests)
+          ? filteredRequests
+          : [];
         const allIds = safeFilteredRequests
-          .filter(request => request && request.id)
-          .map(request => request.id);
-        
+          .filter((request) => request && request.id)
+          .map((request) => request.id);
+
         setCheckedRequestIds(allIds ?? []);
       }
       setSelectAll(!selectAll);
@@ -372,14 +415,16 @@ const EmployeeDetailsRequests = () => {
   const handleRequestApprove = () => {
     try {
       // Get the full request objects for the checked IDs
-      const safeCheckedIds = Array.isArray(checkedRequestIds) ? checkedRequestIds : [];
-      
+      const safeCheckedIds = Array.isArray(checkedRequestIds)
+        ? checkedRequestIds
+        : [];
+
       //transform the array to send the request to the backend
       const requestsIdsApproval = {
-          requestIds: safeCheckedIds,
-          action: RequestStatus.APPROVED,
-          actionedBy: user && user.employeeUuid,
-      }
+        requestIds: safeCheckedIds,
+        action: RequestStatus.APPROVED,
+        actionedBy: user && user.employeeUuid,
+      };
 
       dispatch(approveOrRejectRequest(requestsIdsApproval));
       setCheckedRequestIds([]);
@@ -387,19 +432,21 @@ const EmployeeDetailsRequests = () => {
       console.error("Error handling request approval:", error);
     }
   };
-  
+
   const handleRequestReject = () => {
     try {
       // Get the full request objects for the checked IDs
-      const safeCheckedIds = Array.isArray(checkedRequestIds) ? checkedRequestIds : [];
-      
-      //transform the array to send the request to the backend 
+      const safeCheckedIds = Array.isArray(checkedRequestIds)
+        ? checkedRequestIds
+        : [];
+
+      //transform the array to send the request to the backend
       const requestsIdsApproval = {
         requestIds: safeCheckedIds,
         action: RequestStatus.REJECTED,
         actionedBy: user && user.employeeUuid,
       };
-      
+
       dispatch(approveOrRejectRequest(requestsIdsApproval));
       setCheckedRequestIds([]);
     } catch (error) {
@@ -411,7 +458,9 @@ const EmployeeDetailsRequests = () => {
   const isRequestChecked = (requestId) => {
     try {
       if (!requestId) return false;
-      const safeCheckedIds = Array.isArray(checkedRequestIds) ? checkedRequestIds : [];
+      const safeCheckedIds = Array.isArray(checkedRequestIds)
+        ? checkedRequestIds
+        : [];
       return safeCheckedIds.includes(requestId);
     } catch (error) {
       console.error("Error checking if request is checked:", error);
@@ -420,32 +469,46 @@ const EmployeeDetailsRequests = () => {
   };
 
   // Safely get table headers
-  const safeTableHeaders = Array.isArray(RequestsTableHeader) ? RequestsTableHeader : [];
+  const safeTableHeaders = Array.isArray(RequestsTableHeader)
+    ? RequestsTableHeader
+    : [];
 
   // Render data entries with proper field labels and mapped values
   const renderDataEntries = (data, sectionKey, requestId, prefix) => {
     try {
-      if (!data || typeof data !== 'object') return <div>No data available</div>;
-      
+      if (!data || typeof data !== "object")
+        return <div>No data available</div>;
+
       const entries = Object.entries(data);
       if (!Array.isArray(entries) || entries.length === 0) {
         return <div>No data available</div>;
       }
-      
+
       return entries.map(([key, value], entryIndex) => {
         // Get the user-friendly label for this field
         const fieldLabel = getFieldLabel(key, sectionKey);
-        
+
         // Get the display value using our helper function
         const displayValue = getDisplayValue(key, value, componentTypes);
-        
+
         return (
-          <div key={`${requestId}-${prefix}-${key}` || `${prefix}-data-${entryIndex}`}>
-            <p><span className="table-cell-title">{fieldLabel || key || ""}</span>: {
-              displayValue !== null && displayValue !== undefined && displayValue !== ""
-                ? displayValue 
-                : (prefix === 'old' ? "N/A" : "N/A")
+          <div
+            key={
+              `${requestId}-${prefix}-${key}` || `${prefix}-data-${entryIndex}`
             }
+          >
+            <p>
+              <span className="table-cell-title">
+                {fieldLabel || key || ""}
+              </span>
+              :{" "}
+              {displayValue !== null &&
+              displayValue !== undefined &&
+              displayValue !== ""
+                ? displayValue
+                : prefix === "old"
+                ? "N/A"
+                : "N/A"}
             </p>
           </div>
         );
@@ -517,25 +580,68 @@ const EmployeeDetailsRequests = () => {
 
         {/* action buttons */}
         <div className="requests_action_buttons">
-          <button 
-            className={`requests_approve_button ${!Array.isArray(checkedRequestIds) || checkedRequestIds.length === 0 || pendingRequests.length <= 0 ? "disabled" : ""}`} 
+          <button
+            className={`requests_approve_button ${
+              !Array.isArray(checkedRequestIds) ||
+              checkedRequestIds.length === 0 ||
+              pendingRequests.length <= 0
+                ? "disabled"
+                : ""
+            }`}
             onClick={() => {
-              if (Array.isArray(checkedRequestIds) && checkedRequestIds.length > 0 && pendingRequests.length > 0) {
+              if (
+                Array.isArray(checkedRequestIds) &&
+                checkedRequestIds.length > 0 &&
+                pendingRequests.length > 0
+              ) {
                 handleRequestApprove();
               }
             }}
           >
-            <span className={`${!Array.isArray(checkedRequestIds) || checkedRequestIds.length === 0 ? "disabled" : ""}`}>Approve</span>
+            <span
+              className={`${
+                !Array.isArray(checkedRequestIds) ||
+                checkedRequestIds.length === 0
+                  ? "disabled"
+                  : ""
+              }`}
+            >
+              <img
+                src={approve_icon}
+                alt="Approve Icon"
+                className="approve_icon"
+              />
+              Approve
+            </span>
           </button>
-          <button 
-            className={`requests_reject_button ${!Array.isArray(checkedRequestIds) || checkedRequestIds.length === 0 ? "disabled" : ""}`}
+          <button
+            className={`requests_reject_button ${
+              !Array.isArray(checkedRequestIds) ||
+              checkedRequestIds.length === 0
+                ? "disabled"
+                : ""
+            }`}
             onClick={() => {
-              if (Array.isArray(checkedRequestIds) && checkedRequestIds.length > 0) {
+              if (
+                Array.isArray(checkedRequestIds) &&
+                checkedRequestIds.length > 0
+              ) {
                 handleRequestReject();
               }
             }}
           >
-            <span>Reject</span>
+            <span>
+              <img
+                src={
+                  checkedRequestIds.length === 0
+                    ? reject_icon_disable
+                    : reject_icon_enable
+                }
+                alt="Reject Icon"
+                className="reject_icon"
+              />
+              Reject
+            </span>
           </button>
         </div>
       </div>
@@ -543,7 +649,10 @@ const EmployeeDetailsRequests = () => {
       {/* table */}
       {loading ? (
         <div className="loading_message">
-          <LoadingSpinner message="Loading Employee Requests..." height="40vh" />
+          <LoadingSpinner
+            message="Loading Employee Requests..."
+            height="40vh"
+          />
         </div>
       ) : !Array.isArray(filteredRequests) || filteredRequests.length === 0 ? (
         <div className="no_requests_message">
@@ -564,7 +673,9 @@ const EmployeeDetailsRequests = () => {
                   />
                 </th>
                 {safeTableHeaders.map((header, index) => (
-                  <th key={(header?.name ?? index) || `header-${index}`}>{header?.label ?? ""}</th>
+                  <th key={(header?.name ?? index) || `header-${index}`}>
+                  {header?.label ?? ""}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -575,27 +686,34 @@ const EmployeeDetailsRequests = () => {
                 const sectionKey = request.sectionKey ?? "";
                 const oldData = request.oldData ?? {};
                 const newData = request.newData ?? {};
-                
+
                 return (
-                  <tr key={requestId || `row-${index}`}>
-                    <td>
+                  <tr
+                    key={requestId || `row-${index}`}
+                    className={isRequestChecked(requestId) ? "checked-row" : ""}
+                  >
+                    <td className="checkbox-cell">
                       <input
                         type="checkbox"
                         checked={isRequestChecked(requestId) ?? false}
                         onChange={() => handleCheck(request)}
                       />
                     </td>
-                    <td>{request.person ?? "N/A"}</td>
+                    <td className="person_name">{request.person ?? "N/A"}</td>
                     <td>{request.requestedBy ?? "N/A"}</td>
                     <td>{request.requestedOn ?? "N/A"}</td>
                     <td>{request.type ?? "N/A"}</td>
-                    <td>
-                      {renderDataEntries(oldData, sectionKey, requestId, 'old')}
-                      {Object.keys(oldData || {}).length === 0 && <div>No previous data</div>}
+                    <td >
+                      {renderDataEntries(oldData, sectionKey, requestId, "old")}
+                      {Object.keys(oldData || {}).length === 0 && (
+                        <div>No previous data</div>
+                      )}
                     </td>
                     <td>
-                      {renderDataEntries(newData, sectionKey, requestId, 'new')}
-                      {Object.keys(newData || {}).length === 0 && <div>No new data</div>}
+                      {renderDataEntries(newData, sectionKey, requestId, "new")}
+                      {Object.keys(newData || {}).length === 0 && (
+                        <div>No new data</div>
+                      )}
                     </td>
                   </tr>
                 );

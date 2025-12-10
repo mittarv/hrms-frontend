@@ -88,6 +88,11 @@ export const hrRepoRouterData = [
     icon: employee_repo,
     path: "/employee-repo",
   },
+    { 
+    title: "Employee Directory",
+    icon: employee_repo,
+    path: "/employee-directory",
+  },
   {
     title:"Leave Configurator",
     icon: leave_configurator,
@@ -107,7 +112,7 @@ export const hrRepoRouterData = [
     title: "Requests",
     icon: Requests,
     path: "/hr-repo-requests",
-  }
+  },
 ];
 
 export const userSidebarContent = [

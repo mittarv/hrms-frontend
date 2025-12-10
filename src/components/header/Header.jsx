@@ -31,6 +31,8 @@ const Header = () => {
             ? "Leave & Attendance"
             : location.pathname === "/employee-repo"
             ? "Employee Repository" 
+            : location.pathname === "/employee-directory"
+            ? "Employee Directory" 
             : location.pathname === "/asset-vault-forms"
             ? "Asset Vault Forms"
             :location.pathname === "/dashboard"

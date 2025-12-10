@@ -12,7 +12,11 @@ import Plus_icon from "../../../../assets/icons/plus_inside_circle.svg";
 import FileViewer from "../../Common/components/FileViewerPop";
 import View_Icon from "../../../../assets/icons/view_icon.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
-
+import approve_icon from "../../../../assets/icons/approve_icon.svg";
+import reject_icon_enable from "../../../../assets/icons/reject_icon_enable.svg";
+import reject_icon_disable from "../../../../assets/icons/reject_icon_disable.svg";
+import sort from "../../../../assets/icons/sort.svg";
+import filter from "../../../../assets/icons/filter.svg";
 // Define the ENUM for status
 export const LeaveRequestStatus = {
   APPROVED: "approved",
@@ -22,8 +26,8 @@ export const LeaveRequestStatus = {
 // Table headers for leave requests
 const LeaveRequestsTableHeader = [
   { name: "employeeUuid", label: "Employee" },
-  { name: "requestedDate", label: "Requested On" },
-  { name: "leaveRequestId", label: "Leave Type" },
+  { name: "requestedDate", label: "Requested On",icon: sort },
+  { name: "leaveRequestId", label: "Leave Type",icon: filter },
   { name: "leaveDuration", label: "Leave Duration" },
   { name: "reason", label: "Reason" },
   { name: "proof", label: "Proof" },
@@ -643,6 +647,9 @@ const LeaveRequests = () => {
                   : ""
               }`}
             >
+              <img src={approve_icon} 
+              alt="Approve Icon"
+              className="approve_icon"/>
               Approve
             </span>
           </button>
@@ -662,7 +669,15 @@ const LeaveRequests = () => {
               }
             }}
           >
-            <span>Reject</span>
+            <span>
+              <img src={
+                checkedRequestIds.length === 0
+                  ? reject_icon_disable
+                  : reject_icon_enable} 
+              alt="Reject Icon"
+              className="reject_icon"/>
+              Reject
+            </span>
           </button>
         </div>
       </div>
@@ -682,8 +697,8 @@ const LeaveRequests = () => {
           <table className="leave_requests_table">
             <thead>
               <tr>
-                <th>
-                  <input
+                <th className="checkbox-cell">
+                  <input 
                     type="checkbox"
                     checked={selectAll ?? false}
                     onChange={handleSelectAllClick}
@@ -702,15 +717,15 @@ const LeaveRequests = () => {
                 const requestId = request.id ?? `request-${index}`;
 
                 return (
-                  <tr key={requestId || `row-${index}`}>
-                    <td>
+                  <tr key={requestId || `row-${index}`} className={isRequestChecked(requestId) ? "checked-row" : ""}>
+                    <td className="checkbox-cell">
                       <input
                         type="checkbox"
                         checked={isRequestChecked(requestId) ?? false}
                         onChange={() => handleCheck(request)}
                       />
                     </td>
-                    <td>
+                    <td className="employee_name">
                       {getEmployeeNameByUuid(request.employeeUuid) ?? "N/A"}
                     </td>
                     <td>{request.requestedDate ?? "N/A"}</td>
@@ -723,7 +738,10 @@ const LeaveRequests = () => {
                         {request.leaveDuration ?? "N/A"}
                       </div>
                     </td>
-                    <td>{request.reason ?? "N/A"}</td>
+                    
+                    <td className="reason-cell">
+                      <div className="reason-text">{request.reason ?? "N/A"}</div>
+                    </td>
                     <td>
                       {renderProofStatus(
                         request.approvalStatus,
