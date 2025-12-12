@@ -38,7 +38,7 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/exhaustive-deps': 'error',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': 'off',
       'no-unused-vars': [
