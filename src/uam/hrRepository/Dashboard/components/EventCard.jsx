@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from "@mui/material";
 import { tableStyle } from '../../../../constant/tableStyle';
 import '../dashboard.scss';
+import { formatDate } from "../../Common/utils/helper";
 
 const EventCard = ({ name, data }) => {
   const { MyUpdateStyle } = tableStyle;
@@ -68,9 +69,11 @@ const EventCard = ({ name, data }) => {
             {Object.keys(data).map((key, index) => (
               <TableRow key={index}>
                 <TableCell style={MyUpdateStyle}>
-                  <p className="table-cell-title">
+                  <span><strong>{formatDate(data[key]?.empDob, true)}</strong></span>
+                  <span> - </span>
+                  <span className="table-cell-title">
                     {data[key].empFirstName + " " + data[key].empLastName}
-                  </p>
+                  </span>
                 </TableCell>
               </TableRow>
             ))}

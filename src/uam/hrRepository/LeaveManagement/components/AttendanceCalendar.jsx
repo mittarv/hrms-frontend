@@ -20,7 +20,7 @@ import {
 import { useDispatch } from "react-redux";
 import { getLeaveType } from "../../Common/utils/helper";
 
-const ATTENDANCE_STATUS = {
+export const ATTENDANCE_STATUS = {
   WORKING: "working",
   HALF_DAY: "half_day",
   ON_LEAVE: "on_leave",
@@ -471,9 +471,9 @@ const handleEdit = (currentAttendance) => {
         </div>
         <LeaveAvailable />
         {showViewModal && selectedDate && (
-          <div className="attendance_modal click-modal">
-            <div className="attendance-modal-content">
-              <div className="attendance-modal-header">
+          <div className="modal click-modal">
+            <div className="modal-content">
+              <div className="modal-header">
                 <p className="status-modal-title">
                   {selectedDate.day}{" "}
                   {new Intl.DateTimeFormat("en-US", { month: "long" }).format(

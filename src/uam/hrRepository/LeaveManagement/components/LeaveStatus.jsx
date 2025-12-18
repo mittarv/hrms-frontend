@@ -21,7 +21,7 @@ const LeaveStatus = () => {
   const [applyLeave, setApplyLeave] = useState(false);
   const [uploadProof, setUploadProof] = useState(false);
   const [selectedLeaveForUpload, setSelectedLeaveForUpload] = useState(null);
-  const { loading, employeeLeaveHistory, currentEmployeeDetails, allExisitingLeaves, getAllComponentType} = useSelector(
+  const { loading, currentEmployeeDetailsLoading,  employeeLeaveHistory, currentEmployeeDetails, allExisitingLeaves, getAllComponentType} = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
@@ -155,7 +155,7 @@ const LeaveStatus = () => {
 
   return (
     <>
-      {loading? <LoadingSpinner message="Loading Your Leave Status..." height="40vh" />
+      {(loading || currentEmployeeDetailsLoading)? <LoadingSpinner message="Loading Your Leave Status..." height="40vh" />
       :
       <div className="leave_status_main_container">
         <div className="leave_status_header_container">

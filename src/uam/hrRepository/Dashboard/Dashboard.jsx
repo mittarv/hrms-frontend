@@ -36,6 +36,7 @@ const Dashboard = () => {
     const { user } = useSelector((state) => state.user);
     const { 
         loading, 
+        currentEmployeeDetailsLoading, 
         allEmployeesBirthday, 
         allEmployeesAnniversary, 
         currentEmployeeDetails, 
@@ -158,7 +159,7 @@ const Dashboard = () => {
         ) : 
     
      <>
-        {loading ? (
+        {(loading  || currentEmployeeDetailsLoading)?  (
             <LoadingSpinner message="Loading dashboard..." height="40vh" />
         ) : (
         <>

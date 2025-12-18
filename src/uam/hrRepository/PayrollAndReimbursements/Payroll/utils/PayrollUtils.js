@@ -152,7 +152,7 @@ export const payrollTableColumns = [
   },
   {
     key: "monthlyCtc",
-    header: "Monthly CTC",
+    header: "Monthly Pay",
     className: "monthly-ctc-column",
     sortable: true,
     accessor: "monthlyCtc",

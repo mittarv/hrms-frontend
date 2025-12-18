@@ -59,7 +59,7 @@ const MonthlyCTCModal = () => {
       <div className="monthly-ctc-modal">
         <div className="modal_header_monthly_ctc">
           <div className="header-content">
-            <p className="model_title">Monthly CTC Breakdown</p>
+            <p className="model_title">Monthly Pay Breakdown</p>
             <p className="employee-name">{employeeName}</p>
           </div>
           <button className="close_button_monthly_ctc" onClick={handleClose}>

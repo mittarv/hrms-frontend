@@ -213,7 +213,7 @@
   }
 }
 
-.attendance_modal {
+.modal {
   position: absolute;
   z-index: 1000;
 
@@ -226,13 +226,10 @@
     overflow: auto;
   }
 
-  .attendance-modal-content {
+  .modal-content {
     border-radius: 8px;
     width: 100%;
     max-width: 500px;
-    background-color: #ffffff;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
     .click-modal {
       max-width: 320px;
@@ -244,7 +241,7 @@
     }
   }
 
-  .attendance-modal-header {
+  .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;

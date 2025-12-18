@@ -109,8 +109,10 @@ const TaxesDeductionsModal = () => {
               <div className="deduction-item">
                 <span className="component-name">
                   {isPayrollGenerated 
-                    ? lopComponent?.componentName || 'Loss of Pay'
-                    : `Loss of Pay (${unpaidLeave} ${unpaidLeave === 1 ? 'day' : 'days'} × ${CURRENCY_SYMBOL} ${lopPerDay.toLocaleString('en-IN')})`
+                    ? (lopComponent?.componentName === 'Loss of Pay(per day)' || lopComponent?.componentName === 'Loss of Pay' 
+                        ? 'Unpaid Leave Deduction' 
+                        : lopComponent?.componentName || 'Unpaid Leave Deduction')
+                    : `Unpaid Leave Deduction (${unpaidLeave} ${unpaidLeave === 1 ? 'day' : 'days'} × ${CURRENCY_SYMBOL} ${lopPerDay.toLocaleString('en-IN')})`
                   }
                 </span>
                 <span className="deduction-amount">{CURRENCY_SYMBOL} {finalLopDeduction.toLocaleString('en-IN')}</span>

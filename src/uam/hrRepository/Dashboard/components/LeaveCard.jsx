@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableRow } from "@mui/material";
 import { tableStyle } from '../../../../constant/tableStyle';
 import '../dashboard.scss';
 import { getEmployeeOnLeave } from '../../../../actions/hrRepositoryAction';
-import { getEmployeeName } from '../../Common/utils/helper';
+import { getEmployeeName, formatDate } from '../../Common/utils/helper';
 
 const LeaveCard = () => {
   const dispatch = useDispatch();
@@ -29,13 +29,6 @@ const LeaveCard = () => {
       startDate: monday.toISOString().split('T')[0],
       endDate: sunday.toISOString().split('T')[0]
     };
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    });
   };
 
   const getSelectedDate = () => {
@@ -95,7 +88,7 @@ const LeaveCard = () => {
     <div className='coverClass'>
       <div className="leave-main-container">
         <p className="inner-div-title">
-          {`On Leave - Week ${getWeekOfMonth(weekRange.startDate)} of ${new Date(weekRange.startDate).toLocaleString('default', { month: 'long' })} [${formatDate(weekRange.startDate)} - ${formatDate(weekRange.endDate)}]`}
+          {`On Leave - Week ${getWeekOfMonth(weekRange.startDate)} of ${new Date(weekRange.startDate).toLocaleString('default', { month: 'long' })} [${formatDate(weekRange.startDate, true)} - ${formatDate(weekRange.endDate, true)}]`}
         </p>
         
         <select 

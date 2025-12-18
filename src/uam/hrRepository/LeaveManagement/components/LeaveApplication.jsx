@@ -20,7 +20,7 @@ import {
 import { checkCdlLimit } from "../../../../actions/hrRepositoryAction";
 
 // Attendance Status Enum
-const ATTENDANCE_STATUS = {
+export const ATTENDANCE_STATUS = {
   HALF_DAY: "half_day",
   ON_LEAVE: "on_leave",
 };

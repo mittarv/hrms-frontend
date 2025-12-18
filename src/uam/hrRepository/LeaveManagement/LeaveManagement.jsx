@@ -30,6 +30,7 @@ const LeaveManagement = () => {
   const [activeTab, setActiveTab] = useState("tab1");
   const { 
         loading,
+      
         checkInCheckOutStatus,
         outStandingCheckOut, 
         getAllComponentType, 

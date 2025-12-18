@@ -6,7 +6,7 @@ import EditIcon from "../../../../assets/icons/edit_button_blue.svg";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 
-const ATTENDANCE_STATUS = {
+export const ATTENDANCE_STATUS = {
   WORKING: "working",
   HALF_DAY: "half_day", 
   ON_LEAVE: "on_leave"

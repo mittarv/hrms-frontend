@@ -16,7 +16,7 @@ import LoadingSpinner from "../../../Common/components/LoadingSpinner";
 import addIconGrey from "../../../../../assets/icons/add_icon_grey.svg";
 
 const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
-  const {currentEmployeeDetails, loading, getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
+  const {currentEmployeeDetails, loading, currentEmployeeDetailsLoading,  getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const userEmployeeId = user?.employeeUuid;
@@ -72,7 +72,7 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
   if (!isOpen) return null;
   return (
     <div className="payslip-modal-overlay" onClick={onClose}>
-      {loading ? <LoadingSpinner  message="Loading payslip"/> : <div className="payslip-modal" onClick={(e) => e.stopPropagation()}>
+      {(loading  || currentEmployeeDetailsLoading) ? <LoadingSpinner  message="Loading payslip"/> : <div className="payslip-modal" onClick={(e) => e.stopPropagation()}>
         <button className="close-button" onClick={onClose}>
           <img src={closeIcon} alt="Close" />
         </button>
@@ -252,7 +252,7 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
                   <>
                     {payslipData.deductions.map((item) => (
                       <div className="deductions_row" key={item.payrollItemId}>
-                        <p className="row_title">{item.componentName}</p>
+                        <p className="row_title">{item.componentName === "Loss of Pay(per day)" || item.componentName === "Loss of Pay" ? "Unpaid Leave Deduction" : item.componentName}</p>
                         <p className="row_value">₹{parseFloat(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                       </div>
                     ))}

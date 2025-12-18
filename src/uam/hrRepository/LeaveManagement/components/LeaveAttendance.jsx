@@ -17,7 +17,7 @@ import Dropdown_Arrow from "../../../../assets/icons/dropdow_arrow.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 const LeaveAttendance = () => {
-  const {loading, currentEmployeeDetails, getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
+  const {loading,currentEmployeeDetailsLoading, currentEmployeeDetails, getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const hrRepositoryReducer = useSelector(
     (state) => state?.hrRepositoryReducer
@@ -91,7 +91,7 @@ const LeaveAttendance = () => {
 
   return (
     <>
-      {loading ? 
+      {(loading  || currentEmployeeDetailsLoading)? 
       <LoadingSpinner message="Loading..." height="40vh" /> 
       : 
       <div className="leave_attendance_main_container">
