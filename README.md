@@ -1,77 +1,93 @@
-# TMS Web Application
+# HRMS Frontend
 
-This project is built with [Vite](https://vitejs.dev/) + [React](https://react.dev/).
+This is the frontend application for the HRMS (Human Resource Management System) built with [Vite](https://vitejs.dev/) + [React](https://react.dev/).
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Node Version](#node-version)
+- [Environment Setup](#environment-setup)
+- [Installation](#installation)
+- [Building the Project](#building-the-project)
+- [Running the Application](#running-the-application)
+- [Docker Setup](#docker-setup)
+- [Project Structure](#project-structure)
+- [Troubleshooting](#troubleshooting)
+
+---
 
 ## Prerequisites
 
-This project requires:
-- **Node.js**: LTS version **24.11.0** or higher
-- **npm**: Version **11.6.0** or higher
-- **Docker** (optional): For containerized deployment
+Before you begin, ensure you have the following installed:
 
-## Node.js Version Behavior
+- **Node.js** (version 24.11.0 or higher)
+- **npm** (version 11.6.0 or higher)
+- **Docker** (optional, for containerized deployment)
 
-### ✅ What Works:
-- **Node.js v24.0.0+**: Perfect! ✨
-- **Node.js v25.x or higher**: Also supported ✅
+---
 
-### ❌ What Doesn't Work:
-- **Node.js v23.x or lower**: Too old, project will refuse to start ❌
+## Node Version
 
-## Setup
+This project requires **Node.js version 24.11.0** or higher and **npm version 11.6.0** or higher.
 
-### Step 1: Install Node.js
+You can check your Node.js version by running:
+```bash
+node --version
+```
 
-#### Option 1: Using Node Version Manager (nvm)
+You can check your npm version by running:
+```bash
+npm --version
+```
 
-Install the exact project version:
+If you need to install or update Node.js, visit [nodejs.org](https://nodejs.org/).
+
+### Node.js Version Behavior
+
+- ✅ **Node.js v24.11.0+**: Supported
+- ✅ **Node.js v25.x or higher**: Also supported
+- ❌ **Node.js v23.x or lower**: Not supported - project will refuse to start
+
+### Using Node Version Manager (nvm)
+
+If you have nvm installed, you can automatically switch to the correct version:
+
 ```bash
 nvm use
 # This automatically switches to v24.11.0
 ```
 
-#### Option 2: Manual Installation
+---
 
-If you don't have nvm, download Node.js v24.11.0+ from [nodejs.org](https://nodejs.org/)
-
-### Step 2: Clone the Repository
-
-```bash
-git clone <repository-url>
-cd hrms-frontend
-```
-
-### Step 3: Install Dependencies
-
-```bash
-npm install
-```
-
-**Note:** The `preinstall` script automatically runs before `npm install` to check your Node.js and npm versions. If your versions don't meet the requirements, the installation will be blocked with a clear error message.
-
-## Environment Variables Setup
+## Environment Setup
 
 ### Step 1: Create .env File
 
 Create a `.env` file in the root directory of the project:
 
 ```bash
-# Option 1: Copy from example (if available)
 cp .env.example .env
+```
 
-# Option 2: Create a new .env file
+If `.env.example` doesn't exist, create a new `.env` file manually:
+
+```bash
 touch .env
 ```
 
-### Step 2: Set Environment Variables
+### Step 2: Configure Environment Variables
 
-Open the `.env` file and add the following environment variables:
+Edit the `.env` file and configure the following environment variables:
+
+#### Application Configuration
 
 ```env
 # Backend API Base URL
+# All API requests will be prefixed with this URL
 VITE_REACT_APP_HOSTED_URL=http://localhost:5000
 
 # Google OAuth Client ID (for Google Sign-In)
+# Get this from Google Cloud Console
 VITE_REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 
 # Encryption Key (for sensitive data encryption)
@@ -80,13 +96,13 @@ VITE_REACT_APP_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 VITE_ENCRYPTION_KEY=your-64-character-hex-encryption-key
 ```
 
-### Environment Variables Explained
+### Environment Variables Summary
 
-| Variable | Description | Required | Example |
-|----------|-------------|----------|---------|
-| `VITE_REACT_APP_HOSTED_URL` | Base URL for the backend API. All API requests will be prefixed with this URL. | ✅ Yes | `http://localhost:5000` or `https://api.example.com` |
-| `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Google OAuth 2.0 Client ID for Google Sign-In authentication. Get this from [Google Cloud Console](https://console.cloud.google.com/). | ✅ Yes | `123456789-abc.apps.googleusercontent.com` |
-| `VITE_ENCRYPTION_KEY` | Encryption key used for encrypting sensitive data (e.g., payroll information). Must be a hex string with at least 64 characters (256 bits). | ✅ Yes | `a1b2c3d4e5f6...` (64+ characters) |
+| Variable | Required | Description | Example |
+|----------|----------|-------------|---------|
+| `VITE_REACT_APP_HOSTED_URL` | Yes | Base URL for the backend API. All API requests will be prefixed with this URL. | `http://localhost:5000` or `https://api.example.com` |
+| `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Yes | Google OAuth 2.0 Client ID for Google Sign-In authentication. Get this from [Google Cloud Console](https://console.cloud.google.com/). | `123456789-abc.apps.googleusercontent.com` |
+| `VITE_ENCRYPTION_KEY` | Yes | Encryption key used for encrypting sensitive data (e.g., payroll information). Must be a hex string with at least 64 characters (256 bits). | `a1b2c3d4e5f6...` (64+ characters) |
 
 ### Generating an Encryption Key
 
@@ -118,20 +134,19 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 6. Add authorized JavaScript origins (e.g., `http://localhost:3000`)
 7. Copy the Client ID and paste it into your `.env` file
 
-## Commands
+---
 
-### Installation Commands
+## Installation
 
-#### `npm install`
-
-Installs all project dependencies. This command automatically runs the `preinstall` script which:
-- ✅ Checks Node.js version (must be >= 24.11.0)
-- ✅ Checks npm version (must be >= 11.6.0)
-- ✅ Blocks installation if versions don't meet requirements
+Install all project dependencies:
 
 ```bash
 npm install
 ```
+
+**Note:** The `preinstall` script automatically runs before `npm install` to check your Node.js and npm versions. If your versions don't meet the requirements, the installation will be blocked with a clear error message.
+
+### Installation Commands
 
 #### `npm run preinstall`
 
@@ -153,14 +168,41 @@ npm run check-pkg
 
 This command checks if all installed packages are compatible with the current Node.js version and project configuration.
 
-### Development Commands
+---
 
-#### `npm run dev`
+## Building the Project
 
-Runs the app in development mode with Vite:
+Build the application for production:
+
+```bash
+npm run build
+```
+
+This command:
+- ✅ Automatically checks your Node.js and npm versions (via `precheck`)
+- 📦 Creates an optimized production build in the `dist/` folder
+- 🗜️ Minifies and bundles all assets
+- 🎯 Optimizes for best performance
+- 📝 Filenames include content hashes for caching
+
+The build output will be in the `dist/` folder, ready for deployment.
+
+---
+
+## Running the Application
+
+### Development Mode
+
+Run the application in development mode with hot-reload:
 
 ```bash
 npm run dev
+```
+
+or
+
+```bash
+npm run server
 ```
 
 The application will:
@@ -173,125 +215,76 @@ The application will:
 
 **Note:** The development server uses a proxy to `http://localhost:5000` for API requests. Make sure your backend server is running on port 5000, or update the `proxy` field in `package.json` if your backend runs on a different port.
 
-#### `npm run precheck`
+### Production Mode
 
-Manually run the version check (also runs automatically before `dev`, `build`, `lint`, and `preview`):
+1. Build the project first:
+   ```bash
+   npm run build
+   ```
 
-```bash
-npm run precheck
-```
+2. Preview the production build:
+   ```bash
+   npm run preview
+   ```
 
-This validates Node.js and npm versions before running other commands.
+   This serves the production build locally so you can test it before deployment.
 
-### Build Commands
+### Available Scripts
 
-#### `npm run build`
+#### Development Commands
 
-Builds the app for production to the `dist` folder:
+- **`npm run dev`** - Runs the app in development mode with Vite
+- **`npm run precheck`** - Manually run the version check (also runs automatically before `dev`, `build`, `lint`, and `preview`)
 
-```bash
-npm run build
-```
+#### Build Commands
 
-This will:
-- ✅ Check Node.js and npm versions (via `precheck`)
-- 📦 Create an optimized production build in the `dist` folder
-- 🗜️ Minify and bundle all assets
-- 🎯 Optimize for best performance
-- 📝 Filenames include content hashes for caching
+- **`npm run build`** - Builds the app for production to the `dist` folder
+- **`npm run preview`** - Locally preview the production build before deploying
 
-#### `npm run preview`
+#### Code Quality Commands
 
-Locally preview the production build before deploying:
+- **`npm run lint`** - Runs ESLint to check code quality and potential errors
 
-```bash
-npm run preview
-```
+#### Upgrade Commands
 
-This serves the production build locally so you can test it before deployment.
+- **`npm run upgrade:safe`** - Safely update dependencies to their latest compatible versions
+- **`npm run upgrade:minor`** - Update dependencies to latest minor versions (may introduce breaking changes)
+- **`npm run upgrade:major`** - Update dependencies to latest major versions (use with extreme caution)
 
-### Code Quality Commands
-
-#### `npm run lint`
-
-Runs ESLint to check code quality and potential errors:
-
-```bash
-npm run lint
-```
-
-This will:
-- ✅ Check Node.js and npm versions (via `precheck`)
-- 🔍 Check for code style issues
-- 🐛 Identify potential bugs
-- 📋 Enforce coding standards
-
-### Upgrade Commands
-
-#### `npm run upgrade:safe`
-
-Safely update dependencies to their latest compatible versions:
-
-```bash
-npm run upgrade:safe
-```
-
-This command:
-- Updates packages within their current version ranges
-- Runs tests after upgrade to ensure compatibility
-
-#### `npm run upgrade:minor`
-
-Update dependencies to latest minor versions:
-
-```bash
-npm run upgrade:minor
-```
-
-**Warning:** This may introduce breaking changes. Test thoroughly after running.
-
-#### `npm run upgrade:major`
-
-Update dependencies to latest major versions:
-
-```bash
-npm run upgrade:major
-```
-
-**Warning:** This will likely introduce breaking changes. Use with extreme caution and test thoroughly.
+---
 
 ## Docker Setup
 
-### Prerequisites
+### Building the Docker Image
 
-- Docker installed on your system
-- `.env` file configured with all required environment variables
-
-### Build Docker Image
-
-Build the Docker image for the application:
+Build the Docker image:
 
 ```bash
 docker build -t hrms-frontend .
 ```
 
-This command:
-- Builds a Docker image tagged as `hrms-frontend`
-- Uses the `Dockerfile` in the project root
-- Includes all dependencies and production build
+This will:
+- Use Node.js 24 Alpine as the base image
+- Install dependencies
+- Build the React application
+- Create an optimized production image
 
-### Run Docker Container
+### Running the Docker Container
 
-Run the application in a Docker container:
+Run the container:
 
 ```bash
-docker run -p 3000:3000 --env-file .env hrms-frontend
+docker run -d \
+  --name hrms-frontend \
+  -p 3000:3000 \
+  --env-file .env \
+  hrms-frontend
 ```
 
-**Options explained:**
-- `-p 3000:3000` - Maps port 3000 from container to host
-- `--env-file .env` - Loads environment variables from `.env` file
-- `hrms-frontend` - The image name to run
+**Note:** 
+- The container exposes port `3000` by default
+- Make sure your `.env` file has all required environment variables configured
+- The `--env-file .env` flag loads all environment variables from your `.env` file
 
 ### Docker Commands Reference
 
@@ -338,6 +331,53 @@ docker run -p 3000:3000 \
   -e VITE_ENCRYPTION_KEY=your-encryption-key \
   hrms-frontend
 ```
+
+### Docker Compose (Optional)
+
+You can also use Docker Compose. Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  hrms-frontend:
+    build: .
+    container_name: hrms-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
+```
+
+Then run:
+
+```bash
+docker-compose up -d
+```
+
+### Important Docker Notes
+
+1. **Environment Variables:** Ensure your `.env` file has all required variables before building/running the container.
+
+2. **Port Configuration:** The container exposes port `3000` by default. Change the port mapping if needed: `-p <host-port>:3000`
+
+3. **Logs:** View container logs:
+   ```bash
+   docker logs hrms-frontend
+   ```
+
+4. **Stop Container:**
+   ```bash
+   docker stop hrms-frontend
+   ```
+
+5. **Remove Container:**
+   ```bash
+   docker rm hrms-frontend
+   ```
+
+---
 
 ## Project Structure
 
@@ -433,89 +473,62 @@ hrms-frontend/
 └── vite.config.js            # Vite configuration
 ```
 
-## Configuration
-
-### Port Configuration
-
-The development server runs on port **3000** by default. To change this, modify `vite.config.js`:
-
-```javascript
-export default defineConfig({
-  server: {
-    port: 3000, // Change this to your desired port
-  },
-})
-```
-
-### API Proxy
-
-The project is configured to proxy API requests to `http://localhost:5000` during development. This is set in `package.json`:
-
-```json
-{
-  "proxy": "http://localhost:5000"
-}
-```
-
-To change the backend URL:
-1. Update the `proxy` field in `package.json` for development
-2. Update `VITE_REACT_APP_HOSTED_URL` in `.env` for production
-
-## Cross-Platform Support
-
-✅ **Works on all platforms:**
-- macOS ✅
-- Windows ✅  
-- Linux ✅
-
-The version checking script is written in Node.js, so it works everywhere Node.js runs!
+---
 
 ## Troubleshooting
 
-### Node.js Version Issues
+### Common Issues
 
-If you see an error about Node.js version:
-- Ensure you have Node.js v24.11.0 or higher installed
-- Use `nvm use` if you have nvm installed
-- Check your version with `node --version`
+1. **Node.js Version Error:**
+   - Ensure you have Node.js v24.11.0 or higher installed
+   - Use `nvm use` if you have nvm installed
+   - Check your version with `node --version`
 
-### Environment Variables Not Working
+2. **Environment Variables Not Working:**
+   - Make sure your `.env` file is in the root directory
+   - All environment variables must start with `VITE_` to be accessible in the app
+   - Restart the development server after changing `.env` file
+   - Check that there are no spaces around the `=` sign in `.env`
 
-- ✅ Make sure your `.env` file is in the root directory
-- ✅ All environment variables must start with `VITE_` to be accessible in the app
-- ✅ Restart the development server after changing `.env` file
-- ✅ Check that there are no spaces around the `=` sign in `.env`
+3. **API Connection Issues:**
+   - Ensure your backend server is running
+   - Check that `VITE_REACT_APP_HOSTED_URL` is correct
+   - Verify CORS settings on your backend
+   - Check browser console for specific error messages
 
-### API Connection Issues
+4. **Google OAuth Not Working:**
+   - Verify `VITE_REACT_APP_GOOGLE_CLIENT_ID` is set correctly
+   - Check that authorized JavaScript origins include your domain
+   - Ensure the Google+ API is enabled in Google Cloud Console
 
-- ✅ Ensure your backend server is running
-- ✅ Check that `VITE_REACT_APP_HOSTED_URL` is correct
-- ✅ Verify CORS settings on your backend
-- ✅ Check browser console for specific error messages
+5. **Encryption Key Issues:**
+   - Ensure `VITE_ENCRYPTION_KEY` is at least 64 hexadecimal characters
+   - The key must be a valid hex string (0-9, a-f)
+   - Generate a new key if you see encryption/decryption errors
 
-### Google OAuth Not Working
+6. **Port Already in Use:**
+   - Change the port in `vite.config.js` to an available port
+   - Or stop the process using port 3000
 
-- ✅ Verify `VITE_REACT_APP_GOOGLE_CLIENT_ID` is set correctly
-- ✅ Check that authorized JavaScript origins include your domain
-- ✅ Ensure the Google+ API is enabled in Google Cloud Console
+7. **Build Errors:**
+   - Ensure all dependencies are installed (`npm install`)
+   - Check for TypeScript/JavaScript compilation errors
+   - Verify `vite.config.js` is properly configured
 
-### Encryption Key Issues
+8. **Docker Issues:**
+   - Ensure Docker is installed and running
+   - Check that `.env` file exists and has all required variables
+   - Verify port 3000 is not already in use
+   - Check Docker logs: `docker logs <container-name>`
 
-- ✅ Ensure `VITE_ENCRYPTION_KEY` is at least 64 hexadecimal characters
-- ✅ The key must be a valid hex string (0-9, a-f)
-- ✅ Generate a new key if you see encryption/decryption errors
+---
 
-### Docker Issues
+## License
 
-- ✅ Ensure Docker is installed and running
-- ✅ Check that `.env` file exists and has all required variables
-- ✅ Verify port 3000 is not already in use
-- ✅ Check Docker logs: `docker logs <container-name>`
+ISC
 
-## Learn More
+---
 
-- [Vite Documentation](https://vitejs.dev/)
-- [React Documentation](https://react.dev/)
-- [React Router Documentation](https://reactrouter.com/)
-- [Redux Toolkit Documentation](https://redux-toolkit.js.org/)
-- [Docker Documentation](https://docs.docker.com/)
+## Support
+
+For issues and questions, please visit: [GitHub Issues](https://github.com/mittarv/frontend/issues)
