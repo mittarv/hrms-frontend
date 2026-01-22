@@ -10,15 +10,15 @@ import LoadingSpinner from "../../Common/components/LoadingSpinner";
 import EmployeeCard from "./EmployeeCard";
 import Sort from "./Sort";
 import "../styles/EmployeeDirectory.scss";
-import noResultsImg from "../../../../assets/icons/no_results_icon.svg";
-import searchIcon from "../../../../assets/icons/Search_icon_grey.svg";
-import cross from "../../../../assets/icons/cross_icon.svg";
-import filter_grey_icon from "../../../../assets/icons/filter_grey_icon.svg";
-import divider from "../../../../assets/icons/divider_icon.svg";
-import tick_icon from "../../../../assets/icons/tick_icon.svg";
+import noResultsImg from "../../assets/icons/no_results_icon.svg";
+import searchIcon from "../../assets/icons/Search_icon_grey.svg";
+import cross from "../../assets/icons/cross_icon.svg";
+import filter_grey_icon from "../../assets/icons/filter_grey_icon.svg";
+import divider from "../../assets/icons/divider_icon.svg";
+import tick_icon from "../../assets/icons/tick_icon.svg";
 import { ClickAwayListener } from "@mui/material";
-import dropdown_arrow from "../../../../assets/icons/dropdown_arrow.svg";
-import { toolHomePageData } from "../../../../constant/data";
+import dropdown_arrow from "../../assets/icons/dropdown_arrow.svg";
+import { hrToolHomePageData } from "../../constant/data";
 
 const FilterDropdown = ({ title, options, selected, onSelect }) => {
   
@@ -151,7 +151,7 @@ const EmployeeDirectory = ({hasAccess}) => {
      
       dispatch({
         type: "SET_SELECTED_TOOL_NAME",
-        payload: toolHomePageData.toot_title2
+        payload: hrToolHomePageData.toot_title2
       });
   
     }, [dispatch]);

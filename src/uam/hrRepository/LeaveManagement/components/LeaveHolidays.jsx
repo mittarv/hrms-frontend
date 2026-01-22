@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
-import Plus_icon from "../../../../assets/icons/Plus_icon.svg";
-import Search_icon_grey from "../../../../assets/icons/Search_icon_grey.svg";
-import EditIcon from "../../../../assets/icons/edit_button_blue.svg";
+import Plus_icon from "../../assets/icons/Plus_icon.svg";
+import Search_icon_grey from "../../assets/icons/Search_icon_grey.svg";
+import EditIcon from "../../assets/icons/edit_button_blue.svg";
 import { useState, useEffect } from "react";
 import "../styles/LeaveHoliday.scss";
 import HolidayPopup from "./HolidayPopup";
@@ -11,10 +11,20 @@ import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 
 const LeaveHolidays = () => {
-  const { empHolidays, policy, loading } = useSelector((state) => state.hrRepositoryReducer);
+  const { empHolidays, policy, loading, myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
-  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 500;
+  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+  
+  // Check for Holiday permissions: Create, Update, Delete, or Admin view
+  const hasHolidayCreate = myHrmsAccess?.permissions?.some(perm => perm.name === "Holiday_Create");
+  const hasHolidayUpdate = myHrmsAccess?.permissions?.some(perm => perm.name === "Holiday_Update");
+  const hasHolidayDelete = myHrmsAccess?.permissions?.some(perm => perm.name === "Holiday_Delete");
+  const hasHolidayAdminView = myHrmsAccess?.permissions?.some(perm => perm.name === "HolidayAdmin_view");
+  
+  // User has access if admin OR has any of the holiday permissions
+  const hasAccessToLeaveHolidays = hasHolidayCreate || hasHolidayUpdate || hasHolidayDelete || hasHolidayAdminView;
+
   const dispatch = useDispatch();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -118,7 +128,7 @@ const LeaveHolidays = () => {
     <>
       {loading ? <LoadingSpinner message="Loading Holidays..." height="40vh" /> : 
       <div className="Leave_holiday_main_container">
-        {isAdmin && (
+        {(isAdmin || hasAccessToLeaveHolidays) && (
           <div className="leave_holiday_header_container">
             <span className="leave_holiday_header">
               <p className="leave_holiday_header_title">Admin</p>
@@ -181,7 +191,7 @@ const LeaveHolidays = () => {
         <div className="yearly_holidays_section">
           <p className="holiday_title">
             Yearly Mandatory Holidays
-            {isAdmin && (
+            {(isAdmin || hasAccessToLeaveHolidays) && (
               <span
                 className="edit-button"
                 onClick={() => handleOpenPopup("mandatory")}
@@ -235,7 +245,7 @@ const LeaveHolidays = () => {
         <div className="yearly_holidays_section">
           <p className="holiday_title">
             Yearly Optional/Restricted Holidays
-            {isAdmin && (
+            {(isAdmin || hasAccessToLeaveHolidays) && (
               <span
                 className="edit-button"
                 onClick={() => handleOpenPopup("optional_restricted")}
@@ -244,7 +254,7 @@ const LeaveHolidays = () => {
               </span>
             )}
           </p>
-          {!isAdmin && (
+          {(!isAdmin && !hasAccessToLeaveHolidays) && (
             <p className="policy_reference">
               *Please refer to the{" "}
               <a

@@ -43,14 +43,12 @@ const handleDecimalLeaveDisplay = (decimalValue) => {
 };
 
 const LeaveAvailable = () => {
-  const { currentEmployeeDetails, policy, empFiscalYear, accrualLeaveBalance } = useSelector(
+  const { currentEmployeeDetails, policy, empFiscalYear, accrualLeaveBalance, compOffleaveBalance } = useSelector(
     state => state.hrRepositoryReducer
   );
   const [policyLink, setPolicyLink] = useState("");
 
-
-
-useEffect(() => {
+  useEffect(() => {
     if (policy) {
       const policyLink = policy.find((link) => link.policyName.toLowerCase() === "leave and holiday policy");
       setPolicyLink(policyLink ? policyLink.policyLink : "");
@@ -59,42 +57,85 @@ useEffect(() => {
 
   // Calculate applicable leaves for the current employee
   const applicableLeaves = useMemo(() => {
-    return accrualLeaveBalance.map(leave => {
-      const accrualRecord = leave;
+    // Filter out comp off from accrualLeaveBalance (comp off is handled separately)
+    const regularLeaves = accrualLeaveBalance
+      .filter(leave => {
+        const leaveType = leave?.leaveType?.toLowerCase() || '';
+        return !leaveType.includes('comp') && !leaveType.includes('comp off');
+      })
+      .map(leave => {
+        const accrualRecord = leave;
 
-      // Use accrual data if available, otherwise fallback to legacy
-      const totalAllocated = accrualRecord ? accrualRecord?.totalAllotedLeaves : 0;
-      const accruedLeaves = accrualRecord ? accrualRecord?.accruedLeaves : totalAllocated;
-      const rawTotalLeft = accrualRecord && accrualRecord?.availableLeaves;
-      const totalUsed = accrualRecord && accrualRecord?.totalUsedLeaves;
+        // Use accrual data if available, otherwise fallback to legacy
+        const totalAllocated = accrualRecord ? accrualRecord?.totalAllotedLeaves : 0;
+        const accruedLeaves = accrualRecord ? accrualRecord?.accruedLeaves : totalAllocated;
+        const rawTotalLeft = accrualRecord && accrualRecord?.availableLeaves;
+        const totalUsed = accrualRecord && accrualRecord?.totalUsedLeaves;
+        
+        // **DECIMAL LEAVE HANDLING** - Apply decimal rules to displayed values
+        const totalLeftHandling = handleDecimalLeaveDisplay(rawTotalLeft);
+        const accruedLeavesHandling = handleDecimalLeaveDisplay(accruedLeaves);
+        
+        // Display processed values according to decimal rules
+        const totalLeft = totalLeftHandling?.displayValue;
+        const processedAccruedLeaves = accruedLeavesHandling?.displayValue;
+        
+        return {
+          ...leave,
+          totalAllocated,
+          accruedLeaves: processedAccruedLeaves,
+          totalUsed,
+          totalLeft,
+          isAccrualSystem: !!accrualRecord,
+          // Decimal handling information for tooltips/details
+          decimalInfo: {
+            totalLeft: totalLeftHandling,
+            accrued: accruedLeavesHandling,
+            rawValues: {
+              totalLeft: rawTotalLeft,
+              accrued: accruedLeaves
+            }
+          }
+        };
+      });
+
+    // Add comp off leave from compOffleaveBalance only if totalAllotted > 0
+    const compOffLeave = [];
+    if (
+      compOffleaveBalance && 
+      !Array.isArray(compOffleaveBalance) && 
+      compOffleaveBalance.totalAllotted > 0
+    ) {
+      const totalAllotted = compOffleaveBalance.totalAllotted || 0;
+      const totalLeaveTaken = compOffleaveBalance.totalLeaveTaken || 0;
+      const totalLeft = totalAllotted - totalLeaveTaken;
       
-      // **DECIMAL LEAVE HANDLING** - Apply decimal rules to displayed values
-      const totalLeftHandling = handleDecimalLeaveDisplay(rawTotalLeft);
-      const accruedLeavesHandling = handleDecimalLeaveDisplay(accruedLeaves);
+      // Apply decimal handling to comp off values
+      const totalLeftHandling = handleDecimalLeaveDisplay(totalLeft);
+      const totalAllottedHandling = handleDecimalLeaveDisplay(totalAllotted);
       
-      // Display processed values according to decimal rules
-      const totalLeft = totalLeftHandling?.displayValue;
-      const processedAccruedLeaves = accruedLeavesHandling?.displayValue;
-      
-      return {
-        ...leave,
-        totalAllocated,
-        accruedLeaves: processedAccruedLeaves,
-        totalUsed,
-        totalLeft,
-        isAccrualSystem: !!accrualRecord,
-        // Decimal handling information for tooltips/details
+      compOffLeave.push({
+        leaveType: "Comp Off",
+        leaveConfigId: "comp-off",
+        totalAllocated: totalAllottedHandling.displayValue,
+        accruedLeaves: totalAllottedHandling.displayValue, // For comp off, allotted = accrued
+        totalUsed: totalLeaveTaken,
+        totalLeft: totalLeftHandling.displayValue,
+        isAccrualSystem: false,
+        isCompOff: true,
         decimalInfo: {
           totalLeft: totalLeftHandling,
-          accrued: accruedLeavesHandling,
+          accrued: totalAllottedHandling,
           rawValues: {
-            totalLeft: rawTotalLeft,
-            accrued: accruedLeaves
+            totalLeft: totalLeft,
+            accrued: totalAllotted
           }
         }
-      };
-    });
-  }, [accrualLeaveBalance]);
+      });
+    }
+
+    return [...regularLeaves, ...compOffLeave];
+  }, [accrualLeaveBalance, compOffleaveBalance]);
 
 const getFiscalYear = () => {
    // Check if hire date exists

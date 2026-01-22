@@ -1,11 +1,11 @@
 import "../styles/LeaveStatus.scss";
-import Plus_icon from "../../../../assets/icons/Plus_icon.svg";
+import Plus_icon from "../../assets/icons/Plus_icon.svg";
 import { useEffect, useState } from "react";
 import LeaveApplication from "./LeaveApplication";
 import UploadProofPopup from "./UploadProofPopup";
-import Upload_icon from "../../../../assets/icons/upload_icon_blue.svg";
-import Upload_icon_disable from "../../../../assets/icons/upload_icon_grey.svg";
-import View_icon from "../../../../assets/icons/view_icon.svg";
+import Upload_icon from "../../assets/icons/upload_icon_blue.svg";
+import Upload_icon_disable from "../../assets/icons/upload_icon_grey.svg";
+import View_icon from "../../assets/icons/view_icon.svg";
 import {
   getEmployeeLeaveHistory,
   uploadProofDocuments,
@@ -21,11 +21,12 @@ const LeaveStatus = () => {
   const [applyLeave, setApplyLeave] = useState(false);
   const [uploadProof, setUploadProof] = useState(false);
   const [selectedLeaveForUpload, setSelectedLeaveForUpload] = useState(null);
-  const { loading, currentEmployeeDetailsLoading,  employeeLeaveHistory, currentEmployeeDetails, allExisitingLeaves, getAllComponentType} = useSelector(
+  const { loading, currentEmployeeDetailsLoading,  employeeLeaveHistory, currentEmployeeDetails, allExisitingLeaves, getAllComponentType, myHrmsAccess} = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const dispatch = useDispatch();
+  const hasAccessToLeaveStatus=myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
 
   useEffect(() => {
     dispatch(
@@ -166,7 +167,7 @@ const LeaveStatus = () => {
                 currentEmployeeDetails?.employeeCurrentJobDetails?.empType,
                 getAllComponentType
               ) || ""}
-              {` ${allToolsAccessDetails?.[selectedToolName] >= 500 ? " | Admin" : ""}`}
+              {` ${(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToLeaveStatus) ? " | Admin" : ""}`}
             </p>
           </span>
           <button

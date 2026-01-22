@@ -1,19 +1,19 @@
 // import { X } from 'lucide-react';
-import Mitt_Arv_Logo from "../../../../../assets/icons/mittar_payroll_logo.svg";
-import walletIcon from "../../../../../assets/icons/wallet_icon.svg";
-import walletIconDark from "../../../../../assets/icons/wallet_icon_dark.svg";
-import subtarctIconGrey from "../../../../../assets/icons/subtract_icon_grey.svg";
-import walletIconLight from "../../../../../assets/icons/wallet_icon_light.svg";
-import deductionIcon from "../../../../../assets/icons/deduction_icon.svg";
-import equalIconGrey from "../../../../../assets/icons/equal_icon_grey.svg";
-import closeIcon from "../../../../../assets/icons/cross_icon.svg";
+import Mitt_Arv_Logo from "../../../assets/icons/mittar_payroll_logo.svg";
+import walletIcon from "../../../assets/icons/wallet_icon.svg";
+import walletIconDark from "../../../assets/icons/wallet_icon_dark.svg";
+import subtarctIconGrey from "../../../assets/icons/subtract_icon_grey.svg";
+import walletIconLight from "../../../assets/icons/wallet_icon_light.svg";
+import deductionIcon from "../../../assets/icons/deduction_icon.svg";
+import equalIconGrey from "../../../assets/icons/equal_icon_grey.svg";
+import closeIcon from "../../../assets/icons/cross_icon.svg";
 import "../styles/PayslipPreview.scss";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { getCurrentEmployeeDetails} from "../../../../../actions/hrRepositoryAction";
 import { getComponentTypeValue } from "../../../Common/utils/helper";
 import LoadingSpinner from "../../../Common/components/LoadingSpinner";
-import addIconGrey from "../../../../../assets/icons/add_icon_grey.svg";
+import addIconGrey from "../../../assets/icons/add_icon_grey.svg";
 
 const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
   const {currentEmployeeDetails, loading, currentEmployeeDetailsLoading,  getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);

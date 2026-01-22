@@ -1,33 +1,32 @@
-.leave_configurator_dashboard_main_container {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
+.leave_configurator_container * {
+    box-sizing: border-box;
+    font-family: "Plus Jakarta Sans";
+}
 
-    .leave_configurator_dashboard_header_container {
-        height: 100%;
+.leave_configurator_container {
+    padding: 1.5rem 2.25rem;
+    height: 100%;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #D2D9DF;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #054A68;
+        border-radius: 4px;
+    }
+
+    .leave_configurator_dashboard_body_container {
         width: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-
-        .display_routes {
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
-
-        .uam_main__header {
-            border-bottom: 1px solid #054a684d;
-        }
-
-        .leave_configurator_dashboard_body_container {
-            width: 100%;
-            height: 100%;
-            padding: 54px 50px;
-            overflow-y: hidden;
-            object-fit: contain;
+        height: 100%;
+        overflow-y: hidden;
+        object-fit: contain;
 
             .leave_configurator_dashboard_heading_container {
                 display: flex;
@@ -186,4 +185,4 @@
             }
         }
     }
-}
+

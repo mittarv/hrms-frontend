@@ -1199,7 +1199,7 @@ export const deleteHolidays = (holidayIds) => async (dispatch) => {
     dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
-          payload: await getErrorMessage(error, "An error occurred"),
+          message: error?.response?.data?.message || await getErrorMessage(error, "Failed to delete holiday"),
           severity: "error"
         }
       });
@@ -1346,6 +1346,121 @@ export const createAttendanceLog = (attendanceData, attendanceMonth, attendanceY
           message: await getErrorMessage(error, "An error occurred"),
           severity: "error"
         }
+    });
+  }
+}
+
+export const registerCompOffLeave = (attendanceData, attendanceMonth, attendanceYear) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({type:"CREATE_ATTENDANCE_LOG"});
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${attendanceData.empUuid}/registerCompOffLeave`,
+      attendanceData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      }
+    );
+    if(response.data.success){
+      dispatch({
+        type: "CREATE_ATTENDANCE_LOG_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAttendanceLogs(attendanceMonth, attendanceYear, attendanceData.empUuid));
+      dispatch(getLeaveBalanceWithAccrual(attendanceData.empUuid));
+      dispatch(getCompOffleaveBalance(attendanceData.empUuid));
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Comp off leave applied successfully",
+          severity: "success"
+        }
+      });
+    } else {
+      dispatch({
+        type: "CREATE_ATTENDANCE_LOG_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Error applying comp off leave",
+          severity: "error"
+        }
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "CREATE_ATTENDANCE_LOG_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: await getErrorMessage(error, "An error occurred"),
+          severity: "error"
+        }
+    });
+  }
+}
+
+export const updateCompOffLeave = (attendanceData, attendanceId, month, year, employeeUuid) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({type:"UPDATE_EMPLOYEE_ATTENDANCE_LOG"});
+    const response = await axios.patch(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${attendanceId}/updateCompOffLeave`,
+      attendanceData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "UPDATE_EMPLOYEE_ATTENDANCE_LOG_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAttendanceLogs(month, year, employeeUuid));
+      dispatch(getEmployeeLeaveHistory(employeeUuid));
+      dispatch(getLeaveBalanceWithAccrual(employeeUuid));
+      dispatch(getCompOffleaveBalance(employeeUuid));
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Comp off leave updated successfully",
+          severity: "success"
+        }
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EMPLOYEE_ATTENDANCE_LOG_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to update comp off leave",
+          severity: "error"
+        }
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "UPDATE_EMPLOYEE_ATTENDANCE_LOG_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
 }
@@ -1694,6 +1809,7 @@ export const updateEmployeeAttendanceLog = (attendanceData, attendanceId, month,
       dispatch(getAttendanceLogs(month, year, employeeUuid));
       dispatch(getEmployeeLeaveHistory(employeeUuid));
       dispatch(getLeaveBalanceWithAccrual(employeeUuid));
+      dispatch(getCompOffleaveBalance(employeeUuid));
       dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
@@ -2645,11 +2761,25 @@ export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatc
       pageSize, 
       selectedMonth, 
       selectedYear, 
-      searchQuery 
+      searchQuery
     } = getSalaryComponentsDataParams;
+  const queryParams = new URLSearchParams();
+    // Convert month name to month number (1-12)
+  if (selectedMonth) {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+    const monthNumber = monthNames.indexOf(selectedMonth) + 1;
+    if (monthNumber > 0) {
+      queryParams.append("month", monthNumber);
+    }
+  }
+    
+  if (selectedYear) queryParams.append("year", selectedYear);
+  
+  
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/generatePayroll`,
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/generatePayroll?${queryParams.toString()}`,
       {},
       {
         headers: {
@@ -3016,3 +3146,649 @@ export const setPayslipFilterMonth = (month) => (dispatch) => {
 export const setPayslipFilterYear = (year) => (dispatch) => {
   dispatch({ type: "SET_PAYSLIP_FILTER_YEAR", payload: year });
 };
+
+export const extraWorkLogRequest = (requestData) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "EXTRA_WORK_LOG_REQUEST" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/extraWorkLogRequest`,
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "EXTRA_WORK_LOG_REQUEST_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "EXTRA_WORK_LOG_REQUEST_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "EXTRA_WORK_LOG_REQUEST_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to submit extra work log request"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const getExtraWorkLogRequests = (startDate, endDate) => async(dispatch)=> {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_EXTRA_WORK_LOG_REQUESTS" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getExtraWorkLogRequests/?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_EXTRA_WORK_LOG_REQUESTS_SUCCESS",
+        payload: response.data.workLogRequests,
+      });
+    } else {
+      dispatch({
+        type: "GET_EXTRA_WORK_LOG_REQUESTS_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_EXTRA_WORK_LOG_REQUESTS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const updateExtraWorkLogRequestStatus = (requestIds, action, startDate, endDate) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/updateExtraWorkLogRequestStatus`,
+      { requestIds, action },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getExtraWorkLogRequests(startDate, endDate));
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to update request status"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const getCompOffleaveBalance = (empUuid) => async(dispatch) => {
+  if (!empUuid) return;
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_COMP_OFFLEAVE_BALANCE" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getCompOffleaveBalance?empUuid=${empUuid}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_COMP_OFFLEAVE_BALANCE_SUCCESS",
+        payload: response.data.compOffleaveBalance,
+      });
+    } else {
+      dispatch({
+        type: "GET_COMP_OFFLEAVE_BALANCE_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_COMP_OFFLEAVE_BALANCE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const getCompOffLeaveEligibility = (empUuid, startDate, endDate, isHalfDay) => async(dispatch) => {
+  if (!empUuid || !startDate) return;
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_COMP_OFF_LEAVE_ELIGIBILITY" });
+    const params = new URLSearchParams({
+      empUuid,
+      startDate,
+      ...(endDate && { endDate }),
+      ...(isHalfDay !== undefined && { isHalfDay: isHalfDay ? 'true' : 'false' })
+    });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${empUuid}/getCompOffLeaveEligibility?${params.toString()}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_COMP_OFF_LEAVE_ELIGIBILITY_SUCCESS",
+        payload: response.data.data,
+      });
+    } else {
+      dispatch({
+        type: "GET_COMP_OFF_LEAVE_ELIGIBILITY_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_COMP_OFF_LEAVE_ELIGIBILITY_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const getAllRoles = () => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_ALL_ROLES" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/getAllRoles`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_ALL_ROLES_SUCCESS",
+        payload: response.data.roles,
+      });
+    } else {
+      dispatch({
+        type: "GET_ALL_ROLES_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_ALL_ROLES_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const getAllHrmsAccessPermissions = () => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_ALL_HRMS_ACCESS_PERMISSIONS" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/permissions`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    ); 
+    if (response.data.success) {
+      dispatch({
+        type: "GET_ALL_HRMS_ACCESS_PERMISSIONS_SUCCESS",
+        payload: response.data.permissions,
+      });
+    } else {
+      dispatch({
+        type: "GET_ALL_HRMS_ACCESS_PERMISSIONS_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_ALL_HRMS_ACCESS_PERMISSIONS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const createHrmsRole = (roleData) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "CREATE_HRMS_ROLE" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/createRole`,
+      roleData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "CREATE_HRMS_ROLE_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAllRoles());
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "CREATE_HRMS_ROLE_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+        type: "CREATE_HRMS_ROLE_FAILURE",
+        payload: await getErrorMessage(error, "An error occurred"),
+      });
+    }
+  }
+
+export const getHrmsRoleById = (roleId) => async(dispatch) => {
+  if (!roleId) return;
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_HRMS_ROLE_BY_ID" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/${roleId}/getRoleById`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_HRMS_ROLE_BY_ID_SUCCESS",
+        payload: response.data.role,
+      });
+    } else {
+      dispatch({
+        type: "GET_HRMS_ROLE_BY_ID_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_HRMS_ROLE_BY_ID_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const updateHrmsRole = (roleId, roleData) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "UPDATE_HRMS_ROLE" });
+    const response = await axios.patch(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/${roleId}/updateRole`,
+      roleData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "UPDATE_HRMS_ROLE_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAllRoles());
+      dispatch(getAllEmployee());
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "UPDATE_HRMS_ROLE_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "UPDATE_HRMS_ROLE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const deleteHrmsRole = (roleId) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "DELETE_HRMS_ROLE" });
+    const response = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/${roleId}/deleteRole`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "DELETE_HRMS_ROLE_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAllRoles());
+      dispatch(getAllEmployee());
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "DELETE_HRMS_ROLE_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "DELETE_HRMS_ROLE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const assignEmployeeRole = (empUuid, roleId) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "ASSIGN_EMPLOYEE_ROLE" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/assignEmployeeRole`,
+      { empUuid, roleId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "ASSIGN_EMPLOYEE_ROLE_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAllEmployee());
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "ASSIGN_EMPLOYEE_ROLE_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "ASSIGN_EMPLOYEE_ROLE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const revokeEmployeeAccess = (empUuid) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "REVOKE_EMPLOYEE_ACCESS" });
+    const response = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/${empUuid}/revokeEmployeeAccess`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "REVOKE_EMPLOYEE_ACCESS_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch(getAllEmployee());
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "success",
+        },
+      });
+    } else {
+      dispatch({
+        type: "REVOKE_EMPLOYEE_ACCESS_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "REVOKE_EMPLOYEE_ACCESS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
+  }
+}
+
+export const getEmployeeRoles = (empUuid) => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_EMPLOYEE_ROLES" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/${empUuid}/getEmployeeRoles`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_EMPLOYEE_ROLES_SUCCESS",
+        payload: response.data.employeeRoles,
+      });
+    } else {
+      dispatch({
+        type: "GET_EMPLOYEE_ROLES_FAILURE",
+        payload: response.data.message,
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "GET_EMPLOYEE_ROLES_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+}
+
+export const getMyHrmsAccess = () => async(dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "GET_MY_HRMS_ACCESS" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/access/myHrmsAccess`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_MY_HRMS_ACCESS_SUCCESS",
+        payload: response.data.myHrmsAccess,
+      });
+      return { success: true, data: response.data.myHrmsAccess };
+    } else {
+      dispatch({
+        type: "GET_MY_HRMS_ACCESS_FAILURE",
+        payload: response.data.message,
+      });
+      return { success: false, message: response.data.message };
+    }
+  } catch (error) {
+    const errorMessage = await getErrorMessage(error, "An error occurred");
+    dispatch({
+      type: "GET_MY_HRMS_ACCESS_FAILURE",
+      payload: errorMessage,
+    });
+    return { success: false, message: errorMessage };
+  }
+}

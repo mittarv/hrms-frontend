@@ -76,7 +76,7 @@
         }
         // Keep checkboxes normal but faded (will be replaced with dummy later)
         input[type="checkbox"] {
-          background: url("../../../../../assets/icons/checkbox_disabled.svg") no-repeat center center;
+          background: url("../../../assets/icons/checkbox_disabled.svg") no-repeat center center;
           background-size: contain;
           border: none;
           cursor: not-allowed;
@@ -151,13 +151,13 @@
         position: relative;
 
         &:checked {
-          background: url("../../../../../assets/icons/checkbox_checked.svg") no-repeat center center;
+          background: url("../../../assets/icons/checkbox_checked.svg") no-repeat center center;
           background-size: contain;
           border: none;
         }
 
         &:not(:checked) {
-          background: url("../../../../../assets/icons/checkbox_unchecked.svg") no-repeat center center;
+          background: url("../../../assets/icons/checkbox_unchecked.svg") no-repeat center center;
           background-size: contain;
           border: none;
         }

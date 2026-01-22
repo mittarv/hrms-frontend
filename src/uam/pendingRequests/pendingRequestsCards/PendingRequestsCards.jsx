@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import './pendingRequestsCards.scss'
 import { Avatar } from '@mui/material'
 import LongArrow from '../../../assets/icons/long_arrow.svg'
@@ -16,8 +16,8 @@ const PendingRequestsCards = () => {
     return (
         <div className='pending_requests_cards'>
             {
-                pendingRequests?.filter((req) => req.approvalStatus === "PENDING").map((req, index) =>{
-                    return <Card key={index} cardData = {req}/>
+                pendingRequests?.filter((req) => req.approvalStatus === "PENDING").map((req) =>{
+                    return <Card cardData = {req}/>
                 })
             }
             {/* <Card />

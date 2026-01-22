@@ -355,7 +355,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
       }
 
       setOpenIndexes((prev) =>
-        prev?.map(() =>
+        prev?.map((pr, idx) =>
           false
         ))
     } else {
@@ -374,7 +374,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
       }
 
       setOpenIndexesnew((prev) =>
-        prev?.map(() =>
+        prev?.map((pr, idx) =>
           false
         ))
     }
@@ -598,7 +598,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
                           >
                             <Paper>
                               <ClickAwayListener onClickAway={() => setOpenIndexes((prev) =>
-                                prev?.map(() =>
+                                prev?.map((pr, idx) =>
                                   false
                                 )
 
@@ -608,7 +608,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
                                     userPermissionsDataa?.map((user) => {
                                       return <MenuItem
                                         key={user.user?.id}
-                                        onClick={() => {
+                                        onClick={(event) => {
 
                                           handleMenuItemClick(
                                             user.user?.name,
@@ -814,7 +814,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
                           >
                             <Paper>
                               <ClickAwayListener onClickAway={() => setOpenIndexesnew((prev) =>
-                                prev?.map(() =>
+                                prev?.map((pr, idx) =>
                                   false
                                 )
 
@@ -824,7 +824,7 @@ const MittarvToolsTableEdit = ({ isEdit, toggleOptions }) => {
                                     userPermissionsDataa?.map((user) => {
                                       return <MenuItem
                                         key={user.user?.id}
-                                        onClick={() => {
+                                        onClick={(event) => {
                                           handleMenuItemClick(
                                             user.user?.name,
                                             user.user,

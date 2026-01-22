@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/Snackbar.scss"; 
-import Close_icon from "../../../../assets/icons/cross_icon.svg"
+import Close_icon from "../../assets/icons/cross_icon.svg"
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 

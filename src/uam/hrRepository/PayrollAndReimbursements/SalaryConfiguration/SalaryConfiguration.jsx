@@ -2,6 +2,7 @@ import CustomDropdown from "../../Common/components/CustomDropdown";
 import SalaryTablesPage from "./components/SalaryTablePage";
 import { useSalaryConfiguration } from "./hooks/useSalaryConfiguration";
 import { useDropdownOptions } from "./hooks/useDropdownOptions";
+import { useSelector } from "react-redux";
 import "./styles/SalaryConfiguration.scss";
 
 /**
@@ -9,6 +10,22 @@ import "./styles/SalaryConfiguration.scss";
  * Simplified version with extracted business logic into custom hooks
  */
 const SalaryConfiguration = () => {
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canRead = hasPermission("ConfigureSalary_read");
+  const canCreate = hasPermission("ConfigureSalary_create");
+  const canUpdate = hasPermission("ConfigureSalary_update");
+  const canDelete = hasPermission("ConfigureSalary_delete");
+
   const {
     selectedOptions,
     isLevelDisabled,
@@ -33,6 +50,18 @@ const SalaryConfiguration = () => {
   // Check if current employee type is Intern or Extended Intern
   const isInternType = selectedOptions.employeeType === "Intern" || selectedOptions.employeeType === "Extended Intern";
 
+  // If user doesn't have read permission, show access denied message
+  if (!canRead) {
+    return (
+      <div className="salary_configuration_main_container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p style={{ fontSize: "16px", color: "#666" }}>
+            You don't have permission to view salary configuration
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="salary_configuration_main_container">
@@ -89,12 +118,14 @@ const SalaryConfiguration = () => {
         </div>
         <div className="header_action_button_container">
           {!isSalaryConfigEditing ? (
-            <button 
-              className="salary_configuration_edit_button" 
-              onClick={handleEdit}
-            >
-              Edit
-            </button>
+            (canUpdate || canCreate || canDelete) && (
+              <button 
+                className="salary_configuration_edit_button" 
+                onClick={handleEdit}
+              >
+                Edit
+              </button>
+            )
           ) : (
             <>
               <button 
@@ -103,12 +134,14 @@ const SalaryConfiguration = () => {
               >
                 Cancel
               </button>
-              <button 
-                className="salary_configuration_save_button" 
-                onClick={handleSave}
-              >
-                Save
-              </button>
+              {(canUpdate || canCreate || canDelete) && (
+                <button 
+                  className="salary_configuration_save_button" 
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+              )}
             </>
           )}
         </div>

@@ -2,10 +2,10 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import "../styles/EmployeeRepositoryTable.scss";
 import { EmployeeRepositoryTableHeader } from "../utils/EmployeeRepositoryData";
 import { useSelector } from "react-redux";
-import filter_icon from "../../../../assets/icons/filter_icon.svg";
-import search_icon from "../../../../assets/icons/search_icon.svg";
+import filter_icon from "../../assets/icons/filter_icon.svg";
+import search_icon from "../../assets/icons/search_icon.svg";
 import { useSearchParams } from "react-router-dom";
-import Dropdown_Arrow from "../../../../assets/icons/dropdown_blue_arrow.svg";
+import Dropdown_Arrow from "../../assets/icons/dropdown_blue_arrow.svg";
 import { getCurrentEmployeeDetails } from "../../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
 

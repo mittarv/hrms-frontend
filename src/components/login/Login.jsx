@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import loginImage from "../../assets/images/login_image.svg";
 import mittarvLogo from "../../assets/images/mittarv_logo.svg";
 import mittarvLogo2 from "../../assets/images/mittarv_logo_2.svg";

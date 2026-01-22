@@ -8,9 +8,9 @@ import {
   AMOUNT_TYPES,
   convertFrequencyOptionsFromAPI,
 } from "../utils/PayrollUtils";
-import Cross_icon from "../../../../../assets/icons/cross_icon.svg";
-import Cancel_icon from "../../../../../assets/icons/cancel_icon_red.svg";
-import Restore_icon from "../../../../../assets/icons/restore_icon.svg";
+import Cross_icon from "../../../assets/icons/cross_icon.svg";
+import Cancel_icon from "../../../assets/icons/cancel_icon_red.svg";
+import Restore_icon from "../../../assets/icons/restore_icon.svg";
 import "../styles/PayrollComponentModal.scss";
 
 // Constants
@@ -29,7 +29,19 @@ const PayrollComponentModal = () => {
     payrollFilters, 
     getAllComponentType,
     isAllPayrollGenerated,
+    myHrmsAccess,
   } = useSelector((state) => state.hrRepositoryReducer);
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  
+  // Helper function to check if user has permission
+  const hasPermission = useCallback((permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  }, [myHrmsAccess, allToolsAccessDetails, selectedToolName]);
+  
+  const canEdit = hasPermission("Payroll_Edit");
   const [searchParams, setSearchParams] = useSearchParams();
   const [componentRows, setComponentRows] = useState([]);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -71,7 +83,8 @@ const PayrollComponentModal = () => {
   } = payrollContext || {};
   
   // Determine if modal is in read-only mode
-  const isReadOnly = payrollStatus === "Payroll Finalized" || payrollStatus === "Payroll Generated";
+  // Also check if user has edit permission
+  const isReadOnly = payrollStatus === "Payroll Finalized" || payrollStatus === "Payroll Generated" || !canEdit;
   
   // Get filtered components based on type (addition/deduction)
   const filteredComponents = useMemo(() => {
@@ -102,6 +115,15 @@ const PayrollComponentModal = () => {
   }), []);
 
   /**
+   * Strips "(Effective from ...)" text from component name
+   */
+  const stripEffectiveFromText = useCallback((componentName) => {
+    if (!componentName) return '';
+    // Remove "(Effective from ...)" pattern from component name
+    return componentName.replace(/\s*\(Effective from [^)]+\)/gi, '').trim();
+  }, []);
+
+  /**
    * Loads existing adjustments from payroll context
    */
   const loadExistingAdjustments = useCallback(() => {
@@ -119,11 +141,15 @@ const PayrollComponentModal = () => {
       // Prioritize adjustedFrequency over frequency, fallback to 'monthly_key'
       const frequencyValue = adj.adjustedFrequency || adj.frequency || 'monthly_key';
       
+      // For already added components, strip any "(Effective from ...)" text from component name
+      // This ensures that if effectiveFrom was changed to future date after adding, we don't show it
+      const cleanComponentName = stripEffectiveFromText(adj.componentName || '');
+      
       return {
         id: `existing-${Date.now()}-${Math.random()}`,
         adjustmentId: adj.adjustmentId || null,
         componentId: adj.componentId || '', // May be empty for generated payrolls
-        componentName: adj.componentName || '', // Direct name from API
+        componentName: cleanComponentName, // Clean name without effectiveFrom text
         amount: adj.amount || adj.adjustedAmount || '',
         effectiveTill: adj.effectiveTill || adj.endDate || '',
         effectiveFrom: adj.effectiveFrom || adj.startDate || '',
@@ -143,7 +169,7 @@ const PayrollComponentModal = () => {
         originalFrequency: frequencyValue,
       };
     });
-  }, [componentType, payrollContext, createEmptyRow]);
+  }, [componentType, payrollContext, createEmptyRow, stripEffectiveFromText]);
 
   /**
    * Checks if a component is already selected in another row
@@ -157,15 +183,36 @@ const PayrollComponentModal = () => {
   }, [componentRows]);
 
   /**
-   * Gets available components for a specific row (excluding already selected ones)
+   * Checks if a component's effectiveFrom is in the future
+   */
+  const isEffectiveFromFuture = useCallback((component) => {
+    if (!component.effectiveFrom) return false;
+    const effectiveFromDate = new Date(component.effectiveFrom);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to compare dates only
+    effectiveFromDate.setHours(0, 0, 0, 0);
+    return effectiveFromDate > today;
+  }, []);
+
+  /**
+   * Gets available components for a specific row (excluding already selected ones and future effectiveFrom)
    */
   const getAvailableComponents = useCallback((currentRowId) => {
     const selectedIds = componentRows
       .filter(row => row.id !== currentRowId && row.componentId && !row.toDelete)
       .map(row => row.componentId);
     
-    return filteredComponents.filter(comp => !selectedIds.includes(comp.componentId));
-  }, [componentRows, filteredComponents]);
+    return filteredComponents.filter(comp => {
+      // Exclude already selected components
+      if (selectedIds.includes(comp.componentId)) return false;
+      
+      // Exclude components with future effectiveFrom dates (for new additions)
+      // But allow if it's already added (handled separately in loadExistingAdjustments)
+      if (isEffectiveFromFuture(comp)) return false;
+      
+      return true;
+    });
+  }, [componentRows, filteredComponents, isEffectiveFromFuture]);
 
   /**
    * Validates if a row is complete (has all required fields)
@@ -184,8 +231,33 @@ const PayrollComponentModal = () => {
    * Handles component selection for a row
    */
   const handleComponentSelect = useCallback((rowId, componentId) => {
+    if (!componentId) return; // Allow clearing selection
+    
     if (componentId && isComponentDuplicate(componentId, rowId)) {
       alert('This component has already been added. Please select a different component.');
+      return;
+    }
+
+    const selectedComponent = filteredComponents.find(comp => comp.componentId === componentId);
+    
+    // Prevent selecting components with future effectiveFrom dates
+    if (selectedComponent && isEffectiveFromFuture(selectedComponent)) {
+      const effectiveFromDate = new Date(selectedComponent.effectiveFrom);
+      const formattedDate = effectiveFromDate.toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      });
+      alert(`This component is not yet effective. It will be available from ${formattedDate}.`);
+      // Reset the select to empty
+      setComponentRows(prevRows => 
+        prevRows.map(row => {
+          if (row.id === rowId) {
+            return { ...row, componentId: '', componentName: '' };
+          }
+          return row;
+        })
+      );
       return;
     }
 
@@ -200,17 +272,21 @@ const PayrollComponentModal = () => {
       }
       return newErrors;
     });
-
-    const selectedComponent = filteredComponents.find(comp => comp.componentId === componentId);
     
     setComponentRows(prevRows => 
       prevRows.map(row => {
         if (row.id !== rowId) return row;
 
+        // For new additions, strip effectiveFrom text from component name
+        // For already added components, keep the clean name (handled in loadExistingAdjustments)
+        const componentName = selectedComponent?.componentName 
+          ? (row.adjustmentId ? row.componentName : stripEffectiveFromText(selectedComponent.componentName))
+          : '';
+
         const updatedRow = {
           ...row,
           componentId,
-          componentName: selectedComponent?.componentName || '', // Use componentName from selected component
+          componentName: componentName,
           amount: selectedComponent?.amount || '',
           frequency: selectedComponent?.frequency || frequencyOptions[0]?.value || 'monthly_key',
           amountType: selectedComponent?.isVariable ? AMOUNT_TYPES.VARIABLE : AMOUNT_TYPES.FIXED,
@@ -225,7 +301,7 @@ const PayrollComponentModal = () => {
         return updatedRow;
       })
     );
-  }, [filteredComponents, isComponentDuplicate, isRowComplete, frequencyOptions]);
+  }, [filteredComponents, isComponentDuplicate, isRowComplete, frequencyOptions, isEffectiveFromFuture, stripEffectiveFromText]);
 
   /**
    * Handles input changes for a row field
@@ -561,11 +637,46 @@ const PayrollComponentModal = () => {
                           <option value="">
                             {loading ? 'Loading components...' : 'Select Component'}
                           </option>
+                          {/* Show already added component as selected option (if it exists) */}
+                          {row.componentId && row.adjustmentId && (
+                            <option key={row.componentId} value={row.componentId}>
+                              {row.componentName}
+                            </option>
+                          )}
                           {getAvailableComponents(row.id).map(component => (
                             <option key={component.componentId} value={component.componentId}>
                               {component.componentName}
                             </option>
                           ))}
+                          {/* Show components with future effectiveFrom as disabled options with message */}
+                          {filteredComponents
+                            .filter(comp => {
+                              const selectedIds = componentRows
+                                .filter(r => r.id !== row.id && r.componentId && !r.toDelete)
+                                .map(r => r.componentId);
+                              // Show future effectiveFrom components that aren't already selected and aren't in available list
+                              return !selectedIds.includes(comp.componentId) && 
+                                     isEffectiveFromFuture(comp) &&
+                                     !getAvailableComponents(row.id).some(c => c.componentId === comp.componentId);
+                            })
+                            .map(component => {
+                              const effectiveFromDate = new Date(component.effectiveFrom);
+                              const formattedDate = effectiveFromDate.toLocaleDateString('en-GB', { 
+                                day: '2-digit', 
+                                month: '2-digit', 
+                                year: 'numeric' 
+                              });
+                              return (
+                                <option 
+                                  key={component.componentId} 
+                                  value={component.componentId}
+                                  disabled
+                                  title={`This component is effective from ${formattedDate}`}
+                                >
+                                  {component.componentName} (Effective from {formattedDate})
+                                </option>
+                              );
+                            })}
                         </select>
                       )}
                       <span className={`amount-type-badge ${row.amountType.toLowerCase()}`}>

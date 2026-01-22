@@ -1,4 +1,5 @@
 import './userGroupTableEditable.scss'
+import React from 'react'
 import { useState, useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';

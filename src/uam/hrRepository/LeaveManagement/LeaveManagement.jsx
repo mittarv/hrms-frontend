@@ -1,16 +1,14 @@
-import Sidebar from "../../../components/sidebar/Sidebar";
-import Header from "../../../components/header/Header";
 import { useEffect, useState } from "react";
 import LeaveAttendance from "./components/LeaveAttendance";
 import LeaveHolidays from "./components/LeaveHolidays";
 import LeaveStatus from "./components/LeaveStatus";
 import "./styles/LeaveManagement.scss";
-import Inactive_calendar_icon from "../../../assets/icons/Inactive_calendar_icon.svg";
-import Active_calendar_icon from "../../../assets/icons/Active_calendar_icon.svg";
-import Inactive_Leave_status_icon from "../../../assets/icons/Inactive_Leave_status_icon.svg";
-import Active_leave_status_icon from "../../../assets/icons/Active_leave_status_icon.svg";
-import Inactive_holiday_tab_icon from "../../../assets/icons/Inactive_holiday_tab_icon.svg";
-import Active_holiday_tab_icon from "../../../assets/icons/Active_holiday_tab_icon.svg";
+import Inactive_calendar_icon from "../assets/icons/Inactive_calendar_icon.svg";
+import Active_calendar_icon from "../assets/icons/Active_calendar_icon.svg";
+import Inactive_Leave_status_icon from "../assets/icons/Inactive_Leave_status_icon.svg";
+import Active_leave_status_icon from "../assets/icons/Active_leave_status_icon.svg";
+import Inactive_holiday_tab_icon from "../assets/icons/Inactive_holiday_tab_icon.svg";
+import Active_holiday_tab_icon from "../assets/icons/Active_holiday_tab_icon.svg";
 import { useSelector } from "react-redux";
 import {
   getCurrentEmployeeDetails,
@@ -23,7 +21,7 @@ import {
 import { useDispatch } from "react-redux";
 import Snackbar from "../Common/components/Snackbar";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
-import { toolHomePageData } from "../../../constant/data";
+import { hrToolHomePageData } from "../constant/data";
 const LeaveManagement = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
@@ -40,7 +38,7 @@ const LeaveManagement = () => {
   useEffect(() => {
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
-      payload: toolHomePageData.toot_title2
+      payload: hrToolHomePageData.toot_title2
     });
   }, [dispatch])
 
@@ -94,15 +92,11 @@ const LeaveManagement = () => {
 
   return (
     <>
-      <div className="leave_management_dashboard_main_container">
-        <Sidebar />
-        <div className="leave_management_dashboard_header_container">
-          <Header />
-          <div className="leave_management_dashboard_body_container">
-            <div
-              className="leave_management_requests_tabs"
-              data-active={activeTab}
-            >
+      <div className="leave_management_container">
+        <div
+          className="leave_management_requests_tabs"
+          data-active={activeTab}
+        >
               <span
                 onClick={() => setActiveTab("tab1")}
                 className={activeTab === "tab1" ? "active_tab" : "inactive_tab"}
@@ -149,11 +143,9 @@ const LeaveManagement = () => {
                 <p>Holidays</p>
               </span>
             </div>
-            <hr />
-            <div className="leave_management_tab_content">
-              {renderContent()}
-            </div>
-          </div>
+        <hr />
+        <div className="leave_management_tab_content" role="tabpanel">
+          {renderContent()}
         </div>
       </div>
       <Snackbar />

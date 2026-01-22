@@ -1,5 +1,5 @@
-import search_icon from "../../../../assets/icons/search_icon.svg";
-import Info_icon from "../../../../assets/icons/info_icon.svg";
+import search_icon from "../../assets/icons/search_icon.svg";
+import Info_icon from "../../assets/icons/info_icon.svg";
 import { LeaveConfiguratorTableHeader } from "../utils/LeaveConfiguratorData";
 import { useSelector } from "react-redux";
 import "../styles/LeaveConfiguratorTable.scss";
@@ -11,9 +11,28 @@ import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 const LeaveConfiguratorTable = () => {
-  const { loading, allExisitingLeaves, getAllComponentType } = useSelector(
+  const { loading, allExisitingLeaves, getAllComponentType, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  
+  // Check if user has read permission
+  const canRead = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveConfigurator_Read");
+  
+  // If user doesn't have read permission, show access denied message
+  if (!canRead) {
+    return (
+      <div className="leave_configurator_table_container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p style={{ fontSize: "16px", color: "#666" }}>
+            You don't have permission to view leave configurations
+          </p>
+        </div>
+      </div>
+    );
+  }
   const [filteredLeaves, setFilteredLeaves] = useState(allExisitingLeaves);
   const [searchLeaves, setSearchLeaves] = useState("");
   const dispatch = useDispatch();

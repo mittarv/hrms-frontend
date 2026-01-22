@@ -10,22 +10,25 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { LeaveConfiguratorFormData } from "../utils/LeaveConfiguratorData";
 import Pill from "./Pill";
-import Edit_Button from "../../../../assets/icons/edit_button.svg";
+import Edit_Button from "../../assets/icons/edit_button.svg";
 import { MandatoryFieldPopup, LeaveDiscardPopup } from "./LeaveConfiguratorPopup";
 import LeaveApplicable from "./LeaveApplicable";
-import Info_icon from "../../../../assets/icons/info_icon.svg";
+import Info_icon from "../../assets/icons/info_icon.svg";
 import Tooltip from "./Tooltip";
-import Back_icon from "../../../../assets/icons/leftEmployeeArrow.svg";
+import Back_icon from "../../assets/icons/leftEmployeeArrow.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 
 const LeaveConfiguratorForm = () => {
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const {
     loading,
     getAllComponentType,
     currentLeaveDetails,
     allExisitingLeaves,
-    unpaidLeaveDisabled
+    unpaidLeaveDisabled,
+    myHrmsAccess,
   } = useSelector((state) => state.hrRepositoryReducer);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,16 +42,44 @@ const LeaveConfiguratorForm = () => {
   const [formData, setFormData] = useState({});
   const [showMandatoryFieldPopup, setShowMandatoryFieldPopup] = useState(false);
   const isDiscardChanges = searchParams.get("discard_changes") === "true";
+  
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canCreate = hasPermission("LeaveConfigurator_Create");
+  const canUpdate = hasPermission("LeaveConfigurator_update");
+  const canRead = hasPermission("LeaveConfigurator_Read");
+  
+  const hasWriteAccess = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => 
+      perm.name === "LeaveConfigurator_Create" || 
+      perm.name === "LeaveConfigurator_update"
+    );
 
   useEffect(() => {
     if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
       dispatch(getAllComponentTypes());
     }
 
+    // Check read permission before fetching leave details
     if (leaveConfigId && (isViewMode || isEditMode)) {
+      if (isViewMode && !canRead) {
+        alert("You don't have permission to view leave configuration");
+        setSearchParams({});
+        return;
+      }
+      if (isEditMode && !canUpdate) {
+        alert("You don't have permission to edit leave configuration");
+        setSearchParams({});
+        return;
+      }
       dispatch(getLeaveDetails(leaveConfigId));
     }
-  }, [dispatch, leaveConfigId, isViewMode, isEditMode]);
+  }, [dispatch, leaveConfigId, isViewMode, isEditMode, getAllComponentType, canRead, canUpdate]);
 
   // Pre-fill form data in view and edit mode
   useEffect(() => {
@@ -105,6 +136,12 @@ const LeaveConfiguratorForm = () => {
 
 
   useEffect(() => {
+    if (isCreateMode && !canCreate) {
+      alert("You don't have permission to create leave configuration");
+      setSearchParams({});
+      return;
+    }
+    
     if (isCreateMode && LeaveType.length > 0 && formData.leaveType !== LeaveType[0]) {
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -115,7 +152,7 @@ const LeaveConfiguratorForm = () => {
         excludePaidWeekend: true, // Default: exclude weekends (not included)
       }));
     }
-  }, [isCreateMode, LeaveType, formData.leaveType]);
+  }, [isCreateMode, LeaveType, formData.leaveType, canCreate, setSearchParams]);
 
   useEffect(() => {
     if (isEditMode && currentLeaveDetails && currentLeaveDetails.leaveApplicableTo) {
@@ -166,6 +203,17 @@ const LeaveConfiguratorForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Check permissions before submitting
+    if (isCreateMode && !canCreate) {
+      alert("You don't have permission to create leave configuration");
+      return;
+    }
+    if (isEditMode && !canUpdate) {
+      alert("You don't have permission to update leave configuration");
+      return;
+    }
+    
     if (!validateMandatoryFields()) {
       setShowMandatoryFieldPopup(true);
       return;
@@ -249,6 +297,10 @@ const LeaveConfiguratorForm = () => {
   };
 
   const handleEdit = () => {
+    if (!canUpdate) {
+      alert("You don't have permission to edit leave configuration");
+      return;
+    }
     setSearchParams({
       showLeaveConfiguratorForm: "true",
       edit: "true",
@@ -559,12 +611,14 @@ const LeaveConfiguratorForm = () => {
       <div className="leave_configurator_main_container">    
       {!isViewMode ? (
         <div className="leave_configurator_action_buttons create_edit_mode">
-          <button
-            className="leave_configurator_save_button"
-            onClick={handleSubmit}
-          >
-            {isCreateMode ? "Create" : "Save"}
-          </button>
+          {((isCreateMode && canCreate) || (isEditMode && canUpdate)) && (
+            <button
+              className="leave_configurator_save_button"
+              onClick={handleSubmit}
+            >
+              {isCreateMode ? "Create" : "Save"}
+            </button>
+          )}
           <button
             className="leave_configurator_cancel_button"
             onClick={handleCancel}
@@ -577,10 +631,10 @@ const LeaveConfiguratorForm = () => {
           <button className="leave_configurator_back_button" onClick={handleBackButton}>
             <img src={Back_icon} alt="Back_Button" />
           </button>
-          <button className="edit-button" onClick={handleEdit}>
+          {canUpdate && <button className="edit-button" onClick={handleEdit}>
             <img src={Edit_Button} alt="Edit_Button" />
             <span>Edit</span>
-          </button>
+          </button>}
         </div>
       )}
       <hr className="leave_configurator_hr" />

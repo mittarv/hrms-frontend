@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { toolHomePageData } from "../../../constant/data";
-import Configure_Salary_Inactive_Icon from "../../../assets/icons/configure_salary_inactive_icon.svg";
-import Configure_Salary_Active_Icon from "../../../assets/icons/configure_salary_active_icon.svg";
-import Payroll_Inactive_Icon from "../../../assets/icons/payroll_inactive_icon.svg";
-import Payroll_Active_Icon from "../../../assets/icons/payroll_active_icon.svg";
-import Payslip_Active_Icon from "../../../assets/icons/payslip_active_icon.svg";
-import Payslip_Inactive_Icon from "../../../assets/icons/payslip_inactive_icon.svg";
+import { hrToolHomePageData } from "../constant/data";
+import Configure_Salary_Inactive_Icon from "../assets/icons/configure_salary_inactive_icon.svg";
+import Configure_Salary_Active_Icon from "../assets/icons/configure_salary_active_icon.svg";
+import Payroll_Inactive_Icon from "../assets/icons/payroll_inactive_icon.svg";
+import Payroll_Active_Icon from "../assets/icons/payroll_active_icon.svg";
+import Payslip_Active_Icon from "../assets/icons/payslip_active_icon.svg";
+import Payslip_Inactive_Icon from "../assets/icons/payslip_inactive_icon.svg";
 import SalaryConfiguration from "./SalaryConfiguration/SalaryConfiguration";
 import Payroll from "./Payroll/Payroll";
 import PaySlip from "./Payslip/Payslip";
@@ -58,6 +58,7 @@ const TAB_CONFIG = [
 const PayrollAndReimbursements = () => {
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(TABS.SALARY_CONFIGURATION);
   const dispatch = useDispatch();
@@ -65,7 +66,7 @@ const PayrollAndReimbursements = () => {
   useEffect(() => {
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
-      payload: toolHomePageData.toot_title2
+      payload: hrToolHomePageData.toot_title2
     });
   }, [dispatch]);
 
@@ -77,30 +78,44 @@ const PayrollAndReimbursements = () => {
     }
   }, [searchParams]);
 
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  // Check permissions for each tab
+  const canViewSalaryConfig = hasPermission("ConfigureSalary_read");
+  const canViewPayroll = hasPermission("Payroll_read");
+
   // Get user access level - only calculate after selectedToolName is available
   const userAccessLevel = selectedToolName ? (allToolsAccessDetails[selectedToolName] || 100) : null;
 
-  // Filter tabs based on user access level
+  // Filter tabs based on user permissions
   const availableTabs = useMemo(() => {
+    if (!userAccessLevel && !canViewSalaryConfig && !canViewPayroll) return [];
 
-    if (!userAccessLevel) return [];
-
-    if (userAccessLevel > 100) {
-      // Admin users can see Configure Salary, Payroll, and Payslips
-      return TAB_CONFIG.filter(tab => 
-        tab.id === TABS.SALARY_CONFIGURATION || 
-        tab.id === TABS.PAYROLL || 
-        tab.id === TABS.PAYSLIPS ||
-        tab.id === TABS.REIMBURSEMENTS
-      );
-    } else {
-      // Regular users can only see Payslips
-      return TAB_CONFIG.filter(tab => 
-        tab.id === TABS.PAYSLIPS ||
-        tab.id === TABS.REIMBURSEMENTS
-      );
+    const tabs = [];
+    
+    // Salary Configuration tab - requires ConfigureSalary_read permission or admin
+    if (userAccessLevel >= 900 || canViewSalaryConfig) {
+      tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.SALARY_CONFIGURATION));
     }
-  }, [userAccessLevel]);
+    
+    // Payroll tab - requires Payroll_read permission or admin
+    if (userAccessLevel >= 900 || canViewPayroll) {
+      tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.PAYROLL));
+    }
+    
+    // Payslips tab - always available (users can view their own payslips)
+    tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.PAYSLIPS));
+    
+    // Reimbursements tab - always available
+    tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.REIMBURSEMENTS));
+    
+    return tabs.filter(Boolean); // Remove undefined entries
+  }, [userAccessLevel, canViewSalaryConfig, canViewPayroll]);
 
   // Set default active tab based on available tabs
   useEffect(() => {

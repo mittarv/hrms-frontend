@@ -81,6 +81,16 @@ const initialState = {
   payslipLoading: false,
   payslipError: null,
   netPayPayrollAmount:0,
+  extraWorkLogLoading: false,
+  extraWorkLogRequestsData: [],
+  compOffleaveBalance: [],
+  compOffLeaveEligibility: null,
+  compOffLeaveEligibilityLoading: false,
+  hrmsAccessRoles: [],
+  hrmsAccessPermissions: [],
+  hrmsAccessRole: null,
+  employeeRoles: [],
+  myHrmsAccess: [],
 };
 
 export const hrRepositoryReducer = createReducer(initialState, (builder) => {
@@ -236,14 +246,14 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.error = action.payload;
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS', (state) => {
-        state.loading = true;
+        state.currentEmployeeDetailsLoading = true;
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS_SUCCESS', (state, action) => {
-        state.loading = false;
+        state.currentEmployeeDetailsLoading = false;
         state.currentEmployeeDetails = action.payload;
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS_FAILURE', (state, action) => {
-        state.loading = false;
+        state.currentEmployeeDetailsLoading = false;
         state.error = action.payload;
       })
       .addCase('EMPLOYEE_ONBOARDING_DETAILS', (state) => {
@@ -914,5 +924,147 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       .addCase('GET_NET_PAY_PAYROLL_AMOUNT_FAILURE', (state, action) => {
         state.payrollLoading = false;
         state.payrollError = action.payload;
-      });
+      })
+      .addCase('EXTRA_WORK_LOG_REQUEST', (state) => {
+        state.extraWorkLogLoading = true;
+      })
+      .addCase('EXTRA_WORK_LOG_REQUEST_SUCCESS' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogData = action.payload;
+      })
+      .addCase('EXTRA_WORK_LOG_REQUEST_FAILURE' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogError = action.payload;
+      })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS', (state) => {
+        state.extraWorkLogLoading = true;
+      })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS_SUCCESS' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogRequestsData = action.payload;
+      })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS_FAILURE' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogError = action.payload; 
+      })
+      .addCase('UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS', (state) => { 
+        state.extraWorkLogLoading = true;
+      })
+      .addCase('UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS_SUCCESS' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogUpdateStatus = action.payload;
+      })
+      .addCase('UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS_FAILURE' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogError = action.payload;
+      })
+      .addCase('GET_COMP_OFFLEAVE_BALANCE', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_COMP_OFFLEAVE_BALANCE_SUCCESS', (state, action) => {
+        state.compOffleaveBalanceLoading = false;
+        state.compOffleaveBalance = action.payload;
+      })
+      .addCase('GET_COMP_OFFLEAVE_BALANCE_FAILURE', (state, action) => {
+        state.compOffleaveBalanceLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_COMP_OFF_LEAVE_ELIGIBILITY', (state) => {
+        state.compOffLeaveEligibilityLoading = true;
+      })
+      .addCase('GET_COMP_OFF_LEAVE_ELIGIBILITY_SUCCESS', (state, action) => {
+        state.compOffLeaveEligibilityLoading = false;
+        state.compOffLeaveEligibility = action.payload;
+      })
+      .addCase('GET_COMP_OFF_LEAVE_ELIGIBILITY_FAILURE', (state, action) => {
+        state.compOffLeaveEligibilityLoading = false;
+        state.compOffLeaveEligibility = null;
+        state.error = action.payload;
+      })
+      .addCase('GET_ALL_ROLES', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_ALL_ROLES_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.hrmsAccessRoles = action.payload;
+      })
+      .addCase('GET_ALL_ROLES_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_ALL_HRMS_ACCESS_PERMISSIONS', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_ALL_HRMS_ACCESS_PERMISSIONS_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.hrmsAccessPermissions = action.payload;
+      })
+      .addCase('GET_ALL_HRMS_ACCESS_PERMISSIONS_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('CREATE_HRMS_ROLE', (state) => {
+        state.loading = true;
+      })
+      .addCase('CREATE_HRMS_ROLE_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+      })
+      .addCase('CREATE_HRMS_ROLE_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_HRMS_ROLE_BY_ID', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_HRMS_ROLE_BY_ID_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.hrmsAccessRole = action.payload;
+      })
+      .addCase('GET_HRMS_ROLE_BY_ID_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('UPDATE_HRMS_ROLE', (state) => {
+        state.loading = true;
+      })
+      .addCase('UPDATE_HRMS_ROLE_SUCCESS', (state) => {
+        state.loading = false;
+      })
+      .addCase('UPDATE_HRMS_ROLE_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('DELETE_HRMS_ROLE', (state) => {
+        state.loading = true;
+      })
+      .addCase('DELETE_HRMS_ROLE_SUCCESS', (state) => {
+        state.loading = false;
+      })
+      .addCase('DELETE_HRMS_ROLE_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_EMPLOYEE_ROLES', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_EMPLOYEE_ROLES_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.employeeRoles = action.payload;
+      })
+      .addCase('GET_EMPLOYEE_ROLES_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_MY_HRMS_ACCESS', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_MY_HRMS_ACCESS_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.myHrmsAccess = action.payload;
+      })
+      .addCase('GET_MY_HRMS_ACCESS_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 });

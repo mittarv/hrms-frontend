@@ -4,7 +4,7 @@ import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import { Tooltip, tooltipClasses } from "@mui/material";
 
 export const tableStyle = {
-  StyledTableRow: styled(TableRow)(() => ({
+  StyledTableRow: styled(TableRow)(({ theme }) => ({
     "&:nth-of-type(even)": {
       backgroundColor: "#F9F9FB",
     },
@@ -14,7 +14,7 @@ export const tableStyle = {
     },
   })),
 
-  StyledTableCell: styled(TableCell)(() => ({
+  StyledTableCell: styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: "#F9F9FB",
     },
@@ -25,7 +25,7 @@ export const tableStyle = {
 
   ToolTip1: styled(({ className, ...props }) => (
     <Tooltip {...props} arrow classes={{ popper: className }} />
-  ))(() => ({
+  ))(({ theme }) => ({
     [`& .${tooltipClasses.arrow}`]: {
       color: "#033348",
     },

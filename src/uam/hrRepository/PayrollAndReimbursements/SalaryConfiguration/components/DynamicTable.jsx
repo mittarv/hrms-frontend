@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import "../styles/DynamicTable.scss";
 import CustomDropdown from "../../../Common/components/CustomDropdown";
-import Delete_button from "../../../../../assets/icons/delete_red_icon.svg";
-import Undo_Icon from "../../../../../assets/icons/restore_icon.svg";
-import Add_Icon from "../../../../../assets/icons/Add_Icon_blue.svg";
+import Delete_button from "../../../assets/icons/delete_red_icon.svg";
+import Undo_Icon from "../../../assets/icons/restore_icon.svg";
+import Add_Icon from "../../../assets/icons/Add_Icon_blue.svg";
 import { getFrequencyDisplayValue, getFrequencyKey } from "../utils/TableConfig";
 import { isValidField, calculateLossOfPayAmount, mergeRowData } from "../utils/SalaryConfigurationHelper";
 

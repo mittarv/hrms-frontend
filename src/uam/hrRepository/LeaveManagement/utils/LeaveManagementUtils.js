@@ -49,7 +49,7 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
   const actualDays = formData.isHalfDay ? 0.5 : workingDays;
 
   // Apply validations for normal users (userType === 100), no validations for admin (userType > 100)
-  if (userToolAccess < 500) {
+  if (userToolAccess < 900 && !userAccess) {
     // 1. Minimum Notice Period Validation (for future leaves)
     if ((isLeaveInFuture || isLeaveToday) && selectedLeaveConfig.minimumNoticePeriod > 0) {
       const daysDifference = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
@@ -144,14 +144,26 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
 };
 
 // Filter leaves based on employee type and gender
-export const getApplicableLeaves = (allExistingLeaves, employeeType, empGender) => {
-  if (!allExistingLeaves || !employeeType || !empGender) {
+
+export const getApplicableLeaves = (allExistingLeaves, employeeType, empGender, accrualLeaveBalance) => {
+  if (!allExistingLeaves || !employeeType || !empGender || !accrualLeaveBalance) {
     return [];
   }
+  const eligibleLeaveIds = new Set(
+    accrualLeaveBalance.map(item => item.leaveConfigId)
+  );
 
-  return allExistingLeaves
-    .filter((leave) => leave.isActive)
-    .filter((leave) => {
+  return allExistingLeaves.filter((leave) => {
+  if (!eligibleLeaveIds.has(leave.leaveConfigId)) {
+      return false;
+  }
+
+    // RULE 2: Safety check for active status
+  if (!leave.isActive) {
+    return false;
+  }
+  
+   
       try {
         const allowedTypes = JSON.parse(leave.employeeType);
         const allowedGenders = JSON.parse(leave.appliedGender);
@@ -162,8 +174,9 @@ export const getApplicableLeaves = (allExistingLeaves, employeeType, empGender) 
         console.error("Error parsing employeeType or appliedGender:", error);
         return false;
       }
-    });
-};
+    })
+  };
+
 
 // Check if half-day option is allowed for the selected leave type
 export const isHalfDayAllowed = (leaveType, allExistingLeaves) => {
@@ -183,7 +196,7 @@ export const isReasonRequired = (leaveType, allExistingLeaves) => {
   return selectedLeaveConfig?.isReasonRequired || false;
 };
 
-export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves, setLeaveValidationError, userType = 100) => {
+export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves, setLeaveValidationError, userType = 100, hasAccessToEditAttendance = false) => {
   try {
     const { leaveConfigId, startDate, endDate } = attendanceData;
     
@@ -231,7 +244,7 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
     }
 
     // If userType >= 500, skip all other validations
-    if (userType >= 500) {
+    if (userType >= 900 && hasAccessToEditAttendance) {
       setLeaveValidationError('');
       return true;
     }

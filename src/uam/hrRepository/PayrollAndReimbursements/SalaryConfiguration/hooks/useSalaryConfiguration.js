@@ -47,8 +47,11 @@ export const useSalaryConfiguration = () => {
   const {
     getAllComponentType,
     isSalaryConfigEditing,
-    showResetButton
+    showResetButton,
+    myHrmsAccess
   } = useSelector(state => state.hrRepositoryReducer);
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
   
   const [selectedOptions, setSelectedOptions] = useState({});
   const [isLevelDisabled, setIsLevelDisabled] = useState(true);
@@ -187,6 +190,22 @@ export const useSalaryConfiguration = () => {
 
   // Save handler
   const handleSave = useCallback(() => {
+    // Check permissions before saving
+    const hasPermission = (permissionName) => {
+      const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+      if (isAdmin) return true;
+      return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+    };
+
+    const canCreate = hasPermission("ConfigureSalary_create");
+    const canUpdate = hasPermission("ConfigureSalary_update");
+    const canDelete = hasPermission("ConfigureSalary_delete");
+    
+    if (!canCreate && !canUpdate && !canDelete) {
+      alert("You don't have permission to save salary configuration changes");
+      return;
+    }
+    
     // First clear only validation error display (not the rows themselves)
     clearValidationErrors();
     
@@ -255,7 +274,7 @@ export const useSalaryConfiguration = () => {
     if (saveData.deletedData.length) dispatch(deleteSalaryConfig(saveData.deletedData, keys.employeeType, keys.location, keys.level, keys.department, keys.yearOfStudy, lastApiCallRef));
 
     dispatch({ type: 'SET_SALARY_CONFIG_EDITING', payload: false });
-  }, [dispatch, selectedOptions, getAllComponentType]);
+  }, [dispatch, selectedOptions, getAllComponentType, allToolsAccessDetails, selectedToolName, myHrmsAccess]);
 
   // Validation helpers
   const clearValidationErrors = () => {

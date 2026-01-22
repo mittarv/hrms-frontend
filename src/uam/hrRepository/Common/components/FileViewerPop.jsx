@@ -13,9 +13,9 @@ import {
   Box,
 } from "@mui/material";
 import { removeAppendedSasToken } from "../utils/helper";
-import ArrowRight from "../../../../assets/icons/right_arrow.svg";
-import ArrowLeft from "../../../../assets/icons/left_arrow.svg";
-import Download_icon from "../../../../assets/icons/upload_icon_blue.svg";
+import ArrowRight from "../../assets/icons/right_arrow.svg";
+import ArrowLeft from "../../assets/icons/left_arrow.svg";
+import Download_icon from "../../assets/icons/upload_icon_blue.svg";
 
 const FileViewer = ({ fileUrls, open, onClose, initialIndex = 0 }) => {
   const [htmlContent, setHtmlContent] = useState("");

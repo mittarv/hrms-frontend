@@ -1,7 +1,7 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/EmployeeRepositoryDashboard.scss";
-import Add_icon from "../../../../assets/icons/add_icon_without_background.svg";
+import Add_icon from "../../assets/icons/add_icon_without_background.svg";
 import { useEffect } from "react";
 import EmployeeRepositoryTable from "./EmployeeRepositoryTable";
 import {
@@ -15,32 +15,48 @@ import EmployeeDetailsPage from "./EmployeeDetailsPage";
 import Snackbar from "../../Common/components/Snackbar";
 
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
-import { toolHomePageData } from "../../../../constant/data";
+import { hrToolHomePageData } from "../../constant/data";
 
 const EmployeeRepositoryDashboard = () => {
   
   const { user } = useSelector((state) => state.user);
   const { 
         loading,
-        getAllComponentType
-        
+        myHrmsAccess,
       } = useSelector((state) => state.hrRepositoryReducer);
+  const allToolsAccessDetails = useSelector(state => state.user.allToolsAccessDetails);
+  const selectedToolName = useSelector(state => state.mittarvtools.selectedToolName);
+  const userAccessLevel = allToolsAccessDetails?.[selectedToolName];
+  const hasAccess=userAccessLevel>=900;
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const showEmployeeOnBOardingForm =
     searchParams.get("EmployeeOnBoardingForm") === "true";
   const showEmployeeDetails =
     searchParams.get("showEmployeeDetails") === "true";
+  const hasAccessToAddEmployee = hasAccess || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "ActiveEmployee_onBoarding");
 
   const handleAddEmployeeForm = () => {
+    if(!hasAccessToAddEmployee){
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: "You do not have permission to add employees",
+          severity: "info",
+        },
+      });
+    }
+    else{
     setSearchParams((prev) => {
       if (showEmployeeOnBOardingForm) {
         prev.delete("EmployeeOnBoardingForm");
       } else {
         prev.set("EmployeeOnBoardingForm", "true");
       }
-      return prev;
-    });
+        return prev;
+      });
+    }
   };
 
   //Fetching all employees and dropdowns values with key
@@ -50,16 +66,14 @@ const EmployeeRepositoryDashboard = () => {
     dispatch(getAllCountriesDetails());
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
-      payload: toolHomePageData.toot_title2
+      payload: hrToolHomePageData.toot_title2
     });
 
   }, [dispatch]);
 
 
   return ( 
-    <>
-   
-          
+    <>    
           {showEmployeeOnBOardingForm ? (
             <EmployeeOnBoardingForm />
           ) : showEmployeeDetails ? (
@@ -77,14 +91,15 @@ const EmployeeRepositoryDashboard = () => {
                   </p>
                 </div>
                 <div className="employee_repository_dashboard_buttons_container">
-                  <button
+                  {hasAccessToAddEmployee && <button
                     className="employee_repository_dashboard_button"
                     onClick={handleAddEmployeeForm}
+                    disabled={!hasAccessToAddEmployee}
                   >
                     <p>
                       <img src={Add_icon} /> <span>Add Employee</span>
                     </p>
-                  </button>
+                  </button>}
                 </div>
               </div>
               {loading ? (

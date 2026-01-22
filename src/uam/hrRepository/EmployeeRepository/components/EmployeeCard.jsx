@@ -1,13 +1,15 @@
 import { useState } from "react";
 import {  useSelector } from "react-redux";
 import "../styles/EmployeeCard.scss";
-import dropdown_arrow from "../../../../assets/icons/dropdown_arrow.svg";
+import dropdown_arrow from "../../assets/icons/dropdown_arrow.svg";
 
 import MinLoader from "../../Common/components/MinLoader";
 const EMPLOYEE_STATUS = {
     ACTIVE: "Active",
 };
 const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,getAllManagersDetails ,hasAccess }) => {
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const hasEmployeeDirectoryAdminAccess=myHrmsAccess?.permissions?.some(perm => perm.name === "EmployeeDirectoryAdmin_View");
   const [imgError, setImgError] = useState(false);
   const firstLetter = employee?.employeeFirstName?.charAt(0)?.toUpperCase();
    const handleToggle = () => {
@@ -67,7 +69,7 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
             <h4 className="emp-name">
               {employee?.employeeFirstName} {employee?.employeeLastName}
             </h4>
-            {hasAccess && (
+            {(hasAccess || hasEmployeeDirectoryAdminAccess) && (
             <p>{EMPLOYEE_STATUS.ACTIVE}</p>
             )}
           </div>
@@ -91,7 +93,7 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
             
         ) : hasLoadedDetailsForThisEmployee ? (
         <div className="details">
-          {hasAccess && (
+          {(hasAccess || hasEmployeeDirectoryAdminAccess) && (
           <div className="each">
             <h3>Employee ID</h3>
             <p>{employeeDetails?.employeeBasicDetails?.empCompanyId || "---"}</p>
@@ -105,10 +107,10 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
             <p>{formattedHiringDate}</p>
           </div>
           
-          <div className="each">
+          {(hasAccess || hasEmployeeDirectoryAdminAccess) && <div className="each">
             <h3>Reporting Manager</h3>
             <p>{ManagerName}</p>
-          </div>
+          </div>}
           <div className="each">
             <h3>Phone</h3>
             <p>{phone}</p>

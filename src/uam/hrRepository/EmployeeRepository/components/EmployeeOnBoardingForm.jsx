@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import Left_Arrow from "../../../../assets/icons/leftEmployeeArrow.svg";
+import Left_Arrow from "../../assets/icons/leftEmployeeArrow.svg";
 import { EmployeeRepositoryFormData } from "../utils/EmployeeRepositoryData";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";

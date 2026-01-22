@@ -1,5 +1,5 @@
 
-import { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import '../../uam/myTools/MyTools.scss'
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { useSelector } from "react-redux";
@@ -86,7 +86,7 @@ const MyTools = () => {
                                 </TableHead>
                                 <TableBody>
                                     {
-                                        usertools?.map((item) => {
+                                        usertools?.map((item, index) => {
                                             const toolPresentinRequests = userrequests?.find((request) => request.toolId === item.tool?.toolId);
                                             return <StyledTableRow
                                                 key={item.tool?.toolId}
@@ -140,7 +140,7 @@ const MyTools = () => {
                                         })
                                     }
                                     {
-                                        otherTools?.map((item) => {
+                                        otherTools?.map((item, index) => {
                                             const toolPresentinRequests = userrequests?.find((request) => request.toolId === item.tool?.toolId);
                                             return <StyledTableRow
                                                 key={item.tool?.toolId}

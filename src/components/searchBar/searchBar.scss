@@ -1,0 +1,43 @@
+.search-bar-container {
+    display: flex;
+    margin-left: 25px;
+    margin-top: 25px;
+    width: 100%;
+    padding: 10px;
+  }
+  
+  .search-input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px; 
+  }
+  
+  .search-bar {
+    width: 100%;
+    padding: 10px 20px 10px 45px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(3, 51, 72, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+  
+    &::placeholder {
+      color: #aaa;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  
+    &:focus {
+      box-shadow: 0 4px 8px rgba(3, 51, 72, 0.2);
+    }
+  }
+  

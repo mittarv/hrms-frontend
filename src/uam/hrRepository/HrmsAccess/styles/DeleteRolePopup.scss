@@ -1,0 +1,120 @@
+.delete_role_popup_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+
+    .delete_role_popup_container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 24px;
+        width: 400px;
+        position: relative;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+
+        .delete_role_popup_close_button {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s ease;
+
+            &:hover:not(:disabled) {
+                opacity: 0.7;
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+
+            img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .delete_role_popup_content {
+            text-align: center;
+            margin-top: 8px;
+
+            .delete_role_popup_heading {
+                font-size: 18px;
+                font-weight: 600;
+                font-family: "Plus Jakarta Sans";
+                color: #C73D45;
+                margin: 0 0 12px 0;
+            }
+
+            .delete_role_popup_message {
+                font-size: 14px;
+                font-weight: 400;
+                font-family: "Plus Jakarta Sans";
+                color: #045071;
+                margin: 0;
+                line-height: 1.5;
+            }
+        }
+
+        .delete_role_popup_actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: center;
+
+            button {
+                max-width: 167px;
+                padding: 8px 20px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                font-family: "Plus Jakarta Sans";
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                &:disabled {
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+
+                &.delete_role_confirm_button {
+                    background-color: #C73D45;
+                    color: #ffffff;
+
+                    &:hover:not(:disabled) {
+                        background-color: #A63137;
+                    }
+                }
+
+                &.delete_role_cancel_button {
+                    background-color: #C3E1EF;
+                    color: #045071;
+
+                    &:hover:not(:disabled) {
+                        background-color: #A8D5E8;
+                    }
+                }
+            }
+        }
+    }
+}
+

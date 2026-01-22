@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { formSections, govIdTypes, sectionFieldMapping } from "../utils/EmployeeRepositoryData";
-import Back_icon from "../../../../assets/icons/leftEmployeeArrow.svg";
-import Dropdown_Arrow from "../../../../assets/icons/dropdow_arrow.svg";
-import Edit_Button from "../../../../assets/icons/edit_button.svg";
+import Back_icon from "../../assets/icons/leftEmployeeArrow.svg";
+import Dropdown_Arrow from "../../assets/icons/dropdow_arrow.svg";
+import Edit_Button from "../../assets/icons/edit_button.svg";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { formatDate } from "../utils/EmployeeRepositoryData";
@@ -39,6 +39,7 @@ const EmployeeDetailsPage = () => {
   const hrRepositoryReducer = useSelector((state) => state?.hrRepositoryReducer);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
   const loading = hrRepositoryReducer?.loading ?? false;
   const getAllComponentType = useMemo(
     () => hrRepositoryReducer?.getAllComponentType ?? {},
@@ -75,6 +76,7 @@ const EmployeeDetailsPage = () => {
     () => hrRepositoryReducer?.currentEmployeeDetails?.employeeLatestJobDetails ?? {},
     [hrRepositoryReducer?.currentEmployeeDetails?.employeeLatestJobDetails]
   );
+
   
   const { user } = useSelector((state) => state.user);
   const isAdmin = allToolsAccessDetails?.[selectedToolName];
@@ -87,6 +89,8 @@ const EmployeeDetailsPage = () => {
   const [multiFieldStates, setMultiFieldStates] = useState({});
   const [showJoiningPopup, setShowJoiningPopup] = useState(false);
   const lastApiCallRef = useRef(null);
+  const hasAccessToEditEmployee = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "ActiveEmployee_update");
 
   useEffect(() => {
     if (employeeUuid) {
@@ -404,10 +408,26 @@ const EmployeeDetailsPage = () => {
     }
   }, [isEditing, initialFormData?.empGovId]);
   const handleEdit = () => {
-     setSearchParams((prev) => {
+    // Allow users to edit their own profile without permission check
+    const isEditingOwnProfile = user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid;
+    
+    if (isEditingOwnProfile) {
+      // User is editing their own profile - allow without permission check
+      setSearchParams((prev) => {
         prev.set("isEditing", "true");
         return prev;
-     });
+      });
+    } else {
+      // User is editing someone else's profile - require permission
+      if(isAdmin < 900 && !hasAccessToEditEmployee){
+        window.alert("You are not authorized to edit this employee");
+        return;
+      }
+      setSearchParams((prev) => {
+        prev.set("isEditing", "true");
+        return prev;
+      });
+    }
   };
 
   //Validation to ensure that all required fields are filled in before sending changes to the approver.
@@ -470,7 +490,7 @@ const emailValidation = (updatedFormData) => {
     }, {});
 
     // Users with userType <= 100 must pass validation, Admins with userType > 100 can skip validation.
-    if (isAdmin <= 100) {
+    if (isAdmin < 900 && !hasAccessToEditEmployee) {
       if (!validateFormData()) {
         window.alert("Please fill in all required fields.");
         return;
@@ -763,7 +783,7 @@ const emailValidation = (updatedFormData) => {
     const isFieldDisabled =
       sectionId === "leaves-info" || field?.name === "empLastLogin"
         ? isLeaveField || field?.disabled
-        : isLeaveField || (isAdmin <= 100 && field?.disabled) || isLevelFieldDisabled;
+        : isLeaveField || ((isAdmin < 900 && !hasAccessToEditEmployee) && field?.disabled) || isLevelFieldDisabled;
     const error = errors[field.name];
 
     const countryCurrency = formData?.empPaymentCountryCode 
@@ -1229,10 +1249,15 @@ const renderSalaryConfigField = () => {
                 </button>
               </div>
             ) : (
-              <button className="edit-button" onClick={handleEdit}>
-                <img src={Edit_Button} alt="Edit Button" />
-                <span>Edit</span>
-              </button>
+              <>
+              {/* Show Edit button if user is editing their own profile OR has admin access OR has permission */}
+              {(user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid || isAdmin >= 900 || hasAccessToEditEmployee) && (
+                <button className="edit-button" onClick={handleEdit}>
+                  <img src={Edit_Button} alt="Edit Button" />
+                  <span>Edit</span>
+                </button>
+              )}
+              </>
             )}
           </div>
 

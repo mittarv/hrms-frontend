@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
 import "../styles/EditAttendanceModal.scss";
 import { toHHMMSS, normalizeTime } from "../../Common/utils/helper";
 import { useDispatch } from "react-redux";
 import { validateSingleLeaveApplication } from "../utils/LeaveManagementUtils";
-import { checkCdlLimit, getLeaveBalanceWithAccrual } from "../../../../actions/hrRepositoryAction";
-import Image_icon from "../../../../assets/icons/image_icon.svg";
-import PDF_icon from "../../../../assets/icons/pdf_icon.svg";
-import Delete_icon from "../../../../assets/icons/delete_icon.svg";
+import { checkCdlLimit, getLeaveBalanceWithAccrual, getCompOffLeaveEligibility } from "../../../../actions/hrRepositoryAction";
+import Image_icon from "../../assets/icons/image_icon.svg";
+import PDF_icon from "../../assets/icons/pdf_icon.svg";
+import Delete_icon from "../../assets/icons/delete_icon.svg";
 import { Link } from "react-router-dom";
 import { 
   convertFileToBase64,
@@ -32,11 +32,14 @@ export default function EditAttendanceModal({
   onDelete,
   onClose,
 }) {
-  const {loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, cdlLoading, accrualLeaveBalance } =
+  const {loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, cdlLoading, accrualLeaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading } =
     useSelector((state) => state.hrRepositoryReducer);
   const dispatch = useDispatch();
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
   
   const [formData, setFormData] = useState({
     attendanceStatus: "",
@@ -68,6 +71,57 @@ export default function EditAttendanceModal({
     }
   }, [existingAttendance]);
 
+  // Helper function to check if a date is a weekend
+  const isWeekend = (dateString) => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+  };
+
+  // Check weekend validation when date or leave type changes
+  useEffect(() => {
+    if (formData.leaveConfigId && selectedDate?.dateString) {
+      const selectedLeave = allExisitingLeaves.find(leave => leave.leaveConfigId === formData.leaveConfigId);
+      if (selectedLeave) {
+        const excludePaidWeekend = selectedLeave.excludePaidWeekend;
+        if (excludePaidWeekend === true && isWeekend(selectedDate.dateString)) {
+          setLeaveValidationError("You cannot apply this leave on weekends (Saturday or Sunday)");
+        } else {
+          // Clear weekend error if not applicable
+          setLeaveValidationError(prev => {
+            if (prev === "You cannot apply this leave on weekends (Saturday or Sunday)") {
+              return "";
+            }
+            return prev;
+          });
+        }
+      }
+    } else if (!formData.leaveConfigId || !selectedDate?.dateString) {
+      // Clear weekend error if leave type or date is cleared
+      setLeaveValidationError(prev => {
+        if (prev === "You cannot apply this leave on weekends (Saturday or Sunday)") {
+          return "";
+        }
+        return prev;
+      });
+    }
+  }, [selectedDate, formData.leaveConfigId, allExisitingLeaves]);
+
+  // Refetch comp off eligibility when attendance status changes (for half-day toggle)
+  useEffect(() => {
+    const selectedLeave = allExisitingLeaves.find(leave => leave.leaveConfigId === formData.leaveConfigId);
+    const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+    
+    if (isCompOff && selectedDate?.dateString && formData.leaveConfigId) {
+      const empUuid = currentEmployeeDetails.employeeBasicDetails?.empUuid;
+      if (empUuid) {
+        const isHalfDay = formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY;
+        dispatch(getCompOffLeaveEligibility(empUuid, selectedDate.dateString, selectedDate.dateString, isHalfDay));
+      }
+    }
+  }, [formData.attendanceStatus, formData.leaveConfigId, selectedDate, allExisitingLeaves, currentEmployeeDetails, dispatch]);
+
   // Fetch CDL data when component mounts
   useEffect(() => {
     const empUuid = currentEmployeeDetails.employeeBasicDetails?.empUuid;
@@ -88,9 +142,11 @@ export default function EditAttendanceModal({
 
   const empGender = currentEmployeeDetails.employeeBasicDetails?.empGender || null;
   const currentEmployeeType = currentEmployeeDetails?.employeeCurrentJobDetails?.empType || "";
-
+  const eligibleLeaveIds = new Set(accrualLeaveBalance.map(item => item.leaveConfigId));
   const availableLeaves = allExisitingLeaves.filter((leave) => {
+    if (!eligibleLeaveIds.has(leave.leaveConfigId)) return false;
     if (!leave.isActive) return false;
+    
     try {
       const employeeTypes = JSON.parse(leave.employeeType);
       const appliedGenders = JSON.parse(leave.appliedGender);
@@ -115,6 +171,61 @@ export default function EditAttendanceModal({
 
 
   const handleStatusChange = (status) => {
+    // Only restrict if switching to full day leave with fractional balance (0.5, 1.5, etc.)
+    if (status === ATTENDANCE_STATUS.ON_LEAVE && formData.leaveConfigId) {
+      const selectedLeave = allExisitingLeaves.find(
+        (leave) => leave.leaveConfigId === formData.leaveConfigId
+      );
+      
+      if (selectedLeave) {
+        const isCompOff = selectedLeave.leaveType?.toLowerCase().includes('comp') || 
+                          selectedLeave.leaveType?.toLowerCase().includes('comp off');
+        
+        // Check comp off balance - only restrict if fractional
+        if (isCompOff && compOffLeaveEligibility) {
+          const { availableCompOffCredit } = compOffLeaveEligibility;
+          const fractionalPart = availableCompOffCredit - Math.floor(availableCompOffCredit);
+          const hasFractionalBalance = fractionalPart === 0.5;
+          
+          // Only restrict if balance is fractional and less than 1 day
+          if (hasFractionalBalance && availableCompOffCredit < 1) {
+            dispatch({
+              type: "SET_NEW_SNACKBAR_MESSAGE",
+              payload: {
+                message: `You have only ${availableCompOffCredit} day comp off balance. Please select "Half Day" instead.`,
+                severity: "error",
+              },
+            });
+            return; // Prevent status change
+          }
+        }
+        
+        // Check regular leave balance - only restrict if fractional
+        if (!isCompOff && accrualLeaveBalance) {
+          const accrualRecord = accrualLeaveBalance.find(
+            (balance) => balance.leaveConfigId === selectedLeave.leaveConfigId
+          );
+          if (accrualRecord) {
+            const availableDays = accrualRecord.availableLeaves || 0;
+            const fractionalPart = availableDays - Math.floor(availableDays);
+            const hasFractionalBalance = fractionalPart === 0.5;
+            
+            // Only restrict if balance is fractional and less than 1 day
+            if (hasFractionalBalance && availableDays < 1) {
+              dispatch({
+                type: "SET_NEW_SNACKBAR_MESSAGE",
+                payload: {
+                  message: `You have only ${availableDays} day ${selectedLeave.leaveType} balance. Please select "Half Day" instead.`,
+                  severity: "error",
+                },
+              });
+              return; // Prevent status change
+            }
+          }
+        }
+      }
+    }
+    
     setFormData((prev) => ({
       ...prev,
       attendanceStatus: status,
@@ -135,6 +246,18 @@ export default function EditAttendanceModal({
   const handleLeaveTypeChange = (leaveConfigId) => {
     handleInputChange("leaveConfigId", leaveConfigId);
     
+    const selectedLeave = allExisitingLeaves.find(leave => leave.leaveConfigId === leaveConfigId);
+    const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+    
+    // Fetch comp off eligibility if comp off is selected
+    if (isCompOff && selectedDate?.dateString) {
+      const empUuid = currentEmployeeDetails.employeeBasicDetails?.empUuid;
+      if (empUuid) {
+        const isHalfDay = formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY;
+        dispatch(getCompOffLeaveEligibility(empUuid, selectedDate.dateString, selectedDate.dateString, isHalfDay));
+      }
+    }
+    
     // Skip CDL check for half day attendance
     if (formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY) {
       setCdlError("");
@@ -142,18 +265,22 @@ export default function EditAttendanceModal({
       return;
     }
     
-    // Check CDL for this leave type
-    const cdlAllowed = cdlData[leaveConfigId];
-    const selectedLeave = allExisitingLeaves.find(leave => leave.leaveConfigId === leaveConfigId);
-    
-    // Skip CDL restrictions for admin users (access level >= 500)
-    if (cdlAllowed === false && allToolsAccessDetails?.[selectedToolName] < 500) {
-      // Check if it's sick leave
-      if (selectedLeave && selectedLeave.leaveType.toLowerCase() === 'sick') {
-        setCdlError(`Need medical certificate for ${selectedLeave.leaveType} leave as continuous leave limit (CDL) reached.`);
-        setShowProofUpload(true);
+    // Check CDL for this leave type (skip for comp off as it has its own eligibility)
+    if (!isCompOff) {
+      const cdlAllowed = cdlData[leaveConfigId];
+      
+      // Skip CDL restrictions for admin users (access level >= 500)
+      if (cdlAllowed === false && allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance) {
+        // Check if it's sick leave
+        if (selectedLeave && selectedLeave.leaveType.toLowerCase() === 'sick') {
+          setCdlError(`Need medical certificate for ${selectedLeave.leaveType} leave as continuous leave limit (CDL) reached.`);
+          setShowProofUpload(true);
+        } else {
+          setCdlError(`Application not allowed for ${selectedLeave.leaveType} leave due to continuous leave limit (CDL) restrictions.`);
+          setShowProofUpload(false);
+        }
       } else {
-        setCdlError(`Application not allowed for ${selectedLeave.leaveType} leave due to continuous leave limit (CDL) restrictions.`);
+        setCdlError("");
         setShowProofUpload(false);
       }
     } else {
@@ -212,7 +339,9 @@ const handleProofUpload = async (event) => {
   const validateCDL = () => {
     if (!formData.leaveConfigId) return true;
     // Skip CDL validation for admin users (access level >= 500)
-    if (allToolsAccessDetails?.[selectedToolName] >= 500) return true;
+    if (allToolsAccessDetails?.[selectedToolName] >= 900 && hasAccessToEditAttendance) {
+      return true;
+    }
 
     // Skip CDL validation for half day attendance
     if (formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY) {
@@ -265,6 +394,77 @@ const handleProofUpload = async (event) => {
     const selectedLeave = allExisitingLeaves.find(
       (leave) => leave.leaveConfigId === formData.leaveConfigId
     );
+    
+    // Comp off balance validation - Only restrict for fractional balance scenarios
+    if (selectedLeave && compOffLeaveEligibility) {
+      const isCompOff = selectedLeave.leaveType?.toLowerCase().includes('comp') || 
+                        selectedLeave.leaveType?.toLowerCase().includes('comp off');
+      
+      if (isCompOff) {
+        const { availableCompOffCredit } = compOffLeaveEligibility;
+        const requestedDays = formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY ? 0.5 : 1;
+        
+        // Only restrict if:
+        // 1. Requesting full day (not half day)
+        // 2. Available balance is fractional (has 0.5)
+        // 3. Requested days > available balance
+        if (formData.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE && requestedDays > availableCompOffCredit) {
+          const fractionalPart = availableCompOffCredit - Math.floor(availableCompOffCredit);
+          const hasFractionalBalance = fractionalPart === 0.5;
+          
+          // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
+          if (hasFractionalBalance) {
+            const fullDaysAvailable = Math.floor(availableCompOffCredit);
+            let suggestion = '';
+            
+            if (fullDaysAvailable > 0) {
+              suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
+            } else {
+              suggestion = ` You can take 1 half day.`;
+            }
+            
+            newErrors.attendanceStatus = `You have only ${availableCompOffCredit} ${availableCompOffCredit === 0.5 ? 'day' : 'days'} comp off balance. Please select "Half Day" instead.${suggestion}`;
+          }
+          // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
+        }
+      }
+    }
+    
+    // Regular leave balance validation - Only restrict for fractional balance scenarios
+    if (selectedLeave && !compOffLeaveEligibility && accrualLeaveBalance) {
+      const accrualRecord = accrualLeaveBalance.find(
+        (balance) => balance.leaveConfigId === selectedLeave.leaveConfigId
+      );
+      
+      if (accrualRecord) {
+        const availableDays = accrualRecord.availableLeaves || 0;
+        const requestedDays = formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY ? 0.5 : 1;
+        
+        // Only restrict if:
+        // 1. Requesting full day (not half day)
+        // 2. Available balance is fractional (has 0.5)
+        // 3. Requested days > available balance
+        if (formData.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE && requestedDays > availableDays) {
+          const fractionalPart = availableDays - Math.floor(availableDays);
+          const hasFractionalBalance = fractionalPart === 0.5;
+          
+          // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
+          if (hasFractionalBalance) {
+            const fullDaysAvailable = Math.floor(availableDays);
+            let suggestion = '';
+            
+            if (fullDaysAvailable > 0) {
+              suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
+            } else {
+              suggestion = ` You can take 1 half day.`;
+            }
+            
+            newErrors.attendanceStatus = `You have only ${availableDays} ${availableDays === 0.5 ? 'day' : 'days'} ${selectedLeave.leaveType} balance. Please select "Half Day" instead.${suggestion}`;
+          }
+          // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
+        }
+      }
+    }
     
     if (
       selectedLeave &&
@@ -370,7 +570,8 @@ const handleProofUpload = async (event) => {
         transformedData,
         allExisitingLeaves,
         setLeaveValidationError,
-        allToolsAccessDetails?.[selectedToolName]
+        allToolsAccessDetails?.[selectedToolName],
+        hasAccessToEditAttendance,
       );
       
       if (!isValid) {
@@ -379,6 +580,11 @@ const handleProofUpload = async (event) => {
       
       onSave(transformedData, setAttendanceMonth, setAttendanceYear);
     } else {
+      // When changing from leave/half_day to working, set leaveRequestId to null
+      const wasLeaveOrHalfDay = existingAttendance && 
+        (existingAttendance.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE || 
+         existingAttendance.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY);
+      
       const transformedData = {
         ...attendanceData,
         attendanceDate: selectedDate.dateString,
@@ -386,6 +592,7 @@ const handleProofUpload = async (event) => {
         checkOut: toHHMMSS(formData.checkOut),
         isUpdate: isUpdate,
         attendanceId: isUpdate ? existingAttendance.attendanceId : undefined,
+        leaveRequestId: (isUpdate && wasLeaveOrHalfDay) ? null : undefined,
       };
       onSave(transformedData, setAttendanceMonth, setAttendanceYear);
     }
@@ -408,6 +615,47 @@ const handleProofUpload = async (event) => {
   const selectedLeave = availableLeaves.find(
     (leave) => leave.leaveConfigId === formData.leaveConfigId
   );
+  
+  // Check if full day leave is allowed based on balance - only restrict for fractional balance
+  const canApplyFullDay = () => {
+    if (!selectedLeave) return true;
+    
+    const isCompOff = selectedLeave.leaveType?.toLowerCase().includes('comp') || 
+                      selectedLeave.leaveType?.toLowerCase().includes('comp off');
+    
+    if (isCompOff && compOffLeaveEligibility) {
+      const { availableCompOffCredit } = compOffLeaveEligibility;
+      const fractionalPart = availableCompOffCredit - Math.floor(availableCompOffCredit);
+      const hasFractionalBalance = fractionalPart === 0.5;
+      
+      // Only restrict if balance is fractional and less than 1 day
+      if (hasFractionalBalance && availableCompOffCredit < 1) {
+        return false;
+      }
+      return true;
+    }
+    
+    if (!isCompOff && accrualLeaveBalance) {
+      const accrualRecord = accrualLeaveBalance.find(
+        (balance) => balance.leaveConfigId === selectedLeave.leaveConfigId
+      );
+      if (accrualRecord) {
+        const availableDays = accrualRecord.availableLeaves || 0;
+        const fractionalPart = availableDays - Math.floor(availableDays);
+        const hasFractionalBalance = fractionalPart === 0.5;
+        
+        // Only restrict if balance is fractional and less than 1 day
+        if (hasFractionalBalance && availableDays < 1) {
+          return false;
+        }
+        return true;
+      }
+    }
+    
+    return true; // Default allow if no balance data
+  };
+  
+  const isFullDayAllowed = canApplyFullDay();
 
   const handleDivClick = () => {
     if (formData.attendanceStatus === ATTENDANCE_STATUS.WORKING) {
@@ -445,19 +693,37 @@ const handleProofUpload = async (event) => {
           <div className="form-group">
             <label>Attendance status* (select one)</label>
             <div className="status-options">
-              {Object.values(ATTENDANCE_STATUS).map((status) => (
-                <button
-                  key={status}
-                  className={`${
-                    formData.attendanceStatus === status ? "active" : ""
-                  } ${errors.attendanceStatus ? "error" : ""}`}
-                  onClick={() => handleStatusChange(status)}
-                >
-                  {status
-                    .replace("_", " ")
-                    .replace(/\b\w/g, (l) => l.toUpperCase())}
-                </button>
-              ))}
+              {Object.values(ATTENDANCE_STATUS).map((status) => {
+                const isOnLeave = status === ATTENDANCE_STATUS.ON_LEAVE;
+                const isDisabled = isOnLeave && selectedLeave && !isFullDayAllowed;
+                const disabledTitle = isDisabled 
+                  ? selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'))
+                    ? compOffLeaveEligibility 
+                      ? `You have only ${compOffLeaveEligibility.availableCompOffCredit} ${compOffLeaveEligibility.availableCompOffCredit === 0.5 ? 'day' : 'days'} balance. Please select "Half Day" instead.`
+                      : "Insufficient balance for full day leave"
+                    : accrualLeaveBalance?.find(b => b.leaveConfigId === selectedLeave.leaveConfigId)
+                      ? `You have only ${accrualLeaveBalance.find(b => b.leaveConfigId === selectedLeave.leaveConfigId).availableLeaves} ${accrualLeaveBalance.find(b => b.leaveConfigId === selectedLeave.leaveConfigId).availableLeaves === 0.5 ? 'day' : 'days'} balance. Please select "Half Day" instead.`
+                      : "Insufficient balance for full day leave"
+                  : "";
+                
+                return (
+                  <button
+                    key={status}
+                    className={`${
+                      formData.attendanceStatus === status ? "active" : ""
+                    } ${errors.attendanceStatus ? "error" : ""} ${
+                      isDisabled || !hasAccessToEditAttendance ? "disabled" : ""
+                    }`}
+                    onClick={() => handleStatusChange(status)}
+                    disabled={isDisabled || !hasAccessToEditAttendance}
+                    title={!hasAccessToEditAttendance ? "You don't have permission to edit attendance" : disabledTitle}
+                  >
+                    {status
+                      .replace("_", " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </button>
+                );
+              })}
             </div>
             {errors.attendanceStatus && (
               <p className="validation-error">{errors.attendanceStatus}</p>
@@ -479,7 +745,7 @@ const handleProofUpload = async (event) => {
                         const isDisabled = formData.attendanceStatus !== ATTENDANCE_STATUS.HALF_DAY && 
                                          cdlAllowed === false && 
                                          leave?.leaveType?.toLowerCase() !== 'sick' &&
-                                         allToolsAccessDetails?.[selectedToolName] < 500;
+                                         allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance;
                         
                         return (
                           <button
@@ -489,11 +755,11 @@ const handleProofUpload = async (event) => {
                                 ? "active"
                                 : ""
                             } ${errors.leaveConfigId ? "error" : ""} ${
-                              isDisabled ? "disabled" : ""
+                              isDisabled || !hasAccessToEditAttendance ? "disabled" : ""
                             }`}
                             onClick={() => handleLeaveTypeChange(leave.leaveConfigId)}
-                            disabled={isDisabled}
-                            title={isDisabled ? "CDL reached - Cannot apply for this leave type" : ""}
+                            disabled={isDisabled || !hasAccessToEditAttendance}
+                            title={!hasAccessToEditAttendance ? "You don't have permission to edit attendance" : (isDisabled ? "CDL reached - Cannot apply for this leave type" : "")}
                           >
                             {leave.leaveType}
                             {formData.attendanceStatus !== ATTENDANCE_STATUS.HALF_DAY && 
@@ -532,7 +798,7 @@ const handleProofUpload = async (event) => {
           )}
 
           {/* Proof Upload for Sick Leave when CDL is reached */}
-          {allToolsAccessDetails?.[selectedToolName] < 500 && showProofUpload && (
+          {allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && showProofUpload && (
             <div className="file_upload_container">
               <label>Medical Proof* (Required when CDL is reached)</label>
               <input
@@ -542,6 +808,7 @@ const handleProofUpload = async (event) => {
                 accept=".jpg,.jpeg,.png,.pdf"
                 onChange={handleProofUpload}
                 required
+                disabled={!hasAccessToEditAttendance}
                 style={{ display: "none" }}
               />
               
@@ -618,7 +885,7 @@ const handleProofUpload = async (event) => {
                   value={formData.checkIn}
                   onChange={(e) => handleInputChange("checkIn", e.target.value)}
                   disabled={
-                    formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] === 100 && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
+                    !hasAccessToEditAttendance || formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
                   }
                 />
                 {errors.checkIn && (
@@ -641,7 +908,7 @@ const handleProofUpload = async (event) => {
                     handleInputChange("checkOut", e.target.value)
                   }
                   disabled={
-                    formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] ===100 && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
+                    !hasAccessToEditAttendance || formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
                   }
                 />
                 {errors.checkOut && (
@@ -663,6 +930,8 @@ const handleProofUpload = async (event) => {
               onChange={(e) => handleInputChange("remarks", e.target.value)}
               placeholder="A short, optional description of your day"
               className={errors.remarks ? "error" : ""}
+              disabled={!hasAccessToEditAttendance}
+              readOnly={!hasAccessToEditAttendance}
             />
             {errors.remarks && (
               <p className="validation-error">{errors.remarks}</p>
@@ -674,6 +943,79 @@ const handleProofUpload = async (event) => {
             (formData.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE ||
               formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY) &&
             (() => {
+              const isCompOff = selectedLeave.leaveType?.toLowerCase().includes('comp') || 
+                               selectedLeave.leaveType?.toLowerCase().includes('comp off');
+              
+              // Show comp off eligibility if comp off is selected
+              if (isCompOff) {
+                if (compOffLeaveEligibilityLoading) {
+                  return (
+                    <div className="application-status info">
+                      <LoadingSpinner message="Loading comp off eligibility..." height="10vh" />
+                    </div>
+                  );
+                }
+                
+                if (compOffLeaveEligibility) {
+                  const { paidDays, unpaidDays, availableCompOffCredit, isEligible, validations, totalDays } = compOffLeaveEligibility;
+                  const requestedDays = formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY ? 0.5 : totalDays;
+                  
+                  return (
+                    <div className={`application-status ${isEligible ? "info" : "warning"}`}>
+                      <div className="status-header">
+                        <p className="status-message">
+                          Application For {selectedLeave.leaveType}: {requestedDays}{" "}
+                          {requestedDays === 1 ? "day" : "days"}
+                        </p>
+                      </div>
+                      <div className="status-info">
+                        <p className="balance-summary">
+                          Available Comp Off Credit: {availableCompOffCredit} days
+                        </p>
+                      </div>
+                      {unpaidDays > 0 && (
+                        <div className="status-alert">
+                          <p className="warning-text">
+                            {paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave (comp off), ` : ""}
+                            {unpaidDays} {unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave
+                          </p>
+                        </div>
+                      )}
+                      {unpaidDays === 0 && paidDays > 0 && (
+                        <div className="status-info">
+                          <p className="success-text">
+                            {paidDays} {paidDays === 1 ? "day" : "days"} will be as paid leave (comp off)
+                          </p>
+                        </div>
+                      )}
+                      {validations && (
+                        <div className="status-alert">
+                          {!validations.noticePeriod.valid && validations.noticePeriod.message && (
+                            <p className="warning-text">{validations.noticePeriod.message}</p>
+                          )}
+                          {!validations.continuousLeaveLimit.valid && validations.continuousLeaveLimit.message && (
+                            <p className="warning-text">{validations.continuousLeaveLimit.message}</p>
+                          )}
+                          {!validations.overlappingLeaves.valid && validations.overlappingLeaves.message && (
+                            <p className="warning-text">{validations.overlappingLeaves.message}</p>
+                          )}
+                        </div>
+                      )}
+                      {leaveValidationError && (
+                        <div className="status-alert">
+                          <p className="warning-text">
+                            {leaveValidationError}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
+                return null;
+              }
+              
+              // Regular leave balance display (non-comp off)
               // Fiscal Year Validation
               const conversionDate = new Date(currentEmployeeDetails?.employeeCurrentJobDetails?.empConversionDate);
               const selectedDateObj = new Date(selectedDate.dateString);
@@ -728,6 +1070,9 @@ const handleProofUpload = async (event) => {
                   ? 0.5
                   : 1;
               
+              // Check if the selected leave type is "Unpaid"
+              const isUnpaidLeave = selectedLeave.leaveType?.toLowerCase() === "unpaid";
+              
               const isExceeding = availableDays <= 0 || requestedDays > availableDays;
               
               // Calculate paid and unpaid days
@@ -737,11 +1082,12 @@ const handleProofUpload = async (event) => {
               // Check if this is historical data
               const isHistoricalData = accrualRecord?.targetDate && new Date(accrualRecord.targetDate) < new Date();
 
+              // If unpaid leave is selected, always show as warning (red)
+              const statusClassName = isUnpaidLeave ? "warning" : (isExceeding ? "warning" : "info");
+
               return (
                 <div
-                  className={`application-status ${
-                    isExceeding ? "warning" : "info"
-                  }`}
+                  className={`application-status ${statusClassName}`}
                 >
                   <div className="status-header">
                     <p className="status-message">
@@ -759,20 +1105,31 @@ const handleProofUpload = async (event) => {
                       {isHistoricalData ? ' (as of selected date)' : ''}
                     </p>
                   </div>
-                  {isExceeding && (
+                  {isUnpaidLeave ? (
+                    // Show unpaid leave message in red/warning style
                     <div className="status-alert">
                       <p className="warning-text">
-                        {paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave, ` : ""}
-                        {unpaidDays} {unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave
+                        {requestedDays} {requestedDays === 1 ? "day" : "days"} will be as unpaid leave
                       </p>
                     </div>
-                  )}
-                  {!isExceeding && paidDays > 0 && (
-                    <div className="status-info">
-                      <p className="success-text">
-                        {paidDays} {paidDays === 1 ? "day" : "days"} will be as paid leave
-                      </p>
-                    </div>
+                  ) : (
+                    <>
+                      {isExceeding && (
+                        <div className="status-alert">
+                          <p className="warning-text">
+                            {paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave, ` : ""}
+                            {unpaidDays} {unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave
+                          </p>
+                        </div>
+                      )}
+                      {!isExceeding && paidDays > 0 && (
+                        <div className="status-info">
+                          <p className="success-text">
+                            {paidDays} {paidDays === 1 ? "day" : "days"} will be as paid leave
+                          </p>
+                        </div>
+                      )}
+                    </>
                   )}
                   {leaveValidationError && (
                     <div className="status-alert">
@@ -787,36 +1144,48 @@ const handleProofUpload = async (event) => {
 
           {/* Form Actions */}
           <div className="form-actions">
-            {existingAttendance ? (
-              <button
-                type="button"
-                className={`delete-button ${existingAttendance.attendanceStatus === "working" ? "" : "disabled"}`}
-                onClick={() => handleDelete(existingAttendance)}
-                disabled={existingAttendance.attendanceStatus !== "working"}
-              >
-                Delete
-              </button>
-            ) : (
+            {!hasAccessToEditAttendance ? (
               <button
                 type="button"
                 className="delete-button"
                 onClick={onClose}
               >
-                Cancel
+                Close
               </button>
+            ) : (
+              <>
+                {existingAttendance ? (
+                  <button
+                    type="button"
+                    className={`delete-button ${existingAttendance.attendanceStatus === "working" ? "" : "disabled"}`}
+                    onClick={() => handleDelete(existingAttendance)}
+                    disabled={existingAttendance.attendanceStatus !== "working"}
+                  >
+                    Delete
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="delete-button"
+                    onClick={onClose}
+                  >
+                    Cancel
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="update-button"
+                  onClick={handleSubmit}
+                  disabled={isLoading || cdlLoading}
+                >
+                  {loading || isLoading
+                    ? "Saving..."
+                    : existingAttendance
+                    ? "Update Attendance"
+                    : "Save Attendance"}
+                </button>
+              </>
             )}
-            <button
-              type="button"
-              className="update-button"
-              onClick={handleSubmit}
-              disabled={isLoading || cdlLoading}
-            >
-              {loading || isLoading
-                ? "Saving..."
-                : existingAttendance
-                ? "Update Attendance"
-                : "Save Attendance"}
-            </button>
           </div>
         </div>
       </div>

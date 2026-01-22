@@ -1,8 +1,9 @@
+import React from 'react'
 import "./hello.scss";
 
 const Hello = () => {
   return (
-    <div className='hello_div'>All routes screen should be fit in this screen</div>
+    <div className='hello_div'>All route's screen should be fit in this screen</div>
   )
 }
 

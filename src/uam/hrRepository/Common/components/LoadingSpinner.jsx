@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from "@mui/material";
 
-const LoadingSpinner = ({ message = "Loading...", height = "50vh" }) => {
+const LoadingSpinner = ({ message = "Loading...", height = "50vh" , color = "#045071", gap = 0, loaderSize = 40}) => {
   return (
     <Box
       display="flex"
@@ -8,10 +8,10 @@ const LoadingSpinner = ({ message = "Loading...", height = "50vh" }) => {
       justifyContent="center"
       alignItems="center"
       height={height}
-      gap={2}
+      gap={gap}
     >
-      <CircularProgress size={40} sx={{ color: "#045071" }}/>
-      <p style={{ margin: 0, color: "#666", fontSize: "14px", fontFamily: "Plus Jakarta Sans"}}>{message}</p>
+      <CircularProgress size={loaderSize} sx={{ color: color }} />
+        <p style={{ margin: 0, color: "#666", fontSize: "14px", fontFamily: "Plus Jakarta Sans"}}>{message}</p>
     </Box>
   );
 };
