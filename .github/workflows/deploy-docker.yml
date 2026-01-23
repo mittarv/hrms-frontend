@@ -98,6 +98,13 @@ jobs:
           echo VITE_ALLOWED_EMAIL_DOMAIN=%VITE_ALLOWED_EMAIL_DOMAIN% >> .env
           echo HOST_PORT=%HOST_PORT% >> .env
 
+      - name: Stop and remove existing container
+        shell: cmd
+        run: |
+          cd "${{ github.workspace }}"
+          docker compose down
+        continue-on-error: true
+
       - name: Build and deploy with Docker Compose
         shell: cmd
         run: |
@@ -113,11 +120,6 @@ jobs:
         run: |
           timeout /t 15 /nobreak
           docker ps -f name=hrms-frontend
-
-      - name: Clean up old Docker images
-        shell: cmd
-        run: docker image prune -f
-        continue-on-error: true
 
       - name: Clean up .env file
         shell: cmd
