@@ -54,30 +54,31 @@ jobs:
 
       - name: Bump version and create tag
         id: version
-        shell: pwsh
+        shell: cmd
         run: |
-          # Get current version from package.json
-          $currentVersion = node -p "require('./package.json').version"
-          Write-Host "Current version: $currentVersion"
+          @echo off
+          REM Get current version from package.json
+          for /f "delims=" %%i in ('node -p "require('./package.json').version"') do set CURRENT_VERSION=%%i
+          echo Current version: %CURRENT_VERSION%
           
-          # Bump patch version using npm version (0.1.0 -> 0.1.1)
-          npm version patch --no-git-tag-version
+          REM Bump patch version using npm version (0.1.0 -> 0.1.1)
+          call npm version patch --no-git-tag-version
           
-          # Get new version
-          $newVersion = node -p "require('./package.json').version"
-          Write-Host "New version: $newVersion"
+          REM Get new version
+          for /f "delims=" %%i in ('node -p "require('./package.json').version"') do set NEW_VERSION=%%i
+          echo New version: %NEW_VERSION%
           
-          # Set GitHub output and environment variables
-          "new_version=$newVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "VERSION=$newVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
+          REM Set GitHub output and environment variables
+          echo new_version=%NEW_VERSION%>>%GITHUB_OUTPUT%
+          echo VERSION=%NEW_VERSION%>>%GITHUB_ENV%
           
-          # Configure git for tagging
+          REM Configure git for tagging
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Create git tag
-          git tag -a "v$newVersion" -m "Release version $newVersion"
-          git push origin "v$newVersion"
+          REM Create git tag
+          git tag -a "v%NEW_VERSION%" -m "Release version %NEW_VERSION%"
+          git push origin "v%NEW_VERSION%"
 
       - name: Create .env file from GitHub variables
         shell: cmd
@@ -153,29 +154,31 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit version bump
-        shell: pwsh
+        shell: cmd
         run: |
+          @echo off
           git add package.json package-lock.json
           git commit -m "chore: bump version to ${{ env.VERSION }}"
-          if ($LASTEXITCODE -eq 0) {
+          if %errorlevel% equ 0 (
             git push origin main
-          }
+          )
 
       - name: Deployment Summary
-        shell: pwsh
+        shell: cmd
         run: |
-          $port = "${{ vars.HOST_PORT }}"
-          if ([string]::IsNullOrEmpty($port)) { $port = "3050" }
+          @echo off
+          set PORT=${{ vars.HOST_PORT }}
+          if "%PORT%"=="" set PORT=3050
           
-          @"
-          ## Deployment Successful! :rocket:
-          
-          **Version:** v${{ env.VERSION }}
-          **Docker Image:** ${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }}
-          **Container:** ${{ env.DOCKER_CONTAINER_NAME }}
-          **Port:** $port
-          
-          **Commit:** ${{ github.sha }}
-          **Branch:** ${{ github.ref_name }}
-          **Release:** [v${{ env.VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION }})
-          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
+          (
+            echo ## Deployment Successful! :rocket:
+            echo.
+            echo **Version:** v${{ env.VERSION }}
+            echo **Docker Image:** ${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }}
+            echo **Container:** ${{ env.DOCKER_CONTAINER_NAME }}
+            echo **Port:** %PORT%
+            echo.
+            echo **Commit:** ${{ github.sha }}
+            echo **Branch:** ${{ github.ref_name }}
+            echo **Release:** [v${{ env.VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION }})
+          )>>%GITHUB_STEP_SUMMARY%
