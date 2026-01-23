@@ -474,7 +474,7 @@ export const UserPermissionTableEdit = ({ isEdit, toggleOptions }) => {
                                     id={`split-button-menu-${rowIndex}-${index}`}
                                     autoFocusItem
                                   >
-                                    {userGroupsData.map((option) => (
+                                    {userGroupsData.map((option, index) => (
                                       <MenuItem
                                         key={option.id}
                                         style={
@@ -629,7 +629,7 @@ export const UserPermissionTableEdit = ({ isEdit, toggleOptions }) => {
                                     id={`split-button-menu-${rowIndex}-${index}`}
                                     autoFocusItem
                                   >
-                                    {userGroupsData.map((option) => (
+                                    {userGroupsData.map((option, index) => (
                                       <MenuItem
                                         key={option.id}
                                         // style={option.role === accessTypes[row[`tool${toolIndex + 1}`]] ? { fontWeight: 600, backgroundColor: "white" } : {}}

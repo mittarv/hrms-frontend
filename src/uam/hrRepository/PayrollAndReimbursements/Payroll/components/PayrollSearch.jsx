@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import Search_icon_grey from "../../../../../assets/icons/Search_icon_grey.svg";
+import Search_icon_grey from "../../../assets/icons/Search_icon_grey.svg";
 import "../styles/PayrollSearch.scss";
 
 const PayrollSearch = ({ onSearchChange }) => {

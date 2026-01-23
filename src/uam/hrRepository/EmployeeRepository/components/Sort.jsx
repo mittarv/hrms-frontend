@@ -1,6 +1,6 @@
 import { ClickAwayListener } from "@mui/material"; 
-import sort_grey_icon from "../../../../assets/icons/sort_grey_icon.svg";
-import tick_icon from "../../../../assets/icons/tick_icon.svg";
+import sort_grey_icon from "../../assets/icons/sort_grey_icon.svg";
+import tick_icon from "../../assets/icons/tick_icon.svg";
 import "../styles/Sort.scss";
 
 const Sort = ({ options, currentSort, onSortSelect, isOpen, setIsOpen }) => {

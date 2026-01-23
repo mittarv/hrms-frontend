@@ -1,29 +1,15 @@
 import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
+
 import Login from "./components/login/Login";
 import PrivateRoute from "./PrivateRoute";
-import PageNotFound from "./components/pageNotFound/PageNotFound";
+
 import UserGroups from "./uam/userGroups/userGroups";
 import MyTools from "./uam/myTools/MyTools";
 import UserPermissions from "./uam/userPermissions/UserPermissions";
 import MittArvTools from "./uam/mittarvTools/MittarvTools";
 import PendingRequests from "./uam/pendingRequests/PendingRequests";
-import Dashboard from "./uam/hrRepository/Dashboard/Dashboard";
-import EmployeeRepositoryDashboard from "./uam/hrRepository/EmployeeRepository/EmployeeRepo";
-import LeaveConfiguratorDashboard from "./uam/hrRepository/LeaveConfigurator/LeaveConfiguratorDashboard";
-import Requests from "./uam/hrRepository/Requests/Requests";
-import LeaveManagement from "./uam/hrRepository/LeaveManagement/LeaveManagement";
-import PayrollAndReimbursements from "./uam/hrRepository/PayrollAndReimbursements/PayrollAndReimbursements";
-
-import { toolHomePageData } from "./constant/data";
 
 const AllRoutes = ({ isAuthenticated }) => {
-  const { user, allToolsAccessDetails } = useSelector((state) => state.user);
-
-  const hasAdvancedAccess = (toolKey, threshold = 500) =>
-    allToolsAccessDetails?.[toolKey] >= threshold;
-
-  const isEmployee = user?.employeeUuid !== null;
 
   const baseRoutes = [
     { path: "/login", element: <Login />, isPublic: true },
@@ -32,40 +18,9 @@ const AllRoutes = ({ isAuthenticated }) => {
     { path: "/my-tools", element: <MyTools /> },
     { path: "/mittarv-tools", element: <MittArvTools /> },
     { path: "/pending-requests", element: <PendingRequests /> },
-    { path: "/payroll-reimbursements", element: <PayrollAndReimbursements /> },
   ];
 
   const conditionalRoutes = [
-    {
-      path: "/employee-repo",
-      element: <EmployeeRepositoryDashboard />,
-      condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
-    },
-    {
-      path: "/hr-repo-requests",
-      element: <Requests />,
-      condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
-    },
-    {
-      path: "/dashboard",
-      element: <Dashboard />,
-      condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
-    },
-    {
-      path: "/leave-configurator",
-      element: <LeaveConfiguratorDashboard />,
-      condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
-    },
-    {
-      path: "/leave-attendance",
-      element: <LeaveManagement />,
-      condition: isEmployee || hasAdvancedAccess(toolHomePageData?.toot_title2),
-    },
-    {
-      path: "/employee-directory", 
-      element: <EmployeeRepositoryDashboard />, 
-      condition: isEmployee && !hasAdvancedAccess(toolHomePageData?.toot_title2), 
-    },
   ];
 
   return (
@@ -93,9 +48,6 @@ const AllRoutes = ({ isAuthenticated }) => {
             <Route path={path} element={element} />
           </Route>
         ))}
-
-      {/* Catch-all route for 404 Page Not Found */}
-      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };

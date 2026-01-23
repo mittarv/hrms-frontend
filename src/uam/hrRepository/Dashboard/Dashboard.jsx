@@ -23,14 +23,14 @@ import {
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import Snackbar from "../Common/components/Snackbar";
-import check_in_icon from "../../../assets/icons/check_in_icon.svg";
-import check_out_icon from "../../../assets/icons/check_out_icon.svg";
-import check_in_disable_icon from "../../../assets/icons/check_in_disabled_icon.svg";
-import check_out_disable_icon from "../../../assets/icons/check_out_disabled_icon.svg";
+import check_in_icon from "../assets/icons/check_in_icon.svg";
+import check_out_icon from "../assets/icons/check_out_icon.svg";
+import check_in_disable_icon from "../assets/icons/check_in_disabled_icon.svg";
+import check_out_disable_icon from "../assets/icons/check_out_disabled_icon.svg";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
 import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../Common/components/LoadingSpinner";
-import { toolHomePageData } from "../../../constant/data";
+import { hrToolHomePageData } from "../constant/data";
 
 const Dashboard = () => {
     const { user } = useSelector((state) => state.user);
@@ -62,7 +62,7 @@ const Dashboard = () => {
     useEffect(() => {
         dispatch({
             type: "SET_SELECTED_TOOL_NAME",
-            payload: toolHomePageData.toot_title2
+            payload: hrToolHomePageData.toot_title2
         });
     }, [dispatch]);
 
@@ -163,10 +163,10 @@ const Dashboard = () => {
             <LoadingSpinner message="Loading dashboard..." height="40vh" />
         ) : (
         <>
-            <div className="main_table_header_div" id="top">
-                <div className="inner-div-left-section">
-                    <p className="inner-div-left-title">Welcome, {user?.name}!</p>
-                    <p className="inner-div-left-subtitle-2">
+            <div className="main_table_header_div_dashboard" id="top">
+                <div className="inner-div-left-section_dashboard">
+                    <p className="inner-div-left-title_dashboard">Welcome, {user?.name}!</p>
+                    <p className="inner-div-left-subtitle-2_dashboard">
                         Here you can view key insights and stay updated on important details.
                     </p>         
                 </div>

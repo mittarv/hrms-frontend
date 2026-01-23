@@ -1,6 +1,4 @@
-import Sidebar from "../../../components/sidebar/Sidebar";
-import Header from "../../../components/header/Header";
-import Add_icon from "../../../assets/icons/add_icon_without_background.svg";
+import Add_icon from "../assets/icons/add_icon_without_background.svg";
 import { useSelector, useDispatch } from "react-redux";
 import LeaveConfiguratorTable from "./components/LeaveConfiguratorTable";
 import { useEffect, useRef } from "react";
@@ -19,7 +17,7 @@ import { useState } from "react";
 import { AddNewLeaveTypePopUp, LeaveCreatedSuccess } from "./components/LeaveConfiguratorPopup";
 import Snackbar from "../Common/components/Snackbar";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
-import { toolHomePageData } from "../../../constant/data";
+import { hrToolHomePageData } from "../constant/data";
 
 const LeaveConfiguratorDashboard = () => {
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
@@ -32,6 +30,7 @@ const LeaveConfiguratorDashboard = () => {
     checkInCheckOutStatus,
     outStandingCheckOut, 
     getAllComponentType,
+    myHrmsAccess,
   } = useSelector((state) => state.hrRepositoryReducer);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showLeaveDropwon, setShowLeaveDropwon] = useState(false);
@@ -43,6 +42,22 @@ const LeaveConfiguratorDashboard = () => {
   const [NewLeaveName, setNewLeaveName] = useState("");
   const dispatch = useDispatch();
   const [checkOutPopup, setCheckOutPopup] = useState(false);
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canCreate = hasPermission("LeaveConfigurator_Create");
+  const canRead = hasPermission("LeaveConfigurator_Read");
+  const canUpdate = hasPermission("LeaveConfigurator_update");
+  
+  const hasWriteAccess = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => 
+      perm.name === "LeaveConfigurator_Create" || 
+      perm.name === "LeaveConfigurator_update"
+    );
 
   useEffect(() => {
     dispatch(getAllLeaves());
@@ -59,9 +74,9 @@ const LeaveConfiguratorDashboard = () => {
 
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
-      payload: toolHomePageData.toot_title2
+      payload: hrToolHomePageData.toot_title2
     });
-  }, [dispatch]);
+  }, [dispatch, getAllComponentType, outStandingCheckOut, checkInCheckOutStatus, user.employeeUuid]);
 
   useEffect(() => {
     if (outStandingCheckOut && outStandingCheckOut.isShowCheckoutPopup) {
@@ -100,9 +115,21 @@ const LeaveConfiguratorDashboard = () => {
   }, [showLeaveDropwon]); // Add showLeaveDropwon as a dependency
 
   const handleLeaveForm = (item) => {
+    if (!canUpdate) {
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: "You don't have permission to edit leave configuration",
+          severity: "error",
+        },
+      });
+      setShowLeaveDropwon(false);
+      return;
+    }
+    
     const leaveType = item.leaveType;
     const leaveConfigId = item.leaveConfigId;
-    if (leaveType==="Unpaid" && allToolsAccessDetails?.[selectedToolName] < 900) {
+    if (leaveType==="Unpaid" && allToolsAccessDetails?.[selectedToolName] < 900 ) {
       dispatch({ type: "SET_UNPAID_LEAVE_DISABLED" ,payload:true});
     }
     setShowLeaveDropwon(false);
@@ -121,21 +148,18 @@ const LeaveConfiguratorDashboard = () => {
   };
 
   const toggleDropdown = (event) => {
+    if (!hasWriteAccess) return;
     event.stopPropagation();
     setShowLeaveDropwon((prev) => !prev);
   };
 
   return (
-    <div className="leave_configurator_dashboard_main_container">
-      <Sidebar />
-      <div className="leave_configurator_dashboard_header_container">
-        <Header />
-
+    <>
+      <div className="leave_configurator_container">
         {showLeaveConfiguratorForm ? (
           <LeaveConfiguratorForm />
         ) : (
-          <>
-            <div className="leave_configurator_dashboard_body_container">
+          <div className="leave_configurator_dashboard_body_container">
               <div className="leave_configurator_dashboard_heading_container">
                 <div className="leave_configurator_dashboard_title_container">
                   <p className="leave_configurator_dashboard_title">
@@ -147,7 +171,7 @@ const LeaveConfiguratorDashboard = () => {
                 </div>
                 <div className="leave_configurator_dashboard_buttons_container">
                   <div className="Add_leaves_button_main_container">
-                    <button
+                    {canCreate && <button
                       className="Add_leaves_button_container"
                       ref={buttonRef} 
                       onClick={toggleDropdown}
@@ -155,8 +179,8 @@ const LeaveConfiguratorDashboard = () => {
                       <div className="Add_leaves_button">
                         <img src={Add_icon} /> <span>Add Leaves</span>
                       </div>
-                    </button>
-                    {showLeaveDropwon && (
+                    </button>}
+                    {showLeaveDropwon && canCreate && (
                       <div
                         className="Add_leaves_button_dropdown"
                         ref={dropdownRef}
@@ -187,9 +211,8 @@ const LeaveConfiguratorDashboard = () => {
                   </div>
                 </div>
               </div>
-              <LeaveConfiguratorTable />
-            </div>
-          </>
+            <LeaveConfiguratorTable />
+          </div>
         )}
       </div>
       <Snackbar />
@@ -225,7 +248,7 @@ const LeaveConfiguratorDashboard = () => {
         isLoading={loading}
         handleOustandingCheckout={handleOustandingCheckout}
       />
-    </div>
+    </>
   );
 };
 

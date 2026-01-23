@@ -1,16 +1,11 @@
 import { useState } from "react";
 import "../styles/AttendanceLog.scss";
-import LeftArrowIcon from "../../../../assets/icons/left_grey_arrow.svg";
-import RightArrowIcon from "../../../../assets/icons/right_grey_arrow.svg";
-import EditIcon from "../../../../assets/icons/edit_button_blue.svg";
+import LeftArrowIcon from "../../assets/icons/left_grey_arrow.svg";
+import RightArrowIcon from "../../assets/icons/right_grey_arrow.svg";
+import EditIcon from "../../assets/icons/edit_button_blue.svg";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-
-export const ATTENDANCE_STATUS = {
-  WORKING: "working",
-  HALF_DAY: "half_day", 
-  ON_LEAVE: "on_leave"
-};
+import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
 
 export default function AttendanceLog({
   attendanceData,
@@ -22,6 +17,10 @@ export default function AttendanceLog({
   const [showOnlyLeaves, setShowOnlyLeaves] = useState(false);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
+
   const dispatch = useDispatch();
   // Format date for unique keys and data access (same as AttendanceCalendar)
   const formatDateKey = (day) => {
@@ -144,7 +143,7 @@ export default function AttendanceLog({
   // Handle edit button click
   const handleEditAttendance = (dayInfo) => {
       if (
-        (allToolsAccessDetails?.[selectedToolName] < 500) &&
+        (allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance) &&
         (dayInfo?.attendanceRecord?.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY ||
           dayInfo?.attendanceRecord?.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE)
       ) {
@@ -236,7 +235,7 @@ export default function AttendanceLog({
                 <th>Check-out</th>
                 <th>Duration</th>
                 <th>Remarks</th>
-                <th>Edit Entry</th>
+                {hasAccessToEditAttendance && <th>Edit Entry</th>}
               </tr>
             </thead>
             <tbody>
@@ -262,15 +261,17 @@ export default function AttendanceLog({
                   <td className="remarks-cell" title={dayInfo.remarks}>
                     {truncateText(dayInfo.remarks)}
                   </td>
-                  <td>
-                    <button
-                      className="edit-button"
-                      onClick={() => handleEditAttendance(dayInfo)}
-                    >
-                      <img src={EditIcon} alt="Edit" />
-                      <span>Edit</span>
-                    </button>
-                  </td>
+                  {hasAccessToEditAttendance && (
+                    <td>
+                      <button
+                        className="edit-button"
+                        onClick={() => handleEditAttendance(dayInfo)}
+                      >
+                        <img src={EditIcon} alt="Edit" />
+                        <span>Edit</span>
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

@@ -1,139 +1,100 @@
-.requests_main_container {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
+.requests_container * {
+    box-sizing: border-box;
+    font-family: "Plus Jakarta Sans";
+}
 
-    .requests_header_container {
-        height: 100%;
-        width: 100%;
-        position: relative;
+.requests_container {
+    padding: 1.5rem 2.25rem;
+    height: 100%;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: #D2D9DF;
+        border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #054A68;
+        border-radius: 4px;
+    }
+
+    .requests_tabs {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        margin-bottom: 0;
+
+        .leave_calendar_icon {
+            height: 22px;        
+            width: 22px;         
+            vertical-align: middle; 
+        }
+
+        span {
+            display: flex;
+            flex-direction: row;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .active_tab {
+            background-color: #ebfafa;
+            padding: 0.75rem 0.875rem;
+            border-bottom: 0.25rem solid #28a2a2;
+            border-radius: 0.5rem 0.5rem 0rem 0rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #2e3038;
+            font-family: "Plus Jakarta Sans";
+            line-height: 1.25rem;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+        }
+        .inactive_tab {
+            background-color: #ebfafa;
+            padding: 0.75rem 0.875rem;
+            border-bottom: none;
+            border-radius: 0.5rem 0.5rem 0rem 0rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2e3038;
+            font-family: "Plus Jakarta Sans";
+            line-height: 1.25rem;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+        }
+    }
+
+    hr {
+        border: none;
+        border-top: 0.5px solid #8f92a3;
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .requests_header_title_container {
+        padding-top: 0;
+        margin-top: 1rem;
+
+        p {
+            font-size: 16px;
+            font-weight: 400;
+            font-family: "Plus Jakarta Sans";
+            color: #033348;
+        }
+    }
+
+    .leave_management_tab_content {
         display: flex;
         flex-direction: column;
-
-        .display_routes {
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
-
-        .uam_main__header {
-            border-bottom: 1px solid #054a684d;
-        }
-
-        .requests_body_container {
-            width: 100%;
-            height: 100%;
-            padding: 0px 50px;
-            overflow-y: auto;
-            object-fit: contain;
-            position: relative;
-
-            .requests_header_title_container {
-                padding-top: 2rem;
-
-                p {
-                    font-size: 16px;
-                    font-weight: 400;
-                    font-family: "Plus Jakarta Sans";
-                    color: #033348;
-                }
-            }
-
-            .requests_tabs {
-                display: flex;
-                gap: 20px;
-                align-items: center;
-                cursor: pointer;
-                position: relative;
-                padding-top:24px ;
-                margin-bottom: 0;
-                .leave_calendar_icon {
-                    height: 22px;        
-                    width: 22px;         
-                    vertical-align: middle; 
-                    margin-right: 8px;   
-                }
-
-
-                /* This will be our sliding indicator */
-                // &::after {
-                //     content: "";
-                //     display: block;
-                //     width: 100px;
-                //     height: 2px;
-                //     background: #033348;
-                //     border-radius: 5px;
-                //     position: absolute;
-                //     bottom: -8px;
-                //     transition: transform 0.3s ease;
-                // }
-
-                /* Position the indicator based on which tab is active */
-                // &[data-active="tab1"]::after {
-                //     transform: translateX(70px);
-                // }
-
-                // &[data-active="tab2"]::after {
-                //     transform: translateX(280px); /* Adjust based on your gap and tab width */
-                // }
-
-                span {
-                    display: flex;
-                    align-items: center;
-                    font-size: 16px;
-                    font-weight: 700;
-                    font-family: "Plus Jakarta Sans";
-                    color: #8f92a3;
-                    transition: color 0.3s ease;
-                    gap:8px;
-                }
-                .active_tab {
-                        // font-size: 16px;
-                        // font-weight: 700;
-                        // font-family: "Plus Jakarta Sans";
-                        // color: #033348;
-                        // background: none;
-                    background-color: #ebfafa;
-                    padding: 12px 14px;
-                    border-bottom: 4px solid #28a2a2;
-                    border-radius: 8px 8px 0px 0px;
-                    font-size: 14px;
-                    font-weight: 700;
-                    color: #2e3038;
-                    font-family: "Plus Jakarta Sans";
-                    line-height: 20px;
-                    letter-spacing: 0.01em;
-                    cursor: pointer;
-                }
-                .inactive_tab {
-                    background-color: #ebfafa;
-                    padding: 12px 14px;
-                     border-bottom: 4px solid transparent;
-                    border-radius: 8px 8px 0px 0px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    color: #2e3038;
-                    font-family: "Plus Jakarta Sans";
-                    line-height: 20px;
-                    letter-spacing: 0.01em;
-                    cursor: pointer;
-                }
-                 
-                
-            }
-            hr{
-                margin-top: 0px; // removes gap between tabs and hr
-                border: none;
-                border-top: 0.5px solid #8f92a3;
-                flex-shrink: 0;
-                
-            }
-            .tab_content {
-                margin-top: 32px;
-            }
-
-        }
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        flex: 1;
+        margin-top: 1rem;
     }
 }

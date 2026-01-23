@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import Dropdown_Icon from "../../../../../assets/icons/blue_dropdown_icon.svg";
+import Dropdown_Icon from "../../../assets/icons/blue_dropdown_icon.svg";
 import {
   getAllYears,
 } from "../../Payroll/utils/PayrollUtils.js";

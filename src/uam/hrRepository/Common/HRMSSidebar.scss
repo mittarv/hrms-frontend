@@ -1,0 +1,362 @@
+@use "../../../design/colors/Colors";
+.hrms_main_sidebar {
+  height: 100vh;
+  width: 290px;
+  border-radius: 0px 50px 50px 0px;
+  background-color: Colors.$c31;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  transition: width 0.3s linear;
+  padding: 0;
+  position: relative;
+  overflow: visible; // Allow button to extend beyond border-radius
+  
+  // Clip content but allow header button to be visible
+  .hrms_sidebar_top_section {
+    overflow: hidden;
+  }
+  
+  .hrms_sidebar_top_section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hrms_sidebar_header_container {
+    width: 100%;
+    padding: 40px 20px 20px 20px;
+    flex-shrink: 0;
+    position: relative;
+    background-color: Colors.$c31;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible; // Allow button to be visible at edge
+  }
+
+  .hrms_drawer_close_icon {
+    position: absolute;
+    top: 20px;
+    right: -12px; // Position at the edge, half outside for better visibility
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.3s linear;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    background-color: Colors.$c31;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: block;
+      filter: brightness(0) invert(1); // Make icon white
+    }
+  }
+
+  .hrms_siderbar_header__logo {
+    display: block;
+    width: 100%; 
+    height: auto;
+    max-width: 200px; // Reduced to leave space for edge button
+    object-fit: contain;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .hrms_sidebar_links_container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    padding: 10px 0 20px 0;
+    min-height: 0;
+    
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+
+  .hrms_sidebar_content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0 0 40px 0;
+    background-color: Colors.$c31;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+  }
+
+  .hrms_sidebar_content_links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 60px;
+    width: 100%;
+    transition: all 0.3s ease-in;
+    padding: 0;
+
+    img {
+      margin-left: 37px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(132, 181, 210, 0.1);
+    }
+  }
+
+  .hrms_platform_section_links {
+    border-radius: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-right: none !important;
+  }
+  
+
+  .hrms_sidebar_link_title {
+    color: Colors.$c7;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: "Inter", sans-serif;
+    padding-left: 18.5px;
+  }
+}
+.hrms_toggle_sidebar {
+  height: 100vh;
+  width: 100px;
+  border-radius: 0px 50px 50px 0px;
+  background-color: Colors.$c31;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  z-index: 100;
+  padding: 0;
+  position: relative;
+  overflow: visible; // Allow button to extend beyond border-radius
+  transition: width 0.3s linear;
+  
+  // Clip content but allow header button to be visible
+  .hrms_sidebar_top_section {
+    overflow: hidden;
+  }
+
+  .hrms_sidebar_top_section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .hrms_sidebar_header_container {
+    width: 100%;
+    padding: 40px 15px 20px 15px;
+    flex-shrink: 0;
+    position: relative;
+    background-color: Colors.$c31;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible; // Allow button to be visible at edge
+  }
+
+  .hrms_drawer_close_icon {
+    position: absolute;
+    top: 20px;
+    right: -12px; // Position at the edge, half outside for better visibility
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.3s linear;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    background-color: Colors.$c31;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: block;
+      filter: brightness(0) invert(1); // Make icon white
+    }
+  }
+
+  .hrms_toggled_logo {
+    height: 42px;
+    width: 47px;
+    margin: 0 auto;
+    transition: all 0.3s linear;
+    cursor: pointer;
+    flex-shrink: 0;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .hrms_sidebar_links_container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    padding: 10px 0 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+
+  .hrms_toggle_sidebar_content {
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    flex-shrink: 0;
+    padding: 0 0 40px 0;
+    background-color: Colors.$c31;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: auto;
+  }
+
+  .hrms_toggle_sidebar_content_links {
+    height: 60px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: all 0.3s ease-in;
+    
+    img {
+      margin: 0;
+    }
+    
+    &:hover {
+      background-color: rgba(132, 181, 210, 0.1);
+    }
+  }
+}
+.hrms_active_links,
+.hrms_sidebar_content_links.hrms_active_links,
+.hrms_toggle_sidebar_content_links.hrms_active_links {
+  background-color: Colors.$c5;
+  padding: 10px 0px;
+  height: 60px;
+  border-right: 4px solid Colors.$c12;
+  cursor: pointer;
+  width: 100%;
+
+  .hrms_sidebar_link_title {
+    color: Colors.$c12;
+  }
+
+  .hrms_platform_dropdown{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items: center;
+    padding-top: 5px;
+
+    .hrms_up_arrow{
+      transform: rotate(180deg);
+      transition: all 0.25s linear;
+    }
+  }
+  .hrms_platform_links{
+    padding-top: 20px;
+  }
+}
+
+// Active link styling for toggle sidebar (centered icons)
+.hrms_toggle_sidebar {
+  .hrms_toggle_sidebar_content_links.hrms_active_links {
+    border-right: none;
+    border-left: 4px solid Colors.$c12;
+    border-radius: 0 8px 8px 0;
+  }
+}

@@ -1,4 +1,4 @@
-import Close_icon from "../../../../assets/icons/close_icon.svg";
+import Close_icon from "../../assets/icons/close_icon.svg";
 import '../styles/EmployeeRepositoryPopup.scss';
 const EmployeeRepositoryPopup = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;

@@ -2,11 +2,11 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import "../styles/LeaveApplication.scss";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
-import { createAttendanceLog, getLeaveBalanceWithAccrual } from "../../../../actions/hrRepositoryAction";
-import Image_icon from "../../../../assets/icons/image_icon.svg";
-import PDF_icon from "../../../../assets/icons/pdf_icon.svg";
-import Delete_icon from "../../../../assets/icons/delete_icon.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
+import { createAttendanceLog, getLeaveBalanceWithAccrual, getCompOffLeaveEligibility, registerCompOffLeave } from "../../../../actions/hrRepositoryAction";
+import Image_icon from "../../assets/icons/image_icon.svg";
+import PDF_icon from "../../assets/icons/pdf_icon.svg";
+import Delete_icon from "../../assets/icons/delete_icon.svg";
 import { Link } from "react-router-dom";
 import { 
   convertFileToBase64
@@ -18,22 +18,19 @@ import {
   isReasonRequired as checkReasonRequired 
 } from "../utils/LeaveManagementUtils";
 import { checkCdlLimit } from "../../../../actions/hrRepositoryAction";
+import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
 
-// Attendance Status Enum
-export const ATTENDANCE_STATUS = {
-  HALF_DAY: "half_day",
-  ON_LEAVE: "on_leave",
-};
 
 const LeaveApplication = ({ isOpen, onClose }) => {
-  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, accrualLeaveBalance } = useSelector(
+  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, accrualLeaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
-  const { user, allToolsAccessDetails } = useSelector((state) => state.user);
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const dispatch = useDispatch();
   const startDateInputRef = useRef(null);
   const endDateInputRef = useRef(null);
+  const hasAccessToLeaveApplication=myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveApplication_write");
 
   const [formData, setFormData] = useState({
     leaveType: "",
@@ -57,6 +54,67 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     }
   }, [dispatch, formData.startDate, currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid]);
 
+  // Helper function to check if a date is a weekend
+  const isWeekend = (dateString) => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+  };
+
+  // Check weekend validation when date or leave type changes
+  useEffect(() => {
+    if (formData.leaveType && formData.startDate) {
+      const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
+      if (selectedLeave) {
+        const excludePaidWeekend = selectedLeave.excludePaidWeekend;
+        if (excludePaidWeekend === true) {
+          // Check start date
+          if (isWeekend(formData.startDate)) {
+            setValidationMessages(prev => ({
+              ...prev,
+              weekendError: "You cannot apply this leave on weekends (Saturday or Sunday)"
+            }));
+          } else {
+            // Check end date if different from start date
+            if (formData.endDate && formData.endDate !== formData.startDate && isWeekend(formData.endDate)) {
+              setValidationMessages(prev => ({
+                ...prev,
+                weekendError: "You cannot apply this leave on weekends (Saturday or Sunday)"
+              }));
+            } else {
+              setValidationMessages(prev => {
+                const { weekendError, ...rest } = prev;
+                return rest;
+              });
+            }
+          }
+        } else {
+          // Clear weekend error if excludePaidWeekend is false
+          setValidationMessages(prev => {
+            const { weekendError, ...rest } = prev;
+            return rest;
+          });
+        }
+      }
+    }
+  }, [formData.leaveType, formData.startDate, formData.endDate, allExisitingLeaves]);
+
+  // Fetch comp off eligibility when comp off is selected and dates are available
+  useEffect(() => {
+    if (formData.leaveType && formData.startDate && currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid) {
+      const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
+      const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+      
+      if (isCompOff) {
+        const empUuid = currentEmployeeDetails?.employeeCurrentJobDetails.empUuid;
+        const endDate = formData.endDate || formData.startDate;
+        const isHalfDay = formData.isHalfDay || false;
+        dispatch(getCompOffLeaveEligibility(empUuid, formData.startDate, endDate, isHalfDay));
+      }
+    }
+  }, [dispatch, formData.leaveType, formData.startDate, formData.endDate, formData.isHalfDay, currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid, allExisitingLeaves]);
+
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -76,8 +134,8 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   // Simplified validation function using utils
   const validateLeaveApplication = useCallback(() => {
-    return validateBulkLeave(formData, allExisitingLeaves, cdlData, allToolsAccessDetails?.[selectedToolName], user?.userType, accrualLeaveBalance);
-  }, [allToolsAccessDetails, selectedToolName, formData, allExisitingLeaves, cdlData, user?.userType, accrualLeaveBalance]);
+    return validateBulkLeave(formData, allExisitingLeaves, cdlData, allToolsAccessDetails?.[selectedToolName], hasAccessToLeaveApplication, accrualLeaveBalance);
+  }, [allToolsAccessDetails, selectedToolName, formData, allExisitingLeaves, cdlData, hasAccessToLeaveApplication, accrualLeaveBalance]);
   // Update validation messages when validation changes
   useEffect(() => {
     const { messages } = validateLeaveApplication();
@@ -96,33 +154,75 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   // Update leave balance when leave type or dates change - FIXED: Use validation data
   useEffect(() => {
     if (formData.leaveType && formData.startDate && formData.endDate) {
+      const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
+      const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+      
+      // Use comp off eligibility if comp off is selected
+      if (isCompOff && compOffLeaveEligibility) {
+        const { paidDays, unpaidDays, availableCompOffCredit, validations, totalDays } = compOffLeaveEligibility;
+        const requestedDays = formData.isHalfDay ? 0.5 : totalDays;
+        
+        if (unpaidDays > 0) {
+          setApplicationStatus({
+            type: "warning",
+            message: `Application for ${formData.leaveType} Leave: ${requestedDays} ${requestedDays === 1 ? "day" : "days"}`,
+            details: `Available Comp Off Credit: ${availableCompOffCredit} days`,
+            warning: `${paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave (comp off), ` : ""}${unpaidDays} ${unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave.`,
+            validations: validations
+          });
+        } else {
+          setApplicationStatus({
+            type: "info",
+            message: `Application for ${formData.leaveType} Leave: ${requestedDays} ${requestedDays === 1 ? "day" : "days"}`,
+            details: `Available Comp Off Credit: ${availableCompOffCredit} days`,
+            success: `${paidDays} ${paidDays === 1 ? "day" : "days"} will be as paid leave (comp off).`,
+            validations: validations
+          });
+        }
+        return;
+      }
+      
+      // Regular leave balance calculation
       const { calculatedData } = validateLeaveApplication();
       
       if (calculatedData) {
         const { actualDays, availableBalance, usedDays, totalAllotted, unpaidDays, accruedLeaves } = calculatedData;
 
+        // Check if the selected leave type is "Unpaid"
+        const isUnpaidLeave = selectedLeave && selectedLeave.leaveType?.toLowerCase() === "unpaid";
+
         // Calculate paid days
         const paidDays = Math.min(actualDays, availableBalance);
 
-        // Check if requested leave exceeds available balance
-        if (unpaidDays > 0) {
+        // If unpaid leave is selected, always show as warning (red)
+        if (isUnpaidLeave) {
           setApplicationStatus({
             type: "warning",
-            message: `Application for ${
-              formData.leaveType
-            } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
+            message: `Application for ${formData.leaveType} Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
             details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
-            warning: `${paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave, ` : ""}${unpaidDays} ${unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave.`,
+            warning: `${actualDays} ${actualDays === 1 ? "day" : "days"} will be as unpaid leave.`,
           });
         } else {
-          setApplicationStatus({
-            type: "info",
-            message: `Application for ${
-              formData.leaveType
-            } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
-            details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
-            success: `${paidDays} ${paidDays === 1 ? "day" : "days"} will be as paid leave.`,
-          });
+          // Check if requested leave exceeds available balance
+          if (unpaidDays > 0) {
+            setApplicationStatus({
+              type: "warning",
+              message: `Application for ${
+                formData.leaveType
+              } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
+              details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
+              warning: `${paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave, ` : ""}${unpaidDays} ${unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave.`,
+            });
+          } else {
+            setApplicationStatus({
+              type: "info",
+              message: `Application for ${
+                formData.leaveType
+              } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
+              details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
+              success: `${paidDays} ${paidDays === 1 ? "day" : "days"} will be as paid leave.`,
+            });
+          }
         }
       }
     }
@@ -132,6 +232,8 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     formData.endDate,
     formData.isHalfDay,
     validateLeaveApplication,
+    compOffLeaveEligibility,
+    allExisitingLeaves,
   ]);
 
   const handleModalClick = (e) => {
@@ -206,7 +308,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const applicableLeaves = getApplicableLeaves(allExisitingLeaves, employeeType, empGender);
+  const applicableLeaves = getApplicableLeaves(allExisitingLeaves, employeeType, empGender,accrualLeaveBalance );
 
   const handleStartDateInputContainer = () => {
     startDateInputRef.current?.showPicker();
@@ -252,6 +354,85 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
     if (validationMessages.proofRequired && !uploadedFile) {
       validationErrors.file = "Medical certificate is required for sick leave exceeding continuous limit";
+    }
+
+    // Balance validation for comp off and regular leaves
+    if (selectedLeaveConfig && formData.startDate && formData.endDate) {
+      const isCompOff = selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') || 
+                        selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off');
+      
+      // Calculate requested days - use totalDays from compOffLeaveEligibility if available, otherwise calculate
+      let requestedDays;
+      if (isCompOff && compOffLeaveEligibility) {
+        requestedDays = formData.isHalfDay ? 0.5 : compOffLeaveEligibility.totalDays;
+      } else {
+        // For regular leaves, calculate from date range
+        const start = new Date(formData.startDate);
+        const end = new Date(formData.endDate);
+        const daysDiff = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        requestedDays = formData.isHalfDay ? 0.5 : daysDiff;
+      }
+      
+      if (isCompOff && compOffLeaveEligibility) {
+        const { availableCompOffCredit } = compOffLeaveEligibility;
+        
+        // Only restrict if:
+        // 1. Requesting full day(s) (not half day)
+        // 2. Available balance is fractional (has 0.5)
+        // 3. Requested days > available balance
+        if (!formData.isHalfDay && requestedDays > availableCompOffCredit) {
+          const fractionalPart = availableCompOffCredit - Math.floor(availableCompOffCredit);
+          const hasFractionalBalance = fractionalPart === 0.5;
+          
+          // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
+          if (hasFractionalBalance) {
+            const fullDaysAvailable = Math.floor(availableCompOffCredit);
+            let suggestion = '';
+            
+            if (fullDaysAvailable > 0) {
+              suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
+            } else {
+              suggestion = ` You can take 1 half day.`;
+            }
+            
+            validationErrors.leaveType = `You have only ${availableCompOffCredit} ${availableCompOffCredit === 0.5 ? 'day' : 'days'} comp off balance. Please select "Half Day" for at least one day.${suggestion}`;
+          }
+          // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
+        }
+      } else if (!isCompOff && accrualLeaveBalance) {
+        // Regular leave balance validation
+        const accrualRecord = accrualLeaveBalance.find(
+          (balance) => balance.leaveConfigId === selectedLeaveConfig.leaveConfigId
+        );
+        
+        if (accrualRecord) {
+          const availableDays = accrualRecord.availableLeaves || 0;
+          
+          // Only restrict if:
+          // 1. Requesting full day(s) (not half day)
+          // 2. Available balance is fractional (has 0.5)
+          // 3. Requested days > available balance
+          if (!formData.isHalfDay && requestedDays > availableDays) {
+            const fractionalPart = availableDays - Math.floor(availableDays);
+            const hasFractionalBalance = fractionalPart === 0.5;
+            
+            // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
+            if (hasFractionalBalance) {
+              const fullDaysAvailable = Math.floor(availableDays);
+              let suggestion = '';
+              
+              if (fullDaysAvailable > 0) {
+                suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
+              } else {
+                suggestion = ` You can take 1 half day.`;
+              }
+              
+              validationErrors.leaveType = `You have only ${availableDays} ${availableDays === 0.5 ? 'day' : 'days'} ${selectedLeaveConfig.leaveType} balance. Please select "Half Day" for at least one day.${suggestion}`;
+            }
+            // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
+          }
+        }
+      }
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -317,7 +498,16 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         uploadTimestamp: new Date().toISOString()
       }]) : null,
     };
-    dispatch(createAttendanceLog(requestBody, setAttendanceMonth, setAttendanceYear));
+    
+    // Check if it's a comp off leave
+    const isCompOff = selectedLeaveConfig && (selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') || selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off'));
+    
+    if (isCompOff) {
+      dispatch(registerCompOffLeave(requestBody, setAttendanceMonth, setAttendanceYear));
+    } else {
+      dispatch(createAttendanceLog(requestBody, setAttendanceMonth, setAttendanceYear));
+    }
+    
     setErrors({});
     onClose();
   };
@@ -518,7 +708,11 @@ const LeaveApplication = ({ isOpen, onClose }) => {
               )}
 
               {/* Validation Messages */}
-              
+              {compOffLeaveEligibilityLoading && formData.leaveType && (
+                <div className="application-status info">
+                  <p className="status-title">Loading comp off eligibility...</p>
+                </div>
+              )}
 
               {applicationStatus && (
                 <div className={`application-status ${applicationStatus.type}`}>
@@ -538,8 +732,34 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                       {applicationStatus.success}
                     </p>
                   )}
-                  {Object.keys(validationMessages).length > 0 && (
+                  {/* Show comp off eligibility validations if available */}
+                  {applicationStatus.validations && (
                     <div className="validation-messages">
+                      {!applicationStatus.validations.noticePeriod?.valid && applicationStatus.validations.noticePeriod?.message && (
+                        <div className="status-warning">
+                          {applicationStatus.validations.noticePeriod.message}
+                        </div>
+                      )}
+                      {!applicationStatus.validations.continuousLeaveLimit?.valid && applicationStatus.validations.continuousLeaveLimit?.message && (
+                        <div className="status-warning">
+                          {applicationStatus.validations.continuousLeaveLimit.message}
+                        </div>
+                      )}
+                      {!applicationStatus.validations.overlappingLeaves?.valid && applicationStatus.validations.overlappingLeaves?.message && (
+                        <div className="status-warning">
+                          {applicationStatus.validations.overlappingLeaves.message}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* Show regular validation messages for non-comp off leaves */}
+                  {!applicationStatus.validations && Object.keys(validationMessages).length > 0 && (
+                    <div className="validation-messages">
+                      {validationMessages.weekendError && (
+                        <div className="status-warning">
+                          {validationMessages.weekendError}
+                        </div>
+                      )}
                       {validationMessages.minimumNotice && (
                         <div className="status-warning">
                         {validationMessages.minimumNotice}

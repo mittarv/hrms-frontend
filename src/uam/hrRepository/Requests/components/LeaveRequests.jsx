@@ -8,15 +8,16 @@ import {
 } from "../../../../actions/hrRepositoryAction";
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/LeaveRequests.scss";
-import Plus_icon from "../../../../assets/icons/plus_inside_circle.svg";
+import Plus_icon from "../../assets/icons/plus_inside_circle.svg";
 import FileViewer from "../../Common/components/FileViewerPop";
-import View_Icon from "../../../../assets/icons/view_icon.svg";
+import View_Icon from "../../assets/icons/view_icon.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
-import approve_icon from "../../../../assets/icons/approve_icon.svg";
-import reject_icon_enable from "../../../../assets/icons/reject_icon_enable.svg";
-import reject_icon_disable from "../../../../assets/icons/reject_icon_disable.svg";
-import sort from "../../../../assets/icons/sort.svg";
-import filter from "../../../../assets/icons/filter.svg";
+import approve_icon from "../../assets/icons/approve_icon.svg";
+import reject_icon_enable from "../../assets/icons/reject_icon_enable.svg";
+import reject_icon_disable from "../../assets/icons/reject_icon_disable.svg";
+import sort from "../../assets/icons/sort.svg";
+import filter from "../../assets/icons/filter.svg";
+import { convertBufferToString, handleViewProofClick } from "../../Common/utils/helper";
 // Define the ENUM for status
 export const LeaveRequestStatus = {
   APPROVED: "approved",
@@ -56,10 +57,22 @@ const LeaveRequests = () => {
     hrRepositoryReducer?.allEmployees ?? [], 
     [hrRepositoryReducer?.allEmployees]
   );
-  const { user } = useSelector((state) => state.user);
+  const myHrmsAccess = hrRepositoryReducer?.myHrmsAccess ?? {};
+  const { user, allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [filesToView, setFilesToView] = useState([]);
   const dispatch = useDispatch();
+  
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canRead = hasPermission("LeaveRequest_read");
+  const hasAccessToEditLeave = hasPermission("LeaveRequest_write");
 
   // Convert YYYY-MM-DD to DD/MM/YYYY for display
   const formatDateForDisplay = (isoDate) => {
@@ -312,6 +325,7 @@ const LeaveRequests = () => {
   };
 
   const handleLeaveRequestApprove = () => {
+    if (!hasAccessToEditLeave) return;
     try {
       const safeCheckedIds = Array.isArray(checkedRequestIds)
         ? checkedRequestIds
@@ -336,6 +350,7 @@ const LeaveRequests = () => {
   };
 
   const handleLeaveRequestReject = () => {
+    if (!hasAccessToEditLeave) return;
     try {
       const safeCheckedIds = Array.isArray(checkedRequestIds)
         ? checkedRequestIds
@@ -372,97 +387,6 @@ const LeaveRequests = () => {
   // Handle request proof click
   const handleRequestProofClick = (leaveRequestId) => {
     dispatch(triggerProofRequiredForLeave(leaveRequestId));
-  };
-
-  // Helper function to convert Buffer to string
-  const convertBufferToString = (bufferData) => {
-    try {
-      if (bufferData && typeof bufferData === "object" && bufferData.type === "Buffer" && Array.isArray(bufferData.data)) {
-        // Convert Buffer data array to string
-        const uint8Array = new Uint8Array(bufferData.data);
-        const decoder = new TextDecoder('utf-8');
-        return decoder.decode(uint8Array);
-      }
-      return null;
-    } catch (error) {
-      console.error("Error converting Buffer to string:", error);
-      return null;
-    }
-  };
-
-  // Handle view proof click
-  const handleViewProofClick = (attachmentPath) => {
-    try {
-      let validFiles = [];
-
-      // Parse attachmentPath - it could be a Buffer, stringified JSON array, or direct base64 data
-      let parsedAttachments = [];
-      
-      if (typeof attachmentPath === "string") {
-        try {
-          // Try to parse as JSON first (new format with base64 data)
-          parsedAttachments = JSON.parse(attachmentPath);
-        } catch {
-          // If JSON parsing fails, treat it as a direct URL (legacy format)
-          parsedAttachments = [attachmentPath];
-        }
-      } else if (attachmentPath && typeof attachmentPath === "object" && attachmentPath.type === "Buffer") {
-        // Handle Buffer data from backend
-        const bufferString = convertBufferToString(attachmentPath);
-        if (bufferString) {
-          try {
-            parsedAttachments = JSON.parse(bufferString);
-          } catch {
-            parsedAttachments = [bufferString];
-          }
-        }
-      } else if (Array.isArray(attachmentPath)) {
-        parsedAttachments = attachmentPath;
-      }
-
-      // Process each attachment
-      parsedAttachments.forEach((item, index) => {
-        if (item && typeof item === "object" && item.base64) {
-          // New format: base64 data with metadata
-          validFiles.push({
-            url: item.base64, // Use the base64 data URL
-            fileName: item.fileName || `attachment_${index + 1}`,
-            fileType: item.fileType || 'application/octet-stream',
-            isBase64: true
-          });
-        } else if (item && typeof item === "string" && item.trim() !== "") {
-          // Legacy format: direct URL or base64 string
-          if (item.startsWith('data:')) {
-            // Direct base64 data URL
-            validFiles.push({
-              url: item,
-              fileName: `attachment_${index + 1}`,
-              fileType: item.split(';')[0].split(':')[1] || 'application/octet-stream',
-              isBase64: true
-            });
-          } else {
-            // Regular URL
-            validFiles.push({
-              url: item,
-              fileName: item.split('/').pop() || `attachment_${index + 1}`,
-              fileType: 'application/octet-stream',
-              isBase64: false
-            });
-          }
-        }
-      });
-
-      if (validFiles.length === 0) {
-        alert("No valid documents found to view.");
-        return;
-      }
-
-      setFilesToView(validFiles);
-      setViewerOpen(true);
-    } catch (error) {
-      console.error("Error opening document:", error);
-      alert("An error occurred while trying to open the document.");
-    }
   };
 
   const handleCloseViewer = () => {
@@ -547,7 +471,7 @@ const LeaveRequests = () => {
       return (
         <button
           className="view-proof-button"
-          onClick={() => handleViewProofClick(attachmentPath)}
+          onClick={() => handleViewProofClick(attachmentPath, setFilesToView, setViewerOpen)}
         >
           <img src={View_Icon} /> View proof
         </button>
@@ -559,6 +483,19 @@ const LeaveRequests = () => {
 
   // Get formatted requests
   const formattedRequests = formatPendingLeaveRequests();
+
+  // If user doesn't have read permission, show access denied message
+  if (!canRead) {
+    return (
+      <div className="leave_requests_main_container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p style={{ fontSize: "16px", color: "#666" }}>
+            You don't have permission to view leave requests
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="leave_requests_main_container">
@@ -621,7 +558,7 @@ const LeaveRequests = () => {
 
         {/* Action buttons */}
         <div className="leave_requests_action_buttons">
-          <button
+          {hasAccessToEditLeave && <button
             className={`leave_requests_approve_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0 ||
@@ -652,8 +589,8 @@ const LeaveRequests = () => {
               className="approve_icon"/>
               Approve
             </span>
-          </button>
-          <button
+          </button>}
+          {hasAccessToEditLeave && <button
             className={`leave_requests_reject_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0
@@ -678,7 +615,7 @@ const LeaveRequests = () => {
               className="reject_icon"/>
               Reject
             </span>
-          </button>
+          </button>}
         </div>
       </div>
 

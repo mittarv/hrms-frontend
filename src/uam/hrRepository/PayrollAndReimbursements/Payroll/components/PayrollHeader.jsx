@@ -2,18 +2,31 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount } from "../../../../../actions/hrRepositoryAction.js";
 import { Payroll_Status, CURRENCY_SYMBOL } from "../utils/PayrollUtils.js";
-import Export_File from "../../../../../assets/icons/export_file_icon.svg";
-import Finalize_Icon from "../../../../../assets/icons/finalize_icon.svg";
-import Edit_Icon_Active from "../../../../../assets/icons/edit_icon_blue.svg";
-import Edit_Icon_Disabled from "../../../../../assets/icons/edit_icon_grey.svg";
+import Export_File from "../../../assets/icons/export_file_icon.svg";
+import Finalize_Icon from "../../../assets/icons/finalize_icon.svg";
+import Edit_Icon_Active from "../../../assets/icons/edit_icon_blue.svg";
+import Edit_Icon_Disabled from "../../../assets/icons/edit_icon_grey.svg";
 import ConfirmationPopup from "../../../Common/components/ConfirmationPopup.jsx";
 import "../styles/PayrollHeader.scss";
 
 const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const dispatch = useDispatch();
-  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, netPayPayrollAmount } = useSelector(
+  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, netPayPayrollAmount, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
+  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canGenerate = hasPermission("Payroll_Generate");
+  const canFinalize = hasPermission("Payroll_finalize");
+  const canEdit = hasPermission("Payroll_Edit");
   const [isProcessing, setIsProcessing] = useState(false);
   const [modalState, setModalState] = useState({
     isOpen: false,
@@ -39,6 +52,17 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
 
   // Handle finalize payroll
   const handleFinalizePayroll = async () => {
+    if (!canFinalize) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to finalize payroll',
+        onConfirm: null
+      });
+      return;
+    }
+    
     if (!selectedRows || selectedRows.size === 0) {
       setModalState({
         isOpen: true,
@@ -123,6 +147,17 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
 
   // handle edit button on click it should make all finazlized payrolls to pending again
   const handleEditPayroll = async() => {
+    if (!canEdit) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to edit payroll',
+        onConfirm: null
+      });
+      return;
+    }
+    
     if (!selectedRows || selectedRows.size === 0) {
       setModalState({
         isOpen: true,
@@ -205,6 +240,17 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
   };
 
   const handleGeneratePayroll = () => {
+    if (!canGenerate) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to generate payroll',
+        onConfirm: null
+      });
+      return;
+    }
+    
     // Add logic for generating payroll
     setModalState({
       isOpen: true,
@@ -244,6 +290,16 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
     handleEditPayroll();
   };  
   const handleExportPayslip = () => {
+    if (!canEdit) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to export payroll',
+        onConfirm: null
+      });
+      return;
+    }
     dispatch(exportPayrollAsCsv(selectedMonth, selectedYear));
   }
 
@@ -269,7 +325,7 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
           )}
         </div>
         <div className="payroll_action_buttons">
-          <button className="download_payslip_button" onClick={handleExportPayslip} disabled={!isAllPayrollGenerated}>
+          <button className="download_payslip_button" onClick={handleExportPayslip} disabled={!isAllPayrollGenerated || !canEdit}>
             <img
               src={Export_File}
               alt="export file icon"
@@ -279,9 +335,9 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
           </button>
           <div className="payroll_button_container">
             <button
-              className={`edit_Payroll_button ${!hasSelectedRows || isProcessing ? "disabled" : ""}`}
+              className={`edit_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit ? "disabled" : ""}`}
               onClick={handleEditButton}
-              disabled={!hasSelectedRows || isProcessing}
+              disabled={!hasSelectedRows || isProcessing || !canEdit}
             >
               <img
                 src={!hasSelectedRows || isProcessing ? Edit_Icon_Disabled : Edit_Icon_Active}
@@ -292,10 +348,10 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
             </button>
             <button
               className={`process_payroll_button ${
-                (!hasSelectedRows && !isAllPayrollFinalized) || isProcessing ? "disabled" : ""
+                (!hasSelectedRows && !isAllPayrollFinalized) || isProcessing || (!canFinalize && !isAllPayrollFinalized) || (!canGenerate && isAllPayrollFinalized) ? "disabled" : ""
               }`}
               onClick={isAllPayrollFinalized ? handleGeneratePayroll : handleFinalizePayroll}
-              disabled={(!hasSelectedRows && !isAllPayrollFinalized) || isProcessing}
+              disabled={(!hasSelectedRows && !isAllPayrollFinalized) || isProcessing || (!canFinalize && !isAllPayrollFinalized) || (!canGenerate && isAllPayrollFinalized)}
             >
               <img
                 src={Finalize_Icon}

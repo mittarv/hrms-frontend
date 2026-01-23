@@ -1,0 +1,85 @@
+@use '../../design/colors/Colors';
+
+.main_dialog{
+    .save_button {
+        height: 40px;
+        width: 35%;
+        background-color: Colors.$c35;
+        color: #fff;
+        border: none;
+        margin-right: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 20px;
+        text-transform: none;
+        letter-spacing: 0px;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+    }
+    .save_button.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    .cancel_button {
+        width: 100px;
+        height: 40px;
+        color: Colors.$c37;
+        background-color: transparent;
+        border: none;
+        text-transform: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 20px;
+        letter-spacing: 0px;
+        cursor: pointer;
+    }
+    .dot_indicator{
+        height: 10px;
+        width: 10px;
+        background-color: #FFD600;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .delete_indicator{
+        height: 10px;
+        width: 10px;
+        background-color: #ff8b8b;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    .summary{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .summary_text{
+            word-wrap: break-word;
+            max-width: 220px;
+        }
+
+    }
+
+    .jira_no_input{
+        width: 50%;
+        height: 40px;
+        border: 1px solid Colors.$c2;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 20px;
+        letter-spacing: 0px;
+        margin-bottom: 10px;
+    }
+
+}
+
+
+
+
+
+

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import Plus_icon from "../../../../assets/icons/Add_Icon_blue.svg";
-import Image_icon from "../../../../assets/icons/image_icon.svg";
-import PDF_icon from "../../../../assets/icons/pdf_icon.svg";
-import Delete_icon from "../../../../assets/icons/delete_icon.svg";
-import Upload_icon from "../../../../assets/icons/upload_icon.svg";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
+import Plus_icon from "../../assets/icons/Add_Icon_blue.svg";
+import Image_icon from "../../assets/icons/image_icon.svg";
+import PDF_icon from "../../assets/icons/pdf_icon.svg";
+import Delete_icon from "../../assets/icons/delete_icon.svg";
+import Upload_icon from "../../assets/icons/upload_icon.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
 import "../styles/UploadProofPopup.scss";
 import { useDispatch } from "react-redux";
 import { Box, CircularProgress } from "@mui/material";

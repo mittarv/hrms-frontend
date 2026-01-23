@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import "../styles/AttendanceCalendar.scss";
-import Left_arrow from "../../../../assets/icons/left_grey_arrow.svg";
-import Right_arrow from "../../../../assets/icons/right_grey_arrow.svg";
-import Edit_btn from "../../../../assets/icons/Edit_icon_btn.svg";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
+import Left_arrow from "../../assets/icons/left_grey_arrow.svg";
+import Right_arrow from "../../assets/icons/right_grey_arrow.svg";
+import Edit_btn from "../../assets/icons/Edit_icon_btn.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
 import EditAttendanceModal from "./EditAttendanceModal";
 import LeaveAvailable from "./LeaveAvailable";
 import AttendanceLog from "./AttendanceLog";
@@ -15,16 +15,13 @@ import {
   getAttendanceLogs,
   deleteEmployeeAttendanceLog,
   updateEmployeeAttendanceLog,
-  getLeaveBalanceWithAccrual
+  getLeaveBalanceWithAccrual,
+  registerCompOffLeave,
+  updateCompOffLeave
 } from "../../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
 import { getLeaveType } from "../../Common/utils/helper";
-
-export const ATTENDANCE_STATUS = {
-  WORKING: "working",
-  HALF_DAY: "half_day",
-  ON_LEAVE: "on_leave",
-};
+import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
 
 export default function AttendanceCalendar() {
   const {
@@ -48,6 +45,9 @@ export default function AttendanceCalendar() {
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
 
   // Memoize the employeeUuid to prevent unnecessary re-renders
   const employeeUuid = useMemo(() => {
@@ -254,7 +254,7 @@ export default function AttendanceCalendar() {
 const handleEdit = (currentAttendance) => {
   // If userType is 100, block editing for half day or leave
   if (
-    allToolsAccessDetails?.[selectedToolName] === 100 &&
+    allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance &&
     (currentAttendance?.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY ||
       currentAttendance?.attendanceStatus === ATTENDANCE_STATUS.ON_LEAVE)
   ) {
@@ -270,7 +270,7 @@ const handleEdit = (currentAttendance) => {
   }
 
   // If userType >= 500, allow editing for any leave type
-  if (allToolsAccessDetails?.[selectedToolName] >= 500) {
+  if (allToolsAccessDetails?.[selectedToolName] >= 900 && hasAccessToEditAttendance) {
     setShowViewModal(false);
     setShowEditModal(true);
     return;
@@ -286,7 +286,32 @@ const handleEdit = (currentAttendance) => {
     if (!selectedDate) return;
     const isUpdate = updatedAttendance.isUpdate;
 
+    // Helper function to check if it's a comp off leave
+    const isCompOffLeave = (leaveConfigId) => {
+      if (!leaveConfigId) return false;
+      const leave = allExisitingLeaves.find(l => l.leaveConfigId === leaveConfigId);
+      return leave && (leave.leaveType?.toLowerCase().includes('comp') || leave.leaveType?.toLowerCase().includes('comp off'));
+    };
+
     if (isUpdate) {
+      // Check if the existing leave is comp off (updating from comp off to working/another leave)
+      const existingAttendance = employeeAttendanceData?.[selectedDate.dateString];
+      const existingLeaveConfigId = existingAttendance?.leaveConfigId;
+      const isUpdatingFromCompOff = existingLeaveConfigId && isCompOffLeave(existingLeaveConfigId);
+      
+      if (isUpdatingFromCompOff) {
+        // Use updateCompOffLeave when updating from comp off to working or another leave
+        dispatch(
+          updateCompOffLeave(
+            updatedAttendance,
+            updatedAttendance.attendanceId,
+            attendanceMonth,
+            attendanceYear,
+            employeeUuid
+          )
+        );
+      } else {
+        // Use regular update for other cases
       dispatch(
         updateEmployeeAttendanceLog(
           updatedAttendance,
@@ -296,9 +321,17 @@ const handleEdit = (currentAttendance) => {
           employeeUuid
         )
       );
-
+      }
+    } else {
+      // Check if creating new comp off leave
+      const currentLeaveConfigId = updatedAttendance.leaveConfigId;
+      const isCreatingCompOff = currentLeaveConfigId && isCompOffLeave(currentLeaveConfigId);
+      
+      if (isCreatingCompOff) {
+        dispatch(registerCompOffLeave(updatedAttendance, attendanceMonth, attendanceYear));
     } else {
       dispatch(createAttendanceLog(updatedAttendance, attendanceMonth, attendanceYear));
+      }
     }
 
     setShowEditModal(false);
@@ -482,10 +515,12 @@ const handleEdit = (currentAttendance) => {
                   {selectedDate.date.getFullYear()}
                 </p>
                 <div className="status-modal-actions">
-                  <div className="status-edit-button" onClick={() =>handleEdit(currentAttendance)}>
-                    <img src={Edit_btn} alt="edit" />
-                    <span>Edit</span>
-                  </div>
+                  {hasAccessToEditAttendance && (
+                    <div className="status-edit-button" onClick={() =>handleEdit(currentAttendance)}>
+                      <img src={Edit_btn} alt="edit" />
+                      <span>Edit</span>
+                    </div>
+                  )}
                  <div
                     className="status-close-btn"
                     onClick={() => {

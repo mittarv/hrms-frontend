@@ -1,0 +1,172 @@
+# GitHub Actions Workflow for Docker Deployment
+# 
+# This workflow:
+# 1. Automatically bumps the version in package.json (patch version)
+# 2. Creates .env file from GitHub environment variables at runtime
+# 3. Builds and deploys using Docker Compose on self-hosted runner
+# 4. Creates a GitHub release with the new version
+# 5. Tags the release
+#
+# SECURITY: All sensitive values should be stored as SECRETS, not variables
+# Required GitHub Secrets (Settings > Secrets and variables > Actions > Secrets):
+#   - VITE_REACT_APP_GOOGLE_SECRET: Google OAuth Secret (SENSITIVE)
+#   - VITE_ENCRYPTION_KEY: Encryption key (SENSITIVE)
+#
+# Required GitHub Variables (Settings > Secrets and variables > Actions > Variables):
+#   - VITE_REACT_APP_GOOGLE_CLIENT_ID: Google OAuth Client ID (public, can be in variables)
+#   - VITE_REACT_APP_HOSTED_URL: Backend API URL (public, can be in variables)
+#   - VITE_ALLOWED_EMAIL_DOMAIN: Allowed email domain for login (public, can be in variables)
+#   - HOST_PORT: Port to expose on host (optional, defaults to 3050)
+#
+# The workflow runs on:
+#   - Push to main branch
+#   - Manual trigger via workflow_dispatch
+#   - Requires self-hosted runner configured in repository
+
+name: Build, Deploy to Docker and Create Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_NAME: hrms-frontend
+  DOCKER_CONTAINER_NAME: hrms-frontend
+
+jobs:
+  build-and-deploy-using-docker:
+    name: Build and Deploy using Docker
+    environment: hrms-frontend
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for versioning
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Bump version and create tag
+        id: version
+        shell: bash
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Bump patch version using npm version (0.1.0 -> 0.1.1)
+          npm version patch --no-git-tag-version
+          
+          # Get new version
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          
+          # Configure git for tagging
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create git tag
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+          git push origin "v$NEW_VERSION"
+
+      - name: Create .env file from GitHub variables
+        shell: cmd
+        env:
+          VITE_REACT_APP_GOOGLE_CLIENT_ID: ${{ vars.VITE_REACT_APP_GOOGLE_CLIENT_ID }}
+          VITE_REACT_APP_GOOGLE_SECRET: ${{ secrets.VITE_REACT_APP_GOOGLE_SECRET }}
+          VITE_REACT_APP_HOSTED_URL: ${{ vars.VITE_REACT_APP_HOSTED_URL }}
+          VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
+          VITE_ALLOWED_EMAIL_DOMAIN: ${{ vars.VITE_ALLOWED_EMAIL_DOMAIN }}
+          HOST_PORT: ${{ vars.HOST_PORT }}
+        run: |
+          cd "${{ github.workspace }}"
+          echo VITE_REACT_APP_GOOGLE_CLIENT_ID=%VITE_REACT_APP_GOOGLE_CLIENT_ID% > .env
+          echo VITE_REACT_APP_GOOGLE_SECRET=%VITE_REACT_APP_GOOGLE_SECRET% >> .env
+          echo VITE_REACT_APP_HOSTED_URL=%VITE_REACT_APP_HOSTED_URL% >> .env
+          echo VITE_ENCRYPTION_KEY=%VITE_ENCRYPTION_KEY% >> .env
+          echo VITE_ALLOWED_EMAIL_DOMAIN=%VITE_ALLOWED_EMAIL_DOMAIN% >> .env
+          echo HOST_PORT=%HOST_PORT% >> .env
+
+      - name: Build and deploy with Docker Compose
+        shell: cmd
+        run: |
+          cd "${{ github.workspace }}"
+          docker compose up -d --build hrms-frontend
+        env:
+          # Mask secrets in logs
+          VITE_REACT_APP_GOOGLE_SECRET: ${{ secrets.VITE_REACT_APP_GOOGLE_SECRET }}
+          VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
+
+      - name: Verify container is running
+        shell: cmd
+        run: |
+          timeout /t 15 /nobreak
+          docker ps -f name=hrms-frontend
+
+      - name: Clean up old Docker images
+        shell: cmd
+        run: docker image prune -f
+        continue-on-error: true
+
+      - name: Clean up .env file
+        shell: cmd
+        run: |
+          cd "${{ github.workspace }}"
+          if exist .env del /f /q .env
+        continue-on-error: true
+        if: always()
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          body: |
+            ## Release v${{ env.VERSION }}
+            
+            ### Changes
+            - Automated deployment to Docker server
+            - Docker image: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }}
+            
+            ### Deployment Details
+            - **Commit:** ${{ github.sha }}
+            - **Branch:** ${{ github.ref_name }}
+            - **Author:** ${{ github.actor }}
+            - **Deployed at:** ${{ github.event.head_commit.timestamp }}
+            
+            ### Docker Container
+            - **Container Name:** ${{ env.DOCKER_CONTAINER_NAME }}
+            - **Port:** ${{ vars.HOST_PORT || 3050 }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit version bump
+        shell: bash
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ env.VERSION }}" || exit 0
+          git push origin main || exit 0
+
+      - name: Deployment Summary
+        shell: bash
+        run: |
+          echo "## Deployment Successful! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Docker Image:** ${{ env.DOCKER_IMAGE_NAME }}:${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Container:** ${{ env.DOCKER_CONTAINER_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Port:** ${{ vars.HOST_PORT || 3050 }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** [v${{ env.VERSION }}](https://github.com/${{ github.repository }}/releases/tag/v${{ env.VERSION }})" >> $GITHUB_STEP_SUMMARY

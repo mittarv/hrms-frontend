@@ -1,6 +1,6 @@
 import { useState} from 'react';
 import { Table, TableBody, TableCell, TableRow, Tabs, Tab, Box } from "@mui/material";
-import { tableStyle } from '../../../../constant/tableStyle';
+import { hrRepositoryTableStyle as tableStyle } from '../../constant/hrRepositoryTableStyle';
 import '../dashboard.scss';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';

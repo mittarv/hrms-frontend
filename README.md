@@ -11,6 +11,7 @@ This is the frontend application for the HRMS (Human Resource Management System)
 - [Building the Project](#building-the-project)
 - [Running the Application](#running-the-application)
 - [Docker Setup](#docker-setup)
+- [CI/CD with GitHub Actions](#cicd-with-github-actions)
 - [Project Structure](#project-structure)
 - [Troubleshooting](#troubleshooting)
 
@@ -103,6 +104,7 @@ VITE_ENCRYPTION_KEY=your-64-character-hex-encryption-key
 | `VITE_REACT_APP_HOSTED_URL` | Yes | Base URL for the backend API. All API requests will be prefixed with this URL. | `http://localhost:5000` or `https://api.example.com` |
 | `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Yes | Google OAuth 2.0 Client ID for Google Sign-In authentication. Get this from [Google Cloud Console](https://console.cloud.google.com/). | `123456789-abc.apps.googleusercontent.com` |
 | `VITE_ENCRYPTION_KEY` | Yes | Encryption key used for encrypting sensitive data (e.g., payroll information). Must be a hex string with at least 64 characters (256 bits). | `a1b2c3d4e5f6...` (64+ characters) |
+| `VITE_ALLOWED_EMAIL_DOMAIN` | Yes | Allowed email domain for user login (e.g., `mittarv.com`). | `mittarv.com` |
 
 ### Generating an Encryption Key
 
@@ -255,127 +257,127 @@ The application will:
 
 ## Docker Setup
 
-### Building the Docker Image
+### Prerequisites
 
-Build the Docker image:
+- Docker and Docker Compose installed
+- `.env` file configured with all required environment variables
 
+### Using Docker Compose (Recommended)
+
+Build and run with Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+This will:
+- Build the Docker image using Node.js 24 Alpine
+- Create and start the container
+- Expose the application on port `3050` (configurable via `HOST_PORT` in `.env`)
+
+**Stop the container:**
+```bash
+docker compose down
+```
+
+**View logs:**
+```bash
+docker compose logs -f
+```
+
+### Using Docker Commands
+
+**Build the image:**
 ```bash
 docker build -t hrms-frontend .
 ```
 
-This will:
-- Use Node.js 24 Alpine as the base image
-- Install dependencies
-- Build the React application
-- Create an optimized production image
-
-### Running the Docker Container
-
-Run the container:
-
+**Run the container:**
 ```bash
 docker run -d \
   --name hrms-frontend \
-  -p 3000:3000 \
+  -p 3050:3050 \
   --env-file .env \
+  --restart unless-stopped \
   hrms-frontend
 ```
 
-**Note:** 
-- The container exposes port `3000` by default
-- Make sure your `.env` file has all required environment variables configured
-- The `--env-file .env` flag loads all environment variables from your `.env` file
-
-### Docker Commands Reference
-
-**Build with custom tag:**
+**Common commands:**
 ```bash
-docker build -t hrms-frontend:latest .
-```
-
-**Run in detached mode (background):**
-```bash
-docker run -d -p 3000:3000 --env-file .env --name hrms-frontend-container hrms-frontend
-```
-
-**View running containers:**
-```bash
+# View running containers
 docker ps
+
+# View logs
+docker logs hrms-frontend
+
+# Stop container
+docker stop hrms-frontend
+
+# Remove container
+docker rm hrms-frontend
 ```
 
-**Stop container:**
-```bash
-docker stop hrms-frontend-container
-```
+### Important Notes
 
-**Remove container:**
-```bash
-docker rm hrms-frontend-container
-```
+- The container exposes port `3050` by default
+- Environment variables are loaded from `.env` file
+- The `.env` file is automatically removed from the Docker image after build for security
+- Ensure all required environment variables are set in `.env` before building
 
-**View container logs:**
-```bash
-docker logs hrms-frontend-container
-```
+---
 
-**Run with custom port:**
-```bash
-docker run -p 8080:3000 --env-file .env hrms-frontend
-```
+## CI/CD with GitHub Actions
 
-**Run with environment variables inline:**
-```bash
-docker run -p 3000:3000 \
-  -e VITE_REACT_APP_HOSTED_URL=http://localhost:5000 \
-  -e VITE_REACT_APP_GOOGLE_CLIENT_ID=your-client-id \
-  -e VITE_ENCRYPTION_KEY=your-encryption-key \
-  hrms-frontend
-```
+The project includes an automated deployment workflow that builds and deploys the application using Docker on a self-hosted runner.
 
-### Docker Compose (Optional)
+### Workflow Overview
 
-You can also use Docker Compose. Create a `docker-compose.yml` file:
+The workflow automatically:
+1. Bumps the version in `package.json` (patch increment)
+2. Creates `.env` file from GitHub Variables and Secrets at runtime
+3. Builds and deploys using Docker Compose
+4. Creates a GitHub release with the new version
+5. Tags the release
 
-```yaml
-version: '3.8'
+**Triggers:**
+- Push to `main` branch
+- Manual trigger via `workflow_dispatch`
 
-services:
-  hrms-frontend:
-    build: .
-    container_name: hrms-frontend
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    restart: unless-stopped
-```
+### Required Configuration
 
-Then run:
+The workflow reads environment variables from GitHub repository settings. Configure them at:
+**Settings > Secrets and variables > Actions**
 
-```bash
-docker-compose up -d
-```
+#### GitHub Secrets (Sensitive Data)
 
-### Important Docker Notes
+Store sensitive values as **Secrets** (automatically masked in logs):
 
-1. **Environment Variables:** Ensure your `.env` file has all required variables before building/running the container.
+| Secret | Description | Required |
+|--------|-------------|----------|
+| `VITE_REACT_APP_GOOGLE_SECRET` | Google OAuth Secret | Yes |
+| `VITE_ENCRYPTION_KEY` | Encryption key (64+ hex characters) | Yes |
 
-2. **Port Configuration:** The container exposes port `3000` by default. Change the port mapping if needed: `-p <host-port>:3000`
+#### GitHub Variables (Non-Sensitive Data)
 
-3. **Logs:** View container logs:
-   ```bash
-   docker logs hrms-frontend
-   ```
+Store public configuration as **Variables**:
 
-4. **Stop Container:**
-   ```bash
-   docker stop hrms-frontend
-   ```
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Google OAuth Client ID | Yes | - |
+| `VITE_REACT_APP_HOSTED_URL` | Backend API URL | Yes | - |
+| `VITE_ALLOWED_EMAIL_DOMAIN` | Allowed email domain for login | Yes | - |
+| `HOST_PORT` | Port to expose on host | No | `3050` |
 
-5. **Remove Container:**
-   ```bash
-   docker rm hrms-frontend
-   ```
+### Setup Instructions
+
+1. Go to your repository on GitHub
+2. Navigate to **Settings > Secrets and variables > Actions**
+3. Add all required **Secrets** (sensitive data)
+4. Add all required **Variables** (public configuration)
+5. Ensure a self-hosted runner is configured for the repository
+6. Push to `main` branch or manually trigger the workflow
+
+**Note:** The workflow creates the `.env` file at runtime from these values, so you don't need to commit any `.env` file to the repository.
 
 ---
 
@@ -518,8 +520,8 @@ hrms-frontend/
 8. **Docker Issues:**
    - Ensure Docker is installed and running
    - Check that `.env` file exists and has all required variables
-   - Verify port 3000 is not already in use
-   - Check Docker logs: `docker logs <container-name>`
+   - Verify port 3050 is not already in use (or change `HOST_PORT` in `.env`)
+   - Check Docker logs: `docker logs <container-name>` or `docker compose logs`
 
 ---
 

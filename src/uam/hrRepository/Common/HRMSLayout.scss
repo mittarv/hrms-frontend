@@ -1,0 +1,25 @@
+.hrms_parent_component {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: flex-start;
+  overflow: hidden;
+  
+  .hrms_static_component {
+    height: 100vh;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .hrms_display_routes {
+    width: 100%;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+}

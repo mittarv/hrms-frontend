@@ -62,9 +62,6 @@ export const changeRequestStatus = (request , status) => async(dispatch) =>{
         }
 
     } catch (error) {
-        dispatch({
-            type: "CHANGE_REQUEST_STATUS_FAILED",
-            payload: error.response && error.response.data.message,
-          });
+        
     }
 }

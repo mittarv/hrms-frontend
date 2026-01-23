@@ -1,0 +1,121 @@
+@use "../../../../design/colors/Colors";
+
+// Policy specific table styles - standalone to avoid conflicts
+.policy_tool_input_div {
+  display: flex;
+  align-items: center !important;
+
+  .policy_tool_input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    max-width: 200px;
+    resize: none;
+    overflow: hidden;
+    ::placeholder {
+      vertical-align: middle;
+    }
+  }
+  
+  .policy_edited_input_box {
+    background-color: #fff6c5;
+    border: 1px solid Colors.$c34;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 300px;
+  }
+}
+
+.policy_max_width_class {
+  max-width: 200px;
+}
+
+.policy_tool_name {
+  display: flex;
+  align-items: center;
+}
+
+.policy_tool_link {
+  font-size: 16px;
+  color: #525252;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.policy_tableedit_main_div {
+  width: 100%;
+  margin-bottom: 4.4709vh;
+}
+
+.policy_deleteButtons_section {
+  display: flex;
+  margin-left: 7.4515vh;
+  margin-top: 2.9806vh;
+  gap: 2.9806vh;
+  align-items: center;
+  
+  .policy_delete_button {
+    border: 2px solid Colors.$c37;
+    padding: 1.0432vh 2.0864vh;
+    margin-bottom: 25px;
+    background-color: transparent;
+    color: Colors.$c37;
+    font-size: 2.3845vh;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    &:disabled {
+      border: 2px solid Colors.$c32;
+      color: Colors.$c32;
+      cursor: not-allowed;
+    }
+  }
+  
+  .policy_undo_button {
+    height: 2.98062vh;
+    background-color: transparent;
+    border: none;
+    color: Colors.$c33;
+    padding: 0;
+    border-bottom: 2px solid Colors.$c33;
+    cursor: pointer;
+  }
+}
+.MuiTableContainer-root::-webkit-scrollbar {
+  height: 5px;
+}
+/* Track */
+.MuiTableContainer-root::-webkit-scrollbar-track {
+  background: #c4c4c4;
+  opacity: 0.13%;
+}
+/* Handle */
+.MuiTableContainer-root::-webkit-scrollbar-thumb {
+  background: Colors.$c3;
+}
+
+.policy_create_new_button {
+  background-color: transparent;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-weight: 700;
+  font-size: 2.23546vh;
+  line-height: 2.816691vh;
+  color: Colors.$c31;
+  gap: 4px;
+  cursor: pointer;
+  padding-bottom: 2.23546vh;
+}
+
+.policy_hovered_name {
+  cursor: pointer;
+}
+
+.policy_selected_user_tick {
+  height: 20px;
+  width: 20px;
+}

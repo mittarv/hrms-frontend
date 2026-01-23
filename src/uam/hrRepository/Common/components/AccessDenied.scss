@@ -1,0 +1,90 @@
+// @use "../../../../design/colors/Colors";
+
+.access_denied_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+}
+
+.access_denied_content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.access_denied_icon_wrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.access_denied_icon {
+  width: 80px;
+  height: 80px;
+  opacity: 0.6;
+}
+
+.access_denied_title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.access_denied_message {
+  font-size: 1.125rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.access_denied_submessage {
+  font-size: 0.875rem;
+  color: #999;
+  margin-bottom: 2rem;
+}
+
+.access_denied_actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.access_denied_button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+
+  &.primary {
+    background-color: #007bff;
+    color: white;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  &.secondary {
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+
+    &:hover {
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}

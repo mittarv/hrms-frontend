@@ -1,5 +1,5 @@
-import Plus_icon from "../../../../assets/icons/Plus_icon.svg";
-import Search_icon_grey from "../../../../assets/icons/Search_icon_grey.svg";
+import Plus_icon from "../../assets/icons/Plus_icon.svg";
+import Search_icon_grey from "../../assets/icons/Search_icon_grey.svg";
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/LeaveAttendance.scss";
 import AttendanceCalendar from "./AttendanceCalendar";
@@ -10,14 +10,16 @@ import {
   getAllLeaves,
   getCurrentEmployeeDetails,
   getLeaveBalanceWithAccrual,
+  getCompOffleaveBalance,
 } from "../../../../actions/hrRepositoryAction";
-import mittarv_logo from "../../../../assets/images/mittarv_logo_dark.svg";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
-import Dropdown_Arrow from "../../../../assets/icons/dropdow_arrow.svg";
+import mittarv_logo from "../../assets/images/mittarv_logo_dark.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
+import Dropdown_Arrow from "../../assets/icons/dropdow_arrow.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
-
+import Time_Log_Icon from "../../assets/icons/watch_blue.svg";
+import LogExtraDayPopup from "./LogExtraDayPopup";
 const LeaveAttendance = () => {
-  const {loading,currentEmployeeDetailsLoading, currentEmployeeDetails, getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
+  const {loading,currentEmployeeDetailsLoading, currentEmployeeDetails, getAllComponentType, myHrmsAccess} = useSelector((state) => state.hrRepositoryReducer);
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const hrRepositoryReducer = useSelector(
     (state) => state?.hrRepositoryReducer
@@ -33,11 +35,19 @@ const LeaveAttendance = () => {
   const [handleEmployeeSearch, setHandleEmployeeSearch] = useState("");
   const [filterEmployees, setFilterEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [logExtraDay, setLogExtraDay] = useState(false);
+  // Check for view permission (LeaveAttendanceAdmin_read) or write permission (LeaveAttendance_write)
+  const hasAccessToViewAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendanceAdmin_read");
+  const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
+  const hasAccessToLeaveAttendance = hasAccessToViewAttendance || hasAccessToEditAttendance;
 
   useEffect(() => {
     dispatch(getAllLeaves());
     dispatch(fetchAllPolicyDocuments());
     dispatch(getLeaveBalanceWithAccrual(currentEmployeeDetails?.employeeBasicDetails?.empUuid));
+    dispatch(getCompOffleaveBalance(currentEmployeeDetails?.employeeBasicDetails?.empUuid));
   }, [dispatch, currentEmployeeDetails?.employeeBasicDetails?.empUuid]);
 
   // Dynamic search effect - triggers whenever search input changes
@@ -86,6 +96,16 @@ const LeaveAttendance = () => {
   };
 
   const handleSearchInputChange = (e) => {
+    if(!hasAccessToViewAttendance){
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: "You do not have permission to search employees",
+          severity: "info",
+        },
+      });
+      return;
+    }
     setHandleEmployeeSearch(e.target.value);
   };
 
@@ -104,19 +124,28 @@ const LeaveAttendance = () => {
                   getCurrentUserEmployeeDetails()?.employeeJobType
                 ) ?? ""
               }`}{" "}
-              {`${allToolsAccessDetails?.[selectedToolName] >= 500 ? " | Admin" : ""}`}
+              {`${(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToEditAttendance) ? " | Admin" : ""}`}
             </p>
           </span>
-          <button
-            className="leave_attendance_header_button"
-            onClick={() => setApplyLeave(true)}
-          >
-            {" "}
-            <img src={Plus_icon} alt="Plus_icon" />
-            <span>Apply For Leave</span>
-          </button>
+          <span className="leave_attendance_header_action_button">
+            <button
+              className="leave_attendance_log_header_button"
+              onClick={() => setLogExtraDay(true)}
+            >
+              <img src={Time_Log_Icon} alt="Time_Log_Icon" />
+              <span>Log Extra Day</span>   
+            </button>
+            <button
+              className="leave_attendance_header_button"
+              onClick={() => setApplyLeave(true)}
+            >
+              {" "}
+              <img src={Plus_icon} alt="Plus_icon" />
+              <span>Apply For Leave</span>
+            </button>
+          </span>
         </div>
-        {allToolsAccessDetails?.[selectedToolName] >= 500 && (
+        {(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToViewAttendance) && (
           <div className="leave_attendance_search_container">
             <input
               type="text"
@@ -160,7 +189,7 @@ const LeaveAttendance = () => {
             )}
           </div>
         )}
-        {allToolsAccessDetails?.[selectedToolName] >= 500 && (
+        {(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToViewAttendance) && (
           <div className="attendance_records_container">
             <p className="attendance_records_title">Attendance records of</p>
             <div className="attendance_records_employee_container">
@@ -201,6 +230,12 @@ const LeaveAttendance = () => {
         <LeaveApplication
           isOpen={applyLeave}
           onClose={() => setApplyLeave(false)}
+        />
+      )}
+      {logExtraDay && (
+        <LogExtraDayPopup 
+          isOpen={logExtraDay}
+          onClose={() => setLogExtraDay(false)}
         />
       )}
     </>

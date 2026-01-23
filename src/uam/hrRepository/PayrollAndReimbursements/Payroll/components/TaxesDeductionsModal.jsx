@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getPayrollContext, clearPayrollContext } from "../../../Common/utils/encryptionUtils";
 import { COMPONENT_TYPES, LOP_KEYWORDS, CURRENCY_SYMBOL } from "../utils/PayrollUtils";
-import Cross_icon from "../../../../../assets/icons/cross_icon.svg";
+import Cross_icon from "../../../assets/icons/cross_icon.svg";
 import "../styles/TaxesDeductionsModal.scss";
 
 const TaxesDeductionsModal = () => {

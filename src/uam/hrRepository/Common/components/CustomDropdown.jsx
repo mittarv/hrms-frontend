@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import Dropdown_Arrow from '../../../../assets/icons/dropdow_arrow.svg';
+import Dropdown_Arrow from '../../assets/icons/dropdow_arrow.svg';
 import '../styles/CustomDropdown.scss';
 
 const CustomDropdown = ({

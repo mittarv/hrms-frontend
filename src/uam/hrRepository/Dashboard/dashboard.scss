@@ -144,6 +144,40 @@
     color: Colors.$c40; 
 }
 
+.main_table_header_div_dashboard {
+    height: 8.9418vh;
+    width: 90%;
+    // background-color: pink;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5.96vh;
+    margin-left: 40px;
+
+    .inner-div-left-section_dashboard {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-center;
+        gap: 15px;
+    }
+
+    .inner-div-left-title_dashboard {
+        font-size: 20px;
+        font-weight: 600;
+        color: Colors.$c31;
+        font-family: "Plus Jakarta Sans";
+    }
+    .inner-div-left-subtitle-2_dashboard {
+        font-size: 16px;
+        font-weight: 400;
+        color: Colors.$c36;
+        font-family: "Plus Jakarta Sans";
+        line-height: 20.16px;
+    }
+
+}
 
 .main-body-container {
     height: fit-content;

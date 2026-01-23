@@ -50,10 +50,10 @@ const ActivityLog = () => {
             <TableBody>
               {pendingRequests?.filter((req) => req.status !== "pending")
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+                .map((row) => {
                   console.log(row)
                   return (
-                    <TableRow key={index} hover role="checkbox" tabIndex={-1}>
+                    <TableRow hover role="checkbox" tabIndex={-1}>
 
                       <TableCell>
                       {/* hello */}

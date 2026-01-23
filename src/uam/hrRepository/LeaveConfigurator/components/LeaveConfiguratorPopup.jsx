@@ -3,9 +3,9 @@ import "../styles/AddNewLeaveTypePopUp.scss";
 import { useSelector } from "react-redux";
 import { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/MandatoryFieldPopup.scss";
-import exclamation_mark from "../../../../assets/icons/exclamation_mark.svg";
-import close_icon from "../../../../assets/icons/close_icon.svg";
-import success from "../../../../assets/icons/success.svg";
+import exclamation_mark from "../../assets/icons/exclamation_mark.svg";
+import close_icon from "../../assets/icons/close_icon.svg";
+import success from "../../assets/icons/success.svg";
 import "../styles/LeaveDiscardPopup.scss";
 
 const AddNewLeaveTypePopUp = ({NewLeaveName, setNewLeaveName, setShowLeaveDropwon = () => {}}) => {

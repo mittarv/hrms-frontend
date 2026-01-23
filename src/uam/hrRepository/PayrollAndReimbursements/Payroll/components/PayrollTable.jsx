@@ -13,7 +13,7 @@ import {
   LOP_KEYWORDS
 } from "../utils/PayrollUtils";
 import { storePayrollContext } from "../../../Common/utils/encryptionUtils";
-import Edit_Icon from "../.././../../../assets/icons/edit_blue_icon.svg";
+import Edit_Icon from "../../../assets/icons/edit_blue_icon.svg";
 import LoadingSpinner from "../../../Common/components/LoadingSpinner";
 import "../styles/PayrollTable.scss";
 

@@ -1,4 +1,44 @@
 import store from '../store'
+// import { fetchUserGroups } from '../actions/userGroupsActions'
+
+// const fetchUserPermissionsData = async () => {
+//     await store.dispatch(fetchUserPermissions())
+// }
+
+/* ---- Sample data we get from the user permissions api
+{
+            "user": {
+                "userId": 3,
+                "name": "Debabrata Basak",
+                "email": "debabrata.basak@mittarv.com"
+            },
+            "tools": [
+                {
+                    "userGroup": {
+                        "role": "Tool Admin",
+                        "value": 1000,
+                        "id": 9
+                    },
+                    "tool": {
+                        "toolId": 37,
+                        "name": "Workspace"
+                    }
+                },
+                {
+                    "userGroup": {
+                        "role": "Viewer",
+                        "value": 1000,
+                        "id": 6
+                    },
+                    "tool": {
+                        "toolId": 41,
+                        "name": "Av-Tools"
+                    }
+                }
+            ]
+        },
+*/
+
 
 export const getToolAdminsOfSpecificTool = (toolId, toolAdminsData) => {
     const state = store.getState()

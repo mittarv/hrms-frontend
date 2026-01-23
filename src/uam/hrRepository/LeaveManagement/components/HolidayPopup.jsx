@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import Dropdown_arrow from "../../../../assets/icons/dropdown_arrow.svg";
-import Cross_icon from "../../../../assets/icons/cross_icon.svg";
-import Cancel_icon from "../../../../assets/icons/cancel_icon_red.svg";
-import Tick_icon from "../../../../assets/icons/trailing_icon.svg";
-import Restore_icon from "../../../../assets/icons/restore_icon.svg";
-import Remove_disable_icon from "../../../../assets/icons/remove_grey_icon.svg";
+import Dropdown_arrow from "../../assets/icons/dropdown_arrow.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
+import Cancel_icon from "../../assets/icons/cancel_icon_red.svg";
+import Tick_icon from "../../assets/icons/trailing_icon.svg";
+import Restore_icon from "../../assets/icons/restore_icon.svg";
+import Remove_disable_icon from "../../assets/icons/remove_grey_icon.svg";
 import { createHolidays, deleteHolidays, updateHolidays } from "../../../../actions/hrRepositoryAction";
 import "../styles/HolidayPopup.scss";
 import { useDispatch } from "react-redux";

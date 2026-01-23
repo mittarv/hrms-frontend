@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './pendingRequests.scss';
 import PendingRequestsCards from './pendingRequestsCards/PendingRequestsCards';
 import ActivityLog from './activityLog/ActivityLog';
@@ -9,7 +9,7 @@ const PendingRequests = () => {
     const [toggleActivityLog, setToggleActivityLog] = useState(false);
     useEffect(()=>{
         dispatch(fetchPendingRequests());
-    },[dispatch])
+    })
     return (
         <div>
             <div className="heading">

@@ -1,3 +1,4 @@
+import React from "react";
 import { useState } from "react";
 import { UserPermissionTable } from "./userPermissionTables/UserPermissionTable";
 import { UserPermissionTableEdit } from "./userPermissionTables/UserPermissionTableEdit";

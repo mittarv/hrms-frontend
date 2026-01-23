@@ -1,99 +1,118 @@
 @use '../../design/colors/Colors';
 
+// User Permission specific header styles - unique class names to prevent conflicts
 @media only screen and (min-width: 600px) {
-
-    .main_table_header_div {
+    .user_permission_main_table_header_div {
         height: 8.9418vh;
         width: 90%;
-        // background-color: pink;
+        max-width: calc(100% - 40px);
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 5.96vh;
         margin-left: 40px;
+        margin-right: 0;
+        padding-right: 20px;
+        padding-left: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+        position: relative;
 
-
-        // overflow: hidden;
-        .inner_div_left_section {
-
+        .user_permission_inner_div_left_section {
             height: 100%;
-
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             justify-content: space-between;
+            flex: 1 1 0;
+            min-width: 0;
+            margin-right: 20px;
+            overflow: hidden;
 
-            // justify-content: flex-start;
-            .inner_div_left_title {
-                // background-color: aqua;
+            .user_permission_inner_div_left_title {
                 font-size: 20px;
                 line-height: 25.2px;
                 font-weight: 600;
                 color: Colors.$c31;
                 font-family: "Plus Jakarta Sans", sans-serif;
-                // color: bisque;
+                margin: 0;
+                padding: 0;
             }
 
-            .inner_div_left_subtitle {
+            .user_permission_inner_div_left_subtitle {
                 line-height: 20.16px;
                 font-size: 16px;
                 font-weight: 400;
                 color: Colors.$c36;
-
                 font-family: "Plus Jakarta Sans", sans-serif;
+                margin: 0;
+                padding: 0;
             }
 
-            .inner_div_left_section_isEdit_suggestions {
-                // width: 300px;
-                // width: fit-content;
-                width: 700px;
+            .user_permission_inner_div_left_section_isEdit_suggestions {
+                width: 100%;
+                max-width: 100%;
                 display: flex;
-                justify-content: space-between;
+                align-items: center;
+                gap: 15px;
+                flex-wrap: wrap;
+                overflow: hidden;
+                box-sizing: border-box;
+                
+                p {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 300px;
+                }
 
-                .suggestions_1 {
+                .user_permission_suggestions_1 {
                     display: flex;
+                    align-items: center;
+                    flex-shrink: 0;
+                    min-width: 0;
 
-
-                    .suggestion1_color {
+                    .user_permission_suggestion1_color {
                         width: 18px;
                         height: 18px;
                         background-color: Colors.$c34;
                         margin-right: 10px;
                         border-radius: 2px;
-
-
+                        flex-shrink: 0;
                     }
                 }
 
-                .suggestions2 {
+                .user_permission_suggestions_2 {
                     display: flex;
+                    align-items: center;
+                    flex-shrink: 0;
+                    min-width: 0;
 
-                    .suggestion2_color {
+                    .user_permission_suggestion2_color {
                         width: 18px;
                         height: 18px;
                         background-color: Colors.$c37;
                         margin-right: 10px;
                         border-radius: 2px;
-
+                        flex-shrink: 0;
                     }
-
-
                 }
             }
-
-
         }
 
-        .inner_div_right_section {
+        .user_permission_inner_div_right_section {
             margin: auto 0px;
-            // align-items: center;
-            // justify-content: center;
-            .edit_button {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: fit-content;
+            
+            .user_permission_edit_button {
                 width: 100px;
                 height: 40px;
                 background-color: Colors.$c31;
                 color: #fff;
-                // font-family: Plus Jakarta Sans;
                 border: none;
                 border-radius: 5px;
                 font-size: 16px;
@@ -101,18 +120,15 @@
                 line-height: 20px;
                 letter-spacing: 0px;
                 cursor: pointer;
-                // text-align: left;
-
+                flex-shrink: 0;
             }
-            .save_button {
-
+            
+            .user_permission_save_button {
                 width: 100px;
                 height: 35px;
                 background-color: Colors.$c35;
-
                 color: #fff;
                 border: none;
-                margin-right: 10px;
                 border-radius: 5px;
                 font-size: 16px;
                 font-weight: 600;
@@ -120,9 +136,10 @@
                 text-transform: none;
                 letter-spacing: 0px;
                 cursor: pointer;
-                
+                flex-shrink: 0;
             }
-            .cancel_button {
+            
+            .user_permission_cancel_button {
                 width: 100px;
                 height: 35px;
                 color: Colors.$c37;
@@ -135,13 +152,8 @@
                 line-height: 20px;
                 letter-spacing: 0px;
                 cursor: pointer;
-
+                flex-shrink: 0;
             }
         }
-
-
-
-
     }
-
 }

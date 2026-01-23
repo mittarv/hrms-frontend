@@ -1,0 +1,41 @@
+@use '../../design/colors/Colors';
+
+.approve_reject_buttons {
+    display: flex;
+    gap: 10px; 
+    justify-content: center; 
+    margin-top: 20px; 
+}
+
+.approve_button,
+.reject_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease; 
+}
+
+.approve_button {
+    background-color: Colors.$c35;
+    color: white; 
+}
+
+.approve_button:hover {
+    background-color: #218838; 
+}
+
+.reject_button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.reject_button:hover {
+    background-color: #c82333;
+}
+
+.tabs{
+    color:#033348;
+    font-weight: bold;
+}

@@ -167,3 +167,92 @@ export const isFilePDF = (file) => {
   return file?.type === 'application/pdf' || 
          file?.name?.toLowerCase().endsWith('.pdf');
 };
+
+export const convertBufferToString = (bufferData) => {
+    try {
+      if (bufferData && typeof bufferData === "object" && bufferData.type === "Buffer" && Array.isArray(bufferData.data)) {
+        // Convert Buffer data array to string
+        const uint8Array = new Uint8Array(bufferData.data);
+        const decoder = new TextDecoder('utf-8');
+        return decoder.decode(uint8Array);
+      }
+      return null;
+    } catch (error) {
+      console.error("Error converting Buffer to string:", error);
+      return null;
+    }
+  };
+
+ export const handleViewProofClick = (attachmentPath, setFilesToView, setViewerOpen) => {
+    try {
+      let validFiles = [];
+
+      // Parse attachmentPath - it could be a Buffer, stringified JSON array, or direct base64 data
+      let parsedAttachments = [];
+      
+      if (typeof attachmentPath === "string") {
+        try {
+          // Try to parse as JSON first (new format with base64 data)
+          parsedAttachments = JSON.parse(attachmentPath);
+        } catch {
+          // If JSON parsing fails, treat it as a direct URL (legacy format)
+          parsedAttachments = [attachmentPath];
+        }
+      } else if (attachmentPath && typeof attachmentPath === "object" && attachmentPath.type === "Buffer") {
+        // Handle Buffer data from backend
+        const bufferString = convertBufferToString(attachmentPath);
+        if (bufferString) {
+          try {
+            parsedAttachments = JSON.parse(bufferString);
+          } catch {
+            parsedAttachments = [bufferString];
+          }
+        }
+      } else if (Array.isArray(attachmentPath)) {
+        parsedAttachments = attachmentPath;
+      }
+
+      // Process each attachment
+      parsedAttachments.forEach((item, index) => {
+        if (item && typeof item === "object" && item.base64) {
+          // New format: base64 data with metadata
+          validFiles.push({
+            url: item.base64, // Use the base64 data URL
+            fileName: item.fileName || `attachment_${index + 1}`,
+            fileType: item.fileType || 'application/octet-stream',
+            isBase64: true
+          });
+        } else if (item && typeof item === "string" && item.trim() !== "") {
+          // Legacy format: direct URL or base64 string
+          if (item.startsWith('data:')) {
+            // Direct base64 data URL
+            validFiles.push({
+              url: item,
+              fileName: `attachment_${index + 1}`,
+              fileType: item.split(';')[0].split(':')[1] || 'application/octet-stream',
+              isBase64: true
+            });
+          } else {
+            // Regular URL
+            validFiles.push({
+              url: item,
+              fileName: item.split('/').pop() || `attachment_${index + 1}`,
+              fileType: 'application/octet-stream',
+              isBase64: false
+            });
+          }
+        }
+      });
+
+      if (validFiles.length === 0) {
+        alert("No valid documents found to view.");
+        return;
+      }
+
+      setFilesToView(validFiles);
+      setViewerOpen(true);
+    } catch (error) {
+      console.error("Error opening document:", error);
+      alert("An error occurred while trying to open the document.");
+    }
+  };

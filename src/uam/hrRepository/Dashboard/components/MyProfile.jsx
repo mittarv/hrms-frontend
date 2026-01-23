@@ -2,7 +2,7 @@ import '../dashboard.scss';
 import { useDispatch } from 'react-redux';
 import { getCurrentEmployeeDetails, getAllCountriesDetails} from '../../../../actions/hrRepositoryAction';
 import { useSelector } from 'react-redux';
-import Mittarv_logo from '../../../../assets/images/mittarv_logo_dark.svg'
+import Mittarv_logo from '../../assets/images/mittarv_logo_dark.svg'
 import { useSearchParams } from 'react-router-dom';
 
 const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {

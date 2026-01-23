@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableRow } from "@mui/material";
-import { tableStyle } from '../../../../constant/tableStyle';
+import { hrRepositoryTableStyle as tableStyle } from '../../constant/hrRepositoryTableStyle';
 import '../dashboard.scss';
 import { formatDate } from "../../Common/utils/helper";
 

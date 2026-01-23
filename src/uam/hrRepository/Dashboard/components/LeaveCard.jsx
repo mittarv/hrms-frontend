@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Table, TableBody, TableCell, TableRow } from "@mui/material";
-import { tableStyle } from '../../../../constant/tableStyle';
+import { hrRepositoryTableStyle as tableStyle } from '../../constant/hrRepositoryTableStyle';
 import '../dashboard.scss';
 import { getEmployeeOnLeave } from '../../../../actions/hrRepositoryAction';
 import { getEmployeeName, formatDate } from '../../Common/utils/helper';

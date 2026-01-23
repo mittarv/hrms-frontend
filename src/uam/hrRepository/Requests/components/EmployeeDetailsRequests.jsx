@@ -12,9 +12,9 @@ import {
 } from "../../EmployeeRepository/utils/EmployeeRepositoryData";
 import "../styles/EmployeeDetailsRequests.scss";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
-import approve_icon from "../../../../assets/icons/approve_icon.svg";
-import reject_icon_enable from "../../../../assets/icons/reject_icon_enable.svg";
-import reject_icon_disable from "../../../../assets/icons/reject_icon_disable.svg";
+import approve_icon from "../../assets/icons/approve_icon.svg";
+import reject_icon_enable from "../../assets/icons/reject_icon_enable.svg";
+import reject_icon_disable from "../../assets/icons/reject_icon_disable.svg";
 
 // Define the ENUM for status
 export const RequestStatus = {
@@ -37,7 +37,19 @@ const EmployeeDetailsRequests = () => {
   const pendingRequests = hrRepositoryReducer?.pendingRequests ?? [];
   const componentTypes = hrRepositoryReducer?.getAllComponentType ?? {};
   const getAllComponentType = hrRepositoryReducer?.getAllComponentType ?? [];
-  const { user } = useSelector((state) => state.user);
+  const myHrmsAccess = hrRepositoryReducer?.myHrmsAccess ?? {};
+  const { user, allToolsAccessDetails } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  
+  // Helper function to check if user has permission
+  const hasPermission = (permissionName) => {
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+    if (isAdmin) return true;
+    return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
+  };
+
+  const canRead = hasPermission("EmployeeDetailsRequest_read");
+  const hasAccessToEditEmployee = hasPermission("EmployeeDetailsRequest_write");
 
   const dispatch = useDispatch();
 
@@ -252,7 +264,7 @@ const EmployeeDetailsRequests = () => {
     } catch (error) {
       console.error("Error dispatching initial actions:", error);
     }
-  }, [dispatch]);
+  }, [dispatch, getAllComponentType, hasAccessToEditEmployee]);
 
   // Process pending requests when they change
   useEffect(() => {
@@ -349,6 +361,7 @@ const EmployeeDetailsRequests = () => {
   };
 
   const handleCheck = (request) => {
+    if (!hasAccessToEditEmployee) return;
     try {
       if (!request || !request.id) return;
 
@@ -389,6 +402,7 @@ const EmployeeDetailsRequests = () => {
   };
 
   const handleSelectAllClick = () => {
+    if (!hasAccessToEditEmployee) return;
     try {
       if (selectAll) {
         // Uncheck all
@@ -413,6 +427,7 @@ const EmployeeDetailsRequests = () => {
   };
 
   const handleRequestApprove = () => {
+    if (!hasAccessToEditEmployee) return;
     try {
       // Get the full request objects for the checked IDs
       const safeCheckedIds = Array.isArray(checkedRequestIds)
@@ -434,6 +449,7 @@ const EmployeeDetailsRequests = () => {
   };
 
   const handleRequestReject = () => {
+    if (!hasAccessToEditEmployee) return;
     try {
       // Get the full request objects for the checked IDs
       const safeCheckedIds = Array.isArray(checkedRequestIds)
@@ -519,6 +535,19 @@ const EmployeeDetailsRequests = () => {
     }
   };
 
+  // If user doesn't have read permission, show access denied message
+  if (!canRead) {
+    return (
+      <div className="employee_details_requests_main_container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p style={{ fontSize: "16px", color: "#666" }}>
+            You don't have permission to view employee detail requests
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="employee_details_requests_main_container">
       <div className="employee_details_requests_header">
@@ -580,7 +609,7 @@ const EmployeeDetailsRequests = () => {
 
         {/* action buttons */}
         <div className="requests_action_buttons">
-          <button
+          {hasAccessToEditEmployee && <button
             className={`requests_approve_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0 ||
@@ -613,8 +642,8 @@ const EmployeeDetailsRequests = () => {
               />
               Approve
             </span>
-          </button>
-          <button
+          </button>}
+          {hasAccessToEditEmployee && <button
             className={`requests_reject_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0
@@ -642,7 +671,7 @@ const EmployeeDetailsRequests = () => {
               />
               Reject
             </span>
-          </button>
+          </button>}
         </div>
       </div>
 
