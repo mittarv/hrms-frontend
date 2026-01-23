@@ -128,22 +128,19 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: Release ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
           body: |
-            ## Release ${{ env.RELEASE_TAG }}
+            ## Deployment Information
             
-            ### Changes
-            - Automated deployment to Docker server
-            - Docker image: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.RELEASE_TAG }}
-            
-            ### Deployment Details
-            - **Commit:** ${{ github.sha }}
-            - **Branch:** ${{ github.ref_name }}
-            - **Author:** ${{ github.actor }}
+            - **Docker Image:** `${{ env.DOCKER_IMAGE_NAME }}:${{ env.RELEASE_TAG }}`
+            - **Container Name:** `${{ env.DOCKER_CONTAINER_NAME }}`
+            - **Port:** `${{ vars.HOST_PORT || 3050 }}`
+            - **Commit:** `${{ github.sha }}`
+            - **Branch:** `${{ github.ref_name }}`
+            - **Deployed by:** @${{ github.actor }}
             - **Deployed at:** ${{ github.event.head_commit.timestamp }}
             
-            ### Docker Container
-            - **Container Name:** ${{ env.DOCKER_CONTAINER_NAME }}
-            - **Port:** ${{ vars.HOST_PORT || 3050 }}
+            ---
           draft: false
           prerelease: false
         env:
