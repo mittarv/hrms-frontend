@@ -14,8 +14,15 @@ RUN npm ci
 # Copy the rest of the application
 COPY . .
 
+# Copy .env file if it exists (will be created by workflow)
+COPY .env* ./
+
 # Build the application
+# Environment variables from .env file will be used during build
 RUN npm run build
+
+# Remove .env file after build for security (prevents it from being in the final image)
+RUN rm -f .env .env.* || true
 
 # Install serve to serve the built files
 RUN npm install -g serve

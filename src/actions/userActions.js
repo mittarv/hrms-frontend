@@ -1,12 +1,13 @@
 import axios from "axios";
-import { checkEmailType } from "../utills/emailHelper";
+import { checkEmailType, getAllowedEmailDomain } from "../utills/emailHelper";
 
 export const googleLogin = (email, name, profilePic) => async (dispatch) => {
   try {
     dispatch({ type: "GOOGLE_LOGIN_REQUEST" });
     if (!checkEmailType(email)) {
       window.location.reload();
-      return window.alert("Please use your Mittarv email to login");
+      const allowedDomain = getAllowedEmailDomain();
+      return window.alert(`Please use your ${allowedDomain} email to login`);
     } else {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/login`,
@@ -39,7 +40,8 @@ export const createTmsUser = (email, name, profilePic) => async (dispatch) => {
     dispatch({ type: "CREATE_TMS_USER_REQUEST" });
     if (!checkEmailType(email)) {
       window.location.reload();
-      return window.alert("Please use your Mittarv email to login");
+      const allowedDomain = getAllowedEmailDomain();
+      return window.alert(`Please use your ${allowedDomain} email to login`);
     }
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/add`,
