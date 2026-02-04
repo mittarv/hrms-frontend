@@ -37,9 +37,6 @@ export default function EditAttendanceModal({
   const dispatch = useDispatch();
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
-  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
-  const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
-    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
   
   const [formData, setFormData] = useState({
     attendanceStatus: "",
@@ -270,7 +267,7 @@ export default function EditAttendanceModal({
       const cdlAllowed = cdlData[leaveConfigId];
       
       // Skip CDL restrictions for admin users (access level >= 500)
-      if (cdlAllowed === false && allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance) {
+      if (cdlAllowed === false && allToolsAccessDetails?.[selectedToolName] < 900) {
         // Check if it's sick leave
         if (selectedLeave && selectedLeave.leaveType.toLowerCase() === 'sick') {
           setCdlError(`Need medical certificate for ${selectedLeave.leaveType} leave as continuous leave limit (CDL) reached.`);
@@ -338,8 +335,8 @@ const handleProofUpload = async (event) => {
 
   const validateCDL = () => {
     if (!formData.leaveConfigId) return true;
-    // Skip CDL validation for admin users (access level >= 500)
-    if (allToolsAccessDetails?.[selectedToolName] >= 900 && hasAccessToEditAttendance) {
+    // Skip CDL validation for admin users (access level >= 900)
+    if (allToolsAccessDetails?.[selectedToolName] >= 900) {
       return true;
     }
 
@@ -571,7 +568,6 @@ const handleProofUpload = async (event) => {
         allExisitingLeaves,
         setLeaveValidationError,
         allToolsAccessDetails?.[selectedToolName],
-        hasAccessToEditAttendance,
       );
       
       if (!isValid) {
@@ -712,11 +708,11 @@ const handleProofUpload = async (event) => {
                     className={`${
                       formData.attendanceStatus === status ? "active" : ""
                     } ${errors.attendanceStatus ? "error" : ""} ${
-                      isDisabled || !hasAccessToEditAttendance ? "disabled" : ""
+                      isDisabled ? "disabled" : ""
                     }`}
                     onClick={() => handleStatusChange(status)}
-                    disabled={isDisabled || !hasAccessToEditAttendance}
-                    title={!hasAccessToEditAttendance ? "You don't have permission to edit attendance" : disabledTitle}
+                    disabled={isDisabled}
+                    title={disabledTitle}
                   >
                     {status
                       .replace("_", " ")
@@ -745,7 +741,7 @@ const handleProofUpload = async (event) => {
                         const isDisabled = formData.attendanceStatus !== ATTENDANCE_STATUS.HALF_DAY && 
                                          cdlAllowed === false && 
                                          leave?.leaveType?.toLowerCase() !== 'sick' &&
-                                         allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance;
+                                         allToolsAccessDetails?.[selectedToolName] < 900;
                         
                         return (
                           <button
@@ -755,11 +751,11 @@ const handleProofUpload = async (event) => {
                                 ? "active"
                                 : ""
                             } ${errors.leaveConfigId ? "error" : ""} ${
-                              isDisabled || !hasAccessToEditAttendance ? "disabled" : ""
+                              isDisabled ? "disabled" : ""
                             }`}
                             onClick={() => handleLeaveTypeChange(leave.leaveConfigId)}
-                            disabled={isDisabled || !hasAccessToEditAttendance}
-                            title={!hasAccessToEditAttendance ? "You don't have permission to edit attendance" : (isDisabled ? "CDL reached - Cannot apply for this leave type" : "")}
+                            disabled={isDisabled}
+                            title={isDisabled ? "CDL reached - Cannot apply for this leave type" : ""}
                           >
                             {leave.leaveType}
                             {formData.attendanceStatus !== ATTENDANCE_STATUS.HALF_DAY && 
@@ -798,7 +794,7 @@ const handleProofUpload = async (event) => {
           )}
 
           {/* Proof Upload for Sick Leave when CDL is reached */}
-          {allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && showProofUpload && (
+          {allToolsAccessDetails?.[selectedToolName] < 900 && showProofUpload && (
             <div className="file_upload_container">
               <label>Medical Proof* (Required when CDL is reached)</label>
               <input
@@ -808,7 +804,6 @@ const handleProofUpload = async (event) => {
                 accept=".jpg,.jpeg,.png,.pdf"
                 onChange={handleProofUpload}
                 required
-                disabled={!hasAccessToEditAttendance}
                 style={{ display: "none" }}
               />
               
@@ -885,7 +880,7 @@ const handleProofUpload = async (event) => {
                   value={formData.checkIn}
                   onChange={(e) => handleInputChange("checkIn", e.target.value)}
                   disabled={
-                    !hasAccessToEditAttendance || formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
+                    formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
                   }
                 />
                 {errors.checkIn && (
@@ -908,7 +903,7 @@ const handleProofUpload = async (event) => {
                     handleInputChange("checkOut", e.target.value)
                   }
                   disabled={
-                    !hasAccessToEditAttendance || formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && !hasAccessToEditAttendance && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
+                    formData.attendanceStatus === ATTENDANCE_STATUS.HALF_DAY || (allToolsAccessDetails?.[selectedToolName] < 900 && formData.attendanceStatus === ATTENDANCE_STATUS.WORKING)
                   }
                 />
                 {errors.checkOut && (
@@ -930,8 +925,6 @@ const handleProofUpload = async (event) => {
               onChange={(e) => handleInputChange("remarks", e.target.value)}
               placeholder="A short, optional description of your day"
               className={errors.remarks ? "error" : ""}
-              disabled={!hasAccessToEditAttendance}
-              readOnly={!hasAccessToEditAttendance}
             />
             {errors.remarks && (
               <p className="validation-error">{errors.remarks}</p>
@@ -1144,16 +1137,6 @@ const handleProofUpload = async (event) => {
 
           {/* Form Actions */}
           <div className="form-actions">
-            {!hasAccessToEditAttendance ? (
-              <button
-                type="button"
-                className="delete-button"
-                onClick={onClose}
-              >
-                Close
-              </button>
-            ) : (
-              <>
                 {existingAttendance ? (
                   <button
                     type="button"
@@ -1184,8 +1167,6 @@ const handleProofUpload = async (event) => {
                     ? "Update Attendance"
                     : "Save Attendance"}
                 </button>
-              </>
-            )}
           </div>
         </div>
       </div>

@@ -515,12 +515,10 @@ const handleEdit = (currentAttendance) => {
                   {selectedDate.date.getFullYear()}
                 </p>
                 <div className="status-modal-actions">
-                  {hasAccessToEditAttendance && (
                     <div className="status-edit-button" onClick={() =>handleEdit(currentAttendance)}>
                       <img src={Edit_btn} alt="edit" />
                       <span>Edit</span>
                     </div>
-                  )}
                  <div
                     className="status-close-btn"
                     onClick={() => {
