@@ -3,8 +3,8 @@
 # This workflow:
 # 1. Creates release tags based on date and commit SHA
 # 2. Creates .env file from GitHub environment variables at runtime
-# 3. Builds and deploys using Docker Compose on self-hosted runner
-# 4. Creates a GitHub release with the tag
+# 3. Builds and deploys using Docker Compose on Ubuntu (Github-Unix-Runner)
+# 4. Creates a GitHub release with auto-generated notes
 # 5. Tags format: release-YYYY-MM-DD-<short-sha>
 #
 # SECURITY: All sensitive values should be stored as SECRETS, not variables
@@ -21,7 +21,7 @@
 # The workflow runs on:
 #   - Push to main branch
 #   - Manual trigger via workflow_dispatch
-#   - Requires self-hosted runner configured in repository
+#   - Requires self-hosted runner "Github-Unix-Runner" (Ubuntu) configured in repository
 
 name: Build, Deploy to Docker and Create Release
 
@@ -39,7 +39,7 @@ jobs:
   build-and-deploy-using-docker:
     name: Build and Deploy using Docker
     environment: hrms-frontend
-    runs-on: self-hosted
+    runs-on: Github-Unix-Runner
 
     steps:
       - name: Checkout code
@@ -49,33 +49,19 @@ jobs:
 
       - name: Generate release tag
         id: tag
-        shell: cmd
         run: |
-          @echo off
-          REM Get current date in YYYY-MM-DD format
-          for /f "tokens=1-3 delims=/ " %%a in ('%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe -Command "Get-Date -Format 'yyyy-MM-dd'"') do set RELEASE_DATE=%%a
-          
-          REM Get short commit SHA
-          for /f %%i in ('git rev-parse --short HEAD') do set SHORT_SHA=%%i
-          
-          REM Create release tag
-          set RELEASE_TAG=release-%RELEASE_DATE%-%SHORT_SHA%
-          echo Release tag: %RELEASE_TAG%
-          
-          REM Set GitHub output and environment variables
-          echo release_tag=%RELEASE_TAG%>>%GITHUB_OUTPUT%
-          echo RELEASE_TAG=%RELEASE_TAG%>>%GITHUB_ENV%
-          
-          REM Configure git for tagging
+          RELEASE_DATE=$(date +%Y-%m-%d)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          RELEASE_TAG="release-${RELEASE_DATE}-${SHORT_SHA}"
+          echo "Release tag: ${RELEASE_TAG}"
+          echo "release_tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
+          echo "RELEASE_TAG=${RELEASE_TAG}" >> $GITHUB_ENV
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          REM Create and push git tag
-          git tag -a "%RELEASE_TAG%" -m "Release %RELEASE_TAG%"
-          git push origin "%RELEASE_TAG%"
+          git tag -a "${RELEASE_TAG}" -m "Release ${RELEASE_TAG}"
+          git push origin "${RELEASE_TAG}"
 
       - name: Create .env file from GitHub variables
-        shell: cmd
         env:
           VITE_REACT_APP_GOOGLE_CLIENT_ID: ${{ vars.VITE_REACT_APP_GOOGLE_CLIENT_ID }}
           VITE_REACT_APP_GOOGLE_SECRET: ${{ secrets.VITE_REACT_APP_GOOGLE_SECRET }}
@@ -84,23 +70,22 @@ jobs:
           VITE_ALLOWED_EMAIL_DOMAIN: ${{ vars.VITE_ALLOWED_EMAIL_DOMAIN }}
           HOST_PORT: ${{ vars.HOST_PORT }}
         run: |
-          cd "${{ github.workspace }}"
-          echo VITE_REACT_APP_GOOGLE_CLIENT_ID=%VITE_REACT_APP_GOOGLE_CLIENT_ID% > .env
-          echo VITE_REACT_APP_GOOGLE_SECRET=%VITE_REACT_APP_GOOGLE_SECRET% >> .env
-          echo VITE_REACT_APP_HOSTED_URL=%VITE_REACT_APP_HOSTED_URL% >> .env
-          echo VITE_ENCRYPTION_KEY=%VITE_ENCRYPTION_KEY% >> .env
-          echo VITE_ALLOWED_EMAIL_DOMAIN=%VITE_ALLOWED_EMAIL_DOMAIN% >> .env
-          echo HOST_PORT=%HOST_PORT% >> .env
+          {
+            echo "VITE_REACT_APP_GOOGLE_CLIENT_ID=${VITE_REACT_APP_GOOGLE_CLIENT_ID}"
+            echo "VITE_REACT_APP_GOOGLE_SECRET=${VITE_REACT_APP_GOOGLE_SECRET}"
+            echo "VITE_REACT_APP_HOSTED_URL=${VITE_REACT_APP_HOSTED_URL}"
+            echo "VITE_ENCRYPTION_KEY=${VITE_ENCRYPTION_KEY}"
+            echo "VITE_ALLOWED_EMAIL_DOMAIN=${VITE_ALLOWED_EMAIL_DOMAIN}"
+            echo "HOST_PORT=${HOST_PORT}"
+          } > .env
 
       - name: Stop and remove existing container
-        shell: cmd
         run: |
           cd "${{ github.workspace }}"
           docker compose down
         continue-on-error: true
 
       - name: Build and deploy with Docker Compose
-        shell: cmd
         run: |
           cd "${{ github.workspace }}"
           docker compose up -d --build hrms-frontend
@@ -110,16 +95,14 @@ jobs:
           VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
 
       - name: Verify container is running
-        shell: cmd
         run: |
-          timeout /t 15 /nobreak
+          sleep 15
           docker ps -f name=hrms-frontend
 
       - name: Clean up .env file
-        shell: cmd
         run: |
           cd "${{ github.workspace }}"
-          if exist .env del /f /q .env
+          rm -f .env
         continue-on-error: true
         if: always()
 
@@ -147,21 +130,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deployment Summary
-        shell: cmd
         run: |
-          @echo off
-          set PORT=${{ vars.HOST_PORT }}
-          if "%PORT%"=="" set PORT=3050
-          
-          (
-            echo ## Deployment Successful! :rocket:
-            echo.
-            echo **Release Tag:** ${{ env.RELEASE_TAG }}
-            echo **Docker Image:** ${{ env.DOCKER_IMAGE_NAME }}:${{ env.RELEASE_TAG }}
-            echo **Container:** ${{ env.DOCKER_CONTAINER_NAME }}
-            echo **Port:** %PORT%
-            echo.
-            echo **Commit:** ${{ github.sha }}
-            echo **Branch:** ${{ github.ref_name }}
-            echo **Release:** [${{ env.RELEASE_TAG }}](https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }})
-          )>>%GITHUB_STEP_SUMMARY%
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## Deployment Successful! :rocket:
+
+          **Release Tag:** ${{ env.RELEASE_TAG }}
+
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          **Release:** [${{ env.RELEASE_TAG }}](https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }})
+          EOF
