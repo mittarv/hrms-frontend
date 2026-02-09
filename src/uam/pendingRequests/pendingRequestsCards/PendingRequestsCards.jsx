@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import './pendingRequestsCards.scss'
 import { Avatar } from '@mui/material'
 import LongArrow from '../../../assets/icons/long_arrow.svg'
@@ -16,14 +16,14 @@ const PendingRequestsCards = () => {
     return (
         <div className='pending_requests_cards'>
             {
-                pendingRequests?.filter((req) => req.approvalStatus === "PENDING").map((req) =>{
-                    return <Card cardData = {req}/>
-                })
+                pendingRequests
+                    ?.filter((req) => req.status === "pending")
+                    .map((req) => (
+                        <Card key={req._id || req.id} cardData={req} />
+                    ))
             }
-            {/* <Card />
-            <Card />
-            <Card />
-            <Card /> */}
+            {/* <Card /> */}
+
         </div>
     )
 }
@@ -32,20 +32,18 @@ const Card = ({cardData}) => {
     const dispatch = useDispatch();
     const [extendRemark, setExtendRemark] = useState(true);
 
-    // Debug logging
-    console.log('Card data:', cardData);
-    console.log('RequestedAt:', cardData.requestedAt);
-    console.log('User:', cardData.user);
+    const user = cardData.requestedByUser || cardData.user;
+    const requestedAt = cardData.requestedOn || cardData.requestedAt;
 
     return (
         <div className="pr_card">
             <div className="pr_card_header">
                 <div className="pr_card_header_left">
-                    <Avatar src={cardData.user?.profilePic} />
-                    <p className="user_name">{cardData.user?.name} </p>
+                    <Avatar src={user?.profilePic} />
+                    <p className="user_name">{user?.name} </p>
                 </div>
                 <div className="pr_card_header_right">
-                    <p className="timer_text">{cardData.requestedAt ? convertNormalDate(cardData.requestedAt) : "N/A"}</p>
+                    <p className="timer_text">{requestedAt ? convertNormalDate(requestedAt) : "N/A"}</p>
                 </div>
             </div>
 

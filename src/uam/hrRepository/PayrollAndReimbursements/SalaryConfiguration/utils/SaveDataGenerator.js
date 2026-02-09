@@ -417,8 +417,8 @@ const getComponentTypeForTable = (tableType) => {
   const typeMapping = {
     'defaultAddition': 'defaultAddition',
     'defaultDeduction': 'defaultDeduction',
-    'addition': 'Addition',
-    'deduction': 'Deduction'
+    'addition': 'addition',
+    'deduction': 'deduction'
   };
   
   return typeMapping[tableType] || tableType;

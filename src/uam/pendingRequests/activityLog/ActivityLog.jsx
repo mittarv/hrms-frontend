@@ -50,21 +50,16 @@ const ActivityLog = () => {
             <TableBody>
               {pendingRequests?.filter((req) => req.status !== "pending")
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  console.log(row)
-                  return (
-                    <TableRow hover role="checkbox" tabIndex={-1}>
-
+                .map((row, index) => (
+                    <TableRow key={row?.id ?? `activity-${index}`} hover role="checkbox" tabIndex={-1}>
                       <TableCell>
-                      {/* hello */}
                         {row?.id}
                       </TableCell>
                       <TableCell>
-                      {/* hello */}
-                        {row?.user?.name}
+                        {(row?.requestedByUser || row?.user)?.name}
                       </TableCell>
                       <TableCell>
-                        {row?.requestedAt ? convertNormalDate(row?.requestedAt) : "N/A"}
+                        {(row?.requestedOn || row?.requestedAt) ? convertNormalDate(row?.requestedOn || row?.requestedAt) : "N/A"}
                       </TableCell>
                       <TableCell>
                         {row?.requestedAccessGroup?.role} access
@@ -80,15 +75,14 @@ const ActivityLog = () => {
                         {convertNormalDate(row?.resolvedOn)}
                       </TableCell>
                     </TableRow>
-                  );
-                })}
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={pendingRequests?.length/rowsPerPage<=1 ? 1:parseInt(pendingRequests?.length/rowsPerPage)+1 }
+          count={pendingRequests?.filter((req) => req.status !== "pending").length ?? 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

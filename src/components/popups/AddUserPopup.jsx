@@ -14,7 +14,6 @@ const AddUserPopup = ({ openpopup, setOpenPopup, handleCreateNewRow }) => {
 
 
   const saveuser = () => {
-    console.log(checkEmailType(data.email))
     if(!data.name){
       alert("Please enter the name")
       return;

@@ -1,5 +1,5 @@
 import { FormControl, Select, SvgIcon } from '@mui/material';
-import React, { useState ,useEffect, useCallback } from 'react';
+import { useState ,useEffect, useCallback } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import '../dropDowns/RequestAccessDropDown.scss'
 import bottomArrow from "../../assets/icons/bottom_arrow.svg";
@@ -29,7 +29,8 @@ function RequestAccessDropDown(props) {
         getdata();
     },[getdata])
     
-    const {userGroupsData} = useSelector((state)=>state.usergroup)
+    const { userGroupsData } = useSelector((state) => state.usergroup);
+    const userGroupsForDropdown = userGroupsData?.filter((g) => g.role !== "Super Admin") ?? [];
 
     //CUSTOM ICON FOR THE DROP DOWN
     function CustomSVGIcon({ src, ...props }) {
@@ -60,9 +61,9 @@ function RequestAccessDropDown(props) {
 
             >
                 {
-                    userGroupsData?.map((usergroup)=>{
-                       return <MenuItem key={usergroup.id} id="custom-menu-item" value={usergroup.role}>{usergroup.role}</MenuItem>
-                    })
+                    userGroupsForDropdown?.map((usergroup) => (
+                        <MenuItem key={usergroup.id} id="custom-menu-item" value={usergroup.role}>{usergroup.role}</MenuItem>
+                    ))
                 }
                 {/* <MenuItem id="custom-menu-item" value="Tool Admin" disabled={true}>Tool Admin</MenuItem> */}
                 

@@ -237,11 +237,6 @@ export const toolAdminSidebarContent = [
     icon: user_permission,
     path: "/user-permissions",
   },
-  {
-    title: "Pending Requests",
-    icon: pending_request,
-    path: "/hello",
-  },
 ];
 
 export const role = {
