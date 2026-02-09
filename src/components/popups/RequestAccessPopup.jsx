@@ -16,6 +16,9 @@ function DialogBox({ open, handleClose, selectedTool }) {
     const [selectedAccess, setSelectedAccess] = useState(0);
     const maxCharacters = 50;
 
+    const userGroup = selectedTool?.userGroup;
+    const currentRole = userGroup?.role ?? 'No access';
+
 
     // function to change the selected access type from the dropdown ,it will be passed to dropdown 
     const handleAccessChange = (selectedValue) => {
@@ -42,6 +45,8 @@ function DialogBox({ open, handleClose, selectedTool }) {
 
 
     const isButtonDisabled = remark.length === 0;
+    if (!selectedTool?.tool) return null;
+
     return (
         <Dialog open={open} onClose={handleClose}>
             <span className='dialog_title'>Request Access</span>
@@ -58,11 +63,11 @@ function DialogBox({ open, handleClose, selectedTool }) {
                     </div>
                     <div className='key_value_pair'>
                         <span className='key'>Current Access:</span>
-                        <span id='value_current_access'>{selectedTool.userGroup.role}</span>
+                        <span id='value_current_access'>{currentRole}</span>
                     </div>
                     <div className='key_value_pair'>
                         <span className='key'>Request Access:</span>
-                        <span className='value'> <RequestAccessDropDown label={selectedTool.userGroup.role} onChange={handleAccessChange} /></span>
+                        <span className='value'> <RequestAccessDropDown label={currentRole} onChange={handleAccessChange} /></span>
                     </div>
                     <div className='key_value_pair'>
                         <span className='key'>Remarks*:</span>
@@ -101,7 +106,7 @@ function DialogBox({ open, handleClose, selectedTool }) {
                 </Button>
                 <Button onClick={()=>{
                     // toolId,currentUserGroup,  reqUserGroupId, remark
-                   dispatch(createRequest(selectedTool.tool.toolId,selectedTool.userGroup.id , selectedAccess ,remark  ))
+                   dispatch(createRequest(selectedTool.tool.toolId, userGroup?.id ?? null, selectedAccess, remark))
                 }} disabled={isButtonDisabled} id={isButtonDisabled ? 'req_button_disabled' : 'req_button_enabled'} color="primary">
                     Request
                 </Button>

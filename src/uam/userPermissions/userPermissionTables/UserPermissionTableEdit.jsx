@@ -64,6 +64,7 @@ export const UserPermissionTableEdit = ({ isEdit, toggleOptions }) => {
     deleteExecuted,
   } = useSelector((state) => state.userpermissions);
   const { userGroupsData } = useSelector((state) => state.usergroup);
+  const userGroupsForDropdown = userGroupsData?.filter((g) => g.role !== "Super Admin") ?? [];
 
   //open indexes is a 2D array that represents the values present the open and closed dropdowns [[false,false,false],[false,false,true],[false,false,false]]
   const [openIndexes, setOpenIndexes] = useState(
@@ -474,7 +475,7 @@ export const UserPermissionTableEdit = ({ isEdit, toggleOptions }) => {
                                     id={`split-button-menu-${rowIndex}-${index}`}
                                     autoFocusItem
                                   >
-                                    {userGroupsData.map((option, index) => (
+                                    {userGroupsForDropdown.map((option, index) => (
                                       <MenuItem
                                         key={option.id}
                                         style={
@@ -629,7 +630,7 @@ export const UserPermissionTableEdit = ({ isEdit, toggleOptions }) => {
                                     id={`split-button-menu-${rowIndex}-${index}`}
                                     autoFocusItem
                                   >
-                                    {userGroupsData.map((option, index) => (
+                                    {userGroupsForDropdown.map((option, index) => (
                                       <MenuItem
                                         key={option.id}
                                         // style={option.role === accessTypes[row[`tool${toolIndex + 1}`]] ? { fontWeight: 600, backgroundColor: "white" } : {}}

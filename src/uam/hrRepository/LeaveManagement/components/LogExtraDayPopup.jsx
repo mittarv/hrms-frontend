@@ -23,7 +23,6 @@ const LogExtraDayPopup = ({ onClose }) => {
   });
   const [fileName, setFileName] = useState("");
   const [isEligibleForCompOff, setIsEligibleForCompOff] = useState(false);
-  console.log(currentEmployeeDetails);
   const compOffLeave = allExisitingLeaves.find(
     (leave) => leave.leaveType.toLowerCase() === "comp off"
   );
@@ -31,7 +30,6 @@ const LogExtraDayPopup = ({ onClose }) => {
   useEffect(() => {
     // Add safety checks
     if (!currentEmployeeDetails || !compOffLeave) return;
-    console.log(compOffLeave);
 
     const empType =
       currentEmployeeDetails?.employeeCurrentJobDetails?.empType || "";
@@ -57,7 +55,6 @@ const LogExtraDayPopup = ({ onClose }) => {
           new Date(`1970-01-01T${inputvalue.checkIn}`)) /
         (1000 * 60 * 60)
       : 0;
-  console.log("Comp Off Leave:", compOffLeave);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "checkOut") {
