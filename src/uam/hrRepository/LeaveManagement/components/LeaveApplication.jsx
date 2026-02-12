@@ -8,21 +8,21 @@ import Image_icon from "../../assets/icons/image_icon.svg";
 import PDF_icon from "../../assets/icons/pdf_icon.svg";
 import Delete_icon from "../../assets/icons/delete_icon.svg";
 import { Link } from "react-router-dom";
-import { 
+import {
   convertFileToBase64
 } from "../../Common/utils/helper";
-import { 
-  validateBulkLeave, 
-  getApplicableLeaves, 
-  isHalfDayAllowed as checkHalfDayAllowed, 
-  isReasonRequired as checkReasonRequired 
+import {
+  validateBulkLeave,
+  getApplicableLeaves,
+  isHalfDayAllowed as checkHalfDayAllowed,
+  isReasonRequired as checkReasonRequired
 } from "../utils/LeaveManagementUtils";
 import { checkCdlLimit } from "../../../../actions/hrRepositoryAction";
 import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
 
 
 const LeaveApplication = ({ isOpen, onClose }) => {
-  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, accrualLeaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading, myHrmsAccess } = useSelector(
+  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, accrualLeaveBalance, compOffleaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);
@@ -30,7 +30,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const startDateInputRef = useRef(null);
   const endDateInputRef = useRef(null);
-  const hasAccessToLeaveApplication=myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveApplication_write");
+  const hasAccessToLeaveApplication = myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveApplication_write");
 
   const [formData, setFormData] = useState({
     leaveType: "",
@@ -105,7 +105,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     if (formData.leaveType && formData.startDate && currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid) {
       const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
       const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
-      
+
       if (isCompOff) {
         const empUuid = currentEmployeeDetails?.employeeCurrentJobDetails.empUuid;
         const endDate = formData.endDate || formData.startDate;
@@ -147,7 +147,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     const hasRequiredFields = formData.leaveType && formData.startDate && formData.endDate;
     const { isValid } = validateLeaveApplication();
     const proofValidation = validationMessages.proofRequired ? !!uploadedFile : true;
-    
+
     return hasRequiredFields && isValid && proofValidation;
   }, [formData.leaveType, formData.startDate, formData.endDate, validateLeaveApplication, uploadedFile, validationMessages]);
 
@@ -156,12 +156,12 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     if (formData.leaveType && formData.startDate && formData.endDate) {
       const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
       const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
-      
+
       // Use comp off eligibility if comp off is selected
       if (isCompOff && compOffLeaveEligibility) {
         const { paidDays, unpaidDays, availableCompOffCredit, validations, totalDays } = compOffLeaveEligibility;
         const requestedDays = formData.isHalfDay ? 0.5 : totalDays;
-        
+
         if (unpaidDays > 0) {
           setApplicationStatus({
             type: "warning",
@@ -181,10 +181,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         }
         return;
       }
-      
+
       // Regular leave balance calculation
       const { calculatedData } = validateLeaveApplication();
-      
+
       if (calculatedData) {
         const { actualDays, availableBalance, usedDays, totalAllotted, unpaidDays, accruedLeaves } = calculatedData;
 
@@ -207,18 +207,16 @@ const LeaveApplication = ({ isOpen, onClose }) => {
           if (unpaidDays > 0) {
             setApplicationStatus({
               type: "warning",
-              message: `Application for ${
-                formData.leaveType
-              } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
+              message: `Application for ${formData.leaveType
+                } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
               details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
               warning: `${paidDays > 0 ? `${paidDays} ${paidDays === 1 ? "day" : "days"} as paid leave, ` : ""}${unpaidDays} ${unpaidDays === 1 ? "day" : "days"} will be converted to unpaid leave.`,
             });
           } else {
             setApplicationStatus({
               type: "info",
-              message: `Application for ${
-                formData.leaveType
-              } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
+              message: `Application for ${formData.leaveType
+                } Leave: ${actualDays} ${actualDays === 1 ? "day" : "days"}`,
               details: `Total: ${totalAllotted} days | Accrued: ${accruedLeaves || totalAllotted} days | Used: ${usedDays} days | Available: ${availableBalance} days`,
               success: `${paidDays} ${paidDays === 1 ? "day" : "days"} will be as paid leave.`,
             });
@@ -272,12 +270,12 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
     try {
       // Convert file to base64 using utility function with 10MB limit
       const maxSizeInBytes = 10 * 1024 * 1024; // 10 MB
       const fileData = await convertFileToBase64(file, maxSizeInBytes);
-      
+
       // Create a file object with base64 data
       const processedFile = {
         name: file.name,
@@ -288,7 +286,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         pureBase64: fileData.pureBase64,
         fileMetadata: fileData
       };
-      
+
       setUploadedFile(processedFile);
       setErrors({ ...errors, file: '' });
     } catch (error) {
@@ -308,7 +306,14 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const applicableLeaves = getApplicableLeaves(allExisitingLeaves, employeeType, empGender,accrualLeaveBalance );
+  const applicableLeavesRaw = getApplicableLeaves(allExisitingLeaves, employeeType, empGender, accrualLeaveBalance);
+  // Don't show comp off if total allotted is 0 (same as LeaveAvailable)
+  const applicableLeaves = applicableLeavesRaw.filter((leave) => {
+    const leaveTypeLower = leave?.leaveType?.toLowerCase() || "";
+    const isCompOff = leaveTypeLower.includes("comp") || leaveTypeLower.includes("comp off");
+    if (!isCompOff) return true;
+    return compOffleaveBalance && !Array.isArray(compOffleaveBalance) && compOffleaveBalance.totalAllotted > 0;
+  });
 
   const handleStartDateInputContainer = () => {
     startDateInputRef.current?.showPicker();
@@ -327,7 +332,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       });
       return;
     }
-    
+
     e.preventDefault();
     const validationErrors = {};
 
@@ -358,9 +363,9 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
     // Balance validation for comp off and regular leaves
     if (selectedLeaveConfig && formData.startDate && formData.endDate) {
-      const isCompOff = selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') || 
-                        selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off');
-      
+      const isCompOff = selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') ||
+        selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off');
+
       // Calculate requested days - use totalDays from compOffLeaveEligibility if available, otherwise calculate
       let requestedDays;
       if (isCompOff && compOffLeaveEligibility) {
@@ -372,10 +377,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         const daysDiff = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         requestedDays = formData.isHalfDay ? 0.5 : daysDiff;
       }
-      
+
       if (isCompOff && compOffLeaveEligibility) {
         const { availableCompOffCredit } = compOffLeaveEligibility;
-        
+
         // Only restrict if:
         // 1. Requesting full day(s) (not half day)
         // 2. Available balance is fractional (has 0.5)
@@ -383,18 +388,18 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         if (!formData.isHalfDay && requestedDays > availableCompOffCredit) {
           const fractionalPart = availableCompOffCredit - Math.floor(availableCompOffCredit);
           const hasFractionalBalance = fractionalPart === 0.5;
-          
+
           // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
           if (hasFractionalBalance) {
             const fullDaysAvailable = Math.floor(availableCompOffCredit);
             let suggestion = '';
-            
+
             if (fullDaysAvailable > 0) {
               suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
             } else {
               suggestion = ` You can take 1 half day.`;
             }
-            
+
             validationErrors.leaveType = `You have only ${availableCompOffCredit} ${availableCompOffCredit === 0.5 ? 'day' : 'days'} comp off balance. Please select "Half Day" for at least one day.${suggestion}`;
           }
           // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
@@ -404,10 +409,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         const accrualRecord = accrualLeaveBalance.find(
           (balance) => balance.leaveConfigId === selectedLeaveConfig.leaveConfigId
         );
-        
+
         if (accrualRecord) {
           const availableDays = accrualRecord.availableLeaves || 0;
-          
+
           // Only restrict if:
           // 1. Requesting full day(s) (not half day)
           // 2. Available balance is fractional (has 0.5)
@@ -415,18 +420,18 @@ const LeaveApplication = ({ isOpen, onClose }) => {
           if (!formData.isHalfDay && requestedDays > availableDays) {
             const fractionalPart = availableDays - Math.floor(availableDays);
             const hasFractionalBalance = fractionalPart === 0.5;
-            
+
             // Only restrict if balance is fractional (0.5, 1.5, 2.5, etc.)
             if (hasFractionalBalance) {
               const fullDaysAvailable = Math.floor(availableDays);
               let suggestion = '';
-              
+
               if (fullDaysAvailable > 0) {
                 suggestion = ` You can take ${fullDaysAvailable} full ${fullDaysAvailable === 1 ? 'day' : 'days'} and 1 half day.`;
               } else {
                 suggestion = ` You can take 1 half day.`;
               }
-              
+
               validationErrors.leaveType = `You have only ${availableDays} ${availableDays === 0.5 ? 'day' : 'days'} ${selectedLeaveConfig.leaveType} balance. Please select "Half Day" for at least one day.${suggestion}`;
             }
             // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
@@ -454,7 +459,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     if (uploadedFile) {
       try {
         dispatch({ type: "UPLOAD_PROOF_DOCUMENTS" });
-        
+
         // Use base64 data from the uploaded file
         if (uploadedFile?.base64Data) {
           fileBase64 = uploadedFile.base64Data;
@@ -476,7 +481,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         return;
       }
     }
-    
+
     const requestBody = {
       attendanceStatus: formData.isHalfDay
         ? ATTENDANCE_STATUS.HALF_DAY
@@ -498,16 +503,16 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         uploadTimestamp: new Date().toISOString()
       }]) : null,
     };
-    
+
     // Check if it's a comp off leave
     const isCompOff = selectedLeaveConfig && (selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') || selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off'));
-    
+
     if (isCompOff) {
       dispatch(registerCompOffLeave(requestBody, setAttendanceMonth, setAttendanceYear));
     } else {
       dispatch(createAttendanceLog(requestBody, setAttendanceMonth, setAttendanceYear));
     }
-    
+
     setErrors({});
     onClose();
   };
@@ -534,11 +539,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                         <button
                           key={leave.leaveConfigId}
                           type="button"
-                          className={`leave-type-button ${
-                            formData.leaveType === leave.leaveType
-                              ? "selected"
-                              : ""
-                          }`}
+                          className={`leave-type-button ${formData.leaveType === leave.leaveType
+                            ? "selected"
+                            : ""
+                            }`}
                           onClick={() =>
                             handleInputChange({
                               target: {
@@ -563,7 +567,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                         Please fill all the mandatory profile details to apply for leaves.
                       </p>
                       <Link
-                        to = {`/dashboard?employeeUuid=${currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid}&showEmployeeDetails=true&isEditing=true&fromAttendace=true`}
+                        to={`/dashboard?employeeUuid=${currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid}&showEmployeeDetails=true&isEditing=true&fromAttendace=true`}
                         className="profile-update-note">
                         <span className="update-link">click here</span> to update your profile.
                       </Link>
@@ -661,7 +665,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                       required
                       style={{ display: "none" }}
                     />
-                    
+
                     {uploadedFile ? (
                       // Show uploaded file details
                       <div className="uploaded-file-row">
@@ -682,9 +686,9 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                           onClick={() => setUploadedFile(null)}
                           title="Remove file"
                         >
-                          <img 
-                            src={Delete_icon} 
-                            alt="Delete" 
+                          <img
+                            src={Delete_icon}
+                            alt="Delete"
                             className="delete-icon"
                           />
                         </button>
@@ -697,12 +701,12 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                       </label>
                     )}
                   </label>
-                  
+
                   {errors.file && (
                     <span className="error">{errors.file}</span>
                   )}
                   {!uploadedFile && <small className="file-note">
-                    Upload JPG, PNG, or PDF file 
+                    Upload JPG, PNG, or PDF file
                   </small>}
                 </div>
               )}
@@ -762,7 +766,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                       )}
                       {validationMessages.minimumNotice && (
                         <div className="status-warning">
-                        {validationMessages.minimumNotice}
+                          {validationMessages.minimumNotice}
                         </div>
                       )}
                       {validationMessages.maximumNotice && (
@@ -782,7 +786,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                       )}
                     </div>
                   )}
-                  </div>
+                </div>
               )}
 
               <div className="form-actions">

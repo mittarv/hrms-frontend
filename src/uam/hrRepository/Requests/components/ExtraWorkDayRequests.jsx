@@ -21,7 +21,7 @@ const ExtraWorkDayRequestsTableHeader = [
   { name: "employeeUuid", label: "Employee" },
   { name: "requestedDate", label: "Requested By" },
   { name: "workDate", label: "Date" },
-  { name: "checkIn", label: "Check-In" }, 
+  { name: "checkIn", label: "Check-In" },
   { name: "checkOut", label: "Check-Out" },
   { name: "hours", label: "Duration" },
   { name: "reason", label: "Reason" },
@@ -36,9 +36,10 @@ const ExtraWorkDayRequests = () => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [filesToView, setFilesToView] = useState([]);
 
-  const {hrRepositoryReducer, myHrmsAccess} = useSelector((state) => state?.hrRepositoryReducer);
+  const hrRepositoryReducer = useSelector((state) => state?.hrRepositoryReducer);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+
   const loading = hrRepositoryReducer?.loading ?? false;
   const extraWorkLogRequestsData = useMemo(
     () => hrRepositoryReducer?.extraWorkLogRequestsData ?? [],
@@ -48,8 +49,11 @@ const ExtraWorkDayRequests = () => {
     () => hrRepositoryReducer?.allEmployees ?? [],
     [hrRepositoryReducer?.allEmployees]
   );
+  const myHrmsAccess = hrRepositoryReducer?.myHrmsAccess;
+
+  console.log(extraWorkLogRequestsData)
   const dispatch = useDispatch();
-  
+
   // Helper function to check if user has permission
   const hasPermission = (permissionName) => {
     const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
