@@ -4,10 +4,10 @@ const calculateWorkingDays = (start, end, excludeWeekends = false) => {
   const startDate = new Date(start);
   const endDate = new Date(end);
   if (isNaN(startDate) || isNaN(endDate)) return 0;
-  
+
   let workingDays = 0;
   const currentDate = new Date(startDate);
-  
+
   while (currentDate <= endDate) {
     const dayOfWeek = currentDate.getDay();
     if (!excludeWeekends || (dayOfWeek !== 0 && dayOfWeek !== 6)) {
@@ -15,7 +15,7 @@ const calculateWorkingDays = (start, end, excludeWeekends = false) => {
     }
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  
+
   return workingDays;
 };
 
@@ -42,8 +42,8 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
 
   // Calculate leave duration
   const workingDays = calculateWorkingDays(
-    startDate, 
-    endDate, 
+    startDate,
+    endDate,
     selectedLeaveConfig.excludePaidWeekend
   );
   const actualDays = formData.isHalfDay ? 0.5 : workingDays;
@@ -85,7 +85,7 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
       const leaveConfigId = selectedLeaveConfig.leaveConfigId;
       const isCdlBlocked = cdlData[leaveConfigId] === false;
 
-      
+
       if (isCdlBlocked) {
         if (formData.leaveType.toLowerCase() === 'sick') {
           // Sick leave is allowed but proof is mandatory when CDL is blocked
@@ -111,8 +111,8 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
   const totalAllotted = selectedLeaveConfig.totalAllotedLeaves;
   const accruedLeaves = accrualRecord ? accrualRecord.accruedLeaves : totalAllotted;
   const usedDays = accrualRecord ? parseFloat(accrualRecord.totalUsedLeaves) : 0
-  const availableBalance = accrualRecord ? accrualRecord.availableLeaves : 
-                          Math.max(0, totalAllotted - usedDays);
+  const availableBalance = accrualRecord ? accrualRecord.availableLeaves :
+    Math.max(0, totalAllotted - usedDays);
 
   const paidDays = Math.min(actualDays, availableBalance);
   const unpaidDays = Math.max(0, actualDays - availableBalance);
@@ -122,15 +122,15 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
   } else {
     messages.leaveBreakdown = `Total: ${actualDays} days (all paid)`;
   }
-  
+
   // Return validation result - consider all validation errors including CDL
-  const isValid = !messages.minimumNotice && !messages.maximumNotice && 
-         !(messages.continuousLimit && formData.leaveType.toLowerCase() !== 'sick' && !messages.proofRequired) &&
-         !messages.cdlBlocked;
-  
-  return { 
-    messages, 
-    isValid, 
+  const isValid = !messages.minimumNotice && !messages.maximumNotice &&
+    !(messages.continuousLimit && formData.leaveType.toLowerCase() !== 'sick' && !messages.proofRequired) &&
+    !messages.cdlBlocked;
+
+  return {
+    messages,
+    isValid,
     calculatedData: {
       actualDays,
       paidDays,
@@ -154,28 +154,28 @@ export const getApplicableLeaves = (allExistingLeaves, employeeType, empGender, 
   );
 
   return allExistingLeaves.filter((leave) => {
-  if (!eligibleLeaveIds.has(leave.leaveConfigId)) {
+    if (!eligibleLeaveIds.has(leave.leaveConfigId)) {
       return false;
-  }
+    }
 
     // RULE 2: Safety check for active status
-  if (!leave.isActive) {
-    return false;
-  }
-  
-   
-      try {
-        const allowedTypes = JSON.parse(leave.employeeType);
-        const allowedGenders = JSON.parse(leave.appliedGender);
-          return (
-            allowedTypes.includes(employeeType) && allowedGenders.includes(empGender)
-          );
-      } catch (error) {
-        console.error("Error parsing employeeType or appliedGender:", error);
-        return false;
-      }
-    })
-  };
+    if (!leave.isActive) {
+      return false;
+    }
+
+
+    try {
+      const allowedTypes = JSON.parse(leave.employeeType);
+      const allowedGenders = JSON.parse(leave.appliedGender);
+      return (
+        allowedTypes.includes(employeeType) && allowedGenders.includes(empGender)
+      );
+    } catch (error) {
+      console.error("Error parsing employeeType or appliedGender:", error);
+      return false;
+    }
+  })
+};
 
 
 // Check if half-day option is allowed for the selected leave type
@@ -196,10 +196,10 @@ export const isReasonRequired = (leaveType, allExistingLeaves) => {
   return selectedLeaveConfig?.isReasonRequired || false;
 };
 
-export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves, setLeaveValidationError, userType = 100, hasAccessToEditAttendance = false) => {
+export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves, setLeaveValidationError, userType = 100, _hasAccessToEditAttendance = false) => {
   try {
     const { leaveConfigId, startDate, endDate } = attendanceData;
-    
+
     if (!leaveConfigId || !startDate) {
       setLeaveValidationError("Leave configuration ID and start date are required");
       return false;
@@ -207,19 +207,19 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
 
     // Find the leave configuration from allExistingLeaves
     const leaveConfig = allExistingLeaves.find(leave => leave.leaveConfigId === leaveConfigId);
-    
+
     if (!leaveConfig) {
       setLeaveValidationError("Leave configuration not found");
       return false;
     }
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    
+    today.setHours(0, 0, 0, 0);
+
     // Parse start and end dates
     const leaveStartDate = new Date(startDate);
     leaveStartDate.setHours(0, 0, 0, 0);
-    
+
     const leaveEndDate = endDate ? new Date(endDate) : leaveStartDate;
     leaveEndDate.setHours(0, 0, 0, 0);
 
@@ -243,8 +243,8 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
       }
     }
 
-    // If userType >= 500, skip all other validations
-    if (userType >= 900 && hasAccessToEditAttendance) {
+    // Super Admin (900): no restrictions; skip all validations
+    if (userType >= 900 || _hasAccessToEditAttendance) {
       setLeaveValidationError('');
       return true;
     }
@@ -266,7 +266,7 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
     if (isPastLeave) {
       // For past leaves, check Maximum Notice Period
       const daysSinceLeave = Math.ceil((today - leaveStartDate) / (1000 * 60 * 60 * 24));
-      
+
       if (maximumNoticePeriod === 0) {
         // Can only apply on the same day as leave
         setLeaveValidationError(
@@ -290,7 +290,7 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
     } else if (isFutureLeave) {
       // For future leaves, check Minimum Notice Period
       const daysUntilLeave = Math.ceil((leaveStartDate - today) / (1000 * 60 * 60 * 24));
-      
+
       if (daysUntilLeave < minimumNoticePeriod) {
         setLeaveValidationError(
           `You must apply at least ${minimumNoticePeriod} days before the leave start date. Current gap: ${daysUntilLeave} days.`
@@ -302,7 +302,7 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
     // If we reach here, validation passed - clear any previous errors
     setLeaveValidationError('');
     return true;
-   
+
   } catch (error) {
     setLeaveValidationError(`Validation error: ${error.message}`);
     return false;
