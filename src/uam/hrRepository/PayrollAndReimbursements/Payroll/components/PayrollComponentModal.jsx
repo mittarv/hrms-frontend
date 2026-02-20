@@ -150,7 +150,7 @@ const PayrollComponentModal = () => {
         adjustmentId: adj.adjustmentId || null,
         componentId: adj.componentId || '', // May be empty for generated payrolls
         componentName: cleanComponentName, // Clean name without effectiveFrom text
-        amount: adj.amount || adj.adjustedAmount || '',
+        amount: adj.adjustedAmount || adj.amount || '',
         effectiveTill: adj.effectiveTill || adj.endDate || '',
         effectiveFrom: adj.effectiveFrom || adj.startDate || '',
         frequency: frequencyValue,
@@ -277,26 +277,28 @@ const PayrollComponentModal = () => {
       prevRows.map(row => {
         if (row.id !== rowId) return row;
 
-        // For new additions, strip effectiveFrom text from component name
-        // For already added components, keep the clean name (handled in loadExistingAdjustments)
-        const componentName = selectedComponent?.componentName 
-          ? (row.adjustmentId ? row.componentName : stripEffectiveFromText(selectedComponent.componentName))
+        // Always use the selected component's name so the UI shows the chosen component (e.g. HIJ after changing from EFG)
+        const componentName = selectedComponent?.componentName
+          ? stripEffectiveFromText(selectedComponent.componentName)
           : '';
 
         const updatedRow = {
           ...row,
           componentId,
-          componentName: componentName,
-          amount: selectedComponent?.amount || '',
+          componentName,
+          amount: selectedComponent?.amount ?? row.amount ?? '',
           frequency: selectedComponent?.frequency || frequencyOptions[0]?.value || 'monthly_key',
           amountType: selectedComponent?.isVariable ? AMOUNT_TYPES.VARIABLE : AMOUNT_TYPES.FIXED,
           isVariable: selectedComponent?.isVariable ?? true,
-          thresholdAmount: selectedComponent?.thresholdAmount || null,
-          percentageOfBasicSalary: selectedComponent?.percentageOfBasicSalary || null,
-          effectiveFrom: selectedComponent?.effectiveFrom || '',
-          effectiveTill: selectedComponent?.effectiveTill || '',
+          thresholdAmount: selectedComponent?.thresholdAmount ?? row.thresholdAmount ?? null,
+          percentageOfBasicSalary: selectedComponent?.percentageOfBasicSalary ?? row.percentageOfBasicSalary ?? null,
+          effectiveFrom: row.effectiveFrom || '',
+          effectiveTill: selectedComponent?.effectiveTill ?? row.effectiveTill ?? '',
         };
-        
+        // Mark existing row as edited when component is changed so backend receives the update
+        if (row.adjustmentId && row.componentId !== componentId) {
+          updatedRow.isEdited = true;
+        }
         updatedRow.isCompleted = isRowComplete(updatedRow);
         return updatedRow;
       })
@@ -461,12 +463,25 @@ const PayrollComponentModal = () => {
   }, []);
 
   /**
-   * Prepares adjustment data for API request
+   * Prepares adjustment data for API request.
+   * Only sends rows that are new, edited, or marked for deletion –
+   * unchanged existing rows are not sent so the backend won't update them.
    */
   const prepareAdjustmentsForSave = useCallback((rows) => {
+    const result = [];
+
+    // Deleted: send only adjustmentId + isDeleted so backend can soft-delete
+    const deleted = rows
+      .filter(row => row.toDelete && row.adjustmentId)
+      .map(row => ({ adjustmentId: row.adjustmentId, isDeleted: true }));
+    result.push(...deleted);
+
+    // Active rows that are either new (create) or edited (update) – skip unchanged existing
     const activeRows = rows.filter(row => !row.toDelete && row.isCompleted);
-    
-    const adjustments = activeRows.map(row => ({
+    const toSend = activeRows.filter(
+      row => row.adjustmentId == null || row.isNew || row.isEdited
+    );
+    const adjustments = toSend.map(row => ({
       adjustmentId: row.adjustmentId || null,
       componentId: row.componentId,
       componentName: row.componentName,
@@ -478,16 +493,9 @@ const PayrollComponentModal = () => {
       thresholdAmount: row.thresholdAmount,
       percentageOfBasicSalary: row.percentageOfBasicSalary,
     }));
+    result.push(...adjustments);
 
-    // Add deleted adjustments with deletion flag
-    const deletedAdjustmentIds = rows
-      .filter(row => row.toDelete && row.adjustmentId)
-      .map(row => ({
-        adjustmentId: row.adjustmentId,
-        isDeleted: true
-      }));
-
-    return [...adjustments, ...deletedAdjustmentIds];
+    return result;
   }, []);
 
   /**
