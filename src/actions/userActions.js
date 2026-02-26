@@ -1,51 +1,75 @@
 import axios from "axios";
-import { checkEmailType, getAllowedEmailDomain } from "../utills/emailHelper";
+import { getMyHrmsAccess } from "./hrRepositoryAction";
 
-export const googleLogin = (email, name, profilePic) => async (dispatch) => {
-  try {
-    dispatch({ type: "GOOGLE_LOGIN_REQUEST" });
-    if (!checkEmailType(email)) {
-      window.location.reload();
-      const allowedDomain = getAllowedEmailDomain();
-      return window.alert(`Please use your ${allowedDomain} email to login`);
-    } else {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/login`,
-        { email },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.data.success === true && response.data.user !== null) {
-        dispatch({
-          type: "GOOGLE_LOGIN_SUCCESS",
-          payload: response.data,
-        });
-        dispatch(loadUserInfo());
+const getErrorMessage = async (error, defaultMessage) => {
+  if (error.response) {
+    if (error.response.data instanceof Blob) {
+      try {
+        const text = await error.response.data.text();
+        const jsonData = JSON.parse(text);
+        return jsonData.message || defaultMessage;
+      } catch {
+        return defaultMessage;
       }
     }
+    return error.response.data?.message || defaultMessage;
+  }
+  return error.message || defaultMessage;
+};
+
+export const googleLogin = (code) => async (dispatch) => {
+  try {
+    dispatch({ type: "GOOGLE_LOGIN_REQUEST" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/login`,
+      { code },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (response.data.success === true) {
+      dispatch({
+        type: "GOOGLE_LOGIN_SUCCESS",
+        payload: response.data,
+      });
+      dispatch(loadUserInfo());
+      dispatch(getMyHrmsAccess());
+    } else {
+      dispatch({
+        type: "GOOGLE_LOGIN_FAIL",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
+    }
   } catch (error) {
-    dispatch(createTmsUser(email, name, profilePic));
     dispatch({
       type: "GOOGLE_LOGIN_FAIL",
       payload: error.response && error.response.data.message,
     });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
   }
 };
 
-export const createTmsUser = (email, name, profilePic) => async (dispatch) => {
+export const createTmsUser = (code) => async (dispatch) => {
   try {
     dispatch({ type: "CREATE_TMS_USER_REQUEST" });
-    if (!checkEmailType(email)) {
-      window.location.reload();
-      const allowedDomain = getAllowedEmailDomain();
-      return window.alert(`Please use your ${allowedDomain} email to login`);
-    }
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/add`,
-      { email, name, profilePic },
+      { code },
       {
         headers: {
           "Content-Type": "application/json",
@@ -58,16 +82,31 @@ export const createTmsUser = (email, name, profilePic) => async (dispatch) => {
         payload: response.data,
       });
       dispatch(loadUserInfo());
+      dispatch(getMyHrmsAccess());
     } else {
       dispatch({
         type: "CREATE_TMS_USER_FAIL",
         payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
       });
     }
   } catch (error) {
     dispatch({
       type: "CREATE_TMS_USER_FAIL",
       payload: error.response && error.response.data.message,
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
     });
   }
 };
@@ -90,16 +129,34 @@ export const loadUserInfo = () => async (dispatch) => {
         type: "LOAD_USER_INFO_SUCCESS",
         payload: response.data.user,
       });
+      dispatch(getMyHrmsAccess());
     } else {
       dispatch({
         type: "LOAD_USER_INFO_FAIL",
         payload: response.data.message,
       });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message,
+          severity: "error",
+        },
+      });
     }
   } catch (error) {
+    if (error.response?.status === 403) {
+      localStorage.removeItem("token");
+    }
     dispatch({
       type: "LOAD_USER_INFO_FAIL",
-      payload: error.response && error.response.data.message,
+      payload: error.response?.data?.message,
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
     });
   }
 };
