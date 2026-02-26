@@ -102,9 +102,11 @@ VITE_ENCRYPTION_KEY=your-64-character-hex-encryption-key
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
 | `VITE_REACT_APP_HOSTED_URL` | Yes | Base URL for the backend API. All API requests will be prefixed with this URL. | `http://localhost:5000` or `https://api.example.com` |
-| `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Yes | Google OAuth 2.0 Client ID for Google Sign-In authentication. Get this from [Google Cloud Console](https://console.cloud.google.com/). | `123456789-abc.apps.googleusercontent.com` |
+| `VITE_REACT_APP_GOOGLE_CLIENT_ID` | Yes | Google OAuth 2.0 Client ID for initiating the Authorization Code flow. Get this from [Google Cloud Console](https://console.cloud.google.com/). | `123456789-abc.apps.googleusercontent.com` |
 | `VITE_ENCRYPTION_KEY` | Yes | Encryption key used for encrypting sensitive data (e.g., payroll information). Must be a hex string with at least 64 characters (256 bits). | `a1b2c3d4e5f6...` (64+ characters) |
-| `VITE_ALLOWED_EMAIL_DOMAIN` | Yes | Allowed email domain for user login (e.g., `mittarv.com`). | `mittarv.com` |
+| `VITE_ALLOWED_EMAIL_DOMAIN` | Yes | Allowed email domain for client-side validation in the Add User popup (e.g., `mittarv.com`). Domain validation for login is enforced on the backend via `TMS_ALLOWED_DOMAINS`. | `mittarv.com` |
+
+
 
 ### Generating an Encryption Key
 
@@ -135,6 +137,8 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 5. Choose "Web application"
 6. Add authorized JavaScript origins (e.g., `http://localhost:3000`)
 7. Copy the Client ID and paste it into your `.env` file
+
+> **Security Note:** The frontend only uses the Google Client ID to initiate the OAuth Authorization Code flow. The Google Client Secret is **never** used on the frontend — all token exchange and user verification happens on the backend server-to-server. See the HRMS Backend README for backend auth configuration.
 
 ---
 
@@ -354,8 +358,8 @@ Store sensitive values as **Secrets** (automatically masked in logs):
 
 | Secret | Description | Required |
 |--------|-------------|----------|
-| `VITE_REACT_APP_GOOGLE_SECRET` | Google OAuth Secret | Yes |
 | `VITE_ENCRYPTION_KEY` | Encryption key (64+ hex characters) | Yes |
+
 
 #### GitHub Variables (Non-Sensitive Data)
 
