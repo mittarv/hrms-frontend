@@ -39,7 +39,8 @@ jobs:
   build-and-deploy-using-docker:
     name: Build and Deploy using Docker
     environment: hrms-frontend
-    runs-on: Github-Unix-Runner
+    # runs-on: Github-Unix-Runner
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
