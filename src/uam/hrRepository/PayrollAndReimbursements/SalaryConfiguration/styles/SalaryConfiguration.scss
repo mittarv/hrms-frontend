@@ -1,3 +1,5 @@
+@use '../../../design/colors/customColors' as *;
+
 .salary_configuration_main_container{
     margin-top: 1.5rem;
     font-family: 'Plus Jakarta Sans';
@@ -20,10 +22,10 @@
 
             .salary_configuration_reset_button{
                 background: transparent;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 border: none;
                 padding: 0.6rem 1rem;
-                border: 1px solid #045071;
+                border: 1px solid $PRUSSIAN-70;
                 border-radius: 8px;
                 cursor: pointer;
                 font-size: 0.875rem;
@@ -31,12 +33,12 @@
                 transition: background-color 0.2s;
 
                 &:hover {
-                    background: #045071;
-                    color: #FFFFFF;
+                    background: $PRUSSIAN-70;
+                    color: $WHITE;
                 }
 
                 &:disabled {
-                    background: #ccc;
+                    background: $c76;
                     cursor: not-allowed;
                 }
             }
@@ -49,8 +51,8 @@
 
             .salary_configuration_save_button,
             .salary_configuration_edit_button{
-                background: #045071;
-                color: #FFFFFF;
+                background: $PRUSSIAN-70;
+                color: $WHITE;
                 border: none;
                 padding: 0.6rem 1rem;
                 border-radius: 8px;
@@ -60,14 +62,14 @@
                 transition: background-color 0.2s;
 
                 &:hover {
-                    background: #02303F;
+                    background: $c283;
                 }
             }
 
             .salary_configuration_cancel_button{
                 background: transparent;
-                color: #C73D45;
-                border: 1px solid #C73D45;
+                color: $RED-60;
+                border: 1px solid $RED-60;
                 padding: 0.6rem 1rem;
                 border-radius: 8px;
                 cursor: pointer;
@@ -76,8 +78,8 @@
                 transition: background-color 0.2s;
 
                 &:hover {
-                    background: #C73D45;
-                    color: #FFFFFF;
+                    background: $RED-60;
+                    color: $WHITE;
                 }
             }
         }

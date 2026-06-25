@@ -11,11 +11,13 @@ import Payslip_Inactive_Icon from "../assets/icons/payslip_inactive_icon.svg";
 import SalaryConfiguration from "./SalaryConfiguration/SalaryConfiguration";
 import Payroll from "./Payroll/Payroll";
 import PaySlip from "./Payslip/Payslip";
+import PayrollLevelManagement from "./PayrollLevelManagement/PayrollLevelManagement";
 import Snackbar from "../Common/components/Snackbar";
 import "./PayrollAndReimbursements.scss";
 
 const TABS = {
   SALARY_CONFIGURATION: "salary_configuration",
+  PAYROLL_LEVEL_MANAGEMENT: "payroll_level_management",
   PAYROLL: "payroll",
   PAYSLIPS: "payslips",
   REIMBURSEMENTS: "reimbursements"
@@ -29,6 +31,14 @@ const TAB_CONFIG = [
     inactiveIcon: Configure_Salary_Inactive_Icon,
     component: SalaryConfiguration,
     altText: "Configure Salary Icon"
+  },
+  {
+    id: TABS.PAYROLL_LEVEL_MANAGEMENT,
+    label: "Payroll Level Management",
+    activeIcon: Payroll_Active_Icon,
+    inactiveIcon: Payroll_Inactive_Icon,
+    component: PayrollLevelManagement,
+    altText: "Payroll Level Management Icon"
   },
   {
     id: TABS.PAYROLL,
@@ -87,6 +97,7 @@ const PayrollAndReimbursements = () => {
 
   // Check permissions for each tab
   const canViewSalaryConfig = hasPermission("ConfigureSalary_read");
+  const canViewPayrollLevelManagement = hasPermission("PayrollLevelManagement_read");
   const canViewPayroll = hasPermission("Payroll_read");
 
   // Get user access level - only calculate after selectedToolName is available
@@ -102,6 +113,11 @@ const PayrollAndReimbursements = () => {
     if (userAccessLevel >= 900 || canViewSalaryConfig) {
       tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.SALARY_CONFIGURATION));
     }
+
+    // Payroll Level Management tab - requires dedicated permission or admin
+    if (userAccessLevel >= 900 || canViewPayrollLevelManagement) {
+      tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.PAYROLL_LEVEL_MANAGEMENT));
+    }
     
     // Payroll tab - requires Payroll_read permission or admin
     if (userAccessLevel >= 900 || canViewPayroll) {
@@ -115,7 +131,7 @@ const PayrollAndReimbursements = () => {
     tabs.push(TAB_CONFIG.find(tab => tab.id === TABS.REIMBURSEMENTS));
     
     return tabs.filter(Boolean); // Remove undefined entries
-  }, [userAccessLevel, canViewSalaryConfig, canViewPayroll]);
+  }, [userAccessLevel, canViewSalaryConfig, canViewPayrollLevelManagement, canViewPayroll]);
 
   // Set default active tab based on available tabs
   useEffect(() => {

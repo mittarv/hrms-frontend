@@ -56,7 +56,7 @@ const SalaryConfiguration = () => {
       <div className="salary_configuration_main_container">
         <div style={{ textAlign: "center", padding: "40px" }}>
           <p style={{ fontSize: "16px", color: "#666" }}>
-            You don't have permission to view salary configuration
+            You don&apos;t have permission to view salary configuration
           </p>
         </div>
       </div>

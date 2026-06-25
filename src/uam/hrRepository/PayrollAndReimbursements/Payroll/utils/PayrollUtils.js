@@ -168,7 +168,7 @@ export const payrollTableColumns = [
   },
   {
     key: "taxesDeductions",
-    header: "Taxes/Deductions",
+    header: "Loss of pay",
     className: "taxes-deductions-column",
     sortable: true,
     accessor: "taxesDeductions",
@@ -203,6 +203,13 @@ export const payrollTableColumns = [
     className: "status-column",
     sortable: true,
     accessor: "status",
+  },
+  {
+    key: "manage",
+    header: "Manage",
+    className: "manage-column",
+    sortable: true,
+    accessor: "manage",
   },
 ];
 

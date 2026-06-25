@@ -1,10 +1,12 @@
+@use '../../../design/colors/customColors' as *;
+
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: $c166;
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
@@ -35,7 +37,7 @@
 }
 
 .taxes-deductions-modal {
-  background: white;
+  background: $WHITE;
   border-radius: 12px;
   width: 90%;
   max-width: 750px;
@@ -43,7 +45,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px $c108;
   animation: slideUp 0.3s ease-out;
 
   .modal-header {
@@ -62,7 +64,7 @@
         margin: 0;
         font-size: 18px;
         font-weight: 600;
-        color: #111827;
+        color: $c99;
         margin-bottom: 6px;
         letter-spacing: -0.3px;
       }
@@ -70,11 +72,11 @@
       .employee-name {
         margin: 0;
         font-size: 15px;
-        color: #6b7280;
+        color: $c87;
         font-weight: 500;
         text-decoration: underline;
-        -webkit-text-decoration-color:#2E3038;
-        text-decoration-color: #2E3038;
+        -webkit-text-decoration-color:$GREY-80;
+        text-decoration-color: $GREY-80;
 
         /* Provide a small bottom padding as a fallback for browsers (like Safari on iOS <12.2)
            that don't support text-underline-offset so the underline appears visually offset. */
@@ -98,13 +100,13 @@
         @supports not (text-decoration-thickness: 2px) {
           text-decoration: none;
           padding-bottom: 2px;
-          border-bottom: 2px solid #676B7E;
+          border-bottom: 2px solid $GREY-60;
         }
       }
     }
 
     .close_button_icon {
-      background: #f3f4f6;
+      background: $c94;
       border: none;
       cursor: pointer;
       padding: 8px;
@@ -120,7 +122,7 @@
       }
 
       &:hover {
-        background: #e5e7eb;
+        background: $c95;
         transform: scale(1.05);
       }
 
@@ -138,7 +140,7 @@
     // Deductions List
     .deductions-list {
       margin-bottom: 24px;
-      border-bottom: 1px solid #C7C9D1;
+      border-bottom: 1px solid $GREY-30;
       padding-bottom: 14px;
 
       .deduction-item {
@@ -147,27 +149,27 @@
         align-items: center;
         padding: 12px 20px;
         margin-bottom: 10px;
-        background: white;
+        background: $WHITE;
         border-radius: 8px;
         transition: all 0.2s ease;
 
         &:hover {
-          background: #f9fafb;
-          border-color: #d1d5db;
+          background: $c154;
+          border-color: $c86;
           transform: translateX(4px);
         }
 
         .component-name {
           font-size: 15px;
           font-weight: 500;
-          color: #374151;
+          color: $c88;
           flex: 1;
         }
 
         .deduction-amount {
           font-size: 16px;
           font-weight: 600;
-          color: #454754;
+          color: $GREY-70;
           margin-left: 16px;
         }
 
@@ -193,13 +195,13 @@
       .no-deductions {
         padding: 40px;
         text-align: center;
-        background: #f9fafb;
+        background: $c154;
         border-radius: 8px;
-        border: 1px dashed #d1d5db;
+        border: 1px dashed $c86;
 
         p {
           margin: 0;
-          color: #9ca3af;
+          color: $c98;
           font-size: 14px;
         }
       }
@@ -208,10 +210,10 @@
     // Total Section
     .total-section {
       padding: 20px 24px;
-      background: #FAEBEC;
+      background: $RED-10;
       border-radius: 10px;
-      border: 2px solid #d1d5db;
-      border: 1px solid #E8A1A6;
+      border: 2px solid $c86;
+      border: 1px solid $RED-30;
 
       .total-row {
         display: flex;
@@ -221,7 +223,7 @@
         .label {
           font-size: 16px;
           font-weight: 600;
-          color: #374151;
+          color: $c88;
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -229,7 +231,7 @@
         .total-amount {
           font-size: 18px;
           font-weight: 600;
-          color: #dc2626;
+          color: $c121;
         }
       }
     }
@@ -239,8 +241,8 @@
     display: flex;
     justify-content: flex-end;
     padding: 20px 32px;
-    border-top: 2px solid #e5e7eb;
-    background: #f9fafb;
+    border-top: 2px solid $c95;
+    background: $c154;
 
   }
 }

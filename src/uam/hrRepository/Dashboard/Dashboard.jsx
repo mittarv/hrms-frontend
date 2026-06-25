@@ -126,7 +126,7 @@ const Dashboard = () => {
         };
 
         fetchData();
-    }, [dispatch, user.employeeUuid]);
+    }, [dispatch, user?.employeeUuid]);
 
     useEffect(() => {
         if (outStandingCheckOut && outStandingCheckOut.isShowCheckoutPopup) {

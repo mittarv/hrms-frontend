@@ -10,19 +10,22 @@ import closeIcon from "../../../assets/icons/cross_icon.svg";
 import "../styles/PayslipPreview.scss";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { getCurrentEmployeeDetails} from "../../../../../actions/hrRepositoryAction";
+import { getCurrentEmployeeDetails, downloadPayslipPdf } from "../../../../../actions/hrRepositoryAction";
 import { getComponentTypeValue } from "../../../Common/utils/helper";
 import LoadingSpinner from "../../../Common/components/LoadingSpinner";
 import addIconGrey from "../../../assets/icons/add_icon_grey.svg";
+import downloadIconBlue from "../../../assets/icons/download_icon_blue.svg";
 
-const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
+const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
   const {currentEmployeeDetails, loading, currentEmployeeDetailsLoading,  getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const userEmployeeId = user?.employeeUuid;
+  const userEmployeeId = employeeId || user?.employeeUuid;
 
   useEffect(()=>{
-    dispatch(getCurrentEmployeeDetails(userEmployeeId));
+    if (userEmployeeId) {
+      dispatch(getCurrentEmployeeDetails(userEmployeeId));
+    }
   },[userEmployeeId, dispatch]);
 
   // Helper function to calculate totals and categorize items
@@ -37,18 +40,9 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
       };
     }
 
-    const getOrderScore = (componentName) => {
-      if (!componentName) return 4;
-      const name = componentName.trim().toLowerCase();
-      if (name === "basic salary") return 1;
-      if (name === "house rent allowance (hra)" || name === "house rent allowance" || name === "hra") return 2;
-      if (name === "special allowance") return 3;
-      return 4;
-    };
-
-    const earnings = selectedPayslip.payslipItems
-      .filter(item => item.componentType === 'addition' || item.componentType === 'defaultAddition')
-      .sort((a, b) => getOrderScore(a.componentName) - getOrderScore(b.componentName));
+    const earnings = selectedPayslip.payslipItems.filter(
+      item => item.componentType === 'addition' || item.componentType === 'defaultAddition'
+    );
 
     const deductions = selectedPayslip.payslipItems.filter(
       item => item.componentType === 'deduction' || item.componentType === 'defaultDeduction'
@@ -78,13 +72,27 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
 
   const payslipData = calculatePayslipData();
 
+  const handleDownload = () => {
+    if (selectedPayslip?.payslipId) {
+      dispatch(downloadPayslipPdf(selectedPayslip.payslipId));
+    }
+  };
+
   if (!isOpen) return null;
   return (
     <div className="payslip-modal-overlay" onClick={onClose}>
       {(loading  || currentEmployeeDetailsLoading) ? <LoadingSpinner  message="Loading payslip"/> : <div className="payslip-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>
-          <img src={closeIcon} alt="Close" />
-        </button>
+        <div className="modal-header-actions">
+          {selectedPayslip?.payslipId && (
+            <button className="download-button" onClick={handleDownload} title="Download Payslip">
+              <img src={downloadIconBlue} alt="Download" />
+              <span>Download</span>
+            </button>
+          )}
+          <button className="close-button" onClick={onClose}>
+            <img src={closeIcon} alt="Close" />
+          </button>
+        </div>
 
         <div className="payslip-content">
           <header className="payslip-header">
@@ -114,7 +122,7 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
               <div className="employee_name">
                 <p className='row_title'>Employee Name</p>
                 <p className='row_value'>
-                  {currentEmployeeDetails?.employeeBasicDetails?.empFirstName && currentEmployeeDetails?.employeeBasicDetails?.empLastName
+                  {currentEmployeeDetails?.employeeBasicDetails?.empFirstName || currentEmployeeDetails?.employeeBasicDetails?.empLastName
                     ? `${currentEmployeeDetails.employeeBasicDetails.empFirstName} ${currentEmployeeDetails.employeeBasicDetails.empLastName}`
                     : '-'}
                 </p>

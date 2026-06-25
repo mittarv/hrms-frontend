@@ -1,10 +1,12 @@
+@use '../../../design/colors/customColors' as *;
+
 .payslip-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: $c195;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,14 +14,14 @@
   padding: 20px;
 
   .payslip-modal {
-    background: #f5f5f5;
+    background: $c167;
     border-radius: 12px;
     max-width: 900px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px $c108;
     scrollbar-width: thin;
 
     &::-webkit-scrollbar {
@@ -27,39 +29,79 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #e0e0e0;
+      background: $c66;
       border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #999;
+      background: $c81;
       border-radius: 4px;
 
       &:hover {
-        background: #777;
+        background: $c196;
       }
     }
   }
 
-  .close-button {
+  .modal-header-actions {
     position: absolute;
     top: 16px;
     right: 16px;
-    background: #FFFFFF;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
-    transition: background 0.2s;
+    gap: 12px;
     z-index: 10;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
+    .download-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: $WHITE;
+      border: 1px solid $c66;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: $PRUSSIAN-70;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px $c69;
+
+      img {
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover {
+        background: $CYAN-10;
+        border-color: $CYAN-30;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px $c69;
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+
+    .close-button {
+      position: static;
+      background: $WHITE;
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: $WHITE;
+      transition: background 0.2s;
+      box-shadow: 0 2px 4px $c69;
+
+      &:hover {
+        background: $c197;
+      }
     }
   }
 
@@ -67,7 +109,7 @@
     font-family: "Plus Jakarta Sans";
     .payslip-header {
       padding: 40px 35px 0px 35px;
-      background-color: #2E3038;
+      background-color: $GREY-80;
       position: relative;
       padding-bottom: 100px;
       z-index: 1;
@@ -84,7 +126,7 @@
           font-weight: 600;
           line-height: 1.6;
           white-space: pre-line;
-          color: #ffffff;
+          color: $WHITE;
           max-width: 60%;
         }
 
@@ -111,14 +153,14 @@
           .title_1 {
             font-size: 10px;
             font-weight: 600;
-            color: #ffffff;
+            color: $WHITE;
             margin-bottom: 2px;
           }
 
           .title_2 {
             font-size: 32px;
             font-weight: 700;
-            color: #91e3e3;
+            color: $CYAN-30;
             letter-spacing: -1px;
           }
         }
@@ -132,11 +174,11 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px 30px;
-        background-color: #ebfafa;
-        border: 0.5px solid #91e3e3;
+        background-color: $CYAN-10;
+        border: 0.5px solid $CYAN-30;
         border-radius: 20px;
         padding: 25px 30px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px $c69;
         z-index: 5;
         justify-content: center;
         
@@ -150,14 +192,14 @@
           .row_title {
             font-size: 10px;
             font-weight: 500;
-            color: #454754;
+            color: $GREY-70;
             letter-spacing: 0.16px;
             margin: 0;
           }
           .row_value {
             font-size: 12px;
             font-weight: 700;
-            color: #2e3038;
+            color: $GREY-80;
             letter-spacing: 0.16px;
             margin: 0;
           }
@@ -167,18 +209,18 @@
 
     .payslip_body {
       padding: 90px 35px 40px 35px;
-      background-color: #ffffff;
+      background-color: $WHITE;
       // summary section
       .payslip_summary_section {
-        border: 1px solid #91e3e3;
+        border: 1px solid $CYAN-30;
         border-radius: 12px;
 
         .payslip_summary_header {
           padding: 20px 30px;
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 1px solid $c66;
           display: flex;
           align-items: center;
-          background-color: #c2f0f0;
+          background-color: $CYAN-20;
           border-radius: 12px 12px 0px 0px;
 
           .summary_title {
@@ -187,13 +229,13 @@
             .title1 {
               font-size: 12px;
               font-weight: 700;
-              color: #2e3038;
+              color: $GREY-80;
             }
 
             .title2 {
               font-size: 10px;
               font-weight: 500;
-              color: #454754;
+              color: $GREY-70;
             }
           }
         }
@@ -203,7 +245,7 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background-color: #ffffff;
+          background-color: $WHITE;
           border-radius: 0px 0px 12px 12px;
 
           .summary_row {
@@ -216,21 +258,21 @@
             .row_title {
               font-size: 12px;
               font-weight: 500;
-              color: #676b7e;
+              color: $GREY-60;
               margin: 0;
             }
 
             .row_value {
               font-size: 16px;
               font-weight: 700;
-              color: #2e3038;
+              color: $GREY-80;
               margin: 0;
             }
 
             &.total {
               .row_value {
                 font-size: 20px;
-                color: #91e3e3;
+                color: $CYAN-30;
               }
             }
 
@@ -246,15 +288,15 @@
       //earnings section
       .payslip_earnings_section {
         margin-top: 30px;
-        border: 1px solid #454754;
+        border: 1px solid $GREY-70;
         border-radius: 12px;
 
         .payslip_earnings_header {
           padding: 20px 30px;
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 1px solid $c66;
           display: flex;
           align-items: center;
-          background-color: #454754;
+          background-color: $GREY-70;
           border-radius: 12px 12px 0px 0px;
 
           .earnings_title {
@@ -264,13 +306,13 @@
             .title1 {
               font-size: 12px;
               font-weight: 700;
-              color: #FFFFFF;
+              color: $WHITE;
             }
 
             .title2 {
               font-size: 10px;
               font-weight: 500;
-              color: #FFFFFF;
+              color: $WHITE;
             }
           }
         }
@@ -279,7 +321,7 @@
           padding: 20px 30px;
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          background-color: #ffffff;
+          background-color: $WHITE;
           gap: 20px;
           border-radius: 0px 0px 12px 12px;
 
@@ -293,21 +335,21 @@
             .row_title {
               font-size: 12px;
               font-weight: 500;
-              color: #676b7e;
+              color: $GREY-60;
               margin: 0;
             }
 
             .row_value {
               font-size: 12px;
               font-weight: 700;
-              color: #2e3038;
+              color: $GREY-80;
               margin: 0;
             }
 
             &.total {
               grid-column: 1 / -1;
               padding-top: 15px;
-              border-top: 1px solid #e0e0e0;
+              border-top: 1px solid $c66;
               margin-top: 5px;
 
               .row_value {
@@ -321,15 +363,15 @@
       //deductions section
       .payslip_deductions_section {
         margin-top: 30px;
-        border: 1px solid #454754;
+        border: 1px solid $GREY-70;
         border-radius: 12px;  
 
         .payslip_deductions_header {
           padding: 20px 30px;
-          border-bottom: 1px solid #e0e0e0;
+          border-bottom: 1px solid $c66;
           display: flex;
           align-items: center;
-          background-color: #454754;
+          background-color: $GREY-70;
           border-radius: 12px 12px 0px 0px;
 
           .deductions_title {
@@ -339,13 +381,13 @@
             .title1 {
               font-size: 12px;
               font-weight: 700;
-              color: #FFFFFF;
+              color: $WHITE;
             }
 
             .title2 {
               font-size: 10px;
               font-weight: 500;
-              color: #FFFFFF;
+              color: $WHITE;
             }
           }
         }
@@ -354,7 +396,7 @@
           padding: 20px 30px;
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          background-color: #ffffff;
+          background-color: $WHITE;
           gap: 20px;
           border-radius: 0px 0px 12px 12px;
 
@@ -368,21 +410,21 @@
             .row_title {
               font-size: 12px;
               font-weight: 500;
-              color: #676b7e;
+              color: $GREY-60;
               margin: 0;
             }
 
             .row_value {
               font-size: 12px;
               font-weight: 700;
-              color: #2e3038;
+              color: $GREY-80;
               margin: 0;
             }
 
             &.total {
               grid-column: 1 / -1;
               padding-top: 15px;
-              border-top: 1px solid #e0e0e0;
+              border-top: 1px solid $c66;
               margin-top: 5px;
 
               .row_value {
@@ -396,16 +438,16 @@
 
     .payslip_footer {
       padding: 20px 35px;
-      background-color: #FFFFFF;
+      background-color: $WHITE;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 5px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid $c66;
 
       p {
         font-size: 8px;
-        color: #676b7e;
+        color: $GREY-60;
         margin: 0;
       }
     }
@@ -605,7 +647,7 @@
               &.total {
                 width: 100%;
                 padding-top: 10px;
-                border-top: 1px solid #e0e0e0;
+                border-top: 1px solid $c66;
                 margin-top: 5px;
               }
 

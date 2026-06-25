@@ -1,16 +1,18 @@
+@use '../../../design/colors/customColors' as *;
+
 .dynamic-table {
   margin: 20px 0;
 
   p {
     margin-bottom: 10px;
     font-size: 16px;
-    color: #2E3038;
+    color: $GREY-80;
     font-weight: 600;
   }
 
   .salary_table{
     width: 100%;
-    border: 0.5px solid #aeb0bc;
+    border: 0.5px solid $GREY-40;
     border-radius: 8px;
 
     table {
@@ -21,28 +23,28 @@
       td {
         padding: 12px 15px;
         text-align: left;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid $c66;
         font-size: 14px;
       }
 
       th {
         font-weight: 600;
-        color: #033348;
-        background-color: #f9f9f9;
+        color: $PRUSSIAN-80;
+        background-color: $c93;
         
       }
 
       td {
-        color: #333;
+        color: $c75;
       }
       tr:nth-child(even) {
-        background-color: #f7f7f8;
+        background-color: $GREY-00;
       }
 
       // Focused row styling
       tr.focused-row {
-        border: 3px solid #4FA8CF;
-        background-color: #f8fbff;
+        border: 3px solid $PRUSSIAN-40;
+        background-color: $c287;
         border-top: none;
         border-bottom: none;
       }
@@ -52,7 +54,7 @@
         opacity: 0.6;
         
         td {
-          background-color: #f8f8f8;
+          background-color: $c241;
         }
 
         // Apply line-through to text inputs and spans, but exclude checkboxes and action buttons
@@ -60,18 +62,18 @@
         input[type="number"], 
         input[type="date"] {
           text-decoration: line-through;
-          color: #999;
-          background-color: #f0f0f0;
+          color: $c81;
+          background-color: $c128;
           cursor: not-allowed;
         }
         
         .deleted-text{
             text-decoration: line-through;
-            color: #999;
-            background-color: #f0f0f0;
+            color: $c81;
+            background-color: $c128;
             padding: 2px 12px;
             border-radius: 32px;
-            border: 1px solid #8F92A3;
+            border: 1px solid $GREY-50;
             cursor: not-allowed;
         }
         // Keep checkboxes normal but faded (will be replaced with dummy later)
@@ -96,11 +98,11 @@
         width: 100%;
         padding: 8px;
         box-sizing: border-box;
-        border: 1px solid #ccc;
+        border: 1px solid $c76;
         border-radius: 4px;
     
         &:disabled {
-            background-color: #f5f5f5;
+            background-color: $c167;
         }
 
         &:focus {
@@ -112,11 +114,11 @@
         width: 100%;
         padding: 8px;
         box-sizing: border-box;
-        border: 1px solid #ccc;
+        border: 1px solid $c76;
         border-radius: 4px;
     
         &:disabled {
-            background-color: #f5f5f5;
+            background-color: $c167;
         }
 
         &:focus {
@@ -128,11 +130,11 @@
         width: 100%;
         padding: 8px;
         box-sizing: border-box;
-        border: 1px solid #ccc;
+        border: 1px solid $c76;
         border-radius: 4px;
     
         &:disabled {
-            background-color: #f5f5f5;
+            background-color: $c167;
         }
 
         &:focus {
@@ -145,9 +147,9 @@
         appearance: none;
         width: 18px;
         height: 18px;
-        border: 1px solid #454754;
+        border: 1px solid $GREY-70;
         border-radius: 4px;
-        background-color: #fff;
+        background-color: $WHITE;
         position: relative;
 
         &:checked {
@@ -173,11 +175,11 @@
     }
 
     .variable_checkbox{
-        border: 1px solid #8F92A3;
+        border: 1px solid $GREY-50;
         padding: 2px 12px;
         border-radius: 32px;
-        background-color: #F7F7F8;
-        color:#2E3038;
+        background-color: $GREY-00;
+        color:$GREY-80;
         font-family: 'Plus Jakarta Sans';
     }
 
@@ -192,7 +194,7 @@
         span{
             border: none;
             
-            color: #C73D45;
+            color: $RED-60;
             background: transparent;
             cursor: pointer;
             font-family: 'Plus Jakarta Sans';
@@ -206,7 +208,7 @@
         }
 
         &:hover span {
-            border-bottom: 1px solid #C73D45;
+            border-bottom: 1px solid $RED-60;
         }
 
         &:disabled {
@@ -214,7 +216,7 @@
             opacity: 0.6;
 
             span {
-                color: #999;
+                color: $c81;
                 cursor: not-allowed;
             }
 
@@ -238,7 +240,7 @@
        
         span{
             border: none;   
-            color: #2E3038;
+            color: $GREY-80;
             background: transparent;
             cursor: pointer;
             font-family: 'Plus Jakarta Sans';
@@ -252,7 +254,7 @@
         }
 
         &:hover span {
-            border-bottom: 1px solid #2E3038;
+            border-bottom: 1px solid $GREY-80;
         }
     }
 
@@ -263,7 +265,7 @@
         cursor: pointer;
         
         &:hover {
-            background-color: #f5f5f5;
+            background-color: $c167;
         }
 
         &.disabled {
@@ -276,7 +278,7 @@
 
         .add-btn {
             border: none;
-            color: #045071;
+            color: $PRUSSIAN-70;
             font-size: 12px;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -290,7 +292,7 @@
             }
 
             &:disabled {
-                color: #999;
+                color: $c81;
                 cursor: not-allowed;
                 opacity: 0.6;
 
@@ -305,24 +307,24 @@
     .required-field {
         &::after {
             content: " *";
-            color: #ff6b6b;
+            color: $c281;
             font-weight: bold;
         }
     }
 
     // Validation styles for input fields
     input.validation-error {
-        border-color: #ff6b6b !important;
+        border-color: $c281 !important;
         border-width: 2px !important;
-        box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+        box-shadow: 0 0 0 0.2rem $c282;
     }
     
     .variable_span{
-        border: 1px solid #8F92A3;
+        border: 1px solid $GREY-50;
         padding: 2px 12px;
         border-radius: 32px;
-        background-color: #F7F7F8;
-        color:#2E3038;
+        background-color: $GREY-00;
+        color:$GREY-80;
         font-family: 'Plus Jakarta Sans';
     }
   }

@@ -85,7 +85,7 @@ const TaxesDeductionsModal = () => {
       <div className="taxes-deductions-modal">
         <div className="modal-header">
           <div className="header-content">
-            <p className="modal_title">Taxes/Deductions Breakdown</p>
+            <p className="modal_title">LOP Breakdown</p>
             <p className="employee-name">{employeeName}</p>
           </div>
           <button className="close_button_icon" onClick={handleClose}>
