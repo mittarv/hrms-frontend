@@ -1,0 +1,752 @@
+.rewards_phase_container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 1.5rem 2.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    @media (max-width: 1200px) {
+        padding: 1.375rem 1.75rem;
+        gap: 1.375rem;
+    }
+
+    @media (max-width: 1024px) {
+        padding: 1.25rem 1.5rem;
+        gap: 1.25rem;
+    }
+
+    @media (max-width: 768px) {
+        padding: 1rem 1rem;
+        gap: 1rem;
+    }
+
+    .rewards_phase_loading {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+    }
+
+    .rewards_phase_action_button {
+        display: flex;
+        justify-content: center;
+
+        .start_nominations_button {
+            background-color: #045071;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: #033348;
+            }
+
+            &:disabled {
+                background-color: #8f92a3;
+                color: #ffffff;
+                cursor: not-allowed;
+            }
+        }
+
+        .choose_winner_btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #045071;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            
+
+            &:hover {
+                background-color: #033348;
+            }
+        }
+    }
+
+    .rewards_phase_actions_row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        margin-top: 3rem;
+
+        @media (max-width: 768px) {
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .nominate_peer_btn,
+        .primary_btn {
+            background-color: #045071;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 0 1 auto;
+
+            @media (max-width: 768px) {
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1 1 calc(50% - 0.25rem);
+                min-width: 120px;
+            }
+        }
+
+        .nominate_primary_btn {
+            background-color: #ffffff;
+            border: 1px solid #045071;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #045071;
+        }
+        .vote_nominees_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: #045071;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+
+            .thumbs_icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .end_phase_btn {
+            background: #d4545c;
+            text-align: center;
+            border: none;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition:
+                background-color 0.2s,
+                border-color 0.2s,
+                color 0.2s;
+
+            &:hover:not(:disabled) {
+                background: #ffffff;
+                border: 1px solid #d4545c;
+                border-color: #d4545c;
+                color: #d4545c;
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+    }
+
+    .rewards_phase_panel {
+        width: 100%;
+
+        .rewards_phase_panel_header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            @media (max-width: 1200px) {
+                gap: 0.875rem;
+            }
+
+            @media (max-width: 1024px) {
+                align-items: flex-start;
+            }
+
+            @media (max-width: 768px) {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .rewards_phase_panel_header_title {
+                color: #2e3038;
+
+                .rewards_phase_panel_header_title_text {
+                    font-size: 18px;
+                    font-weight: 600;
+                    margin-bottom: 0.5rem;
+
+                    @media (max-width: 768px) {
+                        font-size: 14px;
+                    }
+                }
+
+                .rewards_phase_panel_header_title_month {
+                    font-size: 28px;
+                    font-weight: 600;
+
+                    @media (max-width: 768px) {
+                        font-size: 20px;
+                    }
+                }
+            }
+
+            h3 {
+                margin: 0;
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #1f2937;
+
+                @media (max-width: 768px) {
+                    font-size: 1rem;
+                }
+            }
+
+            .rewards_phase_panel_actions {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.5rem;
+
+                @media (max-width: 1200px) {
+                    gap: 0.625rem;
+                }
+
+                @media (max-width: 1024px) {
+                    width: 100%;
+                }
+
+                @media (max-width: 768px) {
+                    width: 100%;
+                    gap: 0.5rem;
+                }
+
+                .nominate_primary_btn {
+                    background: #ffffff;
+                    border: 1px solid #045071;
+                    color: #045071;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+
+                    @media (max-width: 768px) {
+                        padding: 8px 12px;
+                        font-size: 12px;
+                        flex: 1 1 auto;
+                        min-width: 100px;
+                    }
+
+                    &:hover {
+                        background: #045071;
+                        color: #ffffff;
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+
+            .rewards_phase_panel_actions .end_phase_btn {
+                background: #d4545c;
+                color: #ffffff;
+                padding: 8px 14px;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+
+                @media (max-width: 768px) {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                    flex: 1 1 auto;
+                    min-width: 100px;
+                }
+
+                &:hover:not(:disabled) {
+                    background: #d4545c;
+                    color: #ffffff;
+                }
+
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+            }
+
+            .primary_btn {
+                background-color: #045071;
+                border: none;
+                color: #fff;
+                padding: 8px 14px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+
+                @media (max-width: 768px) {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                    flex: 1 1 auto;
+                    min-width: 100px;
+                }
+            }
+        }
+    }
+
+    .rewards_phase_table_wrapper {
+        width: 100%;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+        border: 0.5px solid #aeb0bc;
+        border-radius: 8px;
+        -webkit-overflow-scrolling: touch;
+
+        @media (max-width: 768px) {
+            margin-bottom: 0.75rem;
+        }
+    }
+
+    .rewards_phase_table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+
+        @media (max-width: 768px) {
+            font-size: 12px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: top;
+            border-bottom: 1px solid #e0e0e0;
+
+            @media (max-width: 768px) {
+                padding: 10px 8px;
+            }
+        }
+
+        th {
+            font-weight: 600;
+            color: #555;
+            background-color: #f9f9f9;
+        }
+
+        td {
+            color: #333;
+        }
+
+        tbody tr {
+            &:hover {
+                background-color: #f3f4f6;
+            }
+            &:nth-child(even) {
+                background-color: #f7f7f8;
+            }
+        }
+
+        .rewards_phase_nominee_cell {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .rewards_phase_nominee_avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #e5e7eb;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .rewards_phase_nominee_initial {
+                font-size: 0.9375rem;
+                font-weight: 600;
+                color: #374151;
+            }
+        }
+
+        .rewards_phase_nominee_info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            min-width: 0;
+        }
+
+        .rewards_phase_nominee_name {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .rewards_phase_nominee_dept {
+            font-size: 0.8125rem;
+            color: #6b7280;
+        }
+
+        .citation_cell {
+            max-width: 320px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+
+            .citation_preview_text {
+                margin: 0;
+                display: inline;
+            }
+
+            .citation_view_more_btn {
+                padding: 0;
+                border: none;
+                background: transparent;
+                color: #045071;
+                font-size: 13px;
+                font-weight: 600;
+                line-height: inherit;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+                cursor: pointer;
+
+                &:hover {
+                    color: #023b54;
+                }
+            }
+        }
+    }
+
+    .rewards_phase_voted_section {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+
+        .rewards_phase_voted_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+
+            h3 {
+                margin: 0;
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #1f2937;
+            }
+
+            .rewards_phase_voted_header_actions {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+
+                .end_phase_btn {
+                    background: #d4545c;
+                    text-align: center;
+                    border: none;
+                    color: #ffffff;
+                    border-radius: 8px;
+                    padding: 10px 16px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition:
+                        background-color 0.2s,
+                        border-color 0.2s,
+                        color 0.2s;
+
+                    &:hover:not(:disabled) {
+                        background: #ffffff;
+                        border: 1px solid #d4545c;
+                        border-color: #d4545c;
+                        color: #d4545c;
+                    }
+
+                    &:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                    }
+                }
+
+                .vote_nominees_btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background-color: #045071;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 10px 16px;
+                    color: #fff;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+
+                    .thumbs_icon {
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+
+                .choose_winner_btn_header {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background: #045071;
+                    border: none;
+                    color: #fff;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+
+                    img {
+                        width: 20px;
+                        height: 20px;
+                        object-fit: cover;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        flex-shrink: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    &:hover {
+                        background: #034060;
+                    }
+                }
+            }
+        }
+    }
+
+    .rewards_phase_vote_cta {
+        margin-top: 1rem;
+
+        .view_all_nominees_btn {
+            background: transparent;
+            border: 1px solid #045071;
+            color: #045071;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+    }
+
+    .rewards_phase_admin_voting {
+        margin-top: 1rem;
+
+        .choose_winner_btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #045071;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    }
+
+    .rewards_phase_voted_card {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: #fff;
+        border: 0.5px solid #c7c9d1;
+        border-radius: 12px;
+        width: 100%;
+
+        .voted_card_header_row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .voted_card_avatar_wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+        }
+
+        .voted_card_avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 10%;
+            overflow: hidden;
+            background: #e5e7eb;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .voted_card_initial {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: #374151;
+            }
+        }
+
+        .voted_card_name_dept {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            min-width: 0;
+
+            .voted_card_name {
+                font-weight: 600;
+                font-size: 1.0625rem;
+                color: #1f2937;
+            }
+
+            .voted_card_dept {
+                font-size: 0.875rem;
+                color: #6b7280;
+            }
+        }
+
+        .voted_card_citation_box {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 0 0.25rem;
+            padding: 1rem;
+            background: #eceff9;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2e3038;
+
+            .voted_card_citation_quotes {
+                font-size: 1.25em;
+                color: #6b7280;
+                line-height: 1;
+            }
+
+            .voted_card_citation_text {
+                margin: 0;
+                display: inline;
+            }
+
+            .voted_card_view_more_btn {
+                padding: 0;
+                border: none;
+                background: transparent;
+                color: #045071;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: inherit;
+                text-decoration: underline;
+                text-underline-offset: 2px;
+                cursor: pointer;
+
+                &:hover {
+                    color: #023b54;
+                }
+            }
+        }
+
+        .remove_vote_btn {
+            align-self: flex-start;
+            background: transparent;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+
+            &:hover {
+                background: #fef2f2;
+            }
+        }
+
+        .remove_vote_btn_in_card {
+            align-self: center;
+            margin-left: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+    }
+
+    .rewards_phase_other_nominees {
+        h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .view_all_nominees_btn {
+            margin-top: 0.5rem;
+            background: transparent;
+            border: 1px solid #045071;
+            color: #045071;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+
+            &:hover {
+                background: #f0f9fc;
+            }
+        }
+    }
+}

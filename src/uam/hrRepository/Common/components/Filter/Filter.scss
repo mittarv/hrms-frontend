@@ -1,0 +1,102 @@
+.filter-dropdown-container {
+            position: relative;
+            
+            .filter-button-label {
+                padding: 12px 16px;
+                border-radius: 64px;
+                border: 2px solid #2fbcbc; 
+                background-color: #ffffff;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #2e3038;
+
+                &.active {
+                    background-color: #e0f6ff; 
+                }
+                span{
+                    color: #ffffff;
+                    background-color: #454745;
+                    height: 20px;
+                    width: 20px;
+                    display: inline-flex;   
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    font-size: 12px;  
+                    font-weight: 600;
+
+                }
+                .dropdown-arrow-icon {
+                    width: 12px; 
+                    height: 12px;
+                    margin-left: 5px;
+                    transition: transform 0.2s ease-in-out;
+                }
+                .dropdown-arrow-icon.rotated {
+                    transform: rotate(180deg);
+                }
+            }
+
+            .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 100;
+                min-width: 250px;
+                background-color: #ffffff;
+                border: 0.5px solid #c7c9d1;
+                border-radius: 4px;
+                padding: 8px 0;
+                
+                .search-input-container{
+                    border: none;
+                    border-bottom: 1px solid #aeb0bc; 
+                    display: flex;
+                    align-items: center;
+                    padding: 8px 12px;
+                    gap:8px;
+
+                    .dropdown-search-input{
+                        outline: none;
+                        border: none;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #8f92a3;
+                        caret-color: #8f92a3;
+                        &::placeholder {
+                        color: #8f92a3;
+                        font-family: 'Plus Jakarta Sans', sans-serif;
+                    }
+                    }
+                    
+                    
+                }
+                .no-results{
+                    color: #454745;
+                    font-size: 14px;
+                    text-align: center;
+                    font-weight: 600;
+                    padding: 12px 16px;
+                }
+                
+
+                .dropdown-item {
+                    padding: 12px 16px;
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    color: #454745;
+                    font-size: 14px;
+                    font-weight: 600;
+
+                    &:hover {
+                        background-color: #f1f1f4;
+                    }
+                }
+            }
+        }

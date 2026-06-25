@@ -1,0 +1,202 @@
+.process_phases_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #a5d7ed;
+  padding: 1.5rem 2rem;
+  gap: 2rem;
+
+  .title_section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 180px;
+
+    .label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 400;
+    }
+
+    .month_year {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #424242;
+    }
+  }
+
+  .phases_section {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 0;
+
+    .phase_wrapper {
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      .phase_item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        min-width: 160px;
+        flex: 1;
+
+        .icon_container {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+          }
+
+          svg {
+            width: 20px;
+            height: 20px;
+            color: #fff;
+          }
+        }
+
+        .phase_info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.125rem;
+
+          .phase_title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+          }
+
+          .phase_subtitle {
+            font-size: 0.8125rem;
+            font-weight: 400;
+          }
+        }
+
+        // Completed: shared background, lighter border and subtitle
+        &.completed_or_running {
+          background: #e7f3f8;
+
+          .icon_container {
+            background: #045071;
+            color: #fff;
+
+            img {
+              filter: brightness(0) invert(1);
+            }
+          }
+
+          .phase_title {
+            color: #045071;
+          }
+        }
+
+        &.completed {
+          border: 1.5px solid #87c4de;
+
+          .phase_subtitle {
+            color: #1888b9;
+          }
+        }
+
+        // Running (active): same background, stronger border and subtitle
+        &.active {
+          border: 2px solid #045071;
+
+          .phase_subtitle {
+            color: #045071;
+          }
+        }
+
+        // Pending: light grey card, grey icon and text
+        &.pending {
+          background: #f0f0f0;
+          border: 1px solid #e5e7eb;
+
+          .icon_container {
+            background: #8d9092;
+
+            img {
+              filter: brightness(0) invert(1);
+            }
+          }
+
+          .phase_title {
+            color: #424242;
+          }
+
+          .phase_subtitle {
+            color: #8d9092;
+          }
+        }
+      }
+
+      .connector_line {
+        width: 40px;
+        height: 2px;
+        background: #e5e7eb;
+        margin: 0 0.25rem;
+        flex-shrink: 0;
+
+        &.connector_completed {
+          height: 3px;
+          background: #1a527f;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .process_phases_container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+
+    .phases_section {
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+
+      .phase_wrapper {
+        .phase_item {
+          min-width: 180px;
+        }
+
+        .connector_line {
+          width: 30px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .process_phases_container {
+    .phases_section {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .phase_wrapper {
+        flex-direction: column;
+
+        .connector_line {
+          display: none;
+        }
+      }
+    }
+  }
+}

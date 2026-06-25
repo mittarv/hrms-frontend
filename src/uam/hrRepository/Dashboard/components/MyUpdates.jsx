@@ -90,15 +90,27 @@ const MyUpdates = () => {
           <Table>
             <TableBody>
               {organizationUpdates.map((orgnaization_updates, index) => {
-                const messageContent = JSON.parse(orgnaization_updates.message);
+                let messageContent;
+                try {
+                  messageContent = typeof orgnaization_updates.message === 'string'
+                    ? JSON.parse(orgnaization_updates.message)
+                    : orgnaization_updates.message;
+                } catch {
+                  messageContent = null;
+                }
+                const isStructured = messageContent && typeof messageContent === 'object' && messageContent.linkUrl;
                 return (
                   <TableRow key={index}>
                     <TableCell style={MyUpdateStyle}>
-                      <Link to={ messageContent?.linkUrl} className="update-link" style={{ color: '#2E3038' }}>
-                        {messageContent?.prefix} 
-                        <span style={{ fontWeight: 'bold' }}>&nbsp;{messageContent?.linkText}&nbsp;</span> 
-                        {messageContent?.suffix}
-                      </Link>
+                      {isStructured ? (
+                        <Link to={messageContent.linkUrl} className="update-link" style={{ color: '#2E3038' }}>
+                          {messageContent.prefix}
+                          <span style={{ fontWeight: 'bold' }}>&nbsp;{messageContent.linkText}&nbsp;</span>
+                          {messageContent.suffix}
+                        </Link>
+                      ) : (
+                        <span style={{ color: '#2E3038' }}>{orgnaization_updates.message}</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

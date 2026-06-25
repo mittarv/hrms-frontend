@@ -1,0 +1,159 @@
+.citation_detail_modal_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+}
+
+.citation_detail_modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 550px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+
+  .citation_detail_modal_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem 1rem;
+
+    .citation_detail_modal_title_block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .citation_detail_modal_name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f2937;
+      border-bottom: 2px solid #1f2937;
+      padding-bottom: 4px;
+      display: inline-block;
+    }
+
+    .citation_detail_modal_meta {
+      font-size: 13px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .citation_detail_modal_close {
+      background: #f1f1f4;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      img {
+        display: block;
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+  }
+
+  .citation_detail_modal_content {
+    padding: 0 1.5rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .citation_detail_modal_list_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 0.75rem;
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .citation_detail_modal_copy_btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: #045071;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 0.15s;
+
+      .citation_detail_modal_copy_icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      &:hover {
+        background: #f3f4f6;
+      }
+    }
+  }
+
+  .citation_detail_modal_list {
+    display: flex;
+    flex-direction: column;
+    background: #eff6ff;
+    border-radius: 10px;
+  }
+
+  .citation_detail_modal_item {
+    padding: 1rem 1.25rem;
+  }
+
+  .citation_detail_modal_quote {
+    margin: 0 0 0.5rem;
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+
+  .citation_detail_modal_author {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 640px) {
+  .citation_detail_modal {
+    .citation_detail_modal_header {
+      padding: 1rem 1rem 0.75rem;
+    }
+
+    .citation_detail_modal_content {
+      padding: 0 1rem 1rem;
+    }
+
+    .citation_detail_modal_name {
+      font-size: 18px;
+    }
+  }
+}

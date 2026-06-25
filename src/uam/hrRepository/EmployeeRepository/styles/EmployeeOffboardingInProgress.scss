@@ -1,0 +1,282 @@
+.loading_message {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.employee_offboarding_container {
+    padding: 24px 0px;
+    overflow-y: auto;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+
+    > .no-data-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1rem;
+        text-align: center;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        min-height: 200px;
+
+        p {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .employee_offboarding_header {
+        margin-bottom: 24px;
+    }
+
+    .search-bar-collapsed {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        gap: 12px;
+
+        .search-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-grow: 1;
+            max-width: 450px;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            border-bottom: 1px solid #aeb0bc;
+
+            .employee-search-icon {
+                width: 20px;
+                margin-left: 0;
+                margin-right: 8px;
+            }
+
+            .employee-search-input {
+                border: none;
+                padding: 10px 0;
+                margin: 0;
+                outline: none;
+                font-size: 16px;
+                flex: 1;
+                caret-color: #8f92a3;
+                padding-left: 8px;
+                color: #8f92a3;
+
+                &::placeholder {
+                    color: #8f92a3;
+                }
+            }
+        }
+    }
+
+    .offboarding_log {
+        width: 100%;
+        border-radius: 8px;
+        background-color: transparent;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        padding-bottom: 1.5rem;
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0 12px 0;
+
+            p {
+                font-size: 16px;
+                font-weight: 600;
+                color: #2e3038;
+                line-height: 24px;
+                letter-spacing: 0.01em;
+                margin: 0;
+            }
+        }
+
+        .log-table {
+            width: 100%;
+            overflow-x: auto;
+            border: 0.5px solid #aeb0bc;
+            border-radius: 8px;
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+
+                th,
+                td {
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid #e0e0e0;
+                    font-size: 14px;
+                }
+
+                th {
+                    font-weight: 600;
+                    color: #555;
+                    background-color: #f9f9f9;
+                }
+
+                td {
+                    color: #333;
+                }
+
+                tr:nth-child(even) {
+                    background-color: #f7f7f8;
+                }
+
+                .th-with-icons {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    .th-icon {
+                        width: 14px;
+                        height: 14px;
+                        opacity: 0.7;
+                    }
+                }
+
+                .employee-name-link {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #045071;
+                    text-decoration: underline;
+                    text-underline-offset: 2px;
+
+                    &:hover {
+                        text-decoration-thickness: 2px;
+                    }
+                }
+
+                .clearance-checkbox {
+                    display: inline-flex;
+                    align-items: center;
+                    cursor: default;
+
+                    input[type="checkbox"] {
+                        cursor: pointer;
+                        appearance: none;
+                        width: 16px;
+                        height: 16px;
+                        border: 1px solid #454754;
+                        border-radius: 4px;
+                        background-color: #fff;
+                        margin: 0;
+
+                        &:checked {
+                            background: url("../../assets/icons/checkbox_leave_management.svg") no-repeat center center;
+                            background-size: contain;
+                            border: none;
+                        }
+
+                        &:disabled {
+                            cursor: default;
+                        }
+                    }
+                }
+
+                .last-working-day-input-wrap {
+                    position: relative;
+                    display: inline-flex;
+                    align-items: center;
+
+                    .last-working-day-input {
+                        padding: 8px 32px 8px 10px;
+                        border: 1px solid #aeb0bc;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        color: #2e3038;
+                        background-color: #fff;
+                        max-width: 140px;
+
+                        &::-webkit-calendar-picker-indicator {
+                            opacity: 0;
+                            position: absolute;
+                            width: 100%;
+                            height: 100%;
+                            left: 0;
+                            top: 0;
+                            cursor: pointer;
+                        }
+
+                        &:disabled {
+                            cursor: not-allowed;
+                            opacity: 0.5;
+                            background-color: #F1F1F4;
+                            border: 1px solid #8F92A3;
+                        }
+                    }
+
+                    .calendar-icon {
+                        position: absolute;
+                        right: 10px;
+                        width: 16px;
+                        height: 16px;
+                        pointer-events: none;
+                    }
+                }
+
+                .approve-offboarding-button {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 8px 14px;
+                    border-radius: 8px;
+                    border: none;
+                    background-color: #045071;
+                    color: #ffffff;
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    white-space: nowrap;
+
+                    img {
+                        width: 14px;
+                        height: 14px;
+                    }
+
+                    &:hover {
+                        background-color:#033348;
+                    }
+
+                    &:disabled {
+                        cursor: not-allowed;
+                        background-color: #8F92A3;
+                    }
+                }
+            }
+        }
+
+        .no-data-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            text-align: center;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+
+            p {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 500;
+                color: #666;
+            }
+        }
+    }
+}

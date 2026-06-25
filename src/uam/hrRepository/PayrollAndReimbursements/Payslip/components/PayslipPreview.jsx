@@ -37,9 +37,18 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip }) => {
       };
     }
 
-    const earnings = selectedPayslip.payslipItems.filter(
-      item => item.componentType === 'addition' || item.componentType === 'defaultAddition'
-    );
+    const getOrderScore = (componentName) => {
+      if (!componentName) return 4;
+      const name = componentName.trim().toLowerCase();
+      if (name === "basic salary") return 1;
+      if (name === "house rent allowance (hra)" || name === "house rent allowance" || name === "hra") return 2;
+      if (name === "special allowance") return 3;
+      return 4;
+    };
+
+    const earnings = selectedPayslip.payslipItems
+      .filter(item => item.componentType === 'addition' || item.componentType === 'defaultAddition')
+      .sort((a, b) => getOrderScore(a.componentName) - getOrderScore(b.componentName));
 
     const deductions = selectedPayslip.payslipItems.filter(
       item => item.componentType === 'deduction' || item.componentType === 'defaultDeduction'
