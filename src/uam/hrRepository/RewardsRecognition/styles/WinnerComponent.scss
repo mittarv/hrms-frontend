@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .winner_component_container {
     display: flex;
     flex-direction: column;
@@ -6,7 +8,7 @@
     min-height: 0;
     height: 100%;
     overflow-y: auto;
-    border: 1px solid #e4e7ec;
+    border: 1px solid $c85;
     border-radius: 12px;
     padding: 1.5rem 1.25rem;
 
@@ -44,19 +46,19 @@
             .winner_component_header_left_title {
                 font-size: 16px;
                 font-weight: 600;
-                color: #2e3038;
+                color: $GREY-80;
             }
             .winner_component_header_left_month_year {
                 font-size: 20px;
                 font-weight: 400;
-                color: #2e3038;
+                color: $GREY-80;
             }
         }
 
         .winner_component_start_nomination_btn {
-            background: #045071;
+            background: $PRUSSIAN-70;
             border: none;
-            color: #fff;
+            color: $WHITE;
             border-radius: 8px;
             padding: 8px 16px;
             font-size: 14px;
@@ -64,7 +66,7 @@
             cursor: pointer;
 
             &:hover {
-                background: #033348;
+                background: $PRUSSIAN-80;
             }
         }
     }
@@ -75,9 +77,9 @@
         margin-top: 1rem;
 
         .winner_component_start_nomination_btn {
-            background: #045071;
+            background: $PRUSSIAN-70;
             border: none;
-            color: #fff;
+            color: $WHITE;
             border-radius: 8px;
             padding: 12px 16px;
             font-size: 14px;
@@ -85,7 +87,7 @@
             cursor: pointer;
 
             &:hover {
-                background: #033348;
+                background: $PRUSSIAN-80;
             }
         }
     }
@@ -104,34 +106,34 @@
             border: 0.5px solid transparent;
 
             &.winner_card_employee {
-                background: #eceff9;
-                border-color: #4362d0;
+                background: $BLUE-10;
+                border-color: $BLUE-60;
 
                 .winner_card_header {
-                    background: #5d78d7;
+                    background: $BLUE-50;
                 }
                 .winner_card_header_text {
-                    color: #fff;
+                    color: $WHITE;
                 }
                 .winner_card_votes--employee {
                     font-size: 14px;
                     font-weight: 500;
-                    color: #19318b;
+                    color: $BLUE-80;
                 }
             }
 
             &.winner_card_leadership {
-                background: #ebfafa;
-                border-color: #28a2a2;
+                background: $CYAN-10;
+                border-color: $CYAN-70;
 
                 .winner_card_header {
-                    background: #28a2a2;
+                    background: $CYAN-70;
                 }
                 .winner_card_header_text {
-                    color: #fff;
+                    color: $WHITE;
                 }
                 .winner_card_votes--leadership {
-                    color: #115f5f;
+                    color: $CYAN-80;
                     font-size: 14px;
                     font-weight: 500;
                 }
@@ -149,7 +151,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: #fff;
+                    color: $WHITE;
                 }
                 .winner_card_header_text {
                     font-size: 14px;
@@ -191,7 +193,7 @@
                 border-radius: 10px;
                 overflow: hidden;
                 flex-shrink: 0;
-                background: #d1d5db;
+                background: $c86;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -216,7 +218,7 @@
             .winner_card_avatar_initial {
                 font-size: 1.5rem;
                 font-weight: 700;
-                color: #6b7280;
+                color: $c87;
                 text-transform: uppercase;
             }
 
@@ -229,7 +231,7 @@
             .winner_card_name {
                 font-size: 20px;
                 font-weight: 500;
-                color: #2e3038;
+                color: $GREY-80;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -245,7 +247,7 @@
 
             .winner_card_dept {
                 font-size: 0.875rem;
-                color: #6b7280;
+                color: $c87;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -279,13 +281,13 @@
                 min-height: auto;
                 max-height: none;
                 padding: 1rem 1.25rem;
-                background: #ffffff;
+                background: $WHITE;
                 border-radius: 10px;
                 font-size: 14px;
-                color: #374151;
+                color: $c88;
                 line-height: 1.5;
                 word-break: break-word;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+                box-shadow: 0 1px 2px $c89;
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
@@ -310,7 +312,7 @@
                     padding: 0;
                     border: none;
                     background: transparent;
-                    color: #045071;
+                    color: $PRUSSIAN-70;
                     font-size: 14px;
                     font-weight: 600;
                     line-height: inherit;
@@ -324,7 +326,7 @@
                     }
 
                     &:hover {
-                        color: #023b54;
+                        color: $c90;
                     }
                 }
             }

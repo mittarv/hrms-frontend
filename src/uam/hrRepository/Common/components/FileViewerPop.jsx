@@ -25,6 +25,18 @@ const FileViewer = ({ fileUrls, open, onClose, initialIndex = 0 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Reset all state when dialog opens with new files
+  useEffect(() => {
+    if (open) {
+      setCurrentFileIndex(initialIndex);
+      setPageNumber(1);
+      setNumPages(null);
+      setHtmlContent("");
+      setError(null);
+      setLoading(false);
+    }
+  }, [open, initialIndex]);
+
   // Normalize fileUrls to always be an array and handle both old (string) and new (object) formats
   const normalizedFiles = (() => {
     const files = Array.isArray(fileUrls) ? fileUrls : [fileUrls].filter(Boolean);

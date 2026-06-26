@@ -15,6 +15,7 @@ import ImportantLink from "./importantLink/ImportantLink";
 import HrHome from "./HrHome";
 import RewardsRecognition from "./RewardsRecognition/RewardsRecognition";
 import VoteForNomineesPage from "./RewardsRecognition/components/VoteForNomineesPage";
+import SecondaryLocation from "./SecondaryLocation/SecondaryLocation";
 import AccessDenied from "./Common/components/AccessDenied";
 import { hrToolHomePageData } from "./constant/data";
 import exclamationMarkIcon from "./assets/icons/exclamation_mark.svg";
@@ -63,6 +64,7 @@ const HrAllRoutes = ({ isAuthenticated }) => {
     { path: "/payroll-reimbursements", element: <PayrollAndReimbursements /> },
     { path: "/rewards-recognitions", element: <RewardsRecognition /> },
     { path: "/rewards-recognitions/vote", element: <VoteForNomineesPage /> },
+    { path: "/secondary-working-location", element: <SecondaryLocation /> },
   ];
 
   // Conditional routes - require specific permissions or admin access (>= 900)
@@ -121,6 +123,8 @@ const HrAllRoutes = ({ isAuthenticated }) => {
         "LeaveRequest_write",
         "ExtraWorkDayRequests_read",
         "ExtraWorkDayRequests_write",
+        "SecondaryLocationRequests_read",
+        "SecondaryLocationRequests_write",
       ]),
     },
     {

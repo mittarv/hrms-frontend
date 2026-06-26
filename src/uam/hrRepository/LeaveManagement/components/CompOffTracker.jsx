@@ -15,14 +15,14 @@ import divider from "../../../../assets/icons/divider_icon.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 import Filter from "../../Common/components/Filter/Filter";
 import LogExtraDayPopup from "./LogExtraDayPopup";
-import Sort from "../../Common/components/Sort/Sort";
+import Sort from "../../Common/components/Sort";
 
 import { getEmployeeExtraWorkHistory } from "../../../../actions/hrRepositoryAction";
 
 const CompOffTracker = ({ setActiveTab }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
-  const { loading, employeeExtraWorkHistory } = useSelector((state) => state.hrRepositoryReducer);
+  const { loading, employeeExtraWorkHistory = [], employeeExtraWorkPagination} = useSelector((state) => state.hrRepositoryReducer);
 
   // States
   const [currentSort, setCurrentSort] = useState("none");
@@ -30,6 +30,8 @@ const CompOffTracker = ({ setActiveTab }) => {
   const [logExtraDay, setLogExtraDay] = useState(false);
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [extraWorkCurrentPage, setExtraWorkCurrentPage] = useState(1);
+  const extraWorkPageSize = 20;
 
   // Filter States
   const [selectedApprovalStatus, setSelectedApprovalStatus] = useState([]);
@@ -41,11 +43,11 @@ const CompOffTracker = ({ setActiveTab }) => {
   const compOffStatusMap = { active: "Active", used: "Used", expired: "Expired" };
   const creditDaysMap = { 0.5: "0.5 Day/s", 1: "1 Day" };
 
-  useEffect(() => {
-    if (user?.employeeUuid) {
-      dispatch(getEmployeeExtraWorkHistory(user.employeeUuid));
-    }
-  }, [dispatch, user]);
+useEffect(() => {
+  if (user?.employeeUuid) {
+    dispatch(getEmployeeExtraWorkHistory(user.employeeUuid, extraWorkCurrentPage, extraWorkPageSize));
+  }
+}, [dispatch, user, extraWorkCurrentPage]);
 
   const getCompOffStatus = (row) => {
     const { totalCompOffCredit, totalCompOffUsed, compOffExpiryDate, approvalStatus } = row;
@@ -58,7 +60,7 @@ const CompOffTracker = ({ setActiveTab }) => {
     return { label: "Active", class: "status-accepted" };
   };
 
-  const processedHistory = useMemo(() => {
+const processedHistory = useMemo(() => {
     if (!employeeExtraWorkHistory) return [];
 
     let result = employeeExtraWorkHistory.filter((row) => {
@@ -73,19 +75,29 @@ const CompOffTracker = ({ setActiveTab }) => {
       return matchesSearch && matchesApproval && matchesCompOff && matchesCredit;
     });
 
-    if (currentSort !== "none") {
+  if (currentSort !== "none") {
       result = [...result].sort((a, b) => {
-        switch (currentSort) {
-          case "date_asc": return new Date(a.workDate) - new Date(b.workDate);
-          case "date_desc": return new Date(b.workDate) - new Date(a.workDate);
-          case "valid_till_asc": return new Date(a.compOffExpiryDate || 0) - new Date(b.compOffExpiryDate || 0);
-          case "valid_till_desc": return new Date(b.compOffExpiryDate || 0) - new Date(a.compOffExpiryDate || 0);
-          default: return 0;
-        }
-      });
-    }
-    return result;
-  }, [employeeExtraWorkHistory, searchQuery, currentSort, selectedApprovalStatus, selectedCompOffStatus, selectedCreditDays]);
+      switch (currentSort) { 
+        case "date_asc": return new Date(a.workDate) - new Date(b.workDate);
+        case "date_desc": return new Date(b.workDate) - new Date(a.workDate);
+        case "valid_till_asc": return new Date(a.compOffExpiryDate || 0) - new Date(b.compOffExpiryDate || 0);
+        case "valid_till_desc": return new Date(b.compOffExpiryDate || 0) - new Date(a.compOffExpiryDate || 0);
+        default: return 0;
+      }
+    });
+  }
+  return result;
+}, [employeeExtraWorkHistory, searchQuery, currentSort, selectedApprovalStatus, selectedCompOffStatus, selectedCreditDays]);
+  useEffect(() => {
+    setExtraWorkCurrentPage(1);
+  }, [searchQuery, currentSort, selectedApprovalStatus, selectedCompOffStatus, selectedCreditDays]);
+  const totalItems = employeeExtraWorkPagination?.totalRecords || processedHistory?.length || 0;
+  const totalExtraWorkPages = employeeExtraWorkPagination?.totalPages || Math.max(
+    1,
+    Math.ceil((processedHistory?.length || 0) / extraWorkPageSize)
+  );
+  const paginatedProcessedHistory = (processedHistory);
+  const showExtraWorkPagination = totalExtraWorkPages >= 1;
 
   const handleToggleFilterBar = () => setIsFilterBarOpen((prev) => !prev);
 
@@ -123,9 +135,25 @@ const CompOffTracker = ({ setActiveTab }) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
   };
-  
 
-  
+  const getVisibleExtraWorkPages = () => {
+    if (totalExtraWorkPages === 1) return [1];
+    if (totalExtraWorkPages === 0) return [];
+
+    let startPage = Math.max(1, extraWorkCurrentPage - 1);
+    let endPage = Math.min(totalExtraWorkPages, startPage + 2);
+
+    if (endPage - startPage < 2) {
+      startPage = Math.max(1, endPage - 2);
+    }
+
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
 
   return (
 
@@ -234,10 +262,9 @@ const CompOffTracker = ({ setActiveTab }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {processedHistory.length > 0 ? (
-                    
-                    processedHistory.map((row) => {
-                      const compStatus = getCompOffStatus(row)
+                  {Array.isArray(paginatedProcessedHistory) && paginatedProcessedHistory.length > 0 ? (
+                    paginatedProcessedHistory.map((row) => {
+                      const compStatus = getCompOffStatus(row);
                       const isRowDisabled = compStatus.label === "Used" || compStatus.label === "Expired";
                       return (
                         <tr key={row.extraWorkDayId} className={isRowDisabled ? "row-disabled" : ""}>
@@ -271,6 +298,43 @@ const CompOffTracker = ({ setActiveTab }) => {
                   )}
                 </tbody>
               </table>
+
+              {showExtraWorkPagination && (
+                <div className="leave-pagination-wrapper">
+                  <button
+                    className="leave-page-btn nav-btn"
+                    disabled={extraWorkCurrentPage === 1}
+                    onClick={() =>
+                      setExtraWorkCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                  >
+                    Prev
+                  </button>
+
+                  {getVisibleExtraWorkPages().map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      className={`leave-page-btn ${extraWorkCurrentPage === pageNum ? "active-page" : ""
+                        }`}
+                      onClick={() => setExtraWorkCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    className="leave-page-btn nav-btn"
+                    disabled={extraWorkCurrentPage === totalExtraWorkPages}
+                    onClick={() =>
+                      setExtraWorkCurrentPage((prev) =>
+                        Math.min(prev + 1, totalExtraWorkPages)
+                      )
+                    }
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

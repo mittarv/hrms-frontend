@@ -5,19 +5,20 @@ import HRMSLayout from "./Common/HRMSLayout";
 import Login from "../../components/login/Login";
 import useHrmsDynamicTitle from "./hooks/useHrmsDynamicTitle";
 import { loadUserInfo } from "../../actions/userActions";
-import { getMyHrmsAccess } from "../../actions/hrRepositoryAction";
 
 const HrApp = () => {
   const dispatch = useDispatch();
 
   useHrmsDynamicTitle();
 
-  const { isAuthenticated, loading } = useSelector((state) => state.user);
+  const { isAuthenticated, loading, user } = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(loadUserInfo());
-    dispatch(getMyHrmsAccess());
-  }, [dispatch]);
+    // Only load user info if not already authenticated/loaded
+    if (!isAuthenticated && !user) {
+      dispatch(loadUserInfo());
+    }
+  }, [dispatch, isAuthenticated, user]);
 
   if (loading) return <div className="loader">Loading...</div>;
 

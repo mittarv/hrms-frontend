@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .Leave_holiday_main_container {
     height: 100%;
     width: 100%;
@@ -5,7 +7,7 @@
     .leave_holiday_header_container {
         width: 100%;
         height: auto;
-        border: 0.5px solid #aeb0bc;
+        border: 0.5px solid $GREY-40;
         border-radius: 8px;
         display: flex;
         justify-content: space-between;
@@ -22,7 +24,7 @@
                 font-weight: 700;
                 font-size: 12px;
                 line-height: 20px;
-                color: #676b7e;
+                color: $GREY-60;
                 text-transform: uppercase;
                 letter-spacing: 0.03em;
             }
@@ -31,7 +33,7 @@
                 font-weight: 600;
                 font-size: 16px;
                 line-height: 24px;
-                color: #2e3038;
+                color: $GREY-80;
                 letter-spacing: 0.005em;
             }
         }
@@ -41,7 +43,7 @@
             flex-direction: row;
             align-items: center;
             gap: 4px;
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             padding: 12px 16px;
             border: none;
             border-radius: 8px;
@@ -50,7 +52,7 @@
             font-size: 14px;
             line-height: 20px;
             letter-spacing: 0.01em;
-            color: #fff;
+            color: $WHITE;
             cursor: pointer;
         }
     }
@@ -68,20 +70,20 @@
             width: 100%;
             height: auto;
             border: none;
-            border-bottom: 0.5px solid #aeb0bc;
+            border-bottom: 0.5px solid $GREY-40;
             padding: 12px 16px 12px 32px;
             font-family: "Plus Jakarta Sans";
             font-weight: 600;
             font-size: 14px;
             line-height: 20px;
             letter-spacing: 0.01em;
-            color: #656b8a;
+            color: $c220;
 
             &:focus {
                 outline: none;
             }
             &::placeholder {
-                color: #8f92a3;
+                color: $GREY-50;
                 font-family: "Plus Jakarta Sans";
                 font-weight: 400;
                 font-size: 14px;
@@ -94,8 +96,8 @@
             position: absolute;
             right: 0;
             padding: 8px 12px;
-            background-color: #045071;
-            color: #ffffff;
+            background-color: $PRUSSIAN-70;
+            color: $LIGHT;
             font-family: "Plus Jakarta Sans";
             font-weight: 600;
             font-size: 14px;
@@ -116,9 +118,9 @@
             top: 120%;
             left: 0;
             width: 100%;
-            background-color: #fff;
+            background-color: $WHITE;
             border-radius: 4px;
-            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 16px $c69;
             z-index: 1;
             max-height: 200px;
             overflow-y: auto;
@@ -132,14 +134,14 @@
                 cursor: pointer;
 
                 &:hover {
-                    background-color: #f1f1f4;
+                    background-color: $GREY-10;
                 }
 
                 span {
                     font-family: "Plus Jakarta Sans";
                     font-weight: 600;
                     font-size: 12px;
-                    color: #454754;
+                    color: $GREY-70;
                     letter-spacing: 0.01em;
                 }
             }
@@ -147,9 +149,9 @@
 
         .no_result_found {
             width: 100%;
-            background-color: #fff;
+            background-color: $WHITE;
             border-radius: 4px;
-            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 16px $c69;
             z-index: 1;
             padding: 12px 16px;
             font-family: "Plus Jakarta Sans";
@@ -157,7 +159,7 @@
             font-size: 14px;
             line-height: 20px;
             letter-spacing: 0.01em;
-            color: #8f92a3;
+            color: $GREY-50;
         }
     }
 
@@ -170,16 +172,16 @@
             font-weight: 600;
             font-size: 16px;
             line-height: 24px;
-            color: #2e3038;
+            color: $GREY-80;
             margin-bottom: 0.8rem;
 
             span {
                 font-weight: 600;
                 font-size: 12px;
                 line-height: 20px;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 margin-left: 12px;
-                border:1px solid #045071 ;
+                border:1px solid $PRUSSIAN-70 ;
                 padding: 6px 14px;
                 border-radius: 8px;
                 cursor: pointer;
@@ -193,11 +195,11 @@
         .policy_reference {
             font-family: "Plus Jakarta Sans";
             font-size: 12px;
-            color: #676b7e;
+            color: $GREY-60;
             margin-bottom: 1rem;
 
             .policy_link {
-                color: #045071;
+                color: $PRUSSIAN-70;
                 text-decoration: none;
                 font-weight: 600;
 
@@ -212,7 +214,7 @@
             margin-top: 1rem;
             overflow: hidden;
             border-radius: 8px; 
-            border: 0.5px solid #AEB0BC;
+            border: 0.5px solid $GREY-40;
 
             .mandatory_holidays_table {
                 width: 100%;
@@ -220,7 +222,7 @@
                 border: none;
     
                 thead {
-                    background-color: #F7F7F8;
+                    background-color: $GREY-00;
                     
                     th {
                         padding: 12px 16px;
@@ -228,22 +230,22 @@
                         font-family: "Plus Jakarta Sans";
                         font-weight: 700;
                         font-size: 12px;
-                        color: #676b7e;
-                        border-bottom: 0.5px solid #e6e7eb;
+                        color: $GREY-60;
+                        border-bottom: 0.5px solid $c204;
                     }
                 }
     
                 tbody {
                     tr {
-                        border-bottom: 0.5px solid #e6e7eb;
+                        border-bottom: 0.5px solid $c204;
                         
                         &:last-child {
                             border-bottom: none;
                         }
     
                         &.selected {
-                            border: 2px solid #1888B9;
-                            background-color: #E7F3F8;
+                            border: 2px solid $PRUSSIAN-50;
+                            background-color: $PRUSSIAN-10;
                             border-radius: 8px;
                         }
     
@@ -251,12 +253,12 @@
                             padding: 12px 16px;
                             font-family: "Plus Jakarta Sans";
                             font-size: 14px;
-                            color: #2e3038;
+                            color: $GREY-80;
                         }
                     }
     
                     tr:nth-child(even) {
-                        background-color: #f7f7f8;
+                        background-color: $GREY-00;
                       }
                 }
             }
@@ -268,7 +270,7 @@
             margin-top: 1rem;
             overflow: hidden;
             border-radius: 8px; 
-            border: 0.5px solid #AEB0BC;
+            border: 0.5px solid $GREY-40;
             
             .optional_holidays_table {
                 width: 100%;
@@ -276,7 +278,7 @@
                 border: none;
                 
                 thead {
-                    background-color: #F7F7F8;
+                    background-color: $GREY-00;
                 }
                 
                 th {
@@ -285,24 +287,24 @@
                     font-family: "Plus Jakarta Sans";
                     font-weight: 700;
                     font-size: 12px;
-                    color: #676b7e;                   
+                    color: $GREY-60;                   
                 }
                 
                 td {
                     padding: 8px 12px;
                     font-family: "Plus Jakarta Sans";
                     font-size: 14px;
-                    color: #2e3038;
+                    color: $GREY-80;
                     cursor: pointer;
                     
                     &.selected {
-                        border: 2px solid #1888B9;
-                        background-color: #E7F3F8;
+                        border: 2px solid $PRUSSIAN-50;
+                        background-color: $PRUSSIAN-10;
                     }
                 }
         
                 tr:nth-child(even) {
-                    background-color: #f7f7f8;
+                    background-color: $GREY-00;
                 }
             }
         }

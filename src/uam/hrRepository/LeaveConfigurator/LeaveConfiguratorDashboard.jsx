@@ -59,24 +59,17 @@ const LeaveConfiguratorDashboard = () => {
       perm.name === "LeaveConfigurator_update"
     );
 
+  // Fetch data only once on mount — no state dependencies to avoid re-fetching
   useEffect(() => {
     dispatch(getAllLeaves());
-    if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
-            dispatch(getAllComponentTypes());
-        }
-    if (Array.isArray(outStandingCheckOut) && outStandingCheckOut.length === 0) {
-          dispatch(checkOutstandingCheckout(user.employeeUuid));
-    }
-    
-    if (Array.isArray(checkInCheckOutStatus) && checkInCheckOutStatus.length === 0) {
-          dispatch(getCheckInCheckOutStatus(user.employeeUuid));
-    }
-
+    dispatch(getAllComponentTypes());
+    dispatch(checkOutstandingCheckout(user.employeeUuid));
+    dispatch(getCheckInCheckOutStatus(user.employeeUuid));
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
       payload: hrToolHomePageData.toot_title2
     });
-  }, [dispatch, getAllComponentType, outStandingCheckOut, checkInCheckOutStatus, user.employeeUuid]);
+  }, [dispatch, user.employeeUuid]);
 
   useEffect(() => {
     if (outStandingCheckOut && outStandingCheckOut.isShowCheckoutPopup) {

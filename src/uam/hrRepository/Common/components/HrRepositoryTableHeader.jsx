@@ -1,4 +1,4 @@
-import "./HrRepositoryTableHeader.scss";
+import "../styles/HrRepositoryTableHeader.scss";
 import { hrRepoScreenPageData } from "../../constant/data";
 import { useDispatch, useSelector } from "react-redux";
 import { clearTempandErrorData } from "../../../../actions/mittarvToolsActions";

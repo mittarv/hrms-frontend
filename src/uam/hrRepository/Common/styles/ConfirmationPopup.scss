@@ -1,40 +1,43 @@
+@use '../../design/colors/customColors' as *;
+
 .modal_overlay_confirmation_popup {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(158, 185, 197, 0.25);
+    background-color: $c68;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 
     .modal_container_confirmation_popup {
-        background-color: #ffffff;
+        background-color: $WHITE;
         border-radius: 8px;
         padding: 24px;
-        width: 353px;
-        height: 224px;
+        max-width: 500px;
+        width: auto;
+        height:auto;
         position: relative;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px $c69;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
 
     .close_button_confirmation_popup {
-        position: absolute;
-        right: 16px;
-        top: 16px;
+        position: block;
+        margin-left: auto;
+        margin-bottom: 12px;
         background: none;
         border: none;
         cursor: pointer;
-        color: #6b7280;
+        color: $c87;
         padding: 4px;
 
         &:hover {
-            color: #374151;
+            color: $c88;
         }
     }
 
@@ -44,7 +47,7 @@
         font-size: 16px;
         font-weight: 800;
         font-family: "Plus Jakarta Sans";
-        color: #033348;
+        color: $PRUSSIAN-80;
 
         .heading_confirmation_popup{
             font-size: 18px;
@@ -54,10 +57,10 @@
         }
 
         .message_confirmation_popup{
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 400;
             font-family: "Plus Jakarta Sans";
-            color: #4b5563;
+            color: $PRUSSIAN-80;
         }
 
     }
@@ -83,8 +86,8 @@
             &.btn_primary_confirmation_popup{
                 width: auto;
                 height: 29px;
-                background-color: #045071;
-                color: white;
+                background-color: $PRUSSIAN-70;
+                color: $WHITE;
                 font-size: 14px;
                 font-weight: 800;
                 font-family: "Plus Jakarta Sans";
@@ -92,7 +95,7 @@
                 align-items: center;
 
                 &:hover {
-                    background-color: #03405a;
+                    background-color: $c156;
                 }
             }
 
@@ -102,14 +105,14 @@
                 font-size: 14px;
                 font-weight: 800;
                 font-family: "Plus Jakarta Sans";
-                background-color: #c3e1ef;
-                color: #2e3038;
+                background-color: $PRUSSIAN-20;
+                color: $GREY-80;
                 display: flex;
                 align-items: center;
                 justify-content: center;
 
                 &:hover {
-                    background-color: #e5e7eb;
+                    background-color: $c95;
                 }
             }
         }

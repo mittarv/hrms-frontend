@@ -1,7 +1,9 @@
+@use '../../design/colors/customColors' as *;
+
 .employee_onboarding_form_main_container {
     width: 100%;
     height: 100%;
-    padding: 54px 65px;
+    padding: 54px 0px;
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -21,7 +23,7 @@
                 font-size: 22px;
                 font-weight: 700;
                 font-family: "Plus Jakarta Sans";
-                color: #2e3038;
+                color: $GREY-80;
             }
 
             .action_buttons {
@@ -30,18 +32,18 @@
                 align-items: center;
 
                 .employee_onboarding_form_save_button {
-                    background-color: #045071;
+                    background-color: $PRUSSIAN-70;
                     padding: 8px 16px;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
 
                     &:hover {
-                        background-color: #033348;
+                        background-color: $PRUSSIAN-80;
                     }
 
                     span {
-                        color: #fff;
+                        color: $WHITE;
                         font-size: 14px;
                         font-weight: 600;
                         font-family: "Plus Jakarta Sans";
@@ -49,18 +51,18 @@
                 }
 
                 .employee_onboarding_form_cancel_button {
-                    background-color: #f1f1f4;
+                    background-color: $GREY-10;
                     padding: 8px 16px;
                     border: none;
                     border-radius: 5px;
                     cursor: pointer;
 
                     &:hover {
-                        background-color: #e3e4e8;
+                        background-color: $GREY-20;
                     }
 
                     span {
-                        color: #2e3038;
+                        color: $GREY-80;
                         font-size: 14px;
                         font-weight: 600;
                         font-family: "Plus Jakarta Sans";
@@ -72,21 +74,21 @@
         hr {
             margin-top: 1rem;
             border: none;
-            border-top: 1px solid #c7c9d1;
+            border-top: 1px solid $GREY-30;
         }
     }
     .form_container {
         padding-top: 2rem;
         position: relative;
         margin-top: 1rem;
-        border: 1px solid #c7c9d1;
+        border: 1px solid $GREY-30;
         border-radius: 1rem;
         padding: 2rem;
 
         .form_title {
             font-size: 22px;
             font-weight: 600;
-            color: #2e3038;
+            color: $GREY-80;
             font-family: "Plus Jakarta Sans";
             // margin-bottom: 1.5rem;
         }
@@ -94,7 +96,7 @@
         .form_title_hr {
             margin-top: 0.5rem;
             border: none;
-            border-top: 1px solid #c7c9d1;
+            border-top: 1px solid $GREY-30;
             margin-bottom: 1.5rem;
         }
     }
@@ -114,7 +116,7 @@
         //       top: 0;
         //       bottom: 0;
         //       width: 1px;
-        //       background-color: #C7C9D1;
+        //       background-color: $GREY-30;
         //   }
 
         //   &::before {
@@ -145,7 +147,7 @@
             label {
                 font-size: 16px;
                 font-weight: 600;
-                color: #2e3038;
+                color: $GREY-80;
                 font-family: "Plus Jakarta Sans";
             }
 
@@ -161,7 +163,7 @@
                     -webkit-appearance: none;
                     -moz-appearance: none;
                     appearance: none;
-                    border: 1.5px solid #033348;
+                    border: 1.5px solid $PRUSSIAN-80;
                 }
 
                 input[type="checkbox"]:checked {
@@ -202,7 +204,7 @@
                 .custom-dropdown-menu{
                     .dropdown-option{
                              &.highlighted {
-                                background-color: #e3f2fd;
+                                background-color: $c240;
                                 border-radius: 0;
                             }
                     }                
@@ -212,21 +214,21 @@
             .onboard_form_label {
                 font-size: 16px;
                 font-weight: 600;
-                color: #2e3038;
+                color: $GREY-80;
                 font-family: "Plus Jakarta Sans";
 
                 &.disabled {
-                    color: #676b7e;
+                    color: $GREY-60;
                 }
             }
 
             input {
                 padding: 10px;
-                border: 0.35px solid #e3e4e8;
+                border: 0.35px solid $GREY-20;
                 border-radius: 4px;
                 font-size: 14px;
                 width: 100%;
-                color: #033348;
+                color: $PRUSSIAN-80;
                 font-weight: 500;
 
                 &:focus {
@@ -234,11 +236,11 @@
                 }
 
                 &.error {
-                    border-color: #dc2626;
+                    border-color: $c121;
                 }
 
                 &::placeholder {
-                    color: #033348;
+                    color: $PRUSSIAN-80;
                     opacity: 0.4;
                 }
             }
@@ -254,38 +256,38 @@
                     align-items: center;
                     justify-content: space-between;
                     padding: 8px;
-                    border: 0.35px solid #e3e4e8;
+                    border: 0.35px solid $GREY-20;
                     border-radius: 4px;
                     font-size: 14px;
                     width: 100%;
-                    background-color: #ffffff;
+                    background-color: $WHITE;
                     cursor: pointer;
                     min-height: 20px;
 
                     &:focus {
                         outline: none;
-                        border-color: #045071;
+                        border-color: $PRUSSIAN-70;
                     }
 
                     &.error {
-                        border-color: #dc2626;
+                        border-color: $c121;
                     }
 
                     &.disabled {
-                        background-color: #f5f5f5;
+                        background-color: $c167;
                         cursor: not-allowed;
-                        color: #999;
+                        color: $c81;
                     }
 
                     .selected-value {
-                        color: #033348;
+                        color: $PRUSSIAN-80;
                         font-weight: 500;
                         flex: 1;
                         text-align: left;
                     }
 
                     .placeholder {
-                        color: #033348;
+                        color: $PRUSSIAN-80;
                         opacity: 0.4;
                         font-weight: 500;
                         flex: 1;
@@ -308,10 +310,10 @@
                     position: absolute;
                     left: 0;
                     right: 0;
-                    background: white;
-                    border: 1px solid #e3e4e8;
+                    background: $WHITE;
+                    border: 1px solid $GREY-20;
                     border-radius: 4px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                    box-shadow: 0 4px 12px $c118;
                     z-index: 1000;
                     max-height: 200px;
                     overflow-y: auto;
@@ -334,56 +336,56 @@
                     }
 
                     &::-webkit-scrollbar-track {
-                        background: #f1f1f1;
+                        background: $GREY-120;
                         border-radius: 3px;
                     }
 
                     &::-webkit-scrollbar-thumb {
-                        background: #045071;
+                        background: $PRUSSIAN-70;
                         border-radius: 3px;
 
                         &:hover {
-                            background: #033348;
+                            background: $PRUSSIAN-80;
                         }
                     }
 
                     .dropdown-option {
                         padding: 10px 12px;
-                        color: #033348;
-                        background-color: #ffffff;
+                        color: $PRUSSIAN-80;
+                        background-color: $WHITE;
                         font-weight: 400;
                         font-size: 14px;
                         cursor: pointer;
                         transition: background-color 0.2s ease;
-                        border-bottom: 1px solid #f5f5f5;
+                        border-bottom: 1px solid $c167;
 
                         &:last-child {
                             border-bottom: none;
                         }
 
                         &:hover:not(.disabled):not(.placeholder-option) {
-                            background-color: #e7f3f8;
+                            background-color: $PRUSSIAN-10;
                         }
 
                         &.selected {
-                            background-color: #045071;
-                            color: #ffffff;
+                            background-color: $PRUSSIAN-70;
+                            color: $WHITE;
                             font-weight: 500;
 
                             &:hover {
-                                color: black;
+                                color: $BLACK;
                             }
                         }
 
                         &.disabled {
-                            color: #999;
+                            color: $c81;
                             cursor: not-allowed;
-                            background-color: #f8f8f8;
+                            background-color: $c241;
                         }
 
                         &.placeholder-option {
                             cursor: default;
-                            background-color: #f8f8f8;
+                            background-color: $c241;
                         }
                     }
                 }
@@ -392,11 +394,11 @@
             // Keep original select styles for compatibility
             select {
                 padding: 8px;
-                border: 0.35px solid #e3e4e8;
+                border: 0.35px solid $GREY-20;
                 border-radius: 4px;
                 font-size: 14px;
                 width: 100%;
-                color: #033348;
+                color: $PRUSSIAN-80;
                 font-weight: 500;
                 cursor: pointer;
 
@@ -405,7 +407,7 @@
                     height: auto;
                     max-height: 150px;
                     overflow-y: auto;
-                    background-color: #ffffff;
+                    background-color: $WHITE;
 
                     // Custom scrollbar for webkit browsers
                     &::-webkit-scrollbar {
@@ -413,50 +415,50 @@
                     }
 
                     &::-webkit-scrollbar-track {
-                        background: #f1f1f1;
+                        background: $GREY-120;
                         border-radius: 3px;
                     }
 
                     &::-webkit-scrollbar-thumb {
-                        background: #045071;
+                        background: $PRUSSIAN-70;
                         border-radius: 3px;
 
                         &:hover {
-                            background: #033348;
+                            background: $PRUSSIAN-80;
                         }
                     }
                 }
 
                 &:focus {
                     outline: none;
-                    border-color: #045071;
+                    border-color: $PRUSSIAN-70;
                 }
 
                 &.error {
-                    border-color: #dc2626;
+                    border-color: $c121;
                 }
 
                 &::placeholder {
-                    color: #033348;
+                    color: $PRUSSIAN-80;
                     opacity: 0.4;
                 }
 
                 option {
                     padding: 8px 12px;
-                    color: #033348;
-                    background-color: #ffffff;
+                    color: $PRUSSIAN-80;
+                    background-color: $WHITE;
                     font-weight: 400;
                     line-height: 1.4;
 
                     &:hover {
-                        background-color: #007bb0;
-                        color: #ffffff;
+                        background-color: $c171;
+                        color: $WHITE;
                     }
 
                     &:checked,
                     &:selected {
-                        background-color: #e7f3f8;
-                        color: #033348;
+                        background-color: $PRUSSIAN-10;
+                        color: $PRUSSIAN-80;
                     }
                 }
             }
@@ -465,7 +467,7 @@
                 font-family: "Plus Jakarta Sans";
                 font-size: 10px;
                 font-weight: 600;
-                color: #dc2626;
+                color: $c121;
             }
         }
     }
@@ -478,19 +480,19 @@
         .salary_component_label {
             font-size: 16px;
             font-weight: 600;
-            color: #2e3038;
+            color: $GREY-80;
             font-family: "Plus Jakarta Sans";
         }
         .salary_error_component {
-            color: #D4545C;
+            color: $RED-50;
         }
         .salary_component_input{
             padding: 10px;
-            border: 0.35px solid #e3e4e8;
+            border: 0.35px solid $GREY-20;
             border-radius: 4px;
             font-size: 14px;
             width: 100%;
-            color: #033348;
+            color: $PRUSSIAN-80;
             font-weight: 500;
             font-family: 'Plus Jakarta Sans';
 
@@ -499,11 +501,11 @@
             }
 
             &.error {
-                border-color: #dc2626;
+                border-color: $c121;
             }
 
             &::placeholder {
-                color: #033348;
+                color: $PRUSSIAN-80;
                 opacity: 0.4;
             }
         }

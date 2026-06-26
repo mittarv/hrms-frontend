@@ -3,6 +3,30 @@ import { useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+const COMP_OFF_INFO_TEXT =
+  "is a leave you earn by working on a holiday or weekend. Once your extra work is approved, you receive credits that can be used to take a paid leave. Ensure you use them before the expiry date shown in your policy.";
+const COMP_OFF_INFO_PREVIEW_CHARS = 95;
+
+const getCompOffInfoPreview = (text) => {
+  const normalized = String(text || "").trim();
+
+  if (!normalized) {
+    return { preview: "", truncated: false };
+  }
+
+  if (normalized.length <= COMP_OFF_INFO_PREVIEW_CHARS) {
+    return { preview: normalized, truncated: false };
+  }
+
+  const cutAt = normalized.lastIndexOf(" ", COMP_OFF_INFO_PREVIEW_CHARS);
+  const safeCut = cutAt > 0 ? cutAt : COMP_OFF_INFO_PREVIEW_CHARS;
+
+  return {
+    preview: `${normalized.slice(0, safeCut).trim()}...`,
+    truncated: true,
+  };
+};
+
 /**
  * Handles decimal leave values according to specific rules:
  * Exact 0.5: Shows as 0.5 usable (no carry forward)
@@ -42,11 +66,21 @@ const handleDecimalLeaveDisplay = (decimalValue) => {
   };
 };
 
-const LeaveAvailable = () => {
+const LeaveAvailable = ({ panelHeight }) => {
   const { currentEmployeeDetails, policy, empFiscalYear, accrualLeaveBalance, compOffleaveBalance } = useSelector(
     state => state.hrRepositoryReducer
   );
   const [policyLink, setPolicyLink] = useState("");
+  const [showFullCompOffInfo, setShowFullCompOffInfo] = useState(false);
+
+  const baseLeaves = useMemo(
+    () => (Array.isArray(accrualLeaveBalance) ? accrualLeaveBalance : []),
+    [accrualLeaveBalance]
+  );
+  const dynamicLeaves = useMemo(
+    () => (Array.isArray(compOffleaveBalance) ? compOffleaveBalance : []),
+    [compOffleaveBalance]
+  );
 
   useEffect(() => {
     if (policy) {
@@ -55,87 +89,101 @@ const LeaveAvailable = () => {
     }
   }, [policy]);
 
-  // Calculate applicable leaves for the current employee
-  const applicableLeaves = useMemo(() => {
-    // Filter out comp off from accrualLeaveBalance (comp off is handled separately)
-    const regularLeaves = accrualLeaveBalance
-      .filter(leave => {
-        const leaveType = leave?.leaveType?.toLowerCase() || '';
-        return !leaveType.includes('comp') && !leaveType.includes('comp off');
-      })
-      .map(leave => {
-        const accrualRecord = leave;
+  const buildLeaveMetrics = (leave, dynamicUpdate) => {
+    // Used leaves should reduce available balance, never increase quota/allotment.
+    const baseTotalAllocated = Number(leave?.totalAllotedLeaves) || 0;
+    const baseAccruedLeaves = Number(leave?.accruedLeaves) || 0;
+    const baseTotalUsed = Number(leave?.totalUsedLeaves) || 0;
 
-        // Use accrual data if available, otherwise fallback to legacy
-        const totalAllocated = accrualRecord ? accrualRecord?.totalAllotedLeaves : 0;
-        const accruedLeaves = accrualRecord ? accrualRecord?.accruedLeaves : totalAllocated;
-        const rawTotalLeft = accrualRecord && accrualRecord?.availableLeaves;
-        const totalUsed = accrualRecord && accrualRecord?.totalUsedLeaves;
-        
-        // **DECIMAL LEAVE HANDLING** - Apply decimal rules to displayed values
-        const totalLeftHandling = handleDecimalLeaveDisplay(rawTotalLeft);
-        const accruedLeavesHandling = handleDecimalLeaveDisplay(accruedLeaves);
-        
-        // Display processed values according to decimal rules
-        const totalLeft = totalLeftHandling?.displayValue;
-        const processedAccruedLeaves = accruedLeavesHandling?.displayValue;
-        
-        return {
-          ...leave,
-          totalAllocated,
-          accruedLeaves: processedAccruedLeaves,
-          totalUsed,
-          totalLeft,
-          isAccrualSystem: !!accrualRecord,
-          // Decimal handling information for tooltips/details
-          decimalInfo: {
-            totalLeft: totalLeftHandling,
-            accrued: accruedLeavesHandling,
-            rawValues: {
-              totalLeft: rawTotalLeft,
-              accrued: accruedLeaves
-            }
-          }
-        };
-      });
+    let totalAllocated = baseTotalAllocated;
+    let accruedLeaves = baseAccruedLeaves;
+    let totalUsed = baseTotalUsed;
 
-    // Add comp off leave from compOffleaveBalance only if totalAllotted > 0
-    const compOffLeave = [];
-    if (
-      compOffleaveBalance && 
-      !Array.isArray(compOffleaveBalance) && 
-      compOffleaveBalance.totalAllotted > 0
-    ) {
-      const totalAllotted = compOffleaveBalance.totalAllotted || 0;
-      const totalLeaveTaken = compOffleaveBalance.totalLeaveTaken || 0;
-      const totalLeft = totalAllotted - totalLeaveTaken;
-      
-      // Apply decimal handling to comp off values
-      const totalLeftHandling = handleDecimalLeaveDisplay(totalLeft);
-      const totalAllottedHandling = handleDecimalLeaveDisplay(totalAllotted);
-      
-      compOffLeave.push({
-        leaveType: "Comp Off",
-        leaveConfigId: "comp-off",
-        totalAllocated: totalAllottedHandling.displayValue,
-        accruedLeaves: totalAllottedHandling.displayValue, // For comp off, allotted = accrued
-        totalUsed: totalLeaveTaken,
-        totalLeft: totalLeftHandling.displayValue,
-        isAccrualSystem: false,
-        isCompOff: true,
-        decimalInfo: {
-          totalLeft: totalLeftHandling,
-          accrued: totalAllottedHandling,
-          rawValues: {
-            totalLeft: totalLeft,
-            accrued: totalAllotted
-          }
-        }
-      });
+    if (dynamicUpdate) {
+      const dynamicUnusedCredits = Number(dynamicUpdate.totalAllotedLeaves) || 0;
+      const dynamicUsedCredits = Number(dynamicUpdate.totalUsedLeaves) || 0;
+      const dynamicTotalCredits = dynamicUnusedCredits + dynamicUsedCredits;
+      if (dynamicTotalCredits > 0) {
+        // For Comp Off, render from one consistent pool source:
+        // total = unused + used, used = used, left = unused.
+        totalAllocated = dynamicTotalCredits;
+        accruedLeaves = dynamicTotalCredits;
+        totalUsed = dynamicUsedCredits;
+      }
     }
 
-    return [...regularLeaves, ...compOffLeave];
-  }, [accrualLeaveBalance, compOffleaveBalance]);
+    const availableLeaves = Math.max(0, accruedLeaves - totalUsed);
+
+    return {
+      totalAllocated,
+      accruedLeaves,
+      totalUsed,
+      availableLeaves,
+    };
+  };
+
+
+const applicableLeaves = useMemo(() => {
+  if (baseLeaves.length === 0) return [];
+  return baseLeaves.map(leave => {
+    const dynamicUpdate = dynamicLeaves.find(
+      (d) => d.leaveConfigId === leave.leaveConfigId
+    );
+    const { totalAllocated, accruedLeaves, totalUsed, availableLeaves } = buildLeaveMetrics(leave, dynamicUpdate);
+    const totalLeftHandling = handleDecimalLeaveDisplay(availableLeaves);
+    const accruedLeavesHandling = handleDecimalLeaveDisplay(accruedLeaves);
+
+    return {
+      ...leave,
+      totalAllocated,
+      hasExpiry: leave.leaveExpiresAfter !== null && leave.leaveExpiresAfter !== undefined,
+      accruedLeaves: accruedLeavesHandling.displayValue,
+      totalUsed,
+      totalLeft: totalLeftHandling.displayValue,
+      isAccrualSystem: true,
+      decimalInfo: {
+        totalLeft: totalLeftHandling,
+        accrued: accruedLeavesHandling,
+        rawValues: {
+          totalLeft: availableLeaves,
+          accrued: accruedLeaves
+        }
+      }
+    };
+  }).filter(leave => leave.totalAllocated > 0);
+}, [baseLeaves, dynamicLeaves]);
+
+const leaveDebugRows = useMemo(() => {
+  if (!baseLeaves.length) return [];
+
+  return baseLeaves.map((leave) => {
+    const dynamicUpdate = dynamicLeaves.find(
+      (d) => d.leaveConfigId === leave.leaveConfigId
+    );
+    const { totalAllocated, accruedLeaves, totalUsed, availableLeaves } = buildLeaveMetrics(leave, dynamicUpdate);
+
+    return {
+      leaveType: leave.leaveType,
+      leaveConfigId: leave.leaveConfigId,
+      hasDynamicUpdate: Boolean(dynamicUpdate),
+      totalAllocated,
+      accruedLeaves,
+      totalUsed,
+      availableLeaves,
+    };
+  });
+}, [baseLeaves, dynamicLeaves]);
+
+// Find the name of the leave that has an expiry (Comp Off)
+const compOffLeaveName = useMemo(() => {
+  const compLeave = applicableLeaves.find(leave => leave.hasExpiry);
+  return compLeave ? compLeave.leaveType : "Comp Off";
+}, [applicableLeaves]);
+
+const hasCompOffData = useMemo(() => {
+  // Check if any visible leave has an expiry (which signifies it is a Comp Off)
+  return applicableLeaves.some(leave => leave.hasExpiry === true);
+}, [applicableLeaves]);
 
 const getFiscalYear = () => {
    // Check if hire date exists
@@ -186,6 +234,7 @@ const getFiscalYear = () => {
   // Check if gender is missing
   const empGender = currentEmployeeDetails?.employeeBasicDetails?.empGender;
   const employeeId = currentEmployeeDetails?.employeeBasicDetails?.empUuid;
+
   if (!empGender) {
     return (
       <div className="leaves-table-container">
@@ -207,12 +256,39 @@ const getFiscalYear = () => {
       <div className="leaves-table-container">
         <p className="leaves-title">Leaves Available {getFiscalYear()}</p>
         <p>No leave data available for this employee.</p>
+        <div className="leave-debug-panel">
+          <p className="leave-debug-title">Debug Snapshot</p>
+          <p>Accrual API rows: {baseLeaves.length}</p>
+          <p>Comp-off API rows: {dynamicLeaves.length}</p>
+          <p>
+            Rows passing filter (totalAllocated &gt; 0): {
+              leaveDebugRows.filter((row) => Number(row.totalAllocated) > 0).length
+            }
+          </p>
+          <details>
+            <summary>Computed rows (first 8)</summary>
+            <pre>{JSON.stringify(leaveDebugRows.slice(0, 8), null, 2)}</pre>
+          </details>
+          <details>
+            <summary>Accrual payload (first 5)</summary>
+            <pre>{JSON.stringify(baseLeaves.slice(0, 5), null, 2)}</pre>
+          </details>
+          <details>
+            <summary>Comp-off payload (first 5)</summary>
+            <pre>{JSON.stringify(dynamicLeaves.slice(0, 5), null, 2)}</pre>
+          </details>
+        </div>
       </div>
     );
   }
 
+  const leavePanelStyle = panelHeight
+    ? { "--leave-panel-height": `${panelHeight}px` }
+    : undefined;
+  const compOffInfoPreview = getCompOffInfoPreview(COMP_OFF_INFO_TEXT);
+
   return (
-    <div className="leaves-table-container">
+    <div className="leaves-table-container leaves-table-container--scrollable" style={leavePanelStyle}>
       <p className="leaves-title">Leaves Available {getFiscalYear()}</p>
       <div className="leaves-table">
         <table className="desktop-table">
@@ -228,7 +304,7 @@ const getFiscalYear = () => {
           <tbody>
             {applicableLeaves.map((leave, index) => (
               <tr key={leave.leaveConfigId || index}>
-                <td>{leave.leaveType}</td>
+                <td>{leave.hasExpiry && <span>*</span>}{leave.leaveType}</td>
                 <td>{leave.totalAllocated}</td>
                 <td>
                   {leave.accruedLeaves}
@@ -261,7 +337,7 @@ const getFiscalYear = () => {
         <div className="mobile-cards">
           {applicableLeaves.map((leave, index) => (
             <div className="leave-card" key={leave.leaveConfigId || index}>
-              <div className="leave-type">{leave.leaveType}</div>
+              <div className="leave-type">{leave.hasExpiry && <span>*</span>}{leave.leaveType}</div>
               <div className="leave-details">
                 <div className="leave-item">
                   <span className="label">Total:</span>
@@ -304,7 +380,23 @@ const getFiscalYear = () => {
           ))}
         </div>
       </div>
-      
+      {hasCompOffData && (
+        <p className="policy-note policy-note--comp-off">
+          <span className="compOffLeaveName">{`${compOffLeaveName} `}</span>
+          <span className="comp-off-info-text">
+            {showFullCompOffInfo ? COMP_OFF_INFO_TEXT : compOffInfoPreview.preview}
+          </span>
+          {compOffInfoPreview.truncated && (
+            <button
+              type="button"
+              className="comp-off-view-more-btn"
+              onClick={() => setShowFullCompOffInfo((prev) => !prev)}
+            >
+              {showFullCompOffInfo ? "View less" : "View more"}
+            </button>
+          )}
+        </p>
+      )}
       <p className="policy-note">
         *Please refer to the{" "}
         <a 

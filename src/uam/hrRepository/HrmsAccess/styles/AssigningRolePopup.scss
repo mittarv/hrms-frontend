@@ -1,23 +1,25 @@
+@use '../../design/colors/customColors' as *;
+
 .assigning_role_popup_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 
     .assigning_role_popup_container {
-        background-color: #ffffff;
+        background-color: $WHITE;
         border-radius: 16px;
         width: 100%;
         max-width: 600px;
         max-height: 70vh;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px $c118;
         font-family: "Plus Jakarta Sans";
         display: flex;
         flex-direction: column;
@@ -33,22 +35,22 @@
             }
 
             &::-webkit-scrollbar-track {
-                background: #f3f4f6;
+                background: $c94;
                 border-radius: 4px;
             }
 
             &::-webkit-scrollbar-thumb {
-                background: #d1d5db;
+                background: $c86;
                 border-radius: 4px;
 
                 &:hover {
-                    background: #9ca3af;
+                    background: $c98;
                 }
             }
 
             // Firefox scrollbar
             scrollbar-width: thin;
-            scrollbar-color: #d1d5db #f3f4f6;
+            scrollbar-color: $c86 $c94;
         }
 
         .popup_view {
@@ -89,7 +91,7 @@
                 margin-bottom: 1rem;
 
                 .back_button {
-                    background: #f1f1f4;
+                    background: $GREY-10;
                     border: none;
                     cursor: pointer;
                     border-radius: 8px;
@@ -101,7 +103,7 @@
                     margin-right: 1rem;
 
                     &:hover {
-                        background: #e5e7eb;
+                        background: $c95;
                     }
 
                     img {
@@ -114,16 +116,16 @@
                     font-size: 18px;
                     font-weight: 600;
                     font-family: "Plus Jakarta Sans";
-                    color: #2e3038;
+                    color: $GREY-80;
                     line-height: 24px;
                     letter-spacing: 0.01em;
                     margin: 0;
-                    border-bottom: 2px solid #2e3038;
+                    border-bottom: 2px solid $GREY-80;
                     padding-bottom: 4px;
                 }
 
                 .assigning_role_popup_close_button {
-                    background: #f1f1f4;
+                    background: $GREY-10;
                     border: none;
                     cursor: pointer;
                     border-radius: 8px;
@@ -134,7 +136,7 @@
                     transition: background-color 0.2s ease;
 
                     &:hover {
-                        background: #e5e7eb;
+                        background: $c95;
                     }
                 }
             }
@@ -142,7 +144,7 @@
                 font-size: 16px;
                 font-weight: 600;
                 font-family: "Plus Jakarta Sans";
-                color: #2E3038;
+                color: $GREY-80;
                 margin: 1rem 0 0rem 0;
             }
 
@@ -151,8 +153,8 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0.4rem;
-                background-color: #ffffff;
-                border:1px solid #e5e7eb;
+                background-color: $WHITE;
+                border:1px solid $c95;
                 border-radius: 8px;
                 padding: 1rem;
                 margin-bottom: 1rem;
@@ -167,14 +169,14 @@
                         font-size: 16px;
                         font-weight: 600;
                         font-family: "Plus Jakarta Sans";
-                        color: #2E3038;
+                        color: $GREY-80;
                     }
                     
                     &.user_info_email_field {
                         font-size: 14px;
                         font-weight: 400;
                         font-family: "Plus Jakarta Sans";
-                        color: #454754;
+                        color: $GREY-70;
                     }
                 }
             }
@@ -192,28 +194,28 @@
                 }
 
                 &::-webkit-scrollbar-track {
-                    background: #f3f4f6;
+                    background: $c94;
                     border-radius: 4px;
                 }
 
                 &::-webkit-scrollbar-thumb {
-                    background: #d1d5db;
+                    background: $c86;
                     border-radius: 4px;
 
                     &:hover {
-                        background: #9ca3af;
+                        background: $c98;
                     }
                 }
 
                 // Firefox scrollbar
                 scrollbar-width: thin;
-                scrollbar-color: #d1d5db #f3f4f6;
+                scrollbar-color: $c86 $c94;
 
                 .roles_section_title {
                     font-size: 16px;
                     font-weight: 600;
                     font-family: "Plus Jakarta Sans";
-                    color: #2e3038;
+                    color: $GREY-80;
                     margin: 0 0 1rem 0;
                 }
 
@@ -224,9 +226,9 @@
                     align-items: center;
                     justify-content: center;
                     padding: 1.5rem 0rem;
-                    border: 1px solid #e5e7eb;
+                    border: 1px solid $c95;
                     border-radius: 8px;
-                    background-color: #ffffff;
+                    background-color: $WHITE;
                     margin-bottom: 1rem;
                     margin-top: 1rem;
 
@@ -234,27 +236,27 @@
                         font-size: 14px;
                         font-weight: 400;
                         font-family: "Plus Jakarta Sans";
-                        color: #454754;
+                        color: $GREY-70;
                     }
 
                     .create_role_btn {
                         display: flex;
                         align-items: center;
                         gap: 0.5rem;
-                        background: #045071;
+                        background: $PRUSSIAN-70;
                         border: none;
-                        color: #ffffff;
+                        color: $WHITE;
                         padding: 10px 20px;
                         border-radius: 5px;
                         cursor: pointer;
                         transition: all 0.2s ease;
 
                         &:hover {
-                            background: #033348;
+                            background: $PRUSSIAN-80;
                         }
 
                         &:disabled {
-                            background: #d1d5db;
+                            background: $c86;
                         }
                     }
 
@@ -262,12 +264,12 @@
                         font-size: 14px;
                         font-weight: 600;
                         font-family: "Plus Jakarta Sans";
-                        color: #ffffff;
+                        color: $WHITE;
                     }
 
                     .create_role_btn:hover {
-                        background: #033348;
-                        color: #ffffff;
+                        background: $PRUSSIAN-80;
+                        color: $WHITE;
                     }
                 }
 
@@ -281,21 +283,21 @@
                         justify-content: space-between;
                         align-items: center;
                         padding: 1rem;
-                        border: 1px solid #e5e7eb;
+                        border: 1px solid $c95;
                         border-radius: 8px;
-                        background-color: #ffffff;
+                        background-color: $WHITE;
                         transition: all 0.2s ease;
                         position: relative;
 
                         &:hover {
-                            border-color: #1888B9;
-                            background-color: #f9fafb;
+                            border-color: $PRUSSIAN-50;
+                            background-color: $c154;
                         }
 
                         &.selected {
-                            // border-color: #045071;
-                            // background-color: #f0f9ff;
-                            color: #1888B9;
+                            // border-color: $PRUSSIAN-70;
+                            // background-color: $c137;
+                            color: $PRUSSIAN-50;
                         }
 
                         .role_item_left {
@@ -310,7 +312,7 @@
                                 cursor: pointer;
                                 width: 18px;
                                 height: 18px;
-                                accent-color: #1888B9;
+                                accent-color: $PRUSSIAN-50;
                             }
 
                             .role_item_content {
@@ -321,12 +323,12 @@
                                     font-size: 16px;
                                     font-weight: 600;
                                     font-family: "Plus Jakarta Sans";
-                                    color: #2e3038;
+                                    color: $GREY-80;
                                     margin-bottom: 0.5rem;
                                     cursor: pointer;
                                     
                                     &.selected {
-                                        color: #1888B9;
+                                        color: $PRUSSIAN-50;
                                     }
                                 }
 
@@ -334,7 +336,7 @@
                                     font-size: 14px;
                                     font-weight: 400;
                                     font-family: "Plus Jakarta Sans";
-                                    color: #454754;
+                                    color: $GREY-70;
                                     margin: 0;
                                     line-height: 1.5;
                                     position: relative;
@@ -348,7 +350,7 @@
                                     cursor: pointer;
 
                                     &.selected {
-                                        color: #1888B9;
+                                        color: $PRUSSIAN-50;
                                     }
 
                                     .description_tooltip {
@@ -358,8 +360,8 @@
                                         bottom: calc(100% + 8px);
                                         left: 0;
                                         right: 0;
-                                        background-color: #f3f4f6;
-                                        color: #2e3038;
+                                        background-color: $c94;
+                                        color: $GREY-80;
                                         padding: 8px 12px;
                                         border-radius: 6px;
                                         font-size: 12px;
@@ -368,8 +370,8 @@
                                         white-space: normal;
                                         word-wrap: break-word;
                                         z-index: 1000;
-                                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                                        border: 1px solid #e5e7eb;
+                                        box-shadow: 0 2px 8px $c69;
+                                        border: 1px solid $c95;
                                         max-width: 300px;
                                         line-height: 1.4;
                                         transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
@@ -382,7 +384,7 @@
                                             top: 100%;
                                             left: 20px;
                                             border: 6px solid transparent;
-                                            border-top-color: #f3f4f6;
+                                            border-top-color: $c94;
                                         }
                                         
                                         // Arrow border
@@ -392,7 +394,7 @@
                                             top: 100%;
                                             left: 19px;
                                             border: 7px solid transparent;
-                                            border-top-color: #e5e7eb;
+                                            border-top-color: $c95;
                                             z-index: -1;
                                         }
                                     }
@@ -410,19 +412,19 @@
                             align-items: center;
                             gap: 0.25rem;
                             background: none;
-                            border: 1px solid #C7C9D1;
+                            border: 1px solid $GREY-30;
                             padding: 4px 12px;
                             border-radius: 32px;
                             font-size: 14px;
                             font-weight: 400;
                             font-family: "Plus Jakarta Sans";
-                            color: #454754;
+                            color: $GREY-70;
                             cursor: pointer;
                             transition: all 0.2s ease;
 
                             &:hover {
-                                background-color: #f3f4f6;
-                                color: #045071;
+                                background-color: $c94;
+                                color: $PRUSSIAN-70;
                             }
 
                             img {
@@ -439,12 +441,12 @@
                 justify-content: flex-end;
                 gap: 1rem;
                 padding: 1.5rem 0rem;
-                background-color: #ffffff;
+                background-color: $WHITE;
 
                 .cancel_button {
-                    background: #ffffff;
-                    border: 1px solid #045071;
-                    color: #045071;
+                    background: $WHITE;
+                    border: 1px solid $PRUSSIAN-70;
+                    color: $PRUSSIAN-70;
                     padding: 10px 20px;
                     border-radius: 5px;
                     font-size: 14px;
@@ -454,14 +456,14 @@
                     transition: all 0.2s ease;
 
                     &:hover {
-                        background-color: #f0f9ff;
+                        background-color: $c137;
                     }
                 }
 
                 .assign_role_button {
-                    background: #045071;
+                    background: $PRUSSIAN-70;
                     border: none;
-                    color: #ffffff;
+                    color: $WHITE;
                     padding: 12px 24px;
                     border-radius: 8px;
                     font-size: 14px;
@@ -471,12 +473,12 @@
                     transition: all 0.2s ease;
 
                     &:hover:not(:disabled) {
-                        background: #033348;
+                        background: $PRUSSIAN-80;
                     }
 
                     &:disabled {
-                        background: #d1d5db;
-                        color: #9ca3af;
+                        background: $c86;
+                        color: $c98;
                         cursor: not-allowed;
                     }
                 }
@@ -494,7 +496,7 @@
                     font-size: 18px;
                     font-weight: 700;
                     font-family: "Plus Jakarta Sans";
-                    color: #033348;
+                    color: $PRUSSIAN-80;
                     line-height: 28px;
                     letter-spacing: 0.01em;
                 }
@@ -503,7 +505,7 @@
                     font-size: 14px;
                     font-weight: 500;
                     font-family: "Plus Jakarta Sans";
-                    color: #033348;
+                    color: $PRUSSIAN-80;
                     line-height: 1.5;
                     margin: 0;
 
@@ -518,15 +520,15 @@
                     justify-content: space-between;
                     align-items: center;
                     padding: 1rem;
-                    background-color: #f9fafb;
-                    border: 1px solid #e5e7eb;
+                    background-color: $c154;
+                    border: 1px solid $c95;
                     border-radius: 8px;
 
                     .role_name {
                         font-size: 16px;
                         font-weight: 600;
                         font-family: "Plus Jakarta Sans";
-                        color: #2e3038;
+                        color: $GREY-80;
                     }
 
                     .view_permissions_link {
@@ -534,19 +536,19 @@
                         align-items: center;
                         gap: 0.25rem;
                         background: none;
-                        border: 1px solid #C7C9D1;
+                        border: 1px solid $GREY-30;
                         padding: 4px 12px;
                         border-radius: 32px;
                         font-size: 14px;
                         font-weight: 400;
                         font-family: "Plus Jakarta Sans";
-                        color: #454754;
+                        color: $GREY-70;
                         cursor: pointer;
                         transition: all 0.2s ease;
 
                         &:hover {
-                            background-color: #f3f4f6;
-                            color: #045071;
+                            background-color: $c94;
+                            color: $PRUSSIAN-70;
                         }
 
                         img {
@@ -558,9 +560,9 @@
             }
 
             .confirm_button {
-                background: #045071;
+                background: $PRUSSIAN-70;
                 border: none;
-                color: #ffffff;
+                color: $WHITE;
                 padding: 12px 24px;
                 border-radius: 8px;
                 font-size: 14px;
@@ -571,12 +573,12 @@
                 width: 100%;
 
                 &:hover:not(:disabled) {
-                    background: #033348;
+                    background: $PRUSSIAN-80;
                 }
 
                 &:disabled {
-                    background: #d1d5db;
-                    color: #9ca3af;
+                    background: $c86;
+                    color: $c98;
                     cursor: not-allowed;
                 }
             }
@@ -588,11 +590,11 @@
                 align-items: center;
                 gap: 1rem;
                 padding: 1.5rem 0rem;
-                background-color: #ffffff;
+                background-color: $WHITE;
 
                 .continue_button {
-                    background: #045071;
-                    color: #ffffff;
+                    background: $PRUSSIAN-70;
+                    color: $WHITE;
                     padding: 10px 20px;
                     border-radius: 5px;
                     font-size: 14px;
@@ -602,12 +604,13 @@
                     transition: all 0.2s ease;
                     width: 100%;
                     max-width: 167px;
+                    border: none;
                 }
 
                 .go_back_button {
-                    background: #C3E1EF;
+                    background: $PRUSSIAN-20;
                     border: none;
-                    color: #2E3038;
+                    color: $GREY-80;
                     padding: 10px 20px;
                     border-radius: 5px;
                     font-size: 14px;
@@ -619,8 +622,8 @@
                     max-width: 167px;
         
                     &:disabled {
-                        background: #d1d5db;
-                        color: #9ca3af;
+                        background: $c86;
+                        color: $c98;
                         cursor: not-allowed;
                     }
                 }

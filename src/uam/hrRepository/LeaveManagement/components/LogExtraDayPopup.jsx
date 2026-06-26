@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import Cross_icon from "../../assets/icons/cross_icon.svg";
-import Calendar_icon from "../../assets/icons/calendar_icon.svg";
-import Clock_icon from "../../assets/icons/clock_icon.svg";
-import File_icon from "../../assets/icons/file_icon.svg";
+
+import Cross_icon from "../../../../assets/icons/cross_icon.svg";
+import Calendar_icon from "../../../../assets/icons/calendar_icon.svg";
+
+import File_icon from "../../../../assets/icons/file_icon.svg";
+
 import { extraWorkLogRequest } from "../../../../actions/hrRepositoryAction";
 import { convertFileToBase64 } from "../../Common/utils/helper";
 import "../styles/LogExtraDayPopup.scss";
@@ -12,25 +14,34 @@ import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 const LogExtraDayPopup = ({ onClose }) => {
   const dispatch = useDispatch();
-  const { currentEmployeeDetails, allExisitingLeaves, extraWorkLogLoading } =
+  const { currentEmployeeDetails, allExisitingLeaves, extraWorkLogLoading,employeeAttendanceData } =
     useSelector((state) => state.hrRepositoryReducer);
   const [inputvalue, setInputvalue] = useState({
     date: "",
-    checkIn: "",
-    checkOut: "",
+    workType: "",
     remarks: "",
     proof: "",
   });
   const [fileName, setFileName] = useState("");
   const [isEligibleForCompOff, setIsEligibleForCompOff] = useState(false);
-  const compOffLeave = allExisitingLeaves.find(
-    (leave) => leave.leaveType.toLowerCase() === "comp off"
-  );
+ 
+ 
+  const compOffLeave = Array.isArray(allExisitingLeaves)
+    ? allExisitingLeaves.find((leave) => {
+        const expiryDays = Number(leave?.leaveExpiresAfter);
+       return Number.isFinite(expiryDays) && expiryDays > 0;
+      })
+    : null;
+  const getTodayLocalISO = () =>
+    new Date(Date.now() - new Date().getTimezoneOffset() * 60_000)
+      .toISOString()
+      .split("T")[0];
+ 
+  const todayLocalISO = getTodayLocalISO();
 
   useEffect(() => {
     // Add safety checks
     if (!currentEmployeeDetails || !compOffLeave) return;
-
     const empType =
       currentEmployeeDetails?.employeeCurrentJobDetails?.empType || "";
     const empGender =
@@ -49,22 +60,11 @@ const LogExtraDayPopup = ({ onClose }) => {
     setIsEligibleForCompOff(isEligible);
   }, [currentEmployeeDetails, compOffLeave]);
 
-  const totalDuration =
-    inputvalue.checkIn && inputvalue.checkOut
-      ? (new Date(`1970-01-01T${inputvalue.checkOut}`) -
-          new Date(`1970-01-01T${inputvalue.checkIn}`)) /
-        (1000 * 60 * 60)
-      : 0;
+  const totalCompOffCredit = inputvalue.workType === "Full Day" ? 1.00 : 0.50;
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "checkOut") {
-      const checkInTime = new Date(`1970-01-01T${inputvalue.checkIn}`);
-      const checkOutTime = new Date(`1970-01-01T${value}`);
-      if (checkInTime >= checkOutTime) {
-        alert("Check-out time must be after Check-in time");
-        return;
-      }
-    }
+    
     setInputvalue({ ...inputvalue, [name]: value });
   };
 
@@ -90,14 +90,18 @@ const LogExtraDayPopup = ({ onClose }) => {
 
   const SetAttendance = async () => {
     if (extraWorkLogLoading) return;
+
+    if (inputvalue.date && inputvalue.date > getTodayLocalISO()) {
+      alert("Future dates are not allowed.");
+      return;
+    }
     // Validation
     const missingFields = [];
 
     if (!inputvalue.date) missingFields.push("Date");
-    if (!inputvalue.checkIn) missingFields.push("Check In");
-    if (!inputvalue.checkOut) missingFields.push("Check Out");
+    if (!inputvalue.workType) missingFields.push("Duration");
     if (!inputvalue.remarks) missingFields.push("Remarks");
-    if (!inputvalue.proof) missingFields.push("Proof");
+    //if (!inputvalue.proof) missingFields.push("Proof");
 
     if (missingFields.length > 0) {
       alert(
@@ -106,15 +110,28 @@ const LogExtraDayPopup = ({ onClose }) => {
       return;
     }
 
+    const hasExistingLeave = employeeAttendanceData?.some((record) => {
+      if (!record || record.isDeleted) return false;
+      const isLeave = record.leaveConfigId || record.leaveRequestId;
+      if (!isLeave) return false;
+      try {
+        const recordDate = new Date(record.attendanceDate).toISOString().split('T')[0];
+        return recordDate === inputvalue.date;
+      } catch (e) {
+        return false; 
+      }
+    });
+    if (hasExistingLeave) {
+      alert("Leave  already exists for the selected date. Comp Off cannot be applied.");
+      return;
+    }
     const extraLogData = {
       empUuid: currentEmployeeDetails.employeeBasicDetails.empUuid,
       leaveConfigId: compOffLeave.leaveConfigId,
       workDate: inputvalue.date,
-      checkIn: inputvalue.checkIn,
-      checkOut: inputvalue.checkOut,
       remarks: inputvalue.remarks,
       proof: inputvalue.proof,
-      totalDuration: totalDuration.toFixed(2),
+      totalCompOffCredit: totalCompOffCredit.toFixed(2),
     };
     dispatch(extraWorkLogRequest(extraLogData));
     onClose();
@@ -153,66 +170,33 @@ const LogExtraDayPopup = ({ onClose }) => {
               value={inputvalue.date}
               onChange={handleInputChange}
               name="date"
+              max={todayLocalISO}              
             />
           </div>
         </div>
         <div className="log_extra_day_time_container">
-          <div className="time_field">
-            <label className="time_field_title">Check-in*</label>
-            <div
-              className="input_with_icon"
-              onClick={(e) => {
-                const input = e.currentTarget.querySelector("input");
-                if (input && e.target !== input) {
-                  input.showPicker?.();
-                }
-              }}
+          <label className="duration_title">Duration*</label>
+          <div className="duration_button_group">
+            <button
+              type="button"
+              className={`button ${inputvalue.workType === "Half Day" ? "active" : ""}`}
+              onClick={() => setInputvalue({ ...inputvalue, workType: "Half Day" })}
             >
-              <span className="input_icon">
-                <img src={Clock_icon} alt="Clock_icon" />
-              </span>
-              <input
-                type="time"
-                className="time_input"
-                onClick={(e) => e.currentTarget.showPicker?.()}
-                value={inputvalue.checkIn}
-                onChange={handleInputChange}
-                name="checkIn"
-              />
-            </div>
-            {totalDuration > 0 && (
-              <div className="log_extra_day_credit_info">
-                <p>
-                  Comp Off credit: {totalDuration > 7 ? "1 Day" : "0.5 Day"}
-                </p>
-              </div>
-            )}
+             Half-Day
+            </button>
+            <button
+              type="button"
+              className={`button ${inputvalue.workType === "Full Day" ? "active" : ""}`}
+              onClick={() => setInputvalue({ ...inputvalue, workType: "Full Day" })}
+            >
+              Full-Day 
+            </button>
           </div>
 
-          <div className="time_field">
-            <label className="time_field_title">Check-out*</label>
-            <div
-              className="input_with_icon"
-              onClick={(e) => {
-                const input = e.currentTarget.querySelector("input");
-                if (input && e.target !== input) {
-                  input.showPicker?.();
-                }
-              }}
-            >
-              <span className="input_icon">
-                <img src={Clock_icon} alt="Clock_icon" />
-              </span>
-              <input
-                type="time"
-                className="time_input"
-                onClick={(e) => e.currentTarget.showPicker?.()}
-                value={inputvalue.checkOut}
-                onChange={handleInputChange}
-                name="checkOut"
-              />
-            </div>
-          </div>
+          
+            
+            
+         
         </div>
         <div className="log_extra_day_remarks_container">
           <p className="log_extra_day_remarks_title">Remarks*</p>
@@ -226,7 +210,7 @@ const LogExtraDayPopup = ({ onClose }) => {
           />
         </div>
         <div className="log_extra_day_proof_container">
-          <p className="log_extra_day_proof_title">Proof*</p>
+          <p className="log_extra_day_proof_title">Proof</p>
           <div className="proof_upload_box">
             <input
               type="file"

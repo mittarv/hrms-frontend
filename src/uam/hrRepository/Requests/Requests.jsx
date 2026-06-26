@@ -13,6 +13,7 @@ import {
   getCheckInCheckOutStatus,
   updateEmployeeOutstandingCheckout,
   getExtraWorkLogRequests,
+  fetchSecondaryLocationRequests,
  } from "../../../actions/hrRepositoryAction";
 import Snackbar from "../Common/components/Snackbar";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
@@ -20,6 +21,7 @@ import { hrToolHomePageData } from "../constant/data";
 import ExtraWorkDayRequests from "./components/ExtraWorkDayRequests";
 import Inactive_Leave_status_icon from "../assets/icons/Inactive_Leave_status_icon.svg";
 import Active_leave_status_icon from "../assets/icons/Active_leave_status_icon.svg";
+import SecondaryLocationRequests from "./components/SecondaryLocationRequests";
 
 
 const Requests = () => {
@@ -34,6 +36,8 @@ const Requests = () => {
     outStandingCheckOut, 
     extraWorkLogRequestsData,
     myHrmsAccess,
+    secondaryLocationRequests = [],
+    secondaryLocationRequestsMeta = {},
   } = useSelector((state) => state.hrRepositoryReducer || {});
   const dispatch = useDispatch();
   let startDate = "";
@@ -89,8 +93,24 @@ const Requests = () => {
         activeIcon: Active_leave_status_icon,
         inactiveIcon: Inactive_Leave_status_icon,
       },
+      tab4: {
+        permissions: ["SecondaryLocationRequests_read", "SecondaryLocationRequests_write"],
+        label: "Secondary Location Requests",
+        count:
+          typeof secondaryLocationRequestsMeta?.pendingCount === "number"
+            ? secondaryLocationRequestsMeta.pendingCount
+            : secondaryLocationRequests.filter((request) => request.status === "Pending").length,
+        activeIcon: Active_leave_status_icon,
+        inactiveIcon: Inactive_Leave_status_icon,
+      },
     };
-  }, [pendingRequests.length, leavePendingRequests.length, extraWorkLogRequestsData.length]);
+  }, [
+    pendingRequests.length,
+    leavePendingRequests.length,
+    extraWorkLogRequestsData.length,
+    secondaryLocationRequests,
+    secondaryLocationRequestsMeta,
+  ]);
 
   // Filter available tabs based on permissions
   const availableTabs = useMemo(() => {
@@ -107,6 +127,7 @@ const Requests = () => {
   }, [availableTabs, activeTab]);
 
   useEffect(() => {
+    dispatch(getExtraWorkLogRequests(startDate, endDate));
     dispatch(getAllPendingLeaveRequests(startDate, endDate));
      if (Array.isArray(outStandingCheckOut) && outStandingCheckOut.length === 0) {
           dispatch(checkOutstandingCheckout(user.employeeUuid));
@@ -119,6 +140,7 @@ const Requests = () => {
     if (Array.isArray(extraWorkLogRequestsData) && extraWorkLogRequestsData.length === 0) {
         dispatch(getExtraWorkLogRequests(startDate, endDate));
     }
+    dispatch(fetchSecondaryLocationRequests({ pendingOnly: true, sortBy: "createdAt", sortOrder: "DESC" }));
 
     dispatch({
       type: "SET_SELECTED_TOOL_NAME",
@@ -154,6 +176,8 @@ const Requests = () => {
         return <LeaveRequests/>;
       case "tab3":
         return <ExtraWorkDayRequests/>;
+      case "tab4":
+        return <SecondaryLocationRequests />;
       default:
         return null;
     }
@@ -169,7 +193,7 @@ const Requests = () => {
               <span
                 key={tabId}
                 onClick={() => setActiveTab(tabId)}
-                className={activeTab === tabId ? "active_tab" : "inactive_tab"}
+                className={`text-tab-common ${activeTab === tabId ? "active_tab" : "inactive_tab"}`}
               >
                 <img
                   src={
@@ -187,7 +211,7 @@ const Requests = () => {
         </div>
         <hr />
         <div className="requests_header_title_container">
-          <p>Here, you can view and approve/reject requests.</p>
+          <p className="text-tooltip-small">Here, you can view and approve/reject requests.</p>
         </div>
         <div className="leave_management_tab_content" role="tabpanel">
           {renderContent()}

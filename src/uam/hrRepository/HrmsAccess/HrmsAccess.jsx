@@ -64,10 +64,6 @@ const HrmsAccess = () => {
     }
   }, [searchParams]);
 
-  // Get user access level - only calculate after selectedToolName is available
-  const userAccessLevel = selectedToolName
-    ? allToolsAccessDetails[selectedToolName] || 100
-    : null;
 
   // Helper function to check if user has a specific permission (string or array)
   const hasPermission = useCallback((permissionNameOrArray) => {

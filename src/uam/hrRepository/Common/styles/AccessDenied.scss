@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .access_denied_container {
   display: flex;
   align-items: center;
@@ -14,10 +16,10 @@
   max-width: 460px;
   width: 100%;
   padding: 2.5rem 2.5rem;
-  background: #fff;
+  background: $WHITE;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e8e9eb;
+  box-shadow: 0 4px 20px $c82;
+  border: 1px solid $c83;
 }
 
 .access_denied_icon_wrapper {
@@ -35,7 +37,7 @@
 .access_denied_title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #033348;
+  color: $PRUSSIAN-80;
   margin: 0 0 0.75rem 0;
   font-family: "Plus Jakarta Sans", sans-serif;
   letter-spacing: -0.01em;
@@ -45,7 +47,7 @@
 .access_denied_message {
   font-size: 1rem;
   font-weight: 500;
-  color: #2e3038;
+  color: $GREY-80;
   margin: 0 0 0.5rem 0;
   line-height: 1.5;
   font-family: "Plus Jakarta Sans", sans-serif;
@@ -53,7 +55,7 @@
 
 .access_denied_submessage {
   font-size: 0.9375rem;
-  color: #666;
+  color: $c84;
   margin: 0 0 2rem 0;
   line-height: 1.5;
   font-family: "Plus Jakarta Sans", sans-serif;
@@ -77,11 +79,11 @@
   transition: background-color 0.2s ease, transform 0.15s ease;
 
   &.primary {
-    background-color: #045071;
-    color: #fff;
+    background-color: $PRUSSIAN-70;
+    color: $WHITE;
 
     &:hover {
-      background-color: #033348;
+      background-color: $PRUSSIAN-80;
     }
 
     &:active {
@@ -91,11 +93,11 @@
 
   &.secondary {
     background-color: transparent;
-    color: #045071;
-    border: 2px solid #045071;
+    color: $PRUSSIAN-70;
+    border: 2px solid $PRUSSIAN-70;
 
     &:hover {
-      background-color: rgba(4, 80, 113, 0.08);
+      background-color: $c250;
     }
 
     &:active {

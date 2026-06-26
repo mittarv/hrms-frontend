@@ -1,9 +1,10 @@
 // ─── Announce Winners Modal ────────────────────────────────────────────────────
+@use '../../design/colors/customColors' as *;
 
 .aw_overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: $c144;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,14 +23,14 @@
 
 // ─── Main Modal ────────────────────────────────────────────────────────────────
 .aw_modal {
-  background: #fff;
+  background: $WHITE;
   border-radius: 14px;
   width: 90%;
   max-width: 620px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 24px 64px $c145;
   animation: aw_slide_up 0.22s ease;
   overflow: hidden;
 
@@ -67,15 +68,15 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1c1f2e;
+  color: $c103;
   text-decoration: underline;
-  text-decoration-color: #1c1f2e;
+  text-decoration-color: $c103;
   text-underline-offset: 0.45rem;
   text-decoration-thickness: 2px;
 }
 
 .aw_close_btn {
-  background: #f1f1f4;
+  background: $GREY-10;
   border: none;
   border-radius: 8px;
   width: 34px;
@@ -86,16 +87,16 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #6b7280;
+  color: $c87;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: $c95;
+    color: $c88;
   }
 }
 
 .aw_close_btn_icon {
-  background: #f1f1f4;
+  background: $GREY-10;
   border: none;
   border-radius: 8px;
   padding: 10px;
@@ -111,7 +112,7 @@
   }
 
   &:hover {
-    background: #e5e7eb;
+    background: $c95;
   }
 }
 
@@ -135,9 +136,9 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid #d1d5db;
-  background: #fff;
-  color: #9ca3af;
+  border: 2px solid $c86;
+  background: $WHITE;
+  color: $c98;
   font-size: 0.8125rem;
   font-weight: 600;
   display: flex;
@@ -147,32 +148,32 @@
 }
 
 .aw_step--active .aw_step_circle {
-  border-color: #045071;
-  background: #fff;
-  color: #045071;
+  border-color: $PRUSSIAN-70;
+  background: $WHITE;
+  color: $PRUSSIAN-70;
 }
 
 .aw_step--done .aw_step_circle {
-  border-color: #045071;
-  background: #045071;
-  color: #fff;
+  border-color: $PRUSSIAN-70;
+  background: $PRUSSIAN-70;
+  color: $WHITE;
 }
 
 .aw_step_label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #9ca3af;
+  color: $c98;
 }
 
 .aw_step--active .aw_step_label,
 .aw_step--done .aw_step_label {
-  color: #1c1f2e;
+  color: $c103;
 }
 
 .aw_step_line {
   flex: 1;
   height: 1.5px;
-  background: #d1d5db;
+  background: $c86;
   margin: 0 10px;
   min-width: 40px;
 }
@@ -185,7 +186,7 @@
 }
 
 .aw_loading {
-  color: #6b7280;
+  color: $c87;
   padding: 1rem 0;
   font-size: 0.9rem;
 }
@@ -193,7 +194,7 @@
 .aw_nominees_count {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1c1f2e;
+  color: $c103;
   margin: 0.25rem 0 0.625rem;
 }
 
@@ -209,35 +210,35 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid $c95;
   border-radius: 10px;
   cursor: pointer;
   transition:
     border-color 0.15s,
     background 0.15s;
-  background: #fff;
+  background: $WHITE;
   position: relative;
 
   &:hover {
-    border-color: #b0d4e3;
-    background: #f8fbfd;
+    border-color: $c104;
+    background: $c146;
   }
 
   &--selected {
-    border-color: #045071;
-    background: #eaf4f9;
+    border-color: $PRUSSIAN-70;
+    background: $c147;
   }
 
   &--winner {
-    border-color: #045071;
-    background: #eaf4f9;
+    border-color: $PRUSSIAN-70;
+    background: $c147;
   }
 }
 
 .aw_radio {
   width: 17px;
   height: 17px;
-  accent-color: #045071;
+  accent-color: $PRUSSIAN-70;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -249,7 +250,7 @@
   border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
-  background: #e5e7eb;
+  background: $c95;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -270,7 +271,7 @@
 .aw_avatar_initial {
   font-size: 1rem;
   font-weight: 700;
-  color: #6b7280;
+  color: $c87;
   text-transform: uppercase;
 }
 
@@ -290,7 +291,7 @@
 .aw_nominee_name {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #1c1f2e;
+  color: $c103;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -298,7 +299,7 @@
 
 .aw_nominee_dept {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: $c87;
 }
 
 // ─── Row Actions (citation + votes) ───────────────────────────────────────────
@@ -315,25 +316,25 @@
   cursor: pointer;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: #045071;
+  color: $PRUSSIAN-70;
   text-decoration: underline;
   padding: 0;
   white-space: nowrap;
 
   &:hover {
-    color: #03374e;
+    color: $c148;
   }
 }
 
 .aw_no_citation {
   font-size: 0.8125rem;
-  color: #d1d5db;
+  color: $c86;
 }
 
 .aw_votes_badge {
-  background: #fde8dc;
-  color: #c0522a;
-  border: 1.5px solid #f5c4af;
+  background: $c149;
+  color: $c150;
+  border: 1.5px solid $c151;
   border-radius: 20px;
   padding: 3px 10px;
   font-size: 0.75rem;
@@ -341,9 +342,9 @@
   white-space: nowrap;
 
   &--active {
-    background: #eaf4f9;
-    color: #045071;
-    border-color: #a0cfe3;
+    background: $c147;
+    color: $PRUSSIAN-70;
+    border-color: $c152;
   }
 }
 
@@ -357,9 +358,9 @@
   right: 0;
   top: calc(100% + 8px);
   width: 320px;
-  background: #fff;
+  background: $WHITE;
   border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 32px $c153;
   z-index: 100;
   padding: 1rem 1.125rem;
   animation: aw_fade_in 0.15s ease;
@@ -372,25 +373,25 @@
   gap: 8px;
   margin-bottom: 0.75rem;
   padding-bottom: 0.625rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid $c95;
 }
 
 .aw_citation_popover_name {
   display: block;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #1c1f2e;
+  color: $c103;
 }
 
 .aw_citation_popover_meta {
   display: block;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: $c87;
   margin-top: 2px;
 }
 
 .aw_citation_popover_close {
-  background: #f1f1f4;
+  background: $GREY-10;
   border: none;
   border-radius: 6px;
   width: 26px;
@@ -400,12 +401,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: $c87;
   flex-shrink: 0;
 
   &:hover {
-    background: #e5e7eb;
-    color: #374151;
+    background: $c95;
+    color: $c88;
   }
 }
 
@@ -418,9 +419,9 @@
 .aw_citation_text {
   margin: 0;
   font-size: 0.875rem;
-  color: #374151;
+  color: $c88;
   line-height: 1.6;
-  background: #f3f4f6;
+  background: $c94;
   border-radius: 8px;
   padding: 0.75rem;
 }
@@ -428,7 +429,7 @@
 .aw_citation_nominators {
   margin: 0;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: $c87;
   font-style: italic;
 }
 
@@ -436,7 +437,7 @@
 .aw_citation_modal_overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: $c107;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -446,14 +447,14 @@
 }
 
 .aw_citation_modal {
-  background: #fff;
+  background: $WHITE;
   border-radius: 12px;
   max-width: 550px;
   width: 100%;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px $c118;
   animation: aw_slide_up 0.2s ease;
   overflow: hidden;
 
@@ -471,27 +472,27 @@
       .aw_citation_modal_title {
         font-size: 14px;
         font-weight: 500;
-        color: #6b7280;
+        color: $c87;
       }
 
       .aw_citation_modal_name {
         font-size: 20px;
         font-weight: 600;
-        color: #1f2937;
-        border-bottom: 2px solid #1f2937;
+        color: $c91;
+        border-bottom: 2px solid $c91;
         padding-bottom: 4px;
         display: inline-block;
       }
 
       .aw_citation_modal_meta {
         font-size: 13px;
-        color: #6b7280;
+        color: $c87;
         font-weight: 500;
       }
     }
 
     .aw_citation_modal_close {
-      background: #f1f1f4;
+      background: $GREY-10;
       border: none;
       border-radius: 8px;
       padding: 10px;
@@ -508,7 +509,7 @@
       }
 
       &:hover {
-        background: #e5e7eb;
+        background: $c95;
       }
     }
   }
@@ -530,7 +531,7 @@
       margin: 0;
       font-size: 15px;
       font-weight: 600;
-      color: #1f2937;
+      color: $c91;
     }
 
     .aw_citation_modal_copy_btn {
@@ -539,7 +540,7 @@
       gap: 6px;
       background: transparent;
       border: none;
-      color: #045071;
+      color: $PRUSSIAN-70;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -553,7 +554,7 @@
       }
 
       &:hover {
-        background: #f3f4f6;
+        background: $c94;
       }
     }
   }
@@ -561,7 +562,7 @@
   .aw_citation_modal_list {
     display: flex;
     flex-direction: column;
-    background: #eff6ff;
+    background: $c125;
     border-radius: 10px;
   }
 
@@ -572,14 +573,14 @@
   .aw_citation_modal_quote {
     margin: 0 0 0.5rem;
     font-size: 14px;
-    color: #1f2937;
+    color: $c91;
     line-height: 1.6;
     word-break: break-word;
   }
 
   .aw_citation_modal_author {
     font-size: 13px;
-    color: #6b7280;
+    color: $c87;
     font-weight: 500;
   }
 }
@@ -591,30 +592,30 @@
   align-items: center;
   gap: 10px;
   padding: 0.875rem 1.5rem 1.125rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid $c95;
   flex-shrink: 0;
 }
 
 .aw_btn_cancel {
   padding: 8px 18px;
-  border: 1.5px solid #d1d5db;
-  background: #fff;
+  border: 1.5px solid $c86;
+  background: $WHITE;
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #374151;
+  color: $c88;
   cursor: pointer;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: $c154;
+    border-color: $c98;
   }
 }
 
 .aw_btn_next {
   padding: 8px 22px;
-  background: #045071;
-  color: #fff;
+  background: $PRUSSIAN-70;
+  color: $WHITE;
   border: none;
   border-radius: 8px;
   font-size: 0.9375rem;
@@ -623,7 +624,7 @@
   transition: background 0.15s;
 
   &:hover:not(:disabled) {
-    background: #03374e;
+    background: $c148;
   }
 
   &:disabled {
@@ -634,11 +635,11 @@
 
 // ─── Confirmation Modal ────────────────────────────────────────────────────────
 .aw_confirm_modal {
-  background: #fff;
+  background: $WHITE;
   border-radius: 14px;
   width: 100%;
   max-width: 620px;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 24px 64px $c145;
   padding: 1.5rem 1.75rem;
   animation: aw_slide_up 0.22s ease;
   display: flex;
@@ -656,7 +657,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #1c1f2e;
+  color: $c103;
   line-height: 1.4;
 }
 
@@ -668,28 +669,28 @@
   border: 1.5px solid transparent;
 
   &--employee {
-    background: #eceff9;
-    border-color: #4362d0;
+    background: $BLUE-10;
+    border-color: $BLUE-60;
 
     .aw_confirm_winner_badge {
-      background: #5d78d7;
+      background: $BLUE-50;
     }
 
     .aw_confirm_winner_votes--employee {
-      color: #19318b;
+      color: $BLUE-80;
     }
   }
 
   &--leadership {
-    background: #ebfafa;
-    border-color: #28a2a2;
+    background: $CYAN-10;
+    border-color: $CYAN-70;
 
     .aw_confirm_winner_badge {
-      background: #28a2a2;
+      background: $CYAN-70;
     }
 
     .aw_confirm_winner_votes--leadership {
-      color: #115f5f;
+      color: $CYAN-80;
     }
   }
 }
@@ -709,7 +710,7 @@
   }
 
   span {
-    color: #fff;
+    color: $WHITE;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.01em;
@@ -727,13 +728,13 @@
   display: block;
   font-size: 20px;
   font-weight: 500;
-  color: #2e3038;
+  color: $GREY-80;
 }
 
 .aw_confirm_winner_dept {
   display: block;
   font-size: 0.75rem;
-  color: #6b7280;
+  color: $c87;
   margin-top: 2px;
 }
 
@@ -754,22 +755,22 @@
 .aw_btn_back {
   padding: 9px 22px;
   border: none;
-  background: #c3e1ef;
+  background: $PRUSSIAN-20;
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: #374151;
+  color: $c88;
   cursor: pointer;
 
   &:hover {
-    background: #99b9d9;
+    background: $c155;
   }
 }
 
 .aw_btn_confirm {
   padding: 9px 24px;
-  background: #045071;
-  color: #fff;
+  background: $PRUSSIAN-70;
+  color: $WHITE;
   border: none;
   border-radius: 8px;
   font-size: 0.9375rem;
@@ -777,6 +778,6 @@
   cursor: pointer;
 
   &:hover {
-    background: #03405a;
+    background: $c156;
   }
 }

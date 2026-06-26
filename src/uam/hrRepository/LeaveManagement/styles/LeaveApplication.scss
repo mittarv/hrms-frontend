@@ -1,3 +1,4 @@
+@use '../../design/colors/customColors' as *;
 
 .leave-application {
   &-backdrop {
@@ -6,7 +7,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,19 +17,19 @@
 
   &-container {
     font-family: "Plus Jakarta Sans";
-    color: #333;
+    color: $c75;
     width: 100%;
     max-width: 500px;
     animation: scaleIn 0.2s ease-out;
 
     .leave-modal {
-      background-color: white;
+      background-color: $WHITE;
       border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 20px $c112;
       width: 100%;
       margin: 0 auto;
       overflow: hidden;
-      border: 1px solid #e0e0e0;
+      border: 1px solid $c66;
 
       &-header {
         padding: 16px 20px;
@@ -37,21 +38,21 @@
         align-items: center;
 
         p {
-          color: #2e3038;
+          color: $GREY-80;
           font-size: 18px;
           font-weight: 700;
           line-height: 28px;
           letter-spacing: 0.01em;
           padding-bottom: 8px;
-          border-bottom: 2px solid #2e3038;
+          border-bottom: 2px solid $GREY-80;
         }
 
         .application-close-button {
-          background: #f1f1f4;
+          background: $GREY-10;
           border: none;
           font-size: 24px;
           cursor: pointer;
-          color: #666;
+          color: $c84;
           width: 30px;
           height: 30px;
           display: flex;
@@ -61,7 +62,7 @@
           transition: background-color 0.2s;
 
           &:hover {
-            background-color: #f0f0f0;
+            background-color: $c128;
           }
         }
       }
@@ -79,7 +80,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             font-size: 14px;
-            color: #2e3038;
+            color: $GREY-80;
             letter-spacing: 0.01em;
           }
 
@@ -93,9 +94,9 @@
               appearance: none;
               width: 16px;
               height: 16px;
-              border: 1px solid #454754;
+              border: 1px solid $GREY-70;
               border-radius: 4px;
-              background-color: #fff;
+              background-color: $WHITE;
               position: relative;
 
               &:checked {
@@ -109,13 +110,13 @@
               margin: 0;
               font-weight: 600;
               cursor: pointer;
-              color: #2e3038;
+              color: $GREY-80;
               letter-spacing: 0.01em;
             }
           }
 
           .error {
-            color: #f5222d;
+            color: $c206;
             font-size: 12px;
             margin-top: 4px;
             display: block;
@@ -131,79 +132,93 @@
           // Add to your LeaveApplication.scss
             .custom_file_Upload {
               display: flex;
-              align-items: center;
-              justify-content: center;
+              flex-direction: column;
               width: 100%;
-              border: 0.5px solid #AEB0BC;
+              border: 0.5px solid $GREY-40;
               padding: 8px 12px;
               border-radius: 8px;
+              gap: 8px;
 
               &.clickable {
                 cursor: pointer;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
               }
               
               .uploaded-file-row {
-                display: flex;
+                display: grid;
+                grid-template-columns: 24px 1fr auto auto;
                 align-items: center;
-                justify-content: space-between;
+                gap: 8px;
                 width: 100%;
+                padding: 4px 0;
+
+                &:not(:last-child) {
+                  border-bottom: 1px solid $c128;
+                  padding-bottom: 8px;
+                }
               }
 
               .file-icon-container{
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                justify-content: center;
+                width: 24px;
+                flex-shrink: 0;
 
-                .file-icon {
-                  width: 24px;
-                  height: 24px;
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                }
-
-                .file-name {
-                  font-size: 14px;
-                  color: #454754;
-                  font-weight: 600;
-                  flex-grow: 1;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
+                .file-type-icon {
+                  width: 20px;
+                  height: 20px;
                 }
               }
 
               .file-name{
                 font-size: 14px;
-                color: #454754;
+                color: $GREY-70;
                 font-weight: 600;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap;
+                $WHITE-space: nowrap;
+                min-width: 0;
+                background: none;
+                border: none;
+                padding: 0;
+                text-align: left;
+                cursor: pointer;
+                text-decoration: underline;
+
+                &:disabled {
+                  cursor: default;
+                  text-decoration: none;
+                }
               }
 
               .file-meta{
-                color:#676B7E;
+                color:$GREY-60;
                 font-size: 12px;
                 font-weight: 500;
+                $WHITE-space: nowrap;
+                text-align: right;
               }
 
               .delete-file-btn{
                 background: none;
                 border: none;
-                color: #f5222d;
+                color: $c206;
                 cursor: pointer;
                 font-size: 14px;
                 padding: 0;
-                margin-left: 10px;
                 display: flex;
                 align-items: center;
+                flex-shrink: 0;
               }
             }
             .file-upload-label {
               display: flex;
               align-items: center;
               justify-content: center;
-              color: #454754;
+              color: $GREY-70;
               font-size: 14px;
               cursor: pointer;
               transition: all 0.2s;
@@ -222,14 +237,14 @@
               background: none;
               cursor: pointer;
               text-decoration: underline;
-              color: #066893;
+              color: $PRUSSIAN-60;
 
             }
 
             .file-info {
               margin-top: 6px;
               font-size: 13px;
-              color: #066893;
+              color: $PRUSSIAN-60;
             }
         }
 
@@ -243,8 +258,8 @@
 
           .leave-type-button {
             padding: 6px 16px;
-            background-color: white;
-            border: 1px solid #d1d1d1;
+            background-color: $WHITE;
+            border: 1px solid $c212;
             border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
@@ -252,13 +267,13 @@
             outline: none;
 
             &:hover {
-              border-color: #005a8c;
+              border-color: $c213;
             }
 
             &.selected {
-              background-color: #005a8c;
-              color: white;
-              border-color: #005a8c;
+              background-color: $c213;
+              color: $WHITE;
+              border-color: $c213;
             }
           }
         }
@@ -268,18 +283,18 @@
           align-items: center;
           justify-content: center;
           padding: 10px;
-          border: 0.5px solid #dd787f;
+          border: 0.5px solid $RED-40;
           border-radius: 4px;
-          color: #dd787f;
+          color: $RED-40;
         }
 
         .profile-update-note{
           font-size: 0.9rem;
-          color: #64748b;
+          color: $c208;
           text-decoration: none;
 
           .update-link {
-            color: #045071;
+            color: $PRUSSIAN-70;
             text-decoration: none;
             font-weight: 600;
 
@@ -307,10 +322,10 @@
               input {
                 width: 100%;
                 padding: 10px;
-                border: 1px solid #d1d1d1;
+                border: 1px solid $c212;
                 border-radius: 4px;
                 font-size: 14px;
-                background-color: white;
+                background-color: $WHITE;
                 font-family: "Plus Jakarta Sans";
               }
             }
@@ -322,18 +337,18 @@
           display: flex;
           flex-direction: column;
           gap: 8px;
-          color: #e90f1e;
+          color: $c214;
         }
 
         input[type="text"] {
           width: 100%;
           padding: 10px;
-          border: 1px solid #d1d1d1;
+          border: 1px solid $c212;
           border-radius: 4px;
           resize: vertical;
           font-family: inherit;
           font-size: 14px;
-          color: #454754;
+          color: $GREY-70;
           font-weight: 600;
 
           &:focus {
@@ -341,7 +356,7 @@
           }
 
           &::placeholder {
-            color: #b0b0b0;
+            color: $c215;
             font-weight: 500;
           }
         }
@@ -352,11 +367,11 @@
           margin-bottom: 20px;
 
           &.info {
-            background-color: #c3e1ef;
+            background-color: $PRUSSIAN-20;
           }
 
           &.warning {
-            background-color: #f0c2c5;
+            background-color: $RED-20;
           }
 
           .status-title {
@@ -367,19 +382,19 @@
           .status-details {
             margin: 0;
             font-size: 13px;
-            color: #676b7e;
+            color: $GREY-60;
             font-weight: 500;
           }
 
           .status-warning {
-            color: #93252c;
+            color: $RED-80;
             margin: 5px 0 0 0;
             font-size: 13px;
             font-weight: 600;
           }
 
           .status-info{
-            color: #045071;
+            color: $PRUSSIAN-70;
             margin: 5px 0 0 0;
             font-size: 13px;
             font-weight: 600;
@@ -394,9 +409,9 @@
 
           .cancel-button {
             padding: 12px 16px;
-            border: 2px solid #045071;
-            background-color: white;
-            color: #045071;
+            border: 2px solid $PRUSSIAN-70;
+            background-color: $WHITE;
+            color: $PRUSSIAN-70;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
@@ -404,16 +419,16 @@
             font-weight: 600;
 
             &:hover {
-              border-color: #005a8c;
-              color: #005a8c;
+              border-color: $c213;
+              color: $c213;
             }
           }
 
           .apply-button {
             padding: 12px 16px;
             border: none;
-            background-color: #045071;
-            color: white;
+            background-color: $PRUSSIAN-70;
+            color: $WHITE;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
@@ -421,11 +436,11 @@
             font-weight: 600;
 
             &:hover {
-              background-color: #00486f;
+              background-color: $c216;
             }
 
             &:disabled {
-              background-color: #ccc;
+              background-color: $c76;
               cursor: not-allowed;
             }
           }

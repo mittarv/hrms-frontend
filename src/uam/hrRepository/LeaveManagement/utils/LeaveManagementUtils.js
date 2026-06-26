@@ -72,9 +72,9 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
 
     // 3. Continuous Leave Limit Validation - Always check for all leaves
     if (actualDays > selectedLeaveConfig.continuousLeavesLimit) {
-      if (formData.leaveType.toLowerCase() === 'sick') {
-        messages.continuousLimit = `Sick leave exceeds ${selectedLeaveConfig.continuousLeavesLimit} days limit. Medical certificate required.`;
-        messages.proofRequired = true;
+      if (selectedLeaveConfig.isProofRequired) {
+        messages.continuousLimit = `${formData.leaveType} leave exceeds ${selectedLeaveConfig.continuousLeavesLimit} days limit. Proof required.`;
+        messages.proofRequired = "continuous_limit";
       } else {
         messages.continuousLimit = `Leave duration (${actualDays} days) exceeds continuous leave limit of ${selectedLeaveConfig.continuousLeavesLimit} days.`;
       }
@@ -87,12 +87,12 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
 
 
       if (isCdlBlocked) {
-        if (formData.leaveType.toLowerCase() === 'sick') {
-          // Sick leave is allowed but proof is mandatory when CDL is blocked
-          messages.proofRequired = true;
-          messages.continuousLimit = `Medical certificate is mandatory for ${formData.leaveType} leave due to CDL restrictions.`;
+        if (selectedLeaveConfig.isProofRequired) {
+          // Leave types with isProofRequired=true: allowed but proof is mandatory when CDL is blocked
+          messages.proofRequired = "cdl_blocked";
+          messages.continuousLimit = `Proof is mandatory for ${formData.leaveType} leave due to CDL restrictions.`;
         } else {
-          // Non-sick leaves are completely blocked when CDL is blocked
+          // Leave types without proof required: completely blocked when CDL is blocked
           messages.cdlBlocked = true;
           messages.continuousLimit = `Application not allowed for ${formData.leaveType} leave due to continuous leave limit (CDL) restrictions.`;
         }
@@ -110,7 +110,7 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
   // Use accrual data if available, otherwise fallback to legacy
   const totalAllotted = selectedLeaveConfig.totalAllotedLeaves;
   const accruedLeaves = accrualRecord ? accrualRecord.accruedLeaves : totalAllotted;
-  const usedDays = accrualRecord ? parseFloat(accrualRecord.totalUsedLeaves) : 0
+  const usedDays = accrualRecord ? (parseFloat(accrualRecord.totalUsedLeaves) || 0) : 0;
   const availableBalance = accrualRecord ? accrualRecord.availableLeaves :
     Math.max(0, totalAllotted - usedDays);
 
@@ -124,8 +124,9 @@ export const validateBulkLeave = (formData, allExistingLeaves, cdlData, userTool
   }
 
   // Return validation result - consider all validation errors including CDL
+  const isContinuousLimitBlocking = messages.continuousLimit && !messages.proofRequired && !selectedLeaveConfig.isProofRequired;
   const isValid = !messages.minimumNotice && !messages.maximumNotice &&
-    !(messages.continuousLimit && formData.leaveType.toLowerCase() !== 'sick' && !messages.proofRequired) &&
+    !isContinuousLimitBlocking &&
     !messages.cdlBlocked;
 
   return {
@@ -251,10 +252,15 @@ export const validateSingleLeaveApplication = (attendanceData, allExistingLeaves
 
     // 1. Check Continuous Leave Limit
     if (leaveDurationInDays > continuousLeavesLimit) {
-      setLeaveValidationError(
-        `Leave duration (${leaveDurationInDays} days) exceeds continuous leave limit of ${continuousLeavesLimit} days`
-      );
-      return false;
+      if (leaveConfig.isProofRequired) {
+        // Leave types with isProofRequired=true: allow but proof is mandatory (handled by EditAttendanceModal)
+        // Don't block - the backend will handle pending/approval flow
+      } else {
+        setLeaveValidationError(
+          `Leave duration (${leaveDurationInDays} days) exceeds continuous leave limit of ${continuousLeavesLimit} days`
+        );
+        return false;
+      }
     }
 
     // Determine if this is a past leave or future leave

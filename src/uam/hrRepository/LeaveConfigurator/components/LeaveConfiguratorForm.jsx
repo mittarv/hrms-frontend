@@ -1,6 +1,7 @@
 import "../styles/LeaveConfiguratorForm.scss";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import ConfirmationPopup from "../../Common/components/ConfirmationPopup";
 import {
   getLeaveDetails,
   updateLeaveDetails,
@@ -10,8 +11,9 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { LeaveConfiguratorFormData } from "../utils/LeaveConfiguratorData";
 import Pill from "./Pill";
+
 import Edit_Button from "../../assets/icons/edit_button.svg";
-import { MandatoryFieldPopup, LeaveDiscardPopup } from "./LeaveConfiguratorPopup";
+import { MandatoryFieldPopup, LeaveDiscardPopup,  } from "./LeaveConfiguratorPopup";
 import LeaveApplicable from "./LeaveApplicable";
 import Info_icon from "../../assets/icons/info_icon.svg";
 import Tooltip from "./Tooltip";
@@ -42,7 +44,21 @@ const LeaveConfiguratorForm = () => {
   const [formData, setFormData] = useState({});
   const [showMandatoryFieldPopup, setShowMandatoryFieldPopup] = useState(false);
   const isDiscardChanges = searchParams.get("discard_changes") === "true";
+  const [isCompOff, setIsCompOff] = useState(false);
   
+  const [compOffLeaveName, setCompOffLeaveName] = useState("");
+
+
+ const [modalState, setModalState] = useState({
+    isOpen: false,
+    type: 'confirm', // 'confirm' or 'alert'
+    heading: '',
+    message: '',
+    onConfirm: null,
+    confirmText: 'Yes, Continue',
+    cancelText: 'Cancel'
+  });
+
   // Helper function to check if user has permission
   const hasPermission = (permissionName) => {
     const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
@@ -53,12 +69,6 @@ const LeaveConfiguratorForm = () => {
   const canCreate = hasPermission("LeaveConfigurator_Create");
   const canUpdate = hasPermission("LeaveConfigurator_update");
   const canRead = hasPermission("LeaveConfigurator_Read");
-  
-  const hasWriteAccess = allToolsAccessDetails?.[selectedToolName] >= 900 || 
-    myHrmsAccess?.permissions?.some(perm => 
-      perm.name === "LeaveConfigurator_Create" || 
-      perm.name === "LeaveConfigurator_update"
-    );
 
   useEffect(() => {
     if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
@@ -79,7 +89,7 @@ const LeaveConfiguratorForm = () => {
       }
       dispatch(getLeaveDetails(leaveConfigId));
     }
-  }, [dispatch, leaveConfigId, isViewMode, isEditMode, getAllComponentType, canRead, canUpdate]);
+  }, [dispatch, leaveConfigId, isViewMode, isEditMode, getAllComponentType, canRead, canUpdate, setSearchParams]);
 
   // Pre-fill form data in view and edit mode
   useEffect(() => {
@@ -131,6 +141,11 @@ const LeaveConfiguratorForm = () => {
       });
 
       setLeaveApplicable(currentLeaveDetails.leaveApplicableTo || {});
+
+      setIsCompOff(
+      currentLeaveDetails.leaveExpiresAfter !== null &&
+      currentLeaveDetails.leaveExpiresAfter !== undefined
+      );
     }
   }, [currentLeaveDetails, isViewMode, isEditMode, getAllComponentType]);
 
@@ -159,6 +174,29 @@ const LeaveConfiguratorForm = () => {
       setIsLeaveApplicable(true);
     }
   }, [isEditMode, currentLeaveDetails]);
+  
+
+useEffect(() => {
+  if (isCompOff) {
+    setFormData((prev) => {
+      const freq = parseInt(prev.accuralFrequency, 10);
+
+      let accuralRate = null;
+      if (freq > 0) {
+        const totalPeriodsInYear = 12 / freq;
+        accuralRate = 0 / totalPeriodsInYear; // will be 0
+      }
+
+      return {
+        ...prev,
+        totalAllotedLeaves: 0,
+        accuralRate: accuralRate,
+      };
+    });
+  }
+}, [isCompOff]);
+
+
 
   // Validate mandatory fields
   const validateMandatoryFields = () => {
@@ -173,7 +211,9 @@ const LeaveConfiguratorForm = () => {
       "minimumNoticePeriod",
       "continuousLeavesLimit",
     ];
-  
+  if (isCompOff) {
+    mandatoryFields.push("leaveExpiresAfter");
+  }
     for (const field of mandatoryFields) {
       if (
         formData[field] === undefined || 
@@ -200,8 +240,44 @@ const LeaveConfiguratorForm = () => {
     return true;
 };
   
+ 
+// const existingCompOffLeave = allExisitingLeaves?.find(
+//   (leave) =>
+//     leave.leaveExpiresAfter !== null &&
+//     leave.leaveExpiresAfter !== undefined &&
+//     leave.leaveConfigId !== leaveConfigId // avoid self-match in edit
+// );
+const currentLeaveConfigId =
+  leaveConfigId !== null && leaveConfigId !== undefined
+    ? Number(leaveConfigId)
+    : null;
 
-  const handleSubmit = (e) => {
+const existingCompOffLeave = allExisitingLeaves?.find((leave) => {
+  const isCompOff =
+    leave.leaveExpiresAfter !== null && leave.leaveExpiresAfter !== undefined;
+  if (!isCompOff) return false;
+  if (currentLeaveConfigId === null) return true;
+  return Number(leave.leaveConfigId) !== currentLeaveConfigId;
+});
+
+const handleSaveSuccess = () => {
+  setSearchParams({});
+  setFormData({});
+  setModalState(prev => ({ ...prev, isOpen: false }));
+};
+const executeSave = async (data) => {
+  try {
+    if (isCreateMode) {
+      await dispatch(createLeave(data));
+    } else if (isEditMode) {
+      await dispatch(updateLeaveDetails(data));
+    }
+    handleSaveSuccess();
+  } catch (error) {
+    console.error("Save failed, keeping form data:", error);
+  }
+};
+  const handleSubmit = async(e) => {
     e.preventDefault();
     
     // Check permissions before submitting
@@ -224,8 +300,22 @@ const LeaveConfiguratorForm = () => {
       return;
     }
     
+
+    const parsedLeaveExpiresAfter = Number(formData.leaveExpiresAfter);
+     if (
+      isCompOff &&
+      (!Number.isInteger(parsedLeaveExpiresAfter) || parsedLeaveExpiresAfter <= 0)
+    ) {
+      setShowMandatoryFieldPopup(true);
+      return;
+    }
     const transformedData = {
       ...formData,
+      leaveExpiresAfter:
+    // isCompOff && formData.leaveExpiresAfter !== undefined && formData.leaveExpiresAfter !== ""
+    //   ? parseInt(formData.leaveExpiresAfter, 10)
+    //   : null,
+    isCompOff ? parsedLeaveExpiresAfter : null,
     };
     
     if (leaveConfigId) {
@@ -264,29 +354,53 @@ const LeaveConfiguratorForm = () => {
     
     delete transformedData.additionalInformation;
 
+   
+
     const numericFields = [
       "totalAllotedLeaves", 
       "accuralRate", 
       "minimumNoticePeriod", 
       "maximumNoticePeriod", 
-      "continuousLeavesLimit"
+      "continuousLeavesLimit",
+      
     ];
     
     numericFields.forEach(field => {
-      if (transformedData[field]) {
-        transformedData[field] = parseFloat(transformedData[field]);
-      }
+      const value = transformedData[field];
+
+  // Only convert if the value is a non-empty string or a number
+  // This avoids converting null, undefined, or "" into NaN
+  if (value !== undefined && value !== null && value !== "") {
+    transformedData[field] = parseFloat(value);
+  } else {
+    // Explicitly set to null if it's empty, so the backend/DB is happy
+    transformedData[field] = null;
+  }
     });
 
     transformedData.leaveApplicableTo = isLeaveApplicable ? leaveApplicable : null;    
-    if (isCreateMode) {
-      dispatch(createLeave(transformedData));
-    } else if (isEditMode) {
-      dispatch(updateLeaveDetails(transformedData));
+
+    if (isCompOff && existingCompOffLeave) {
+      setCompOffLeaveName(existingCompOffLeave.leaveType);
+      setModalState({
+      isOpen: true,
+      type: 'confirm',
+      heading: 'Confirm Comp-Off Change',
+      message: `This will replace ${existingCompOffLeave.leaveType} Comp-Off. Do you want to continue?`,
+      confirmText: 'Yes, Continue',
+      cancelText: 'Cancel',
+      onConfirm: () => executeSave(transformedData) // Call the save here!
+    });
+  }
+    else{
+    
+      await executeSave(transformedData);
     }
-    setSearchParams({});
-    setFormData({});
+    
   };
+    
+  
+  
 
   const handleCancel = () => {
     const currentParams = Object.fromEntries(searchParams.entries()); 
@@ -333,13 +447,17 @@ const LeaveConfiguratorForm = () => {
       const accrualFrequency =
         name === "accuralFrequency" ? value : formData.accuralFrequency;
 
-      if (totalLeaves && accrualFrequency) {
-        // Calculate accrual rate as leaves per frequency period
-        // Total periods in a year = 12 / frequency
-        // Leaves per period = total leaves / total periods
-        const totalPeriodsInYear = 12 / parseInt(accrualFrequency);
-        newFormData.accuralRate = totalLeaves / totalPeriodsInYear;
-      }
+      const freq = parseInt(accrualFrequency, 10);
+      const leaves = parseFloat(totalLeaves);
+      
+
+     if (freq > 0 && leaves >= 0) {
+      const rate = leaves / (12 / freq);
+      newFormData.accuralRate = parseFloat(rate.toFixed(2));
+    } else {
+      newFormData.accuralRate = null;
+    }
+
     }
     
     if (name === "additionalInformation") {
@@ -367,7 +485,7 @@ const LeaveConfiguratorForm = () => {
     setSearchParams(""); 
   };
   const isMandatoryField = (fieldName) => {
-    return [ 
+     const baseMandatoryFields = [ 
       "totalAllotedLeaves", 
       "employeeType", 
       "isActive", 
@@ -376,8 +494,13 @@ const LeaveConfiguratorForm = () => {
       "appliedGender",
       "maximumNoticePeriod",
       "minimumNoticePeriod",
-      "continuousLeavesLimit"
-    ].includes(fieldName);
+      "continuousLeavesLimit",
+     
+    ]
+     if (isCompOff && fieldName === "leaveExpiresAfter") {
+    return true;
+  }
+  return baseMandatoryFields.includes(fieldName);
   };
 
   const renderField = (field) => {
@@ -417,7 +540,7 @@ const LeaveConfiguratorForm = () => {
         if (field.name === "leaveType" && isEditMode) {
           return (
             <div className={`leave_configurator_form_field_container`}>
-              <p className="leave_configurator_form_field_label">
+              <p className="leave_configurator_form_field_label text-time-label">
                 {field.label} {isMandatory && <span className="mandatory-marker">*</span>}
               </p>
               <Pill
@@ -449,7 +572,7 @@ const LeaveConfiguratorForm = () => {
   
         return (
           <div className={`leave_configurator_form_field_container`}>
-            <div className="leave_configurator_form_field_label">
+            <div className="leave_configurator_form_field_label text-time-label">
               {field.label} {isMandatory && <span className="mandatory-marker">*</span>} {field.subLabel && <span className="sub_label">{field.subLabel}</span>} 
               {field.Description && (      
                   <span className="description_marker">
@@ -503,7 +626,7 @@ const LeaveConfiguratorForm = () => {
       case "textfield": 
         return (
           <div className={`leave_configurator_form_field_container`}>
-            <div className="leave_configurator_form_field_label">
+            <div className="leave_configurator_form_field_label text-time-label">
               {field.label} {isMandatory && <span className="mandatory-marker">*</span>} {field.subLabel && <span className="sub_label">{field.subLabel}</span>} 
               {field.Description && (      
                   <span className="description_marker">
@@ -516,30 +639,30 @@ const LeaveConfiguratorForm = () => {
             {field.name === "accuralRate" ? (
               <input
                 type="text"
-                className="leave_configurator_form_field_input disabled"
+                className="leave_configurator_form_field_input text-input-field disabled"
                 name={field.name}
                 placeholder={field.placeholder}
                 value={formData[field.name] ?? ""}
                 onChange={(e) => handleInputChange(field.name, e.target.value)}
                 disabled = {false}
               />
-            ) : field.name === "totalAllotedLeaves" && unpaidLeaveDisabled ? ( <input
+            ) : field.name === "totalAllotedLeaves" && (unpaidLeaveDisabled || isCompOff) ? ( <input
                 type="text"
-                className={`leave_configurator_form_field_input ${unpaidLeaveDisabled ? "disabled" : ""}`}
+                className={`leave_configurator_form_field_input text-input-field ${(unpaidLeaveDisabled || isCompOff) ? "disabled" : ""}`}
                 name={field.name}
                 placeholder={field.placeholder}
-                value={ formData[field.name] }
+                value={ formData[field.name] ?? "" }
                 onChange={(e) => handleInputChange(field.name, e.target.value)}
-                disabled={ unpaidLeaveDisabled}
+                disabled={ unpaidLeaveDisabled || isCompOff}
               />):(
              
              
               <input
                 type="text"
-                className={`leave_configurator_form_field_input ${disabled ? "disabled" : ""}`}
+                className={`leave_configurator_form_field_input text-input-field ${disabled ? "disabled" : ""}`}
                 name={field.name}
                 placeholder={field.placeholder}
-                value={ formData[field.name] }
+                value={ formData[field.name] ?? "" }
                 onChange={(e) => handleInputChange(field.name, e.target.value)}
                 disabled={disabled || field.isDisabled}
               />
@@ -550,7 +673,7 @@ const LeaveConfiguratorForm = () => {
       case "checkbox":
         return (
           <div className={`leave_configurator_form_field_container`}>
-            <div className="leave_configurator_form_field_label">
+            <div className="leave_configurator_form_field_label text-time-label">
               {field.label} {isMandatory && <span className="mandatory-marker">*</span>} 
               {field.Description && (      
                   <span className="description_marker">
@@ -573,7 +696,7 @@ const LeaveConfiguratorForm = () => {
       case "dropdown":
         return (
           <div className={`leave_configurator_form_field_container`}>
-            <div className="leave_configurator_form_field_label">
+            <div className="leave_configurator_form_field_label text-time-label">
               {field.label} {isMandatory && <span className="mandatory-marker">*</span>} {field.subLabel && <span className="sub_label">{field.subLabel}</span>} 
               {field.Description && (
                   <span className="description_marker">
@@ -583,12 +706,12 @@ const LeaveConfiguratorForm = () => {
                   </span>
               )}
             </div>
-            <select
+            <select 
               name={field.name}
               value={formData[field.name] || ""}
               onChange={(e) => handleInputChange(field.name, e.target.value)}
               disabled={disabled}
-              className={`${isViewMode ? "disabled" : ""}`}
+              className={`text-input-field ${isViewMode ? "disabled" : ""}`}
             >
               {field.options.map((option, index) => (
                 <option key={index} value={option}>
@@ -613,14 +736,14 @@ const LeaveConfiguratorForm = () => {
         <div className="leave_configurator_action_buttons create_edit_mode">
           {((isCreateMode && canCreate) || (isEditMode && canUpdate)) && (
             <button
-              className="leave_configurator_save_button"
+              className="leave_configurator_save_button text-btn-primary"
               onClick={handleSubmit}
             >
               {isCreateMode ? "Create" : "Save"}
             </button>
           )}
           <button
-            className="leave_configurator_cancel_button"
+            className="leave_configurator_cancel_button text-btn-primary"
             onClick={handleCancel}
           >
             Cancel
@@ -631,9 +754,9 @@ const LeaveConfiguratorForm = () => {
           <button className="leave_configurator_back_button" onClick={handleBackButton}>
             <img src={Back_icon} alt="Back_Button" />
           </button>
-          {canUpdate && <button className="edit-button" onClick={handleEdit}>
+          {canUpdate && <button className="edit-button " onClick={handleEdit}>
             <img src={Edit_Button} alt="Edit_Button" />
-            <span>Edit</span>
+            <span className="text-btn-primary">Edit</span>
           </button>}
         </div>
       )}
@@ -641,17 +764,44 @@ const LeaveConfiguratorForm = () => {
       <div className="leave_configurator_form_container">
         <form onSubmit={handleSubmit} className="leave_configurator_form">
           <div className="leave_configurator_form_inner_container">
-            {LeaveConfiguratorFormData.slice(0, 3).map((field) => (
+            {LeaveConfiguratorFormData.slice(0, 1).map((field) => (
+              <div key={field.name}>{renderField(field)}</div>
+            ))}
+                      <div className="leave_configurator_form_field_container">
+            <label className="leave_configurator_form_comp_off_field_label text-time-label">
+              <input
+                type="checkbox"
+                checked={isCompOff}
+                onChange={(e) => setIsCompOff(e.target.checked)}
+                disabled={isViewMode}
+                
+              />
+               <span className={isCompOff ? "comp-off" : ""}>Is Compensatory Off</span>
+               <Tooltip content={"When enabled, this leave is treated as a compensatory off. You can set when it expires. The initial balance is 0, and only one such leave can exist."}>
+                  <img src={Info_icon} alt="Info"/>
+                </Tooltip>
+            </label>
+
+            {isCompOff && (<>
+               {LeaveConfiguratorFormData.slice(1, 2).map((field) => (
+              <div key={field.name}>{renderField(field)}</div>
+            ))}
+            </>)
+            }
+            {LeaveConfiguratorFormData.slice(2, 4).map((field) => (
+              <div key={field.name}>{renderField(field)}</div>
+            ))}
+          </div>
+          </div>
+
+          
+          <div className="leave_configurator_form_inner_container">
+            {LeaveConfiguratorFormData.slice(4, 8).map((field) => (
               <div key={field.name}>{renderField(field)}</div>
             ))}
           </div>
           <div className="leave_configurator_form_inner_container">
-            {LeaveConfiguratorFormData.slice(3, 7).map((field) => (
-              <div key={field.name}>{renderField(field)}</div>
-            ))}
-          </div>
-          <div className="leave_configurator_form_inner_container">
-            {LeaveConfiguratorFormData.slice(7).map((field) => (
+            {LeaveConfiguratorFormData.slice(8).map((field) => (
               <div key={field.name}>{renderField(field)}</div>
             ))}
           </div>
@@ -668,7 +818,7 @@ const LeaveConfiguratorForm = () => {
               checked={isLeaveApplicable}
               />
             )}
-            <label>{`Leave Applicable${isLeaveApplicable ? "*" : ""} (In Days/ Weeks/ Months)`}</label>
+            <label className="text-time-label">{`Leave Applicable${isLeaveApplicable ? "*" : ""} (In Days/ Weeks/ Months)`}</label>
             <Tooltip content={"Leave Applicable is the number of days, weeks, or months that the leave type is applicable to the selected employee types."}>
                 <img src={Info_icon} alt="Info" className="info_icon" />
             </Tooltip>
@@ -688,6 +838,22 @@ const LeaveConfiguratorForm = () => {
       )}
       {isDiscardChanges && (
         <LeaveDiscardPopup searchParams={searchParams}setSearchParams={setSearchParams} setFormData={setFormData} />
+      )}
+      
+     {modalState.isOpen && (
+        <ConfirmationPopup
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalState.onConfirm}
+        heading={modalState.heading}
+        message={(<span>
+            This will replace <b style={{ color: '#045071' }}>{compOffLeaveName}</b> Comp-Off. Do you want to continue?
+          </span>
+        )}
+        type={modalState.type}
+        confirmText={modalState.confirmText}
+        cancelText={modalState.cancelText}
+      />
       )}
       </div>
     }

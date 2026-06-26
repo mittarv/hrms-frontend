@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .no-results-container {
   display: flex;
   flex-direction: column;
@@ -8,7 +10,7 @@
   text-align: center;
   width: 100%;
   box-sizing: border-box;
-  background-color: #ffffff;
+  background-color: $WHITE;
   border-radius: 12px;
 
   .no-results-image {
@@ -22,7 +24,7 @@
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 22px;
     font-weight: 500;
-    color: #033348;
+    color: $PRUSSIAN-80;
     margin: 0;
     line-height: 1.5;
   }
@@ -31,7 +33,7 @@
     font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 18px;
     font-weight: 500;
-    color: #667085;
+    color: $c262;
     margin: 8px 0 0 0;
     line-height: 1.5;
   }

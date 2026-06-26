@@ -53,6 +53,15 @@ export const LeaveConfiguratorFormData = [
     subLabel: "(Select one)"
   },
   {
+    name: "leaveExpiresAfter",
+    label: "Leave Expires After",
+    inputType: "textfield",
+    placeholder: "e.g. 10, 15, etc.",
+    required: false,
+    subLabel: "(In Days)",
+    
+  },
+  {
     name: "employeeType",
     label: "Employee Type",
     inputType: "select_option",
@@ -173,5 +182,6 @@ export const LeaveConfiguratorFormData = [
         defaultChecked: false,
       },
     ]
-  }
+  },
+  
 ];

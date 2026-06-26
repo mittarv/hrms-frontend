@@ -25,6 +25,10 @@ export const EmployeeRepositoryTableHeader = [
     label: "Department",
     name: "Department",
   },
+  {
+    label: "Action",
+    name: "Action",
+  }
 ];
 
 export const EmployeeRepositoryFormData = [
@@ -147,6 +151,7 @@ export const formSectionKeyValues = {
   "compensation": "Compensation & Payment",
   "leaves-info": "Leaves",
   "other-info": "Other Information",
+  "offboarding-details": "Offboarding Details",
 };
 
 export const sectionFieldMapping = {
@@ -202,6 +207,11 @@ export const sectionFieldMapping = {
     { name: "empEmergencyContactRelation", label: "Emergency Contact Relation" },
     { name: "empBloodGroup", label: "Blood Group" },
     { name: "empNationality", label: "Nationality" }
+  ],
+  "offboarding-details": [
+    { name: "hrClearanceStatus", label: "HR Clearance" },
+    { name: "financeClearanceStatus", label: "Finance Clearance" },
+    { name: "lastWorkingDay", label: "Last Working Day" }
   ]
 };
 
@@ -519,6 +529,11 @@ export const formSections = [
       },
     ],
   },
+  {
+    id: "offboarding-details",
+    title: formSectionKeyValues["offboarding-details"],
+    fields: ["offboarding"]
+  },
 ];
 
 
@@ -541,45 +556,3 @@ export const formatDate = (dateString) => {
   return `${day}${ordinalSuffix(day)} ${month} ${year}`;
 };
 
-
-
-export const salaryComponents =[
-                {
-                    "componentId": "66bb2a86-b79c-4004-8e4d-2b48ded9b8b0",
-                    "salaryCategoryId": "3a75a88a-d443-4ce3-8e0d-61b7db56edc8",
-                    "componentName": "Remote Work Allowance",
-                    "componentType": "defaultAddition",
-                    "amount": 5000,
-                    "percentageOfBasicSalary": null,
-                    "thresholdAmount": null,
-                    "frequency": "one_time_key",
-                    "isVariable": false,
-                    "includeinLop": true,
-                    "isDeleted": false,
-                    "createdBy": "abhishek.anand@mittarv.com",
-                    "updatedBy": "abhishek.anand@mittarv.com",
-                    "effectiveFrom": null,
-                    "effectiveTill": null,
-                    "createdAt": "2025-09-05T11:57:39.000Z",
-                    "updatedAt": "2025-09-05T11:57:39.000Z"
-                },
-                {
-                    "componentId": "f369445b-764e-4c57-96c3-c60b6731f7fd",
-                    "salaryCategoryId": "11071ac1-fffa-4587-a536-1028f03d61dd",
-                    "componentName": "Bug Bash",
-                    "componentType": "addition",
-                    "amount": 5000,
-                    "percentageOfBasicSalary": null,
-                    "thresholdAmount": 10000,
-                    "frequency": "one_time_key",
-                    "isVariable": true,
-                    "includeinLop": false,
-                    "isDeleted": false,
-                    "createdBy": "abhishek.anand@mittarv.com",
-                    "updatedBy": "abhishek.anand@mittarv.com",
-                    "effectiveFrom": "2025-01-01T00:00:00.000Z",
-                    "effectiveTill": "2025-12-31T23:59:59.000Z",
-                    "createdAt": "2025-09-05T12:00:29.000Z",
-                    "updatedAt": "2025-09-05T12:00:29.000Z"
-                }
-            ];

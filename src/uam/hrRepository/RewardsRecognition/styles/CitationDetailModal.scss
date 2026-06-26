@@ -1,7 +1,9 @@
+@use '../../design/colors/customColors' as *;
+
 .citation_detail_modal_overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: $c107;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,14 +12,14 @@
 }
 
 .citation_detail_modal {
-  background: #fff;
+  background: $WHITE;
   border-radius: 12px;
   max-width: 550px;
   width: 100%;
   max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px $c118;
   overflow: hidden;
 
   .citation_detail_modal_header {
@@ -35,20 +37,20 @@
     .citation_detail_modal_name {
       font-size: 20px;
       font-weight: 600;
-      color: #1f2937;
-      border-bottom: 2px solid #1f2937;
+      color: $c91;
+      border-bottom: 2px solid $c91;
       padding-bottom: 4px;
       display: inline-block;
     }
 
     .citation_detail_modal_meta {
       font-size: 13px;
-      color: #6b7280;
+      color: $c87;
       font-weight: 500;
     }
 
     .citation_detail_modal_close {
-      background: #f1f1f4;
+      background: $GREY-10;
       border: none;
       border-radius: 8px;
       padding: 10px;
@@ -65,7 +67,7 @@
       }
 
       &:hover {
-        background: #e5e7eb;
+        background: $c95;
       }
     }
   }
@@ -88,7 +90,7 @@
       margin: 0;
       font-size: 15px;
       font-weight: 600;
-      color: #1f2937;
+      color: $c91;
     }
 
     .citation_detail_modal_copy_btn {
@@ -97,7 +99,7 @@
       gap: 6px;
       background: transparent;
       border: none;
-      color: #045071;
+      color: $PRUSSIAN-70;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -111,7 +113,7 @@
       }
 
       &:hover {
-        background: #f3f4f6;
+        background: $c94;
       }
     }
   }
@@ -119,7 +121,7 @@
   .citation_detail_modal_list {
     display: flex;
     flex-direction: column;
-    background: #eff6ff;
+    background: $c125;
     border-radius: 10px;
   }
 
@@ -130,14 +132,14 @@
   .citation_detail_modal_quote {
     margin: 0 0 0.5rem;
     font-size: 14px;
-    color: #1f2937;
+    color: $c91;
     line-height: 1.6;
     word-break: break-word;
   }
 
   .citation_detail_modal_author {
     font-size: 13px;
-    color: #6b7280;
+    color: $c87;
     font-weight: 500;
   }
 }

@@ -1,121 +1,37 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useMemo } from "react";
 import {
-  
-  getCurrentEmployeeDetails,
+  getEmployeeDirectoryDetails,
   
 } from "../../../../actions/hrRepositoryAction";
 import Snackbar from "../../Common/components/Snackbar";
+import Filter from "../../Common/components/Filter/Filter";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import NoResultsContainer from "../../Common/components/NoResultsContainer";
 import EmployeeCard from "./EmployeeCard";
-import Sort from "./Sort";
+
+import Sort from "../../Common/components/Sort";
+
 import "../styles/EmployeeDirectory.scss";
-import noResultsImg from "../../assets/icons/no_results_icon.svg";
+
+
+
+
+
 import searchIcon from "../../assets/icons/Search_icon_grey.svg";
 import cross from "../../assets/icons/cross_icon.svg";
 import filter_grey_icon from "../../assets/icons/filter_grey_icon.svg";
 import divider from "../../assets/icons/divider_icon.svg";
-import tick_icon from "../../assets/icons/tick_icon.svg";
-import { ClickAwayListener } from "@mui/material";
-import dropdown_arrow from "../../assets/icons/dropdown_arrow.svg";
+
+
+
 import { hrToolHomePageData } from "../../constant/data";
-
-const FilterDropdown = ({ title, options, selected, onSelect }) => {
-  
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const activeCount = selected.length;
-
- 
-  const listOptions = Object.entries(options).map(([key, value]) => ({
-    key,
-    label: value,
-  }));
-  const filteredOptions = useMemo(() => {
-    if (!searchTerm) {
-      return listOptions;
-    }
-    const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return listOptions.filter(option =>
-      option.label.toLowerCase().includes(lowerCaseSearchTerm)
-    );
-  }, [listOptions, searchTerm]);
- 
-
-  const handleOptionClick = (key) => {
-   
-    onSelect(key);
-  };
-
-  return (
-    <ClickAwayListener onClickAway={() => setIsOpen(false)}>
-      <div
-        className={`filter-dropdown-container ${
-          activeCount > 0 ? "active" : ""
-        }`}
-      >
-        <button
-          className="filter-button-label"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          <p>{activeCount > 0 && <span>{activeCount}</span>} {title} </p>
-
-          
-          <img
-            src={dropdown_arrow}
-            alt="Dropdown"
-            className={`dropdown-arrow-icon ${isOpen ? "rotated" : ""}`}
-          />
-        </button>
-        {isOpen && (
-          <div className="dropdown-menu">
-            <div className="search-input-container">
-              <img src={searchIcon}/>
-              <img src={divider}/>
-              <input
-                type="text"
-                placeholder="Start Searching"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="dropdown-search-input" 
-                onClick={(e) => e.stopPropagation()} 
-              />
-            </div>
-
-            
-            {filteredOptions.length > 0 ? (
-              <div className="dropdown-options-list">
-                {filteredOptions.map((option) => (
-                  <div
-                    key={option.key}
-                    className={`dropdown-item ${
-                      selected.includes(option.key) ? "selected" : ""
-                    }`}
-                    onClick={() => handleOptionClick(option.key)}
-                  >
-                    {option.label}
-                    {selected.includes(option.key) && <img src={tick_icon} alt="Selected" />}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="no-results">
-                <p>No results</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </ClickAwayListener>
-  );
-};
 
 
 const EmployeeDirectory = ({hasAccess}) => {
 
   const dispatch = useDispatch();
-  const { loading, allEmployees, getAllComponentType, getAllManagersDetails } =
+  const { allEmployeesLoading, allEmployees, getAllComponentType, getAllManagersDetails } =
     useSelector((state) => state.hrRepositoryReducer);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCardUuid, setExpandedCardUuid] = useState(null);
@@ -160,7 +76,7 @@ const EmployeeDirectory = ({hasAccess}) => {
       expandedCardUuid === clickedUuid ? null : clickedUuid;
     setExpandedCardUuid(newExpandedUuid);
     if (newExpandedUuid !== null) {
-      dispatch(getCurrentEmployeeDetails(clickedUuid));
+      dispatch(getEmployeeDirectoryDetails(clickedUuid));
     }
   };
 
@@ -247,7 +163,7 @@ const EmployeeDirectory = ({hasAccess}) => {
   return (
     <>
       <Snackbar />
-      {loading ? (
+      {allEmployeesLoading ? (
         <LoadingSpinner />
       ) : (
         <div className="employee-directory-container">
@@ -271,7 +187,7 @@ const EmployeeDirectory = ({hasAccess}) => {
                   <img src={filter_grey_icon} alt="Filter" />
                 </button>
 
-                <FilterDropdown
+                <Filter
                   title="Team"
                   options={departmentMap}
                   selected={selectedDepartments}
@@ -279,7 +195,7 @@ const EmployeeDirectory = ({hasAccess}) => {
                     handleToggleFilterSelection(key, setSelectedDepartments)
                   }
                 />
-                <FilterDropdown
+                <Filter
                   title="Employee Type"
                   options={jobTypeMap}
                   selected={selectedJobTypes}
@@ -347,18 +263,11 @@ const EmployeeDirectory = ({hasAccess}) => {
             All Employees ({sortedAndFilteredEmployees?.length || 0})
           </h3>
           {sortedAndFilteredEmployees.length === 0 ? (
-            <div className="no-results-container">
-              <img
-                src={noResultsImg}
-                alt="No results"
-                className="no-results-image"
-              />
-              <p className="no-results-text">
-                We couldn’t find anyone matching your search.
-                <br />
-                Try searching with different details.
-              </p>
-            </div>
+            <NoResultsContainer
+              showImage={true}
+              message="We couldn't find anyone matching your search."
+              subMessage="Try searching with different details."
+            />
           ) : (
             <div className="employee-list">
               {sortedAndFilteredEmployees.map((emp) => (

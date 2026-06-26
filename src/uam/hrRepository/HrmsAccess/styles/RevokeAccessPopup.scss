@@ -1,21 +1,23 @@
+@use '../../design/colors/customColors' as *;
+
 .revoke_access_popup_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1001;
 
     .revoke_access_popup_container {
-        background-color: #ffffff;
+        background-color: $WHITE;
         border-radius: 16px;
         width: 100%;
         max-width: 500px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px $c118;
         font-family: "Plus Jakarta Sans";
         position: relative;
 
@@ -23,7 +25,7 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: #f1f1f4;
+            background: $GREY-10;
             border: none;
             cursor: pointer;
             border-radius: 8px;
@@ -35,7 +37,7 @@
             z-index: 10;
 
             &:hover:not(:disabled) {
-                background: #e5e7eb;
+                background: $c95;
             }
 
             &:disabled {
@@ -52,7 +54,7 @@
                 font-size: 18px;
                 font-weight: 700;
                 font-family: "Plus Jakarta Sans";
-                color: #C73D45;
+                color: $RED-60;
                 line-height: 28px;
                 letter-spacing: 0.01em;
                 margin: 0 0 0.5rem 0;
@@ -62,7 +64,7 @@
                 font-size: 14px;
                 font-weight: 500;
                 font-family: "Plus Jakarta Sans";
-                color: #033348;
+                color: $PRUSSIAN-80;
                 line-height: 1.5;
                 margin: 0;
             }
@@ -78,9 +80,9 @@
 
 
             .confirm_button {
-                background: #C73D45;
+                background: $RED-60;
                 border: none;
-                color: #ffffff;
+                color: $WHITE;
                 padding: 8px 12px;
                 border-radius: 8px;
                 font-size: 14px;
@@ -93,20 +95,20 @@
                 max-width: 167px;
 
                 &:hover:not(:disabled) {
-                    background: #b91c1c;
+                    background: $c124;
                 }
 
                 &:disabled {
-                    background: #d1d5db;
-                    color: #9ca3af;
+                    background: $c86;
+                    color: $c98;
                     cursor: not-allowed;
                 }
             }
 
             .cancel_button {
-                background: #C3E1EF;
+                background: $PRUSSIAN-20;
                 border: none;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 padding: 8px 12px;
                 border-radius: 8px;
                 font-size: 14px;
@@ -119,7 +121,7 @@
                 max-width: 167px;
 
                 &:hover:not(:disabled) {
-                    background: #fef2f2;
+                    background: $c122;
                 }
 
                 &:disabled {

@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .rewards_phase_container {
     display: flex;
     flex-direction: column;
@@ -6,10 +8,10 @@
     min-height: 0;
     height: auto;
     overflow: visible;
-    border: 1px solid #d1d5db;
+    border: 1px solid $c86;
     border-radius: 12px;
     padding: 1.5rem 2.25rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px $c119;
 
     @media (max-width: 1200px) {
         padding: 1.375rem 1.75rem;
@@ -29,7 +31,7 @@
     .rewards_phase_loading {
         text-align: center;
         padding: 2rem;
-        color: #6b7280;
+        color: $c87;
     }
 
     .rewards_phase_action_button {
@@ -37,23 +39,23 @@
         justify-content: center;
 
         .start_nominations_button {
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             border: none;
             border-radius: 8px;
             padding: 12px 16px;
-            color: #ffffff;
+            color: $WHITE;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
 
             &:hover {
-                background-color: #033348;
+                background-color: $PRUSSIAN-80;
             }
 
             &:disabled {
-                background-color: #8f92a3;
-                color: #ffffff;
+                background-color: $GREY-50;
+                color: $WHITE;
                 cursor: not-allowed;
             }
         }
@@ -62,11 +64,11 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             border: none;
             border-radius: 8px;
             padding: 12px 16px;
-            color: #ffffff;
+            color: $WHITE;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -74,7 +76,7 @@
             
 
             &:hover {
-                background-color: #033348;
+                background-color: $PRUSSIAN-80;
             }
         }
     }
@@ -93,11 +95,11 @@
 
         .nominate_peer_btn,
         .primary_btn {
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             border: none;
             border-radius: 8px;
             padding: 10px 16px;
-            color: #fff;
+            color: $WHITE;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -112,21 +114,21 @@
         }
 
         .nominate_primary_btn {
-            background-color: #ffffff;
-            border: 1px solid #045071;
+            background-color: $WHITE;
+            border: 1px solid $PRUSSIAN-70;
             border-radius: 8px;
             padding: 10px 16px;
-            color: #045071;
+            color: $PRUSSIAN-70;
         }
         .vote_nominees_btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             border: none;
             border-radius: 8px;
             padding: 10px 16px;
-            color: #fff;
+            color: $WHITE;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -138,10 +140,10 @@
         }
 
         .end_phase_btn {
-            background: #d4545c;
+            background: $RED-50;
             text-align: center;
             border: none;
-            color: #ffffff;
+            color: $WHITE;
             border-radius: 8px;
             padding: 10px 16px;
             font-size: 14px;
@@ -153,10 +155,10 @@
                 color 0.2s;
 
             &:hover:not(:disabled) {
-                background: #ffffff;
-                border: 1px solid #d4545c;
-                border-color: #d4545c;
-                color: #d4545c;
+                background: $WHITE;
+                border: 1px solid $RED-50;
+                border-color: $RED-50;
+                color: $RED-50;
             }
 
             &:disabled {
@@ -192,7 +194,7 @@
             }
 
             .rewards_phase_panel_header_title {
-                color: #2e3038;
+                color: $GREY-80;
 
                 .rewards_phase_panel_header_title_text {
                     font-size: 18px;
@@ -218,7 +220,7 @@
                 margin: 0;
                 font-size: 1.125rem;
                 font-weight: 600;
-                color: #1f2937;
+                color: $c91;
 
                 @media (max-width: 768px) {
                     font-size: 1rem;
@@ -245,9 +247,9 @@
                 }
 
                 .nominate_primary_btn {
-                    background: #ffffff;
-                    border: 1px solid #045071;
-                    color: #045071;
+                    background: $WHITE;
+                    border: 1px solid $PRUSSIAN-70;
+                    color: $PRUSSIAN-70;
                     padding: 8px 14px;
                     border-radius: 8px;
                     font-size: 14px;
@@ -262,8 +264,8 @@
                     }
 
                     &:hover {
-                        background: #045071;
-                        color: #ffffff;
+                        background: $PRUSSIAN-70;
+                        color: $WHITE;
                     }
 
                     &:disabled {
@@ -274,8 +276,8 @@
             }
 
             .rewards_phase_panel_actions .end_phase_btn {
-                background: #d4545c;
-                color: #ffffff;
+                background: $RED-50;
+                color: $WHITE;
                 padding: 8px 14px;
                 border: none;
                 border-radius: 8px;
@@ -291,8 +293,8 @@
                 }
 
                 &:hover:not(:disabled) {
-                    background: #d4545c;
-                    color: #ffffff;
+                    background: $RED-50;
+                    color: $WHITE;
                 }
 
                 &:disabled {
@@ -302,9 +304,9 @@
             }
 
             .primary_btn {
-                background-color: #045071;
+                background-color: $PRUSSIAN-70;
                 border: none;
-                color: #fff;
+                color: $WHITE;
                 padding: 8px 14px;
                 border-radius: 8px;
                 font-size: 14px;
@@ -325,7 +327,7 @@
         width: 100%;
         overflow-x: auto;
         margin-bottom: 1rem;
-        border: 0.5px solid #aeb0bc;
+        border: 0.5px solid $GREY-40;
         border-radius: 8px;
         -webkit-overflow-scrolling: touch;
 
@@ -348,7 +350,7 @@
             padding: 12px 15px;
             text-align: left;
             vertical-align: top;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid $c66;
 
             @media (max-width: 768px) {
                 padding: 10px 8px;
@@ -357,20 +359,20 @@
 
         th {
             font-weight: 600;
-            color: #555;
-            background-color: #f9f9f9;
+            color: $c92;
+            background-color: $c93;
         }
 
         td {
-            color: #333;
+            color: $c75;
         }
 
         tbody tr {
             &:hover {
-                background-color: #f3f4f6;
+                background-color: $c94;
             }
             &:nth-child(even) {
-                background-color: #f7f7f8;
+                background-color: $GREY-00;
             }
         }
 
@@ -385,7 +387,7 @@
             height: 40px;
             border-radius: 50%;
             overflow: hidden;
-            background: #e5e7eb;
+            background: $c95;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -400,7 +402,7 @@
             .rewards_phase_nominee_initial {
                 font-size: 0.9375rem;
                 font-weight: 600;
-                color: #374151;
+                color: $c88;
             }
         }
 
@@ -414,12 +416,12 @@
         .rewards_phase_nominee_name {
             font-size: 0.9375rem;
             font-weight: 600;
-            color: #1f2937;
+            color: $c91;
         }
 
         .rewards_phase_nominee_dept {
             font-size: 0.8125rem;
-            color: #6b7280;
+            color: $c87;
         }
 
         .citation_cell {
@@ -438,7 +440,7 @@
                 padding: 0;
                 border: none;
                 background: transparent;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 font-size: 13px;
                 font-weight: 600;
                 line-height: inherit;
@@ -447,7 +449,7 @@
                 cursor: pointer;
 
                 &:hover {
-                    color: #023b54;
+                    color: $c90;
                 }
             }
         }
@@ -470,7 +472,7 @@
                 margin: 0;
                 font-size: 1.125rem;
                 font-weight: 600;
-                color: #1f2937;
+                color: $c91;
             }
 
             .rewards_phase_voted_header_actions {
@@ -480,10 +482,10 @@
                 flex-wrap: wrap;
 
                 .end_phase_btn {
-                    background: #d4545c;
+                    background: $RED-50;
                     text-align: center;
                     border: none;
-                    color: #ffffff;
+                    color: $WHITE;
                     border-radius: 8px;
                     padding: 10px 16px;
                     font-size: 14px;
@@ -495,10 +497,10 @@
                         color 0.2s;
 
                     &:hover:not(:disabled) {
-                        background: #ffffff;
-                        border: 1px solid #d4545c;
-                        border-color: #d4545c;
-                        color: #d4545c;
+                        background: $WHITE;
+                        border: 1px solid $RED-50;
+                        border-color: $RED-50;
+                        color: $RED-50;
                     }
 
                     &:disabled {
@@ -511,11 +513,11 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
-                    background-color: #045071;
+                    background-color: $PRUSSIAN-70;
                     border: none;
                     border-radius: 8px;
                     padding: 10px 16px;
-                    color: #fff;
+                    color: $WHITE;
                     font-size: 14px;
                     font-weight: 600;
                     cursor: pointer;
@@ -530,9 +532,9 @@
                     display: flex;
                     align-items: center;
                     gap: 0.5rem;
-                    background: #045071;
+                    background: $PRUSSIAN-70;
                     border: none;
-                    color: #fff;
+                    color: $WHITE;
                     padding: 8px 14px;
                     border-radius: 8px;
                     font-size: 14px;
@@ -552,7 +554,7 @@
                     }
 
                     &:hover {
-                        background: #034060;
+                        background: $c120;
                     }
                 }
             }
@@ -564,8 +566,8 @@
 
         .view_all_nominees_btn {
             background: transparent;
-            border: 1px solid #045071;
-            color: #045071;
+            border: 1px solid $PRUSSIAN-70;
+            color: $PRUSSIAN-70;
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 14px;
@@ -581,9 +583,9 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: #045071;
+            background: $PRUSSIAN-70;
             border: none;
-            color: #fff;
+            color: $WHITE;
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 14px;
@@ -597,8 +599,8 @@
         flex-direction: column;
         gap: 1rem;
         padding: 1.25rem;
-        background: #fff;
-        border: 0.5px solid #c7c9d1;
+        background: $WHITE;
+        border: 0.5px solid $GREY-30;
         border-radius: 12px;
         width: 100%;
 
@@ -622,7 +624,7 @@
             height: 56px;
             border-radius: 10%;
             overflow: hidden;
-            background: #e5e7eb;
+            background: $c95;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -637,7 +639,7 @@
             .voted_card_initial {
                 font-size: 1.25rem;
                 font-weight: 600;
-                color: #374151;
+                color: $c88;
             }
         }
 
@@ -650,12 +652,12 @@
             .voted_card_name {
                 font-weight: 600;
                 font-size: 1.0625rem;
-                color: #1f2937;
+                color: $c91;
             }
 
             .voted_card_dept {
                 font-size: 0.875rem;
-                color: #6b7280;
+                color: $c87;
             }
         }
 
@@ -665,15 +667,15 @@
             align-items: baseline;
             gap: 0 0.25rem;
             padding: 1rem;
-            background: #eceff9;
+            background: $BLUE-10;
             border-radius: 12px;
             font-size: 14px;
             font-weight: 500;
-            color: #2e3038;
+            color: $GREY-80;
 
             .voted_card_citation_quotes {
                 font-size: 1.25em;
-                color: #6b7280;
+                color:  $c87;
                 line-height: 1;
             }
 
@@ -686,7 +688,7 @@
                 padding: 0;
                 border: none;
                 background: transparent;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 font-size: 14px;
                 font-weight: 600;
                 line-height: inherit;
@@ -695,7 +697,7 @@
                 cursor: pointer;
 
                 &:hover {
-                    color: #023b54;
+                    color: $c90;
                 }
             }
         }
@@ -703,15 +705,15 @@
         .remove_vote_btn {
             align-self: flex-start;
             background: transparent;
-            border: 1px solid #dc2626;
-            color: #dc2626;
+            border: 1px solid $c121;
+            color: $c121;
             padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.875rem;
             cursor: pointer;
 
             &:hover {
-                background: #fef2f2;
+                background: $c122;
             }
         }
 
@@ -730,14 +732,14 @@
             margin: 0 0 1rem 0;
             font-size: 1.125rem;
             font-weight: 600;
-            color: #1f2937;
+            color: $c91;
         }
 
         .view_all_nominees_btn {
             margin-top: 0.5rem;
             background: transparent;
-            border: 1px solid #045071;
-            color: #045071;
+            border: 1px solid $PRUSSIAN-70;
+            color: $PRUSSIAN-70;
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 14px;
@@ -745,7 +747,7 @@
             cursor: pointer;
 
             &:hover {
-                background: #f0f9fc;
+                background: $c123;
             }
         }
     }

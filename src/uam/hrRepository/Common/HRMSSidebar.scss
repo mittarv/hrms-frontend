@@ -1,23 +1,20 @@
 @use "../../../design/colors/Colors";
+@use '../design/colors/customColors' as *;
+
 .hrms_main_sidebar {
   height: 100vh;
-  width: 290px;
-  border-radius: 0px 50px 50px 0px;
+  width: 318px;
+  border-radius: 0 50px 50px 0;
   background-color: Colors.$c31;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
   transition: width 0.3s linear;
-  padding: 0;
+  padding:40px 24px 40px 32px;
   position: relative;
-  overflow: visible; // Allow button to extend beyond border-radius
-  
-  // Clip content but allow header button to be visible
-  .hrms_sidebar_top_section {
-    overflow: hidden;
-  }
-  
+  overflow: visible;
+
   .hrms_sidebar_top_section {
     width: 100%;
     display: flex;
@@ -29,69 +26,30 @@
 
   .hrms_sidebar_header_container {
     width: 100%;
-    padding: 40px 20px 20px 20px;
+    height:52.6px;
     flex-shrink: 0;
     position: relative;
-    background-color: Colors.$c31;
+    background-color: transparent;
     z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: visible; // Allow button to be visible at edge
-  }
+    overflow: hidden;
+    gap:24px;
 
-  .hrms_drawer_close_icon {
-    position: absolute;
-    top: 20px;
-    right: -12px; // Position at the edge, half outside for better visibility
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    transition: all 0.3s linear;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border-radius: 50%;
-    background-color: Colors.$c31;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-    &:hover {
-      opacity: 1;
-      transform: scale(1.1);
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
+    .hrms_sidebar_header_logo {
       display: block;
-      filter: brightness(0) invert(1); // Make icon white
-    }
-  }
+      width: 100%;
+      height: auto;
+      max-width: 262px;
+      object-fit: contain;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-right:auto;
 
-  .hrms_siderbar_header__logo {
-    display: block;
-    width: 100%; 
-    height: auto;
-    max-width: 200px; // Reduced to leave space for edge button
-    object-fit: contain;
-    margin-left: auto;
-    margin-right: auto;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    
-    &:hover {
-      opacity: 0.8;
+      &:hover {
+        opacity: 0.8;
+      }
     }
   }
 
@@ -100,94 +58,166 @@
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
-    padding: 10px 0 20px 0;
+    padding:72px 0px 0px 0px;
     min-height: 0;
-    
-    // Custom scrollbar styling
+
     &::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: $c197;
       border-radius: 3px;
-      
+
       &:hover {
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: $c39;
       }
     }
   }
 
+  .hrms_sidebar_divider {
+    width: 262px;
+    height: 0px;
+    margin: 10px auto;
+    border: 0.5px solid #F1F1F4;
+    opacity: 0.9;
+  }
+
   .hrms_sidebar_content {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
     width: 100%;
+    height:48px;
     flex-shrink: 0;
-    padding: 0 0 40px 0;
-    background-color: Colors.$c31;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: transparent;
+    border-top: none;
     margin-top: auto;
+    position: relative;
+    overflow: visible;
+    gap:8px;
   }
 
   .hrms_sidebar_content_links {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    height: 60px;
+    height: 50.03px;
     width: 100%;
     transition: all 0.3s ease-in;
-    padding: 0;
+    padding: 10px 12px 10px 16px;
+    cursor: pointer;
 
     img {
-      margin-left: 37px;
+      filter: brightness(0) saturate(100%) invert(76%) sepia(7%) saturate(190%) hue-rotate(185deg) brightness(92%) contrast(86%);
+      transition: filter 0.3s ease, transform 0.3s ease;
     }
+
 
     &:hover {
-      cursor: pointer;
-      background-color: rgba(132, 181, 210, 0.1);
+      background-color: transparent;
+    }
+
+    .hrms_sidebar_link_title {
+      color: #C7C9D1;
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-family: "Inter", sans-serif;
+      padding-left: 18.5px;
     }
   }
 
-  .hrms_platform_section_links {
-    border-radius: 50px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border-right: none !important;
-  }
-  
+  .hrms_sidebar_content_links.hrms_active_links {
+    background-color: transparent;
 
-  .hrms_sidebar_link_title {
-    color: Colors.$c7;
-    font-size: 1rem;
-    font-weight: 500;
-    font-family: "Inter", sans-serif;
-    padding-left: 18.5px;
+    img {
+      filter: brightness(0) invert(1);
+      transform: scale(1.05);
+    }
+
+    .hrms_sidebar_link_title {
+      color: Colors.$c12;
+      text-decoration: underline;
+      text-decoration-color: Colors.$c12;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.25rem;
+      font-family: "Inter", sans-serif;
+    }
+  }
+
+  .hrms_toggle_button_expanded {
+    position: absolute;
+    top: 12%;
+    right: -20px;
+    transform: translateY(-50%);
+    z-index: 1000;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #033348;
+    border: 1.5px solid #033348;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 4px;
+    margin: 0;
+
+    &:hover {
+      transform: translateY(-50%) scale(1.08);
+      border-color: $c274;
+      background: #033348;
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.96);
+      box-shadow:
+        0 1px 3px $c143,
+        0 0 0 1px $c275 inset;
+    }
+
+    img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      display: block;
+      filter: none;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    &:hover img {
+      opacity: 1;
+    }
   }
 }
+
 .hrms_toggle_sidebar {
   height: 100vh;
-  width: 100px;
-  border-radius: 0px 50px 50px 0px;
+  width: 132px;
+  border-radius: 0 50px 50px 0;
   background-color: Colors.$c31;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-between;
   z-index: 100;
-  padding: 0;
+  padding: 40px 24px 40px 32px;
   position: relative;
-  overflow: visible; // Allow button to extend beyond border-radius
+  overflow: visible;
   transition: width 0.3s linear;
-  
-  // Clip content but allow header button to be visible
-  .hrms_sidebar_top_section {
-    overflow: hidden;
-  }
 
   .hrms_sidebar_top_section {
     width: 100%;
@@ -199,66 +229,23 @@
 
   .hrms_sidebar_header_container {
     width: 100%;
-    padding: 40px 15px 20px 15px;
+    height:43.65px;
     flex-shrink: 0;
     position: relative;
-    background-color: Colors.$c31;
     z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: visible; // Allow button to be visible at edge
-  }
+    overflow: hidden;
 
-  .hrms_drawer_close_icon {
-    position: absolute;
-    top: 20px;
-    right: -12px; // Position at the edge, half outside for better visibility
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    transition: all 0.3s linear;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    border-radius: 50%;
-    background-color: Colors.$c31;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    .hrms_toggled_logo {
+      height: 43.65px;
+      width: 76px;
+      margin: 0 auto;
+      transition: all 0.3s linear;
+      cursor: pointer;
+      flex-shrink: 0;
 
-    &:hover {
-      opacity: 1;
-      transform: scale(1.1);
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
-      display: block;
-      filter: brightness(0) invert(1); // Make icon white
-    }
-  }
-
-  .hrms_toggled_logo {
-    height: 42px;
-    width: 47px;
-    margin: 0 auto;
-    transition: all 0.3s linear;
-    cursor: pointer;
-    flex-shrink: 0;
-    
-    &:hover {
-      opacity: 0.8;
+      &:hover {
+        opacity: 0.8;
+      }
     }
   }
 
@@ -266,29 +253,37 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 100%;
-    padding: 10px 0 20px 0;
+    width:100%;
+    padding: 72px 0px 12px 0px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    
-    // Custom scrollbar styling
+
+
     &::-webkit-scrollbar {
       width: 4px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: transparent;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: $c197;
       border-radius: 2px;
-      
+
       &:hover {
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: $c39;
       }
     }
+  }
+
+  .hrms_sidebar_divider {
+    width: 76px;
+    height: 0px;
+    margin: 10px auto;
+    border:0.5px solid #F1F1F4;
+    opacity: 0.9;
   }
 
   .hrms_toggle_sidebar_content {
@@ -297,66 +292,152 @@
     display: flex;
     width: 100%;
     flex-shrink: 0;
-    padding: 0 0 40px 0;
-    background-color: Colors.$c31;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0 0 20px;
+    background-color: transparent;
+    border-top: none;
     margin-top: auto;
+    position: relative;
+    overflow: visible;
+    gap:10px;
   }
 
   .hrms_toggle_sidebar_content_links {
-    height: 60px;
+    height: 48px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    transition: all 0.3s ease-in;
-    
+    transition: filter 0.45s ease, transform 0.45s ease, opacity 0.45s ease;
+    border-radius: 8px;
+    padding:10px 12px 10px 12px;
+    position: relative;
+    gap:8px;
+
     img {
-      margin: 0;
+      margin: 0px;
+      filter: brightness(0) saturate(100%) invert(76%) sepia(7%) saturate(190%) hue-rotate(185deg) brightness(92%) contrast(86%);
+      transition: filter 0.45s ease, transform 0.45s ease, opacity 0.45s ease;
     }
-    
+
     &:hover {
-      background-color: rgba(132, 181, 210, 0.1);
+      background-color: $c286;
+    }
+
+    .hrms_sidebar_link_title {
+      color: Colors.$c7;
+      font-size: 0.875rem;
+      font-weight: 500;
+      font-family: "Inter", sans-serif;
     }
   }
-}
-.hrms_active_links,
-.hrms_sidebar_content_links.hrms_active_links,
-.hrms_toggle_sidebar_content_links.hrms_active_links {
-  background-color: Colors.$c5;
-  padding: 10px 0px;
-  height: 60px;
-  border-right: 4px solid Colors.$c12;
-  cursor: pointer;
-  width: 100%;
 
-  .hrms_sidebar_link_title {
-    color: Colors.$c12;
-  }
-
-  .hrms_platform_dropdown{
-    display: flex;
-    flex-direction: row;
-    justify-content:space-around;
-    align-items: center;
-    padding-top: 5px;
-
-    .hrms_up_arrow{
-      transform: rotate(180deg);
-      transition: all 0.25s linear;
-    }
-  }
-  .hrms_platform_links{
-    padding-top: 20px;
-  }
-}
-
-// Active link styling for toggle sidebar (centered icons)
-.hrms_toggle_sidebar {
   .hrms_toggle_sidebar_content_links.hrms_active_links {
-    border-right: none;
-    border-left: 4px solid Colors.$c12;
-    border-radius: 0 8px 8px 0;
+    height: 64px;
+    width: 76px;
+    min-height: 64px;
+    max-height: 64px;
+    min-width: 76px;
+    max-width: 76px;
+    position: relative;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      width: 52px;
+      height: 48px;
+      background-color: #002231;
+      border-radius: 10px;
+      z-index: 0;
+      transform: translateZ(0);
+    }
+
+    img {
+      filter: brightness(0) invert(1);
+      transform: scale(1.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 7px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 0px;
+      border-radius: 2px;
+      border-bottom: 2px solid #FFFFFF;
+      background-color: transparent;
+    }
+
+    .hrms_sidebar_link_title {
+      text-decoration: underline;
+      text-decoration-color: Colors.$c12;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 8px;
+      position: relative;
+      z-index: 1;
+    }
+  }
+
+  .hrms_toggle_button_collapsed {
+    position: absolute;
+    top: 12%;
+    right: -20px;
+    transform: translateY(-50%);
+    z-index: 1000;
+    margin-top: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: #033348;
+    border: 1.5px solid #033348;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 4px;
+    margin: 0;
+
+    &:hover {
+      transform: translateY(-50%) scale(1.08);
+      border-color: rgba(174, 176, 188, 0.6);
+      background: #033348;
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.96);
+      box-shadow:
+        0 1px 3px $c143,
+        0 0 0 1px $c275 inset;
+    }
+
+    img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      display: block;
+      filter: none;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+      transform: rotate(180deg);
+    }
+
+    &:hover img {
+      opacity: 1;
+    }
   }
 }

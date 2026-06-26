@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .custom_tooltip_wrapper {
   cursor: default;
 
@@ -17,12 +19,12 @@
   max-height: min(320px, 60vh);
   padding: 10px 14px;
   padding-bottom: 14px;
-  background: #374151;
-  color: #fff;
+  background: $c88;
+  color: $WHITE;
   font-size: 13px;
   line-height: 1.45;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px $c138;
   pointer-events: none;
   animation: custom_tooltip_show 0.1s ease-out;
   overflow: visible;
@@ -49,12 +51,12 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.1);
+      background: $c261;
       border-radius: 2px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
+      background: $c197;
       border-radius: 2px;
     }
   }
@@ -67,7 +69,7 @@
     height: 0;
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
-    border-top: 7px solid #374151;
+    border-top: 7px solid $c88;
     bottom: -7px;
     flex-shrink: 0;
   }
@@ -80,7 +82,7 @@
       bottom: auto;
       top: -7px;
       border-top: none;
-      border-bottom: 7px solid #374151;
+      border-bottom: 7px solid $c88;
     }
   }
 }

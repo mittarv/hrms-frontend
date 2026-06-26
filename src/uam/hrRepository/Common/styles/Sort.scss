@@ -1,6 +1,8 @@
+@use '../../design/colors/customColors' as *;
+
 .sort-container {
   position: relative;
-
+  // padding: ;
   // The filter-button (which acts as the Sort Icon button) styles should be defined elsewhere,
   // but we ensure the dropdown is correctly positioned relative to it.
 
@@ -10,13 +12,13 @@
     position: absolute;
 
     // Positioning relative to the filter-button
-    top: 56px; // ~56px below the button (based on common design systems)
+    top: calc(100% + 8px);
     right: 0; // Align dropdown to the right edge of the sort button
 
     // Standard dropdown appearance
-    background-color:#ffffff;
+    background-color: $WHITE;
     width: 253px; // Fixed width matching your reference
-    border: 0.5px solid #c7c9d1;
+    border: 0.5px solid $GREY-30;
     border-radius: 4px;
 
     z-index: 100; // Ensure it appears above other content
@@ -37,10 +39,10 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
-      color: #454754; // Assuming a dark text color
+      color: $GREY-70; // Assuming a dark text color
 
       &.selected {
-        background-color: #f0f0f0;
+        background-color: $c128;
       }
     }
 
@@ -48,9 +50,62 @@
 
     .selected-tick-mark {
       // Adjust the color and size of the checkmark
-      color: #454754; // Should match the selected item text color
+      color: $GREY-70; // Should match the selected item text color
       font-size: 16px;
       font-weight: 600;
+    }
+  }
+
+  .sort-button-label {
+    border: 2px solid $CYAN-50;
+    background-color: $WHITE;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 64px;
+    transition: background-color 0.2s ease;
+    color: $GREY-80;
+    font-size: 14px;
+    font-weight: 600;
+
+    .sort-title-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      background-color: $CYAN-20;
+    }
+
+    &.active {
+      background-color: $CYAN-20;
+    }
+  }
+
+  .filter-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid $CYAN-50;
+    background-color: $WHITE;
+    transition: background-color 0.2s ease;
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background-color: $CYAN-20;
+    }
+
+    &.active {
+      background-color: $CYAN-20;
     }
   }
 }

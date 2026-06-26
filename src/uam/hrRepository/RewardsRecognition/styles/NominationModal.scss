@@ -1,10 +1,12 @@
+@use '../../design/colors/customColors' as *;
+
 .nomination_modal_overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: $c131;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +15,7 @@
 }
 
 .nomination_modal {
-  background: white;
+  background: $WHITE;
   border-radius: 12px;
   width: 90%;
   max-width: 620px;
@@ -21,7 +23,7 @@
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px $c108;
   box-sizing: border-box;
 
   .nomination_modal_header {
@@ -38,15 +40,15 @@
       font-size: 18px;
       font-weight: 600;
       line-height: 28px;
-      color: #2e3038;
+      color: $GREY-80;
       text-decoration: underline;
-      text-decoration-color: #2e3038;
+      text-decoration-color: $GREY-80;
       text-underline-offset: 0.5rem;
       text-decoration-thickness: 2px;
     }
 
     .nomination_modal_close_button {
-      background: #f1f1f4;
+      background: $GREY-10;
       border: none;
       cursor: pointer;
       border-radius: 8px;
@@ -67,17 +69,17 @@
     flex: 1;
 
     .nomination_modal_info {
-      background: #e7f3f8;
-      color: #454754;
+      background: $c42;
+      color: $GREY-70;
       padding: 0.5rem 1rem;
-      border: 1px solid #87c4de;
+      border: 1px solid $PRUSSIAN-30;
       border-radius: 4px;
       font-size: 14px;
       line-height: 1.5;
       margin-bottom: 1.5rem;
 
       .award_highlight {
-        color: #1888b9;
+        color: $PRUSSIAN-50;
         font-weight: 600;
       }
     }
@@ -89,13 +91,13 @@
         display: block;
         font-size: 1rem;
         font-weight: 600;
-        color: #1f2937;
+        color: $c91;
         margin-bottom: 0.25rem;
       }
 
       .label_subtitle {
         font-size: 12px;
-        color: #676b7e;
+        color: $GREY-60;
         margin-bottom: 0.75rem;
       }
 
@@ -115,23 +117,23 @@
         input[type="text"] {
           width: 100%;
           padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-          border: 1.5px solid #d1d5db;
+          border: 1.5px solid $c86;
           border-radius: 4px;
           font-size: 0.9375rem;
           transition: all 0.2s;
 
           &:focus {
             outline: none;
-            border-color: #0284c7;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+            border-color: $c132;
+            box-shadow: 0 0 0 3px $c133;
           }
 
           &.error {
-            border-color: #ef4444;
+            border-color: $c134;
           }
 
           &::placeholder {
-            color: #9ca3af;
+            color: $c98;
           }
         }
 
@@ -140,10 +142,10 @@
           top: calc(100% + 4px);
           left: 0;
           right: 0;
-          background: white;
+          background: $WHITE;
           border: 1px solid #e5e7eb;
           border-radius: 8px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 10px 25px $c69;
           max-height: 300px;
           overflow-y: auto;
           z-index: 10;
@@ -157,11 +159,11 @@
             transition: background 0.15s;
 
             &:hover {
-              background: #f3f4f6;
+              background: $c94;
             }
 
             &:not(:last-child) {
-              border-bottom: 1px solid #f3f4f6;
+              border-bottom: 1px solid $c94;
             }
 
             .emp_avatar {
@@ -170,7 +172,7 @@
               height: 40px;
               border-radius: 50%;
               overflow: hidden;
-              background: #e5e7eb;
+              background: $c95;
 
               img {
                 width: 100%;
@@ -184,8 +186,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #1888b9;
-                color: white;
+                background: $PRUSSIAN-50;
+                color: $WHITE;
                 font-size: 0.875rem;
                 font-weight: 600;
               }
@@ -201,7 +203,7 @@
               .emp_name {
                 font-size: 0.9375rem;
                 font-weight: 500;
-                color: #1f2937;
+                color: $c91;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -209,7 +211,7 @@
 
               .emp_dept {
                 font-size: 0.8125rem;
-                color: #6b7280;
+                color: $c87;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -218,7 +220,7 @@
           }
 
           .search_result_item.empty {
-            color: #6b7280;
+            color: $c87;
             cursor: default;
             justify-content: center;
           }
@@ -229,8 +231,8 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        background: #ebfafa;
-        border: 1px solid #167e7e;
+        background: $CYAN-10;
+        border: 1px solid $c135;
         border-radius: 4px;
         padding: 10px 14px;
         margin-top: 0.75rem;
@@ -241,7 +243,7 @@
           height: 48px;
           border-radius: 50%;
           overflow: hidden;
-          background: #e5e7eb;
+          background: $c95;
 
           img {
             width: 100%;
@@ -255,8 +257,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #167e7e;
-            color: white;
+            background: $c135;
+            color: $WHITE;
             font-size: 1rem;
             font-weight: 600;
           }
@@ -272,12 +274,12 @@
           .emp_name {
             font-size: 1rem;
             font-weight: 600;
-            color: #1f2937;
+            color: $c91;
           }
 
           .emp_dept {
             font-size: 0.8125rem;
-            color: #6b7280;
+            color: $c87;
           }
         }
       }
@@ -285,7 +287,7 @@
       textarea {
         width: 100%;
         padding: 10px 14px;
-        border: 1.5px solid #d1d5db;
+        border: 1.5px solid $c86;
         border-radius: 4px;
         font-size: 0.9375rem;
         font-family: inherit;
@@ -295,16 +297,16 @@
 
         &:focus {
           outline: none;
-          border-color: #0284c7;
-          box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+          border-color: $c132;
+          box-shadow: 0 0 0 3px $c133;
         }
 
         &.error {
-          border-color: #ef4444;
+          border-color: $c134;
         }
 
         &::placeholder {
-          color: #9ca3af;
+          color: $c98;
         }
       }
 
@@ -336,15 +338,15 @@
           }
 
           &.empty {
-            color: #676b7e;
+            color: $GREY-60;
           }
 
           &.insufficient {
-            color: #ef4444;
+            color: $c134;
           }
 
           &.sufficient {
-            color: #10b981;
+            color: $c136;
           }
         }
       }
@@ -352,7 +354,7 @@
       .error_message {
         display: block;
         font-size: 0.8125rem;
-        color: #ef4444;
+        color: $c134;
         margin-top: 0.5rem;
       }
     }
@@ -380,25 +382,25 @@
     }
 
     .cancel_btn {
-      background: white;
-      color: #045071;
-      border: 1px solid #045071;
+      background: $WHITE;
+      color: $PRUSSIAN-70;
+      border: 1px solid $PRUSSIAN-70;
 
       &:hover:not(:disabled) {
-        background: #f0f9ff;
+        background: $c137;
       }
     }
 
     .submit_btn {
-      background: #045071;
-      color: white;
+      background: $PRUSSIAN-70;
+      color: $WHITE;
 
       &:hover:not(:disabled) {
-        background: #034060;
+        background: $c120;
       }
 
       &:disabled {
-        background: #d1d5db;
+        background: $c86;
       }
     }
   }

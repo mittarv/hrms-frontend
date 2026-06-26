@@ -121,6 +121,33 @@ const initialState = {
   offboardedEmployees: [],
 
   // Rewards & Recognition
+secondaryLocationOverview: null,
+  secondaryLocationLogs: [],
+  secondaryLocationLogsMeta: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationConfigs: [],
+  secondaryLocationRequests: [],
+  secondaryLocationConfigsMeta: {
+    limit: 10,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationRequestsMeta: {
+    pendingCount: 0,
+    historyCount: 0,
+    totalCount: 0,
+    limit: 20,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationLoading: false,
+  secondaryLocationRequestsLoading: false,
+
   rewardsDashboardLoading: false,
   rewardsDashboardData: null,
   rewardsDashboardError: null,
@@ -1513,5 +1540,170 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
     })
     .addCase('SET_ANNOUNCE_WINNERS_MODAL_OPEN', (state, action) => {
       state.announceWinnersModalOpen = action.payload;
+    })
+
+    // Secondary Location
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationOverview = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      const incomingList = action.payload?.list || [];
+      if (action.append) {
+        const existing = state.secondaryLocationLogs || [];
+        const seen = new Set(existing.map((item) => item.logId));
+        state.secondaryLocationLogs = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.logId)),
+        ];
+      } else {
+        state.secondaryLocationLogs = incomingList;
+      }
+      state.secondaryLocationLogsMeta = action.payload?.meta || state.secondaryLocationLogsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      if (Array.isArray(action.payload)) {
+        state.secondaryLocationConfigs = action.payload;
+        state.secondaryLocationConfigsMeta = {
+          limit: 10,
+          nextLastId: null,
+          hasNext: false,
+        };
+        return;
+      }
+
+      const incomingList = action.payload?.list || [];
+      if (action.append) {
+        const existing = state.secondaryLocationConfigs || [];
+        const seen = new Set(existing.map((item) => item.configId));
+        state.secondaryLocationConfigs = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.configId)),
+        ];
+      } else {
+        state.secondaryLocationConfigs = incomingList;
+      }
+
+      state.secondaryLocationConfigsMeta = action.payload?.meta || state.secondaryLocationConfigsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS', (state) => {
+      state.secondaryLocationRequestsLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS_SUCCESS', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      const incomingList = action.payload?.requests || [];
+      if (action.append) {
+        const existing = state.secondaryLocationRequests || [];
+        const seen = new Set(existing.map((item) => item.requestId));
+        state.secondaryLocationRequests = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.requestId)),
+        ];
+      } else {
+        state.secondaryLocationRequests = incomingList;
+      }
+      state.secondaryLocationRequestsMeta = action.payload?.meta || state.secondaryLocationRequestsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS_FAILURE', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST', (state) => {
+      state.secondaryLocationRequestsLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST_SUCCESS', (state) => {
+      state.secondaryLocationRequestsLoading = false;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST_FAILURE', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
     });
 });

@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
 import { RequestsTableHeader } from "../utils/RequestsData";
 import {
   getPendingRequests,
+  getProcessedRequests,
   approveOrRejectRequest,
   getAllComponentTypes,
+  getAllEmployee,
 } from "../../../../actions/hrRepositoryAction";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -11,35 +14,59 @@ import {
   sectionFieldMapping,
 } from "../../EmployeeRepository/utils/EmployeeRepositoryData";
 import "../styles/EmployeeDetailsRequests.scss";
+import Pagination from "../../Common/components/Pagination"
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 import approve_icon from "../../assets/icons/approve_icon.svg";
 import reject_icon_enable from "../../assets/icons/reject_icon_enable.svg";
 import reject_icon_disable from "../../assets/icons/reject_icon_disable.svg";
+import RequestsSubTabs from "./RequestsSubTabs";
 
 // Define the ENUM for status
 export const RequestStatus = {
   APPROVED: "approve",
   REJECTED: "reject",
 };
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
+
+const START_YEAR = 2020;
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: CURRENT_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
 
 const EmployeeDetailsRequests = () => {
+  const [selectedMonth, setSelectedMonth] = useState("all"); // 0-indexed
+  const [selectedYear, setSelectedYear] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [displayStartDate, setDisplayStartDate] = useState("");
-  const [displayEndDate, setDisplayEndDate] = useState("");
   const [checkedRequestIds, setCheckedRequestIds] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [filteredRequests, setFilteredRequests] = useState([]);
+  const [activeTab, setActiveTab] = useState("pending");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const hrRepositoryReducer = useSelector(
     (state) => state?.hrRepositoryReducer
   );
   const loading = hrRepositoryReducer?.loading ?? false;
-  const pendingRequests = hrRepositoryReducer?.pendingRequests ?? [];
-  const componentTypes = hrRepositoryReducer?.getAllComponentType ?? {};
-  const getAllComponentType = hrRepositoryReducer?.getAllComponentType ?? [];
-  const myHrmsAccess = hrRepositoryReducer?.myHrmsAccess ?? {};
+  const pendingRequests = Array.isArray(hrRepositoryReducer?.pendingRequests)
+    ? hrRepositoryReducer.pendingRequests
+    : EMPTY_ARRAY;
+  const componentTypes = hrRepositoryReducer?.getAllComponentType ?? EMPTY_OBJECT;
+  const allEmployees = Array.isArray(hrRepositoryReducer?.allEmployees)
+    ? hrRepositoryReducer.allEmployees
+    : EMPTY_ARRAY;
+  const myHrmsAccess = hrRepositoryReducer?.myHrmsAccess ?? EMPTY_OBJECT;
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const processedRequests = Array.isArray(hrRepositoryReducer?.processedRequests?.data)
+    ? hrRepositoryReducer.processedRequests.data
+    : EMPTY_ARRAY;
+  const pagination = hrRepositoryReducer?.processedRequests?.pagination ?? null;
   
   // Helper function to check if user has permission
   const hasPermission = (permissionName) => {
@@ -47,7 +74,39 @@ const EmployeeDetailsRequests = () => {
     if (isAdmin) return true;
     return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
   };
+   useEffect(() => {
+    setCurrentPage(1);
+  // If user sets either to "Month" or "Year" (value "all"), 
+  // we clear the dates so the backend fetches everything.
+  if (selectedMonth === "all" || selectedYear === "all") {
+    setStartDate("");
+    setEndDate("");
+  } else {
+    const start = new Date(selectedYear, selectedMonth, 1);
+    const end = new Date(selectedYear, selectedMonth + 1, 0);
+    
+    setStartDate(start.toISOString().split('T')[0]);
+    setEndDate(end.toISOString().split('T')[0]);
+  }
+}, [selectedMonth, selectedYear]);
 
+ useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, startDate, endDate]);
+
+  
+
+  const handleMonthChange = (e) => {
+  const val = e.target.value;
+  // If they click the placeholder "Month", val is "all", which resets the filter
+  setSelectedMonth(val === "all" ? "all" : parseInt(val));
+};
+
+const handleYearChange = (e) => {
+  const val = e.target.value;
+  // If they click the placeholder "Year", val is "all", which resets the filter
+  setSelectedYear(val === "all" ? "all" : parseInt(val));
+};
   const canRead = hasPermission("EmployeeDetailsRequest_read");
   const hasAccessToEditEmployee = hasPermission("EmployeeDetailsRequest_write");
 
@@ -96,15 +155,42 @@ const EmployeeDetailsRequests = () => {
     }
   };
 
+  // Map employee UUID to display name using getAllEmployee data
+  const getEmployeeNameByUuid = (uuid) => {
+    if (!uuid || typeof uuid !== "string") return "N/A";
+    const employee = allEmployees.find((emp) => emp.employeeUuid === uuid);
+    if (!employee) return String(uuid);
+    const firstName = employee.employeeFirstName ?? "";
+    const lastName = employee.employeeLastName ?? "";
+    return [firstName, lastName].filter(Boolean).join(" ") || String(uuid);
+  };
+
   // Helper function to get human-readable value from component types
   const getDisplayValue = (fieldName, value, componentTypes) => {
     if (value === null || value === undefined) return "N/A";
+
+    // Employee reference fields (UUIDs) – resolve to name via getAllEmployee
+    if (fieldName === "empManager") {
+      return getEmployeeNameByUuid(value);
+    }
+
+    // Boolean isManager – show Yes/No
+    if (fieldName === "isManager") {
+      const isTrue = value === true || value === 1 || String(value).toLowerCase() === "true";
+      return isTrue ? "Yes" : "No";
+    }
+
+    // Boolean Same-as-Primary toggle – show Yes/No
+    if (fieldName === "isSecondarySameAsPrimary") {
+      const isTrue = value === true || value === 1 || String(value).toLowerCase() === "true";
+      return isTrue ? "Yes" : "No";
+    }
 
     // Map field names to their respective dropdown types
     const fieldDropdownMap = {
       empType: "emp_type_dropdown",
       empDepartment: "department_type_dropdown",
-      empManager: null, // This is likely a different type of reference
+      empManager: null, // Resolved above via getEmployeeNameByUuid
       empGender: "gender_type_dropdown",
       empBloodGroup: "blood_group_dropdown",
       empMaritalStatus: "marital_status_dropdown",
@@ -112,6 +198,7 @@ const EmployeeDetailsRequests = () => {
       empDob: null, // This is a date field, not a dropdown
       empLevel: "level_dropdown",
       state: "location_dropdown",
+      secondaryLocation: "location_dropdown",
       empYearOfStudy: "year_of_study",
     };
 
@@ -160,12 +247,15 @@ const EmployeeDetailsRequests = () => {
 
   // Format the pending requests to match the expected structure
   const formatPendingRequests = () => {
-    if (!Array.isArray(pendingRequests) || pendingRequests.length === 0) {
+    const sourceData = activeTab === "pending" 
+    ? (pendingRequests ?? []) 
+    : (processedRequests ?? []);
+    if (!Array.isArray(sourceData) || sourceData.length === 0) {
       return [];
     }
 
     try {
-      return pendingRequests
+      return sourceData
         .map((request) => {
           if (!request) return null;
 
@@ -196,8 +286,8 @@ const EmployeeDetailsRequests = () => {
           // Determine the request type based on sectionChanged
           const sectionKey = request?.sectionChanged ?? "";
           const requestType = getSectionName(sectionKey);
-
-          return {
+          
+          const baseData =  {
             id:
               request?.requestId ??
               `unknown-${Math.random().toString(36).substring(2, 11)}`, // Generate a unique ID if none exists
@@ -211,6 +301,19 @@ const EmployeeDetailsRequests = () => {
             // Keep the original request data for later use if needed
             originalRequest: request ?? {},
           };
+
+          if (activeTab==="history") {
+            let status = request?.status || "Pending";
+            if (request.isApproved) status = "Approved";
+            else if (request.isRejected) status = "Rejected";
+
+            return {
+              ...baseData,
+              status: status,
+              reviewedBy: getEmployeeNameByUuid(request.actionedBy) || "N/A",
+            };
+          }
+          return baseData;
         })
         .filter(Boolean); // Remove any null items that may have resulted from errors
     } catch (error) {
@@ -219,20 +322,6 @@ const EmployeeDetailsRequests = () => {
     }
   };
 
-  // Convert YYYY-MM-DD to DD/MM/YYYY for display
-  const formatDateForDisplay = (isoDate) => {
-    if (!isoDate) return "";
-    try {
-      const parts = isoDate.split("-");
-      if (!parts || parts.length !== 3) return "";
-      const [year, month, day] = parts;
-      if (!year || !month || !day) return "";
-      return `${day}/${month}/${year}`;
-    } catch (error) {
-      console.error("Error formatting date for display:", error);
-      return "";
-    }
-  };
 
   // Convert DD/MM/YYYY to YYYY-MM-DD for comparison
   const formatDateForComparison = (date) => {
@@ -248,117 +337,85 @@ const EmployeeDetailsRequests = () => {
       return "";
     }
   };
-
-  // Fetch data when component mounts
+  
   useEffect(() => {
+  const fetchData = async () => {
     try {
-      if (typeof dispatch === "function") {
+      if (allEmployees.length === 0) dispatch(getAllEmployee());
+      if (Object.keys(componentTypes).length === 0) dispatch(getAllComponentTypes());
+
+      if (activeTab === "pending") {
         dispatch(getPendingRequests());
-        if (
-          Array.isArray(getAllComponentType) &&
-          getAllComponentType.length === 0
-        ) {
-          dispatch(getAllComponentTypes());
-        }
+      } else {
+        // Pass dates here so the backend filters the specific page correctly
+        dispatch(getProcessedRequests(startDate, endDate, currentPage, pageSize));
       }
     } catch (error) {
-      console.error("Error dispatching initial actions:", error);
+      console.error("Error fetching repository data:", error);
     }
-  }, [dispatch, getAllComponentType, hasAccessToEditEmployee]);
+  };
 
+  fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [dispatch, activeTab, currentPage, startDate, endDate]); // Added dates as dependencies
+
+ 
   // Process pending requests when they change
+  
   useEffect(() => {
-    try {
-      const formattedRequests = formatPendingRequests();
-      setFilteredRequests(
-        Array.isArray(formattedRequests) ? formattedRequests : []
-      );
-    } catch (error) {
-      console.error("Error processing pending requests:", error);
-      setFilteredRequests([]);
-    }
-  }, [pendingRequests]);
+  try {
+    const formattedRequests = formatPendingRequests();
 
-  // Update display dates when the actual dates change
-  useEffect(() => {
-    try {
-      setDisplayStartDate(formatDateForDisplay(startDate) ?? "");
-      setDisplayEndDate(formatDateForDisplay(endDate) ?? "");
-    } catch (error) {
-      console.error("Error updating display dates:", error);
-      setDisplayStartDate("");
-      setDisplayEndDate("");
-    }
-  }, [startDate, endDate]);
+    // Only apply local date filtering if we are in the "pending" tab
+    // For "history", the backend handles the dates, so we trust the sourceData
+    const filtered = activeTab === "pending" 
+      ? formattedRequests.filter((request) => {
+          if (!startDate && !endDate) return true;
+          const requestDate = formatDateForComparison(request?.requestedOn);
+          const start = startDate || "0000-00-00";
+          const end = endDate || "9999-12-31";
+          return requestDate >= start && requestDate <= end;
+        })
+      : formattedRequests; // Trust the backend for History tab
 
-  // Filter requests based on start date and end date
-  useEffect(() => {
-    try {
-      const formattedRequests = formatPendingRequests();
+    setFilteredRequests(filtered ?? []);
 
-      const filtered = Array.isArray(formattedRequests)
-        ? formattedRequests.filter((request) => {
-            if (!request) return false;
-            if (!startDate && !endDate) return true;
+    // Update selectAll logic
+    const filteredIds = filtered.map((request) => request.id).filter(Boolean);
+    const allSelected = filteredIds.length > 0 && 
+                        filteredIds.every((id) => checkedRequestIds.includes(id));
+    setSelectAll(allSelected);
 
-            try {
-              const requestDate = formatDateForComparison(request?.requestedOn);
-              if (!requestDate) return true; // Include if we can't determine the date
-
-              const start = startDate ? startDate : "0000-00-00";
-              const end = endDate ? endDate : "9999-12-31";
-              return requestDate >= start && requestDate <= end;
-            } catch (error) {
-              console.error("Error filtering request date:", error);
-              return true; // Include in case of error
-            }
-          })
-        : [];
-
-      setFilteredRequests(filtered ?? []);
-
-      // Update selectAll state based on filtered requests
-      const filteredIds = Array.isArray(filtered)
-        ? filtered
-            .filter((request) => request && request.id)
-            .map((request) => request.id)
-        : [];
-
-      const allSelected =
-        filteredIds.length > 0 &&
-        Array.isArray(checkedRequestIds) &&
-        filteredIds.every((id) => checkedRequestIds.includes(id));
-
-      setSelectAll(allSelected);
-    } catch (error) {
-      console.error("Error filtering requests:", error);
-      setFilteredRequests([]);
-      setSelectAll(false);
-    }
-  }, [startDate, endDate, checkedRequestIds, pendingRequests]);
+  } catch (error) {
+    console.error("Error filtering requests:", error);
+    setFilteredRequests([]);
+  }
+  //eslint-disable-next-line react-hooks/exhaustive-deps
+}, [startDate, endDate, checkedRequestIds, pendingRequests, processedRequests, activeTab]); 
+// ^ IMPORTANT: Added processedRequests and activeTab to dependencies
 
   // Handle date changes and update both actual and display dates
-  const handleStartDateChange = (e) => {
-    try {
-      if (e && e.target) {
-        setStartDate(e.target.value ?? "");
-      }
-    } catch (error) {
-      console.error("Error handling start date change:", error);
-      setStartDate("");
-    }
-  };
+  // const handleStartDateChange = (e) => {
+  //   try {
+  //     if (e && e.target) {
+  //       setStartDate(e.target.value ?? "");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error handling start date change:", error);
+  //     setStartDate("");
+  //   }
+  // };
 
-  const handleEndDateChange = (e) => {
-    try {
-      if (e && e.target) {
-        setEndDate(e.target.value ?? "");
-      }
-    } catch (error) {
-      console.error("Error handling end date change:", error);
-      setEndDate("");
-    }
-  };
+  // const handleEndDateChange = (e) => {
+  //   try {
+  //     if (e && e.target) {
+  //       setEndDate(e.target.value ?? "");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error handling end date change:", error);
+  //     setEndDate("");
+  //   }
+  // };
 
   const handleCheck = (request) => {
     if (!hasAccessToEditEmployee) return;
@@ -485,9 +542,24 @@ const EmployeeDetailsRequests = () => {
   };
 
   // Safely get table headers
-  const safeTableHeaders = Array.isArray(RequestsTableHeader)
-    ? RequestsTableHeader
-    : [];
+  const safeTableHeaders = useMemo(() => {
+    // Start with your default headers
+    const baseHeaders = Array.isArray(RequestsTableHeader) ? [...RequestsTableHeader] : [];
+
+    // If tab is history, append the extra two columns
+    if (activeTab === "history") {
+      return [
+        ...baseHeaders,
+        { name: "status", label: "Status" },
+        { name: "reviewedBy", label: "Reviewed By" },
+      ];
+    }
+
+    return baseHeaders;
+  }, [activeTab]);
+  // const safeTableHeaders = Array.isArray(RequestsTableHeader)
+  //   ? RequestsTableHeader
+  //   : [];
 
   // Render data entries with proper field labels and mapped values
   const renderDataEntries = (data, sectionKey, requestId, prefix) => {
@@ -540,8 +612,8 @@ const EmployeeDetailsRequests = () => {
     return (
       <div className="employee_details_requests_main_container">
         <div style={{ textAlign: "center", padding: "40px" }}>
-          <p style={{ fontSize: "16px", color: "#666" }}>
-            You don't have permission to view employee detail requests
+          <p className="text-tooltip-small">
+            You don&apos;t have permission to view employee detail requests
           </p>
         </div>
       </div>
@@ -551,8 +623,16 @@ const EmployeeDetailsRequests = () => {
   return (
     <div className="employee_details_requests_main_container">
       <div className="employee_details_requests_header">
+        <RequestsSubTabs
+          tabs={[
+            { value: "pending", label: "Pending" },
+            { value: "history", label: "History" },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
         {/* Date filter */}
-        <div className="date-filter">
+        {/* <div className="date-filter">
           <div className="date-input">
             <label>From</label>
             <div className="custom-date-input">
@@ -605,11 +685,38 @@ const EmployeeDetailsRequests = () => {
               />
             </div>
           </div>
+        </div> */}
+        <div className="date-filter-dropdowns">
+          <div className="custom-select-wrapper">
+            <select 
+              value={selectedMonth} 
+              onChange={handleMonthChange}
+              className="filter-select"
+            >
+              <option value="all">Month</option> 
+              {MONTHS.map((month, index) => (
+                <option key={month} value={index}>{month}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="custom-select-wrapper">
+            <select 
+              value={selectedYear} 
+              onChange={handleYearChange}
+              className="filter-select"
+            >
+              <option value="all">Year</option>
+              {YEARS.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* action buttons */}
         <div className="requests_action_buttons">
-          {hasAccessToEditEmployee && <button
+          {activeTab === "pending"  && hasAccessToEditEmployee && <button
             className={`requests_approve_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0 ||
@@ -628,7 +735,7 @@ const EmployeeDetailsRequests = () => {
             }}
           >
             <span
-              className={`${
+              className={`text-btn-primary ${
                 !Array.isArray(checkedRequestIds) ||
                 checkedRequestIds.length === 0
                   ? "disabled"
@@ -643,7 +750,7 @@ const EmployeeDetailsRequests = () => {
               Approve
             </span>
           </button>}
-          {hasAccessToEditEmployee && <button
+          {activeTab === "pending"  && hasAccessToEditEmployee && <button
             className={`requests_reject_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0
@@ -659,7 +766,7 @@ const EmployeeDetailsRequests = () => {
               }
             }}
           >
-            <span>
+            <span className="text-btn-primary">
               <img
                 src={
                   checkedRequestIds.length === 0
@@ -684,16 +791,18 @@ const EmployeeDetailsRequests = () => {
           />
         </div>
       ) : !Array.isArray(filteredRequests) || filteredRequests.length === 0 ? (
-        <div className="no_requests_message">
+        <div className="no_requests_message text-input-field">
           {startDate || endDate
-            ? "No pending requests between the selected dates."
-            : "No pending requests available."}
+            ? "No requests between the selected dates."
+            : "No requests available."}
         </div>
       ) : (
         <div className="employee_requests_table_container">
           <table className="employee_requests_table">
             <thead>
               <tr>
+                {activeTab === "pending" && (
+                      <>
                 <th>
                   <input
                     type="checkbox"
@@ -701,6 +810,7 @@ const EmployeeDetailsRequests = () => {
                     onChange={handleSelectAllClick}
                   />
                 </th>
+                </> )}
                 {safeTableHeaders.map((header, index) => (
                   <th key={(header?.name ?? index) || `header-${index}`}>
                   {header?.label ?? ""}
@@ -721,6 +831,8 @@ const EmployeeDetailsRequests = () => {
                     key={requestId || `row-${index}`}
                     className={isRequestChecked(requestId) ? "checked-row" : ""}
                   >
+                    {activeTab === "pending" && (
+                      <>
                     <td className="checkbox-cell">
                       <input
                         type="checkbox"
@@ -728,6 +840,7 @@ const EmployeeDetailsRequests = () => {
                         onChange={() => handleCheck(request)}
                       />
                     </td>
+                    </>)}
                     <td className="person_name">{request.person ?? "N/A"}</td>
                     <td>{request.requestedBy ?? "N/A"}</td>
                     <td>{request.requestedOn ?? "N/A"}</td>
@@ -744,6 +857,31 @@ const EmployeeDetailsRequests = () => {
                         <div>No new data</div>
                       )}
                     </td>
+                    {activeTab === "history" && (
+                      <>
+                        <td >
+                          <span className={`status-badge status-${request.status?.toLowerCase()}`}>{request.status ?? "N/A"}</span>
+                          
+                        </td>
+                        <td>{request.reviewedBy ?? "N/A"}</td>
+                        <td className="action-cell">
+                          <button 
+                            className={`edit-button ${request.status?.toLowerCase() === "completed" ? "disabled" : ""}`}
+                            disabled={request.status?.toLowerCase() === "completed"}
+                            title={request.status?.toLowerCase() === "completed" ? "Cannot edit completed requests" : "Edit"}
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            className={`delete-button ${request.status?.toLowerCase() === "completed" ? "disabled" : ""}`}
+                            disabled={request.status?.toLowerCase() === "completed"}
+                            title={request.status?.toLowerCase() === "completed" ? "Cannot delete completed requests" : "Delete"}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 );
               })}
@@ -751,6 +889,13 @@ const EmployeeDetailsRequests = () => {
           </table>
         </div>
       )}
+      {!loading && activeTab === "history" && pagination && (
+  <Pagination
+    pagination={pagination}
+    currentPage={currentPage}
+    onPageChange={(page) => setCurrentPage(page)} // Added handler
+  />
+)}
     </div>
   );
 };

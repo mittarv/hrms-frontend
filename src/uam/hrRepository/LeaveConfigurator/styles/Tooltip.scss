@@ -1,3 +1,7 @@
+@use "../../../../design/colors/customFonts" as fonts;
+
+@use '../../design/colors/customColors' as *;
+
 .tooltip-container {
     position: relative;
     display: flex;
@@ -7,15 +11,13 @@
   
   .tooltip-box {
     position: absolute;
-    background-color: #045071;
-    color: #ffffff;
+    background-color: $PRUSSIAN-70;
+    color: $LIGHT;
     padding: 8px 12px;
     border-radius: 4px;
-    font-size: 12px;
-    font-family: "Plus Jakarta Sans", sans-serif;
     white-space: normal; /* Allow content to wrap */
     z-index: 9999;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 6px $c69;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -43,7 +45,7 @@
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: #045071 transparent transparent transparent;
+    border-color: $PRUSSIAN-70 transparent transparent transparent;
   }
   
   /* Position: bottom */
@@ -61,7 +63,7 @@
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: transparent transparent #045071 transparent;
+    border-color: transparent transparent $PRUSSIAN-70 transparent;
   }
   
   /* Position: left */
@@ -79,7 +81,7 @@
     transform: translateY(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: transparent transparent transparent #045071;
+    border-color: transparent transparent transparent $PRUSSIAN-70;
   }
   
   /* Position: right */
@@ -97,5 +99,5 @@
     transform: translateY(-50%);
     border-width: 6px;
     border-style: solid;
-    border-color: transparent #045071 transparent transparent;
+    border-color: transparent $PRUSSIAN-70 transparent transparent;
   }

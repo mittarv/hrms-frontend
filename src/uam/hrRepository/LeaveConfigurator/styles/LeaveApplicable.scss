@@ -1,3 +1,8 @@
+@use "../../../../design/colors/customFonts" as fonts;
+
+
+@use '../../design/colors/customColors' as *;
+
 .time-input-container {
   display: flex;
   flex-direction: column;
@@ -21,11 +26,11 @@
 
 .time-input-label {
   min-width: 112px;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: 'Plus Jakarta Sans';
+  // font-size: fonts.$font-size-md;
+  // font-weight:fonts.$font-weight-semibold;
+  // font-family: fonts.$font-family;
   line-height: 24px;
-  color: #2E3038;
+  color: $GREY-80;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -35,7 +40,7 @@
   margin-left: 16px;
   width: 50px;
   height: 42px;
-  border: 1px solid #aeb0bc;
+  border: 1px solid $GREY-40;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -48,17 +53,17 @@
     height: 100%;
     border: none !important;
     text-align: center;
-    font-size: 14px;
-    color: #033348;
-    font-family: "Plus Jakarta Sans";
-    font-weight: 500;
+    font-size: fonts.$font-size-small;
+    color: $PRUSSIAN-80;
+    font-family: fonts.$font-family;
+    font-weight: fonts.$font-weight-medium;
 
     &:focus {
       outline: none;
     }
 
     &::placeholder {
-      color: #aaa;
+      color: $c65;
     }
   }
 }
@@ -68,23 +73,23 @@
   display: flex;
   border-radius: 999px;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+  border: 1px solid $c66;
   flex-shrink: 0;
 
   .time-input-unit-option {
-    font-size: 16px;
-    font-weight: 500;
-    font-family: "Plus Jakarta Sans";
+    font-size: fonts.$font-size-md;
+    font-weight: fonts.$font-weight-medium;
+    font-family: fonts.$font-family;
     padding: 8px 23px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: white;
+    background-color: $WHITE;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid $c66;
 
     &:last-child {
       border-right: none;
@@ -95,9 +100,9 @@
     }
 
     &.selected {
-      background-color: #004060;
-      color: white;
-      font-weight: 500;
+      background-color: $c67;
+      color: $WHITE;
+      font-weight: fonts.$font-weight-medium;
     }
 
     .checkmark {
@@ -110,16 +115,16 @@
   margin-left: 16px;
   padding: 4px 26px;
   border-radius: 9999px;
-  background-color: #F1F1F4;
-  font-size: 16px;
-  color: #2E3038;
-  font-family: 'Plus Jakarta Sans';
-  font-weight: 500;
+  background-color: $GREY-10;
+  font-size: fonts.$font-size-md;
+  color: $GREY-80;
+  font-family: fonts.$font-family;
+  font-weight: fonts.$font-weight-medium;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border : 1px solid #AEB0BC;
+  border : 1px solid $GREY-40;
 }
 
 /* Responsive behavior */

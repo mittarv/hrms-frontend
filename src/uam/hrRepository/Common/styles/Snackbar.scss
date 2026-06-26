@@ -1,3 +1,4 @@
+@use '../../design/colors/customColors' as *;
 .snackbar {
   position: fixed;
   top: 20px;
@@ -7,8 +8,8 @@
   max-width: 500px;
   padding: 16px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  box-shadow: 0 4px 12px $c118;
+  z-index: 99999; /* Above all modals and overlays */
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
   opacity: 0;
   font-family: "Plus Jakarta Sans";
@@ -22,27 +23,27 @@
   }
 
   &--success {
-    background-color: #87C4DE;
-    border: 1px solid #c3e6cb;
-    color: #2E3038;
+    background-color: $PRUSSIAN-30;
+    border: 1px solid $c263;
+    color: $GREY-80;
   }
 
   &--error {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
+    background-color: $c264;
+    border: 1px solid $c265;
+    color: $c266;
   }
 
   &--warning {
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    color: #856404;
+    background-color: $c267;
+    border: 1px solid $c268;
+    color: $c269;
   }
 
   &--info {
-    background-color: #d1ecf1;
-    border: 1px solid #bee5eb;
-    color: #0c5460;
+    background-color: $c270;
+    border: 1px solid $c271;
+    color: $c272;
   }
 
   &__content {
@@ -76,7 +77,7 @@
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: $c69;
     }
 
     &:focus {

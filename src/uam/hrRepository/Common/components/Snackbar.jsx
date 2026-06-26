@@ -28,6 +28,7 @@ const Snackbar = () => {
     if (isOpen) {
       dispatch({ type: "CLEAR_NEW_SNACKBAR_MESSAGE" });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, dispatch]);
 
   const handleClose = () => {

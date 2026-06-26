@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .employee-card {
   display: inline-block; 
   width: 100%;           
@@ -7,11 +9,11 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   padding: 12px 12px;
   padding-right: 28px;
-  background: #ffffff;
+  background: $WHITE;
   border-radius: 10px;
   
   cursor: pointer;
-  border: 1px solid #c7c9d1;
+  border: 1px solid $GREY-30;
   .employee-default-details{
     display: flex;
     justify-content: space-between;
@@ -35,8 +37,8 @@
       height: 80px;
       border: none;
       border-radius: 10.67px;
-      background: #f1f1f4;
-      color: #066893;
+      background: $GREY-10;
+      color: $PRUSSIAN-60;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -56,17 +58,26 @@
           margin: 0;
           font-size: 16px;
           font-weight: 600;
-          color: #2e3038;
+          color: $GREY-80;
         }
         
-        p{
-          border: 1px solid #1eab69;
-          padding: 8px 12px;
+        .active_employee{
+          border: 1px solid $GREEN-70;
+          padding: 4px 12px;
           font-size: 12px;
-          color: #2e3038;
+          color: $GREY-80;
           font-weight: 500;
           border-radius: 32px;
-          background-color: #ebfaf3;
+          background-color: $GREEN-10;
+        }
+        .Offboarding_initiated{
+          border: 1px solid $YELLOW-70;
+          padding: 4px 12px;
+          font-size: 12px;
+          color: $GREY-80;
+          font-weight: 500;
+          border-radius: 32px;
+          background-color: $YELLOW-10;
         }
       }
 
@@ -76,7 +87,7 @@
         
         font-size: 14px;
         font-weight: 600;
-        color: #8f92a3;
+        color: $GREY-50;
       }
     }
   }
@@ -100,7 +111,7 @@
     
       hr {
         border: none;
-        border-top: 0.5px solid #e3e4e8;
+        border-top: 0.5px solid $GREY-20;
        
       }
     
@@ -115,12 +126,12 @@
         h3{
           font-size: 12px;
           font-weight: 500;
-          color: #676b7e;
+          color: $GREY-60;
         }
         p{
           font-size: 14px;
           font-weight: 500;
-          color: #454754;
+          color: $GREY-70;
           word-wrap: break-word;
           overflow-wrap: break-word;
           word-break: break-word;

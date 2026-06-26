@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .received_citations_card {
   display: flex;
   flex-direction: column;
@@ -6,7 +8,7 @@
   min-height: 0;
   height: 100%;
   overflow-y: auto;
-  border: 1px solid #e4e7ec;
+  border: 1px solid $c85;
   border-radius: 12px;
   padding: 1.5rem 1.25rem;
 
@@ -44,20 +46,20 @@
       .received_citations_card_title {
         font-size: 16px;
         font-weight: 500;
-        color: #676b7e;
+        color: $GREY-60;
       }
 
       .received_citations_card_month_year {
         font-size: 24px;
         font-weight: 600;
-        color: #2e3038;
+        color: $GREY-80;
       }
     }
 
     .received_citations_view_all_btn {
       background: transparent;
-      border: 1px solid #045071;
-      color: #045071;
+      border: 1px solid $PRUSSIAN-70;
+      color: $PRUSSIAN-70;
       border-radius: 8px;
       padding: 8px 16px;
       font-size: 14px;
@@ -72,8 +74,8 @@
       }
 
       &:hover {
-        background: #045071;
-        color: #fff;
+        background: $PRUSSIAN-70;
+        color: $WHITE;
       }
     }
   }
@@ -86,7 +88,7 @@
 
   .received_citations_loading {
     margin: 0;
-    color: #6b7280;
+    color: $c87;
     font-size: 14px;
   }
 
@@ -101,7 +103,7 @@
 
   .received_citations_item {
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid $c95;
 
     &:last-of-type {
       border-bottom: none;
@@ -112,7 +114,7 @@
   .received_citations_quote {
     margin: 0 0 0.25rem;
     font-size: 14px;
-    color: #374151;
+    color: $c88;
     line-height: 1.5;
     word-break: break-word;
 
@@ -120,7 +122,7 @@
       padding: 0;
       border: none;
       background: transparent;
-      color: #045071;
+      color: $PRUSSIAN-70;
       font-size: 14px;
       font-weight: 600;
       line-height: inherit;
@@ -129,21 +131,21 @@
       cursor: pointer;
 
       &:hover {
-        color: #033348;
+        color: $PRUSSIAN-80;
       }
     }
   }
 
   .received_citations_author {
     font-size: 13px;
-    color: #6b7280;
+    color: $c87;
   }
 
   .received_citations_view_all_link {
     margin-top: 0.75rem;
     background: none;
     border: none;
-    color: #045071;
+    color: $PRUSSIAN-70;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -151,7 +153,7 @@
     text-decoration: underline;
 
     &:hover {
-      color: #033348;
+      color: $PRUSSIAN-80;
     }
   }
 }

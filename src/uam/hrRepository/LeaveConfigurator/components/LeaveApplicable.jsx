@@ -106,9 +106,9 @@ const LeaveApplicable = ({
               <div key={label} className="time-input-row">
                 {viewMode ? (
                   <>
-                    {currentValue && currentUnit && (
+                    {currentValue!=undefined && currentUnit && (
                       <>
-                        <div className="time-input-label">{label}</div>
+                        <div className="time-input-label text-time-label">{label}</div>
                         <div className="time-input-view-pill">
                           {currentValue} {currentUnit}
                         </div>
@@ -117,7 +117,7 @@ const LeaveApplicable = ({
                   </>
                 ) : (
                   <>
-                    <div className="time-input-label">{label}</div>
+                    <div className="time-input-label text-time-label">{label}</div>
                     <div className="time-input-value-container">
                       <input
                         type="number"

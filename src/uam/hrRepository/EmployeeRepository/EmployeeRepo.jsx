@@ -4,9 +4,12 @@ import "./styles/EmployeeRepo.scss";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import EmployeeRepositoryDashboard from "./components/EmployeeRepositoryDashboard";
 import EmployeeDirectory from "./components/EmployeeDirectory";
+import EmployeeDetailsPage from "./components/EmployeeDetailsPage";
 import { useLocation } from "react-router-dom";
-
+import EmployeeOffboardingInProgress from "./components/EmployeeOffboardingInProgress";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
+import EmployeeOffboarded from "./components/EmployeeOffboarded";
+import AccessDenied from "../Common/components/AccessDenied";
 
 const EMPLOYEE_TABS = {
     DASHBOARD: "active_employees",
@@ -29,9 +32,10 @@ import Active_offboarded_icon from "../assets/icons/Active_offboarded_icon.svg";
 const EmployeeRepo = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.user);
   const allToolsAccessDetails = useSelector(state => state.user.allToolsAccessDetails);
   const selectedToolName = useSelector(state => state.mittarvtools.selectedToolName);
-  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const { myHrmsAccess, myHrmsAccessLoaded } = useSelector((state) => state.hrRepositoryReducer);
 
   const userAccessLevel = allToolsAccessDetails?.[selectedToolName];
   const hasAccess = userAccessLevel >= 900;
@@ -42,41 +46,78 @@ const EmployeeRepo = () => {
     perm.name === "ActiveEmployee_update" || 
     perm.name === "ActiveEmployee_onBoarding"
   );
-  
-  // Check for Employee Directory Admin View permission (separate from Active Employees)
-  const hasEmployeeDirectoryAdminAccess = myHrmsAccess?.permissions?.some(perm => 
-    perm.name === "EmployeeDirectoryAdmin_View"
-  );
-  
-  // Note: OffBoardedEmployee and OffBoardingInProgress permissions don't exist in the migration
-  // These tabs are accessible to admins (>= 900) only
-  const hasAccessToOffboardedEmployees = hasAccess;
-  const hasAccessToOffboarding = hasAccess;
 
-  // Default tab: Active Employees if user has access to Active Employees, otherwise Employee Directory
-  // Note: EmployeeDirectoryAdmin_View does NOT grant access to Active Employees tab
-  const defaultTab = (hasAccess || hasAccessToActiveEmployees) ? EMPLOYEE_TABS.DASHBOARD : EMPLOYEE_TABS.DIRECTORY;
+  const hasAccessToEmployeeOffboardingInProgress = myHrmsAccess?.permissions?.some(perm => 
+      perm.name === "Offboarding_View" || 
+      perm.name === "Offboarding_Initiate" || 
+      perm.name === "Offboarding_HR_Clearance" || 
+      perm.name === "Offboarding_Finance_Clearance" || 
+      perm.name === "Offboarding_Approve"
+  );
+
+  const hasAccessToEmployeeOffboardedEmployees = myHrmsAccess?.permissions?.some(perm => 
+    perm.name === "View_Offboarded_Employees"
+  );
+
+  
+  // These tabs are accessible to admins (>= 900) only
+  const hasAccessToActiveEmployeesTab = hasAccess || hasAccessToActiveEmployees;
+  const hasAccessToOffboardedEmployeesTab = hasAccess || hasAccessToEmployeeOffboardedEmployees;
+  const hasAccessToOffboardingInProgressTab = hasAccess || hasAccessToEmployeeOffboardingInProgress;
+
+  // Default tab: first available tab (Active Employees if allowed, else Employee Directory, etc.)
+  const defaultTab = useMemo(() => {
+    if (hasAccessToActiveEmployeesTab) return EMPLOYEE_TABS.DASHBOARD;
+    if (hasAccessToOffboardingInProgressTab) return EMPLOYEE_TABS.OFFBOARDING;
+    if (hasAccessToOffboardedEmployeesTab) return EMPLOYEE_TABS.OFFBOARDED;
+    return EMPLOYEE_TABS.DIRECTORY;
+  }, [hasAccessToActiveEmployeesTab, hasAccessToOffboardingInProgressTab, hasAccessToOffboardedEmployeesTab]);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const currentPath = location.pathname;
   const [activeTab, setActiveTab] = useState(
       searchParams.get('tab') || defaultTab
   );
- 
-  const ALL_TABS = useMemo(() => Object.values(EMPLOYEE_TABS), []);
-  const LIMITED_TABS = useMemo(() => [EMPLOYEE_TABS.DIRECTORY], []);
+  const showEmployeeDetails = searchParams.get("showEmployeeDetails") === "true";
+  const employeeUuidParam = searchParams.get("employeeUuid");
+
+  // Permission check for viewing employee details via URL
+  const isOwnProfile = user?.employeeUuid === employeeUuidParam;
+  const hasAccessToViewEmployeeDetails = hasAccess || isOwnProfile || 
+    hasAccessToActiveEmployees || 
+    hasAccessToEmployeeOffboardingInProgress || 
+    hasAccessToEmployeeOffboardedEmployees ||
+    myHrmsAccess?.permissions?.some(perm => 
+      perm.name === "EmployeeDirectoryAdmin_View"
+    );
+
+  // Tabs the user is allowed to see, based on permissions (not just admin)
+  const validTabsList = useMemo(() => {
+    const tabs = [EMPLOYEE_TABS.DIRECTORY]; // Employee Directory always available
+    if (hasAccessToActiveEmployeesTab) tabs.push(EMPLOYEE_TABS.DASHBOARD);
+    if (hasAccessToOffboardingInProgressTab) tabs.push(EMPLOYEE_TABS.OFFBOARDING);
+    if (hasAccessToOffboardedEmployeesTab) tabs.push(EMPLOYEE_TABS.OFFBOARDED);
+    return tabs;
+  }, [hasAccessToActiveEmployeesTab, hasAccessToOffboardingInProgressTab, hasAccessToOffboardedEmployeesTab]);
 
 
 useEffect(() => {
-    // Determine valid tabs based on access
-    // Active Employees tab: only if user has ActiveEmployee permissions OR admin access
-    // Employee Directory tab: always available (for users with EmployeeDirectoryAdmin_View or no access)
-    const validTabs = (hasAccess || hasAccessToActiveEmployees) ? ALL_TABS : LIMITED_TABS;
+    // Don't make routing decisions until permissions are loaded
+    if (!myHrmsAccessLoaded && !hasAccess) return;
+
+    // Valid tabs = tabs the user has permission to see (validTabsList)
+    const validTabs = validTabsList;
     const tabFromUrl = searchParams.get('tab');
     let targetTab = defaultTab;
-    
+
     // If on /employee-directory route
     if (currentPath === "/employee-directory") {
+        // User clicked a valid non-directory tab (e.g. Offboarding) -> go to /employee-repo with that tab
+        if (tabFromUrl && validTabs.includes(tabFromUrl) && tabFromUrl !== EMPLOYEE_TABS.DIRECTORY) {
+            navigate(`/employee-repo?tab=${tabFromUrl}`, { replace: true });
+            setActiveTab(tabFromUrl);
+            return;
+        }
         // If user has access to Active Employees, redirect to /employee-repo
         if (hasAccessToActiveEmployees || hasAccess) {
             navigate("/employee-repo", { replace: true });
@@ -85,34 +126,37 @@ useEffect(() => {
         // Otherwise, ensure we're showing Employee Directory tab
         targetTab = EMPLOYEE_TABS.DIRECTORY;
     }
-    // If on /employee-repo route and user doesn't have access to Active Employees, redirect to /employee-directory
-    else if (currentPath === "/employee-repo" && !hasAccessToActiveEmployees && !hasAccess) {
+    // If on /employee-repo route and user doesn't have access to any repo tab except directory, redirect to /employee-directory
+    else if (currentPath === "/employee-repo" && validTabs.length === 1 && validTabs[0] === EMPLOYEE_TABS.DIRECTORY) {
         navigate("/employee-directory", { replace: true });
         return;
     }
-    // Use tab from URL if valid, otherwise use default
+    // Prefer current activeTab if valid (e.g. user just clicked; URL may not have updated yet)
+    else if (validTabs.includes(activeTab)) {
+        targetTab = activeTab;
+    }
+    // Otherwise use tab from URL if valid
     else if (tabFromUrl && validTabs.includes(tabFromUrl)) {
         targetTab = tabFromUrl;
-    } 
-    else if (!validTabs.includes(activeTab)) {
+    }
+    else {
         targetTab = defaultTab;
     }
-    
+
     // Update URL params if needed
     if (searchParams.get('tab') !== targetTab) {
         setSearchParams({ tab: targetTab }, { replace: true });
     }
     // Update active tab state if needed
     if (activeTab !== targetTab) {
-        setActiveTab(targetTab); 
+        setActiveTab(targetTab);
     }
-}, [hasAccess, hasAccessToActiveEmployees, searchParams, setSearchParams, activeTab, currentPath, ALL_TABS, LIMITED_TABS, defaultTab, navigate]);
+}, [hasAccess, hasAccessToActiveEmployees, searchParams, setSearchParams, activeTab, currentPath, validTabsList, defaultTab, navigate, myHrmsAccessLoaded]);
 
   useEffect(() => {
         dispatch(getAllComponentTypes());
         dispatch(getAllEmployee());
     }, [dispatch]);
-  const { user } = useSelector((state) => state.user);
   const {
     loading,
   
@@ -153,22 +197,10 @@ useEffect(() => {
     OFFBOARDED_EMPLOYEES: "Offboarded Employees"
   };
 
-const handleActiveTab = useCallback((tabId, tabLabel) => {
-   if ([EMPLOYEE_TABS.OFFBOARDING, EMPLOYEE_TABS.OFFBOARDED].includes(tabId)) {
-    dispatch({
-      type: "SET_NEW_SNACKBAR_MESSAGE",
-      payload: {
-        message: `${tabLabel} feature coming soon!`,
-        severity: "info",
-      },
-    });
-    return;
-  }
- 
-
+const handleActiveTab = useCallback((tabId) => {
   setActiveTab(tabId);
   setSearchParams({ tab: tabId });
-}, [dispatch,setSearchParams]);
+}, [setSearchParams]);
 
 
   const renderContent = () => {
@@ -179,6 +211,10 @@ const handleActiveTab = useCallback((tabId, tabLabel) => {
         { const hasAccessToDirectory = hasAccess || 
           myHrmsAccess?.permissions?.some(perm => perm.name === "EmployeeDirectoryAdmin_View");
         return <EmployeeDirectory hasAccess={hasAccessToDirectory}/> }
+      case EMPLOYEE_TABS.OFFBOARDING:
+        return <EmployeeOffboardingInProgress />;
+      case EMPLOYEE_TABS.OFFBOARDED:
+        return <EmployeeOffboarded />;
       default:
         return null;
     }
@@ -186,79 +222,94 @@ const handleActiveTab = useCallback((tabId, tabLabel) => {
 
   return (
     <>
-      <div className="employee_repository_container">
-        <div className="employee_repository_tabs" data-active={activeTab}>
-            { (hasAccess || hasAccessToActiveEmployees) && (
-              <span
-                onClick={() => handleActiveTab(EMPLOYEE_TABS.DASHBOARD, tabsEnum.DASHBOARD)}
-                className={activeTab === EMPLOYEE_TABS.DASHBOARD ? "active_tab" : "inactive_tab"}
-              >
-                <img
-                  src={
-                    activeTab === EMPLOYEE_TABS.DASHBOARD
-                      ? Active_employees_icon
-                      : Inactive_employees_icon
-                  }
-                  alt="Employees Icon"
-                  className="employees_icon"
-                />
-                <p>Active Employees</p>
-              </span>
-             )}
-              { (hasAccess || hasAccessToOffboarding) &&(
-              <span
-                onClick={() => handleActiveTab(EMPLOYEE_TABS.OFFBOARDING,tabsEnum.OFFBOARDING_IN_PROGRESS)}
-                className={activeTab === EMPLOYEE_TABS.OFFBOARDING ? "active_tab" : "inactive_tab"}
-              >
-                <img
-                  src={
-                    activeTab === EMPLOYEE_TABS.OFFBOARDING
-                      ? Active_offboarding_icon
-                      : Inactive_offboarding_icon
-                  }
-                  alt="Employees Icon"
-                  className="employees_icon"
-                />
-                <p>Offboarding In Progress</p>
-              </span>
-              )}
-               { (hasAccess || hasAccessToOffboardedEmployees) &&(
-              <span
-                onClick={() => handleActiveTab(EMPLOYEE_TABS.OFFBOARDED,tabsEnum.OFFBOARDED_EMPLOYEES)}
-                className={activeTab === EMPLOYEE_TABS.OFFBOARDED ? "active_tab" : "inactive_tab"}
-              >
-                <img
-                  src={
-                    activeTab === EMPLOYEE_TABS.OFFBOARDED
-                      ? Active_offboarded_icon
-                      : Inactive_offboarded_icon
-                  }
-                  alt="Employees Icon"
-                  className="employees_icon"
-                />
-                <p>Offboarded Employees</p>
-              </span>
-               )}
-           
-              <span
-                onClick={() => handleActiveTab(EMPLOYEE_TABS.DIRECTORY,tabsEnum.EMPLOYEE_DIRECTORY)}
-                className={activeTab === EMPLOYEE_TABS.DIRECTORY ? "active_tab" : "inactive_tab"}
-              >
-                <img
-                  src={
-                    activeTab === EMPLOYEE_TABS.DIRECTORY
-                      ? Active_employees_icon
-                      : Inactive_employees_icon
-                  }
-                  alt="Employees Icon"
-                  className="employees_icon"
-                />
-                <p>Employee Directory</p>
-              </span>
-            </div>
-        <hr />
+      <div className={`employee_repository_container ${showEmployeeDetails ? "employee_details_view" : ""}`}>
+        {!showEmployeeDetails && (
+          <>
+            <div className="employee_repository_tabs" data-active={activeTab}>
+                { (hasAccessToActiveEmployeesTab) && (
+                  <span
+                    onClick={() => handleActiveTab(EMPLOYEE_TABS.DASHBOARD, tabsEnum.DASHBOARD)}
+                    className={activeTab === EMPLOYEE_TABS.DASHBOARD ? "active_tab" : "inactive_tab"}
+                  >
+                    <img
+                      src={
+                        activeTab === EMPLOYEE_TABS.DASHBOARD
+                          ? Active_employees_icon
+                          : Inactive_employees_icon
+                      }
+                      alt="Employees Icon"
+                      className="employees_icon"
+                    />
+                    <p>Active Employees</p>
+                  </span>
+                 )}
+                  { (hasAccessToOffboardingInProgressTab) &&(
+                  <span
+                    onClick={() => handleActiveTab(EMPLOYEE_TABS.OFFBOARDING,tabsEnum.OFFBOARDING_IN_PROGRESS)}
+                    className={activeTab === EMPLOYEE_TABS.OFFBOARDING ? "active_tab" : "inactive_tab"}
+                  >
+                    <img
+                      src={
+                        activeTab === EMPLOYEE_TABS.OFFBOARDING
+                          ? Active_offboarding_icon
+                          : Inactive_offboarding_icon
+                      }
+                      alt="Employees Icon"
+                      className="employees_icon"
+                    />
+                    <p>Offboarding In Progress</p>
+                  </span>
+                  )}
+                   { (hasAccessToOffboardedEmployeesTab) &&(
+                  <span
+                    onClick={() => handleActiveTab(EMPLOYEE_TABS.OFFBOARDED,tabsEnum.OFFBOARDED_EMPLOYEES)}
+                    className={activeTab === EMPLOYEE_TABS.OFFBOARDED ? "active_tab" : "inactive_tab"}
+                  >
+                    <img
+                      src={
+                        activeTab === EMPLOYEE_TABS.OFFBOARDED
+                          ? Active_offboarded_icon
+                          : Inactive_offboarded_icon
+                      }
+                      alt="Employees Icon"
+                      className="employees_icon"
+                    />
+                    <p>Offboarded Employees</p>
+                  </span>
+                   )}
+               
+                  <span
+                    onClick={() => handleActiveTab(EMPLOYEE_TABS.DIRECTORY,tabsEnum.EMPLOYEE_DIRECTORY)}
+                    className={activeTab === EMPLOYEE_TABS.DIRECTORY ? "active_tab" : "inactive_tab"}
+                  >
+                    <img
+                      src={
+                        activeTab === EMPLOYEE_TABS.DIRECTORY
+                          ? Active_employees_icon
+                          : Inactive_employees_icon
+                      }
+                      alt="Employees Icon"
+                      className="employees_icon"
+                    />
+                    <p>Employee Directory</p>
+                  </span>
+                </div>
+            <hr />
+          </>
+        )}
         <div className="leave_management_tab_content" role="tabpanel">
-          {renderContent()}
+          {showEmployeeDetails 
+            ? (!myHrmsAccessLoaded && !hasAccess 
+                ? <div className="permissions-loading">Loading...</div>
+                : hasAccessToViewEmployeeDetails 
+                  ? <EmployeeDetailsPage /> 
+                  : <AccessDenied 
+                      message="You don't have permission to view this employee's details."
+                      submessage="Please contact your administrator to get the required access."
+                    />
+              )
+            : renderContent()
+          }
         </div>
       </div>
 

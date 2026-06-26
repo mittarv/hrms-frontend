@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .attendance-calendar {
   display: flex;
   font-family:
@@ -9,6 +11,7 @@
   gap: 1rem;
   position: relative;
   justify-content: space-around;
+  align-items: flex-start;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -19,16 +22,17 @@
   flex: 1;
   display: flex;
   gap: 2rem;
-  font-family: "Plus Jakarta Sans";
+  align-items: flex-start;
+  font-family: "Plus Jakarta Sans", sans-serif;
   position: relative;
   max-width: 470px;
 
   .calendar-inner-container {
     flex: 1;
-    background: #f9fafb;
+    background: $c154;
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px $c69;
   }
 }
 
@@ -62,16 +66,16 @@
       .dropdown-selector {
         cursor: pointer;
         padding: 0.5rem 0.75rem;
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 14px;
         font-weight: 600;
-        color: #676b7e;
+        color: $GREY-60;
         display: flex;
         align-items: center;
         border-radius: 4px;
 
         &:hover {
-          background-color: #f3f4f6;
+          background-color: $c94;
         }
 
         .dropdown-arrow {
@@ -85,9 +89,9 @@
         top: 100%;
         left: 0;
         z-index: 100;
-        background-color: white;
+        background-color: $WHITE;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px $c118;
         padding: 0.5rem 0;
         min-width: 120px;
         max-height: 300px;
@@ -102,13 +106,13 @@
           cursor: pointer;
 
           &:hover {
-            background-color: #f3f4f6;
+            background-color: $c94;
           }
 
           &.active {
-            background-color: #e5e7eb;
+            background-color: $c95;
             font-weight: 600;
-            color: #1e40af;
+            color: $c192;
           }
         }
       }
@@ -125,7 +129,7 @@
     padding: 0.5rem;
     text-align: center;
     font-weight: 600;
-    color: #4b5563;
+    color: $c139;
   }
 
   .calendar-day {
@@ -139,32 +143,32 @@
     position: relative;
 
     &:hover {
-      background-color: #066893;
+      background-color: $PRUSSIAN-60;
     }
 
     &.prev-month,
     &.next-month {
-      color: #9ca3af;
+      color: $c98;
     }
 
     &.working {
-      background-color: #a9eacc;
+      background-color: $GREEN-30;
     }
 
     &.half-day {
-      background-color: #f2e25a;
+      background-color: $YELLOW-40;
     }
 
     &.on-leave {
-      background-color: #dd787f;
+      background-color: $RED-40;
     }
 
     &.today {
-      border: 2px solid #6b7280;
+      border: 2px solid $c87;
     }
     &.selected {
-      background-color: #045071;
-      color: white;
+      background-color: $PRUSSIAN-70;
+      color: $WHITE;
     }
   }
 }
@@ -187,28 +191,28 @@
     }
 
     .legend-text {
-      font-family: "Plus Jakarta Sans";
+      font-family: "Plus Jakarta Sans", sans-serif;
       font-size: 12px;
       font-weight: 600;
-      color: #454754;
+      color: $GREY-70;
       line-height: 20px;
       letter-spacing: 0.01em;
     }
 
     &.working .color-dot {
-      background-color: #a9eacc;
+      background-color: $GREEN-30;
     }
 
     &.half-day .color-dot {
-      background-color: #f2e25a;
+      background-color: $YELLOW-40;
     }
 
     &.on-leave .color-dot {
-      background-color: #dd787f;
+      background-color: $RED-40;
     }
 
     &.today .color-dot {
-      border: 2px solid #6b7280;
+      border: 2px solid $c87;
     }
   }
 }
@@ -230,9 +234,6 @@
     border-radius: 8px;
     width: 100%;
     max-width: 500px;
-    background-color: #ffffff;
-    padding: 1.5rem;
-    box-shadow: 0 0 16px 2px rgba(0, 0, 0, 0.1);
 
     .click-modal {
       max-width: 320px;
@@ -251,14 +252,14 @@
     margin-bottom: 1rem;
 
     .status-modal-title {
-      font-family: "Plus Jakarta Sans";
+      font-family: "Plus Jakarta Sans", sans-serif;
       font-size: 14px;
       font-weight: 700;
       line-height: 20px;
       letter-spacing: 0.01em;
-      border-bottom: 2px solid #2e3038;
+      border-bottom: 2px solid $GREY-80;
       padding-bottom: 8px;
-      color: #2e3038;
+      color: $GREY-80;
     }
 
     .status-modal-actions {
@@ -270,8 +271,8 @@
         display: flex;
         align-items: center;
         gap: 0.25rem;
-        background-color: #045071;
-        color: white;
+        background-color: $PRUSSIAN-70;
+        color: $WHITE;
         border: none;
         border-radius: 8px;
         cursor: pointer;
@@ -280,7 +281,7 @@
         padding: 0px 6px;
 
         span {
-          font-family: "Plus Jakarta Sans";
+          font-family: "Plus Jakarta Sans", sans-serif;
           font-size: 14px;
           font-weight: 600;
           line-height: 20px;
@@ -297,10 +298,10 @@
         background: none;
         border: none;
         cursor: pointer;
-        color: #6b7280;
+        color: $c87;
         font-size: 16px;
         border-radius: 8px;
-        background-color: #f3f4f6;
+        background-color: $c94;
       }
     }
   }
@@ -319,12 +320,12 @@
       gap: 8px;
 
       .status-label {
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 12px;
         font-weight: 700;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #454754;
+        color: $GREY-70;
       }
 
       .status-badge {
@@ -334,30 +335,30 @@
         font-weight: 500;
 
         &.working {
-          background-color: #ebfaf3;
-          color: #2e3038;
-          border: 1px solid #1eab69;
+          background-color: $GREEN-10;
+          color: $GREY-80;
+          border: 1px solid $GREEN-70;
           font-weight: 500;
         }
 
         &.half-day {
-          background-color: #fdfbe7;
-          color: #2e3038;
-          border: 1px solid #c6b410;
+          background-color: $YELLOW-10;
+          color: $GREY-80;
+          border: 1px solid $YELLOW-70;
           font-weight: 500;
         }
 
         &.on-leave {
-          background-color: #fcefe9;
-          color: #2e3038;
-          border: 1px solid #d9642a;
+          background-color: $ORANGE-10;
+          color: $GREY-80;
+          border: 1px solid $ORANGE-60;
           font-weight: 500;
         }
 
         &.not-set {
-          background-color: #f7f7f8;
-          color: #8f92a3;
-          border: 1px solid #8f92a3;
+          background-color: $GREY-00;
+          color: $GREY-50;
+          border: 1px solid $GREY-50;
           font-weight: 500;
         }
       }
@@ -373,21 +374,21 @@
       .check-out,
       .check-in {
         .check-in-out-title {
-          font-family: "Plus Jakarta Sans";
+          font-family: "Plus Jakarta Sans", sans-serif;
           font-size: 14px;
           font-weight: 700;
           line-height: 20px;
           letter-spacing: 0.01em;
-          color: #454754;
+          color: $GREY-70;
         }
 
         .check-in-out-time {
-          font-family: "Plus Jakarta Sans";
+          font-family: "Plus Jakarta Sans", sans-serif;
           font-size: 14px;
           font-weight: 500;
           line-height: 20px;
           letter-spacing: 0.01em;
-          color: #8f92a3;
+          color: $GREY-50;
         }
       }
     }
@@ -402,23 +403,24 @@
       align-items: start;
       justify-content: center;
       text-align: left;
+      margin-bottom: 1rem;
 
       .remarks-title {
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 14px;
         font-weight: 700;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #454754;
+        color: $GREY-70;
       }
 
       .remarks-text {
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 14px;
         font-weight: 500;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #8f92a3;
+        color: $GREY-50;
       }
     }
 
@@ -429,21 +431,60 @@
       justify-content: center;
       text-align: left;
       .leave-type-title {
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 14px;
         font-weight: 700;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #454754;
+        color: $GREY-70;
       }
       .leave-type-text {
-        font-family: "Plus Jakarta Sans";
+        font-family: "Plus Jakarta Sans", sans-serif;
         font-size: 14px;
         font-weight: 500;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #8f92a3;
+        color: $GREY-50;
       }
+    }
+  }
+}
+
+.proof-details {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+  text-align: left;
+
+  .proof-title {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 20px;
+    letter-spacing: 0.01em;
+    color: $GREY-70;
+    margin-bottom: 4px;
+  }
+
+  .view-proof-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 24px;
+    color: $PRUSSIAN-70;
+    border-bottom: 2px solid $PRUSSIAN-70;
+    padding-bottom: 4px;
+
+    svg {
+      flex-shrink: 0;
     }
   }
 }

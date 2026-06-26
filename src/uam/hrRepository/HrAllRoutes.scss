@@ -1,3 +1,5 @@
+@use './design/colors/customColors' as *;
+
 .account_inactive_container {
   display: flex;
   align-items: center;
@@ -13,10 +15,10 @@
   max-width: 420px;
   width: 100%;
   padding: 2rem 2.5rem;
-  background: #fff;
+  background: $WHITE;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e8e9eb;
+  box-shadow: 0 4px 20px $c82;
+  border: 1px solid $c83;
 }
 
 .account_inactive_icon_wrapper {
@@ -34,14 +36,14 @@
 .account_inactive_title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #033348;
+  color: $PRUSSIAN-80;
   margin: 0 0 0.75rem 0;
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .account_inactive_message {
   font-size: 0.9375rem;
-  color: #666;
+  color: $c84;
   margin: 0;
   line-height: 1.5;
   font-family: "Plus Jakarta Sans", sans-serif;

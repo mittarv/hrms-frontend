@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .comp-off-tracker-container {
   width: 100%;
 
@@ -20,25 +22,25 @@
           .filter-button-label {
             padding: 8px 16px; 
             border-radius: 64px;
-            border: 2px solid #2fbcbc;
-            background-color: #ffffff;
+            border: 2px solid $CYAN-50;
+            background-color: $LIGHT;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
             font-size: 14px;
             font-weight: 600;
-            color: #2e3038;
-            white-space: nowrap;
+            color: $GREY-80;
+            $WHITE-space: nowrap;
 
             &.active {
-              background-color: #e0f6ff;
+              background-color: $c202;
             }
 
             span {
               // The counter badge (e.g., [1])
-              color: #ffffff;
-              background-color: #454745;
+              color: $LIGHT;
+              background-color: $c203;
               height: 20px;
               width: 20px;
               display: inline-flex;
@@ -75,7 +77,7 @@
           border-radius: 0;
           padding: 0;
           border: none;
-          border-bottom: 1px solid #aeb0bc;
+          border-bottom: 1px solid $GREY-40;
           .employee-search-icon {
             width: 20px;
             margin-left: 0;
@@ -89,11 +91,11 @@
             outline: none;
             font-size: 16px;
             flex: 1;
-            caret-color: #8f92a3;
+            caret-color: $GREY-50;
             padding-left: 8px;
-            color: #8f92a3;
+            color: $GREY-50;
             &::placeholder {
-              color: #8f92a3;
+              color: $GREY-50;
             }
           }
         }
@@ -105,7 +107,6 @@
         margin-left: 12px;
       }
 
-      .filter-button,
       .filter-toggle-icon {
         min-width: 44px;
         height: 44px;
@@ -116,8 +117,8 @@
         justify-content: center;
         padding: 0;
         position: relative;
-        border: 2px solid #2fbcbc;
-        background-color: #ffffff;
+        border: 2px solid $CYAN-50;
+        background-color: $LIGHT;
         transition: background-color 0.2s ease;
         .dot {
           position: absolute;
@@ -125,8 +126,8 @@
           right: 2px;
           width: 10px;
           height: 10px;
-          background-color: #2fbcbc;
-          border: 2px solid #ffffff;
+          background-color: $CYAN-50;
+          border: 2px solid $LIGHT;
           border-radius: 50%;
         }
 
@@ -136,8 +137,8 @@
         }
 
         &.active {
-          background-color: #c2f0f0;
-          border-color: #2fbcbc;
+          background-color: $CYAN-20;
+          border-color: $CYAN-50;
         }
       }
       .clear-filters-button {
@@ -147,7 +148,7 @@
             cursor: pointer;
             background: none;
             border: none;
-            color:#2e3038;
+            color:$GREY-80;
             font-weight: 700;
             font-size: 14px; 
             padding: 0 4px; 
@@ -166,7 +167,7 @@
       .log-extra-day_button {
         display: flex;
         gap: 4px;
-        background-color: #045071;
+        background-color: $PRUSSIAN-70;
         padding: 12px 16px;
         border: none;
         border-radius: 8px;
@@ -175,7 +176,7 @@
         font-size: 14px;
         line-height: 20px;
         letter-spacing: 0.01em;
-        color: #fff;
+        color: $WHITE;
         cursor: pointer;
       }
     }
@@ -185,7 +186,7 @@
         display: flex;
         align-items: center;
         padding: 8px 16px;
-        background-color: #C3E1EF;
+        background-color: $PRUSSIAN-20;
         border-radius: 4px;
         margin:8px 0px;
         .info-content{
@@ -198,7 +199,7 @@
             line-height: 20px;
             letter-spacing: 0.5px;
             margin: 0;
-            color: #2E3038;
+            color: $GREY-80;
             }
 
             
@@ -207,17 +208,17 @@
                 display: flex;
                 align-items: center;
                 gap:8px;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 text-decoration: underline;
                 cursor: pointer;
             }
     }
         .comp_off_table_container {
             overflow-x: auto;
-            background: white;
+            background: $WHITE;
             border-radius: 8px;
             padding: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px $c69;
 
             .comp_off_table {
                 width: 100%;
@@ -225,23 +226,23 @@
                 font-size: 14px;
 
                 thead {
-                    background-color: #f7f7f8;
+                    background-color: $GREY-00;
                     th {
                         padding: 12px 16px;
                         text-align: left;
                         font-family: "Plus Jakarta Sans";
                         font-weight: 700;
                         font-size: 14px;
-                        color: #033348;
+                        color: $PRUSSIAN-80;
                         line-height: 20px;
-                        border-bottom: 0.5px solid #e6e7eb;
+                        border-bottom: 0.5px solid $c204;
                     }
                 }
 
                 tbody {
                     tr {
 
-                        border-bottom: 0.5px solid #e6e7eb;
+                        border-bottom: 0.5px solid $c204;
 
                         &:last-child {
                             border-bottom: none;
@@ -249,36 +250,36 @@
 
                         // Zebra striping like LeaveStatus
                         &:nth-child(even) {
-                            background-color: #f7f7f8;
+                            background-color: $GREY-00;
                         }
 
                         td {
                             padding: 12px 16px;
                             font-family: "Plus Jakarta Sans";
                             font-size: 14px;
-                            color: #2e3038;
+                            color: $GREY-80;
                             vertical-align: middle;
                         }
 
                         // Optional: Highlight row on hover or selection
                         &:hover {
-                            background-color: #f1f5f9;
+                            background-color: $c186;
                         }
                     }
                     tr {
                     &.row-disabled {
                       td {
-                        color: #8f92a3 !important;
+                        color: $GREY-50 !important;
                       }
 
                       td:nth-child(5) .status-badge {
-                        color: #8f92a3 !important;
+                        color: $GREY-50 !important;
                       }
 
                       .credit-used-cell {
-                        color: #8f92a3 !important;
+                        color: $GREY-50 !important;
                         .divider, .used-val, .credit-val {
-                          color: #8f92a3 !important;
+                          color: $GREY-50 !important;
                         }
                       }
                     }
@@ -296,29 +297,29 @@
         font-size: 12px;
         font-weight: 500;
         text-transform: capitalize;
-        white-space: nowrap;
+        $WHITE-space: nowrap;
 
         &.status-accepted {
-            background-color: #ebfaf3;
-            border: 1px solid #1eab69;
-            color: #2e3038;
+            background-color: $GREEN-10;
+            border: 1px solid $GREEN-70;
+            color: $GREY-80;
         }
 
         &.status-pending {
-            background-color: #fdfbe7;
-            color: #2e3038;
-            border: 1px solid #c6b410;
+            background-color: $YELLOW-10;
+            color: $GREY-80;
+            border: 1px solid $YELLOW-70;
         }
 
         &.status-rejected {
-            background-color: #faebec;
-            color: #2e3038;
-            border: 1px solid #d4545c;
+            background-color: $RED-10;
+            color: $GREY-80;
+            border: 1px solid $RED-50;
         }
 
         &.status-used {
-            background-color: #f7f7f8;
-            border: 1px solid #8f92a3;
+            background-color: $GREY-00;
+            border: 1px solid $GREY-50;
         }
     }
    
@@ -329,3 +330,4 @@
         font-weight: 600;
     }
 }
+

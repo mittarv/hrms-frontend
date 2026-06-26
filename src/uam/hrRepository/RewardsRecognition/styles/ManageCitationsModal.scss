@@ -1,10 +1,12 @@
+@use '../../design/colors/customColors' as *;
+
 .manage_citations_modal_overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: $c131;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,14 +14,14 @@
 }
 
 .manage_citations_modal {
-  background: white;
+  background: $WHITE;
   border-radius: 12px;
   width: 90%;
   max-width: 660px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px $c138;
 
   .manage_citations_modal_header {
     display: flex;
@@ -32,14 +34,14 @@
         margin: 0;
         font-size: 1.375rem;
         font-weight: 700;
-        color: #1f2937;
+        color: $c91;
       }
 
       .manage_citations_modal_employee_role {
         margin: 0.25rem 0 0 0;
         font-size: 0.9375rem;
         font-weight: 400;
-        color: #6b7280;
+        color: $c87;
       }
     }
 
@@ -47,17 +49,17 @@
       background: none;
       border: none;
       font-size: 1.5rem;
-      color: #9ca3af;
+      color: $c98;
       cursor: pointer;
       padding: 0;
       line-height: 1;
       &:hover {
-        color: #374151;
+        color: $c88;
       }
     }
 
     .close_btn_icon {
-      background: #f1f1f4;
+      background: $GREY-10;
       border: none;
       border-radius: 8px;
       padding: 10px;
@@ -73,14 +75,14 @@
       }
 
       &:hover {
-        background: #e5e7eb;
+        background: $c95;
       }
     }
   }
 
   .manage_citations_modal_hr {
     border: none;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid $c95;
     margin: 1rem 1.5rem 0;
   }
 
@@ -91,7 +93,7 @@
 
     .loading_text {
       margin: 0;
-      color: #6b7280;
+      color: $c87;
     }
 
     .citations_list_section {
@@ -107,13 +109,13 @@
           margin: 0;
           font-size: 1rem;
           font-weight: 600;
-          color: #374151;
+          color: $c88;
         }
 
         .copy_citations_btn {
           background: none;
           border: none;
-          color: #0284c7;
+          color: $c132;
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
@@ -130,7 +132,7 @@
         margin: 0;
         padding: 0;
         border: none;
-        background-color: #ECEFF9;
+        background-color: $BLUE-10;
         border-radius: 8px;
         padding: 1rem;
 
@@ -145,7 +147,7 @@
           .citation_text {
             margin: 0;
             font-size: 0.9375rem;
-            color: #4b5563;
+            color: $c139;
             line-height: 1.5;
             font-style: normal;
           }
@@ -160,13 +162,13 @@
 
             .citation_author {
               font-size: 0.875rem;
-              color: #6b7280;
+              color: $c87;
             }
 
             .remove_citation_link {
               background: none;
               border: none;
-              color: #dc2626;
+              color: $c121;
               font-size: 0.875rem;
               cursor: pointer;
               padding: 0;
@@ -185,14 +187,14 @@
         display: block;
         font-size: 1rem;
         font-weight: 600;
-        color: #374151;
+        color: $c88;
         margin-bottom: 0.5rem;
       }
 
       textarea {
         width: 100%;
         padding: 0.75rem;
-        border: 1px solid #d1d5db;
+        border: 1px solid $c86;
         border-radius: 8px;
         font-size: 0.9375rem;
         font-family: inherit;
@@ -218,11 +220,11 @@
           }
 
           &.sufficient {
-            color: #059669;
+            color: $c140;
           }
 
           &.insufficient {
-            color: #6b7280;
+            color: $c87;
           }
         }
 
@@ -231,11 +233,11 @@
           font-weight: 500;
 
           &.insufficient {
-            color: #ef4444;
+            color: $c134;
           }
 
           &.sufficient {
-            color: #059669;
+            color: $c140;
           }
         }
       }
@@ -247,22 +249,22 @@
     justify-content: flex-end;
     gap: 0.75rem;
     padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid $c95;
 
     .cancel_btn {
       padding: 8px 16px;
-      border: 1px solid #d1d5db;
-      background: white;
+      border: 1px solid $c86;
+      background: $WHITE;
       border-radius: 8px;
       font-size: 0.9375rem;
-      color: #374151;
+      color: $c88;
       cursor: pointer;
     }
 
     .save_btn {
       padding: 8px 16px;
-      background: #045071;
-      color: white;
+      background: $PRUSSIAN-70;
+      color: $WHITE;
       border: none;
       border-radius: 8px;
       font-size: 0.9375rem;

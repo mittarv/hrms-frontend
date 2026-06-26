@@ -6,6 +6,7 @@ import EditIcon from "../../assets/icons/edit_button_blue.svg";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
+import NoResultsContainer from "../../Common/components/NoResultsContainer";
 
 export default function AttendanceLog({
   attendanceData,
@@ -277,14 +278,11 @@ export default function AttendanceLog({
             </tbody>
           </table>
         ) : (
-          <div className="no-data-message">
-            <p>No data to display</p>
-            {showOnlyLeaves && (
-              <p className="no-data-subtext">
-                There are no leave or half-day records for this month.
-              </p>
-            )}
-          </div>
+          <NoResultsContainer
+            showImage={true}
+            message="We couldn't find anyone matching your search."
+            subMessage="Try searching with different details."
+          />
         )}
       </div>
     </div>

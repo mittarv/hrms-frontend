@@ -6,4 +6,5 @@ export const RequestsTableHeader = [
   { name: "type", label: "Type" },
   { name: "oldData", label: "Old Data" },
   { name: "newData", label: "New Data" },
+  { name: "action", label: "Action" },
 ];

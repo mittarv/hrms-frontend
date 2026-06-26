@@ -1,10 +1,12 @@
+@use '../../design/colors/customColors' as *;
+
 .joining_popup_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: $c166;
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     display: flex;
@@ -18,7 +20,7 @@
         position: relative;
         width: 200px;
         height: 200px;
-        background: white;
+        background: $WHITE;
         border-radius: 1rem;
         padding: 1rem;
         font-family: 'Plus Jakarta Sans';
@@ -30,7 +32,7 @@
             text-decoration: underline;
             text-underline-offset: 0.5rem;
             text-decoration-thickness: 2px;
-            text-decoration-color: #2E3038;
+            text-decoration-color: $GREY-80;
             margin-bottom: 2rem;
             font-weight: 700;
             font-size: 18px;
@@ -48,7 +50,7 @@
             input {
                 padding: 0.5rem 1rem;
                 border-radius: 0.4rem;
-                border: 1px solid #C7C9D1;
+                border: 1px solid $GREY-30;
                 cursor: pointer;
                 font-family: 'Plus Jakarta Sans';
             }
@@ -68,24 +70,24 @@
                     font-size: 14px;
                     font-weight: 700;
                     padding: 12px 16px;
-                    border: 1px solid #8F92A3;
+                    border: 1px solid $GREY-50;
                     border-radius: 0.4rem;
                     cursor: pointer;
                     font-family: 'Plus Jakarta Sans';
                 }
 
                 .joining_cancel_button{
-                    background: white;
-                    color: #C73D45;
-                    border-color: #C73D45;
+                    background: $WHITE;
+                    color: $RED-60;
+                    border-color: $RED-60;
                 }
                 .joining_save_button {
-                    background: #8F92A3;
-                    color: #E3E4E8;
+                    background: $GREY-50;
+                    color: $GREY-20;
 
                     &.save_enabled {
-                        background: #045071;
-                        color: white;
+                        background: $PRUSSIAN-70;
+                        color: $WHITE;
                     }
                 }
             }

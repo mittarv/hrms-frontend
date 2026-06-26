@@ -397,10 +397,10 @@ export const getAllComponentTypes = () => async (dispatch) => {
       }
     );
     if (response.data.success) {
-     dispatch({
-      type:"GET_ALL_COMPONENT_TYPES_SUCCESS",
-      payload: response.data.allComponent,
-     })
+      dispatch({
+        type:"GET_ALL_COMPONENT_TYPES_SUCCESS",
+        payload: response.data.allComponent,
+      })
     } else {
       dispatch({
         type: "GET_ALL_COMPONENT_TYPES_FAILURE",
@@ -568,231 +568,231 @@ export const updatePayrollLevel = (levelKey, levelName) => async (dispatch) => {
 };
 
 export const employeeOnboardingDetails = (updatedFormValueList) => async (dispatch) => {
-    const token = localStorage.getItem("token");
-    dispatch({ type: "EMPLOYEE_ONBOARDING_DETAILS" });
-    try {
-      const response = await axios.post(
-        `${
-          import.meta.env.VITE_REACT_APP_HOSTED_URL
-        }/api/hrms/empDetails/createEmployeeData`,
-        updatedFormValueList,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
+  const token = localStorage.getItem("token");
+  dispatch({ type: "EMPLOYEE_ONBOARDING_DETAILS" });
+  try {
+    const response = await axios.post(
+      `${
+        import.meta.env.VITE_REACT_APP_HOSTED_URL
+      }/api/hrms/empDetails/createEmployeeData`,
+      updatedFormValueList,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      }
+
+    );
+    if (response.data.success) {
+      dispatch(getAllEmployee());
+      dispatch(getAllManagers());
+      dispatch({
+        type: "EMPLOYEE_ONBOARDING_DETAILS_SUCCESS",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Employee onboarded successfully",
+          severity: "success"
         }
-       
-      );
-      if (response.data.success) {
-        dispatch(getAllEmployee());
-        dispatch(getAllManagers());
-        dispatch({
-          type: "EMPLOYEE_ONBOARDING_DETAILS_SUCCESS",
-          payload: response.data.message,
-        });
-        dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Employee onboarded successfully",
-            severity: "success"
-          }
-        });
-       }
-       else {
-        dispatch({
-          type: "EMPLOYEE_ONBOARDING_DETAILS_FAILURE",
-          payload: response.data.message,
-        });
-        dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to onboard employee",
-            severity: "error"
-          }
-        });
-       }
-    } catch (error) {
+      });
+    }
+    else {
       dispatch({
         type: "EMPLOYEE_ONBOARDING_DETAILS_FAILURE",
-        payload: error.message,
-      })
-      dispatch({
-        type: "SET_SNACKBAR_MESSAGE",
-        payload: await getErrorMessage(error, "An error occurred"),
-        severity: "error",
+        payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to onboard employee"),
-            severity: "error"
-          }
-        });
-    }
-  };
-
-
-  //Function for getting all employees
-  export const getAllEmployee = () => async (dispatch) => {
-    try {
-      const token = localStorage.getItem("token");
-      dispatch({type:"GET_ALL_EMPLOYEE"});
-      const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getAllEmployees`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to onboard employee",
+          severity: "error"
         }
-      );
-      if (response.data.success) {
-       dispatch({
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "EMPLOYEE_ONBOARDING_DETAILS_FAILURE",
+      payload: error.message,
+    })
+    dispatch({
+      type: "SET_SNACKBAR_MESSAGE",
+      payload: await getErrorMessage(error, "An error occurred"),
+      severity: "error",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to onboard employee"),
+        severity: "error"
+      }
+    });
+  }
+};
+
+
+//Function for getting all employees
+export const getAllEmployee = () => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("token");
+    dispatch({type:"GET_ALL_EMPLOYEE"});
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getAllEmployees`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
         type:"GET_ALL_EMPLOYEE_SUCCESS",
         payload: response.data.allEmployeeDetails,
-       })
-      } else {
-        dispatch({
-          type: "GET_ALL_EMPLOYEE_FAILURE",
-          payload: response.data.message,
-        });
-      }
-    } catch (error) {
+      })
+    } else {
       dispatch({
-        type: "GET_ALL_EMPLOYEE_FAILURE",
-        payload: await getErrorMessage(error, "An error occurred"),
+          type: "GET_ALL_EMPLOYEE_FAILURE",
+        payload: response.data.message,
       });
     }
-  };
+  } catch (error) {
+    dispatch({
+      type: "GET_ALL_EMPLOYEE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+};
 
 
 
-  //Function for getting current employee details
-  export const getCurrentEmployeeDetails = (employeeUuid) => async (dispatch) => {
-    try {
-      const token = localStorage.getItem("token");
-      dispatch({type:"GET_CURRENT_EMPLOYEE_DETAILS"});
-      const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getCurrentEmpDetails/${employeeUuid}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        }
-      );
-      if (response.data.success) {
-       dispatch({
+//Function for getting current employee details
+export const getCurrentEmployeeDetails = (employeeUuid) => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("token");
+    dispatch({type:"GET_CURRENT_EMPLOYEE_DETAILS"});
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getCurrentEmpDetails/${employeeUuid}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      dispatch({
         type:"GET_CURRENT_EMPLOYEE_DETAILS_SUCCESS",
         payload: response.data,
-       })
-       //Show the employee details page (After successfully api called)
-       dispatch({type: "SET_EMPLOYEES_DETAILS_PAGE"});
-      } else {
-        dispatch({
-          type: "GET_CURRENT_EMPLOYEE_DETAILS_FAILURE",
-          payload: response.data.message,
-        });
-      }
-    } catch (error) {
+      })
+      //Show the employee details page (After successfully api called)
+      dispatch({type: "SET_EMPLOYEES_DETAILS_PAGE"});
+    } else {
       dispatch({
         type: "GET_CURRENT_EMPLOYEE_DETAILS_FAILURE",
-        payload: await getErrorMessage(error, "An error occurred"),
+        payload: response.data.message,
       });
     }
-  };
+  } catch (error) {
+    dispatch({
+      type: "GET_CURRENT_EMPLOYEE_DETAILS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+};
 
-  // Function for getting employee directory card details
-  export const getEmployeeDirectoryDetails = (employeeUuid) => async (dispatch) => {
-    try {
-      const token = localStorage.getItem("token");
-      dispatch({ type: "GET_EMPLOYEE_DIRECTORY_DETAILS" });
-      const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getEmployeeDirectoryDetails/${employeeUuid}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        }
-      );
-      if (response.data.success) {
-        dispatch({
-          type: "GET_EMPLOYEE_DIRECTORY_DETAILS_SUCCESS",
-          payload: response.data,
-        });
-      } else {
-        dispatch({
-          type: "GET_EMPLOYEE_DIRECTORY_DETAILS_FAILURE",
-          payload: response.data.message,
-        });
+// Function for getting employee directory card details
+export const getEmployeeDirectoryDetails = (employeeUuid) => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("token");
+    dispatch({ type: "GET_EMPLOYEE_DIRECTORY_DETAILS" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getEmployeeDirectoryDetails/${employeeUuid}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
       }
-    } catch (error) {
+    );
+    if (response.data.success) {
+      dispatch({
+        type: "GET_EMPLOYEE_DIRECTORY_DETAILS_SUCCESS",
+        payload: response.data,
+      });
+    } else {
       dispatch({
         type: "GET_EMPLOYEE_DIRECTORY_DETAILS_FAILURE",
-        payload: await getErrorMessage(error, "An error occurred"),
+        payload: response.data.message,
       });
     }
-  };
+  } catch (error) {
+    dispatch({
+      type: "GET_EMPLOYEE_DIRECTORY_DETAILS_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
+  }
+};
 
-  
-  export const updateEmployeeDetails = (updatedEmployeeData, employeeUuid) => async (dispatch) => {
-    const token = localStorage.getItem("token");
-    try {
-      dispatch({type:"EMPLOYEE_DETAILS_UPDATE"});
-      const response = await axios.patch(
-        `${
-          import.meta.env.VITE_REACT_APP_HOSTED_URL
-        }/api/hrms/empDetails/updateCurrentEmpDetails/${employeeUuid}`,
-        updatedEmployeeData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${token}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        await dispatch(getCurrentEmployeeDetails(employeeUuid));
-        dispatch(getAllEmployee());
-        dispatch(getAllManagers());
-        dispatch({
-          type: "EMPLOYEE_DETAILS_UPDATE_SUCCESS"
-        });
-        dispatch({
+
+export const updateEmployeeDetails = (updatedEmployeeData, employeeUuid) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({type:"EMPLOYEE_DETAILS_UPDATE"});
+    const response = await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_HOSTED_URL
+      }/api/hrms/empDetails/updateCurrentEmpDetails/${employeeUuid}`,
+      updatedEmployeeData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      }
+    );
+    if (response.data.success) {
+      await dispatch(getCurrentEmployeeDetails(employeeUuid));
+      dispatch(getAllEmployee());
+      dispatch(getAllManagers());
+      dispatch({
+        type: "EMPLOYEE_DETAILS_UPDATE_SUCCESS"
+      });
+      dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
           message: response?.data?.message || "Employee details updated successfully",
           severity: "success"
         }
       });
-       }
-       else {
-        dispatch({
-          type: "EMPLOYEE_DETAILS_UPDATE_FAILURE",
-        })
-        dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to update employee details",
-            severity: "error"
-          }
-        });
-       }
-    } catch (error) {
+    }
+    else {
       dispatch({
         type: "EMPLOYEE_DETAILS_UPDATE_FAILURE",
       })
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to update employee details"),
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to update employee details",
+          severity: "error"
+        }
       });
     }
+  } catch (error) {
+    dispatch({
+      type: "EMPLOYEE_DETAILS_UPDATE_FAILURE",
+    })
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to update employee details"),
+        severity: "error"
+      }
+    });
   }
+}
 // to fetch all the managers list
 export const getAllManagers = () => async (dispatch) => {
   try {
@@ -809,8 +809,8 @@ export const getAllManagers = () => async (dispatch) => {
     );
     if (response.data.success) {
       dispatch({
-       type:"GET_ALL_MANAGER_DETAILS_SUCCESS",
-       payload: response.data.managerInfo,
+        type:"GET_ALL_MANAGER_DETAILS_SUCCESS",
+        payload: response.data.managerInfo,
       })
     } else {
       dispatch({
@@ -822,7 +822,7 @@ export const getAllManagers = () => async (dispatch) => {
     dispatch({
       type: "GET_ALL_MANAGER_DETAILS_FAILURE",
       payload: await getErrorMessage(error, "An error occurred"),
-    });   
+    });
   }
 }
 
@@ -858,7 +858,7 @@ export const getAllBirthdayAndAnniversary = () => async (dispatch) => {
         payload: response.data.message && response.data.message,
       });
     }
-    
+
   } catch (error) {
     dispatch({
       type: "GET_ALL_EMPLOYEE_BIRTHDAY_AND_ANNIVERSARY_FAILURE",
@@ -883,7 +883,7 @@ export const getAllLeaves = () => async (dispatch) => {
     if (response.data.success) {
       dispatch({
        type:"GET_ALL_LEAVE_DETAILS_SUCCESS",
-       payload: response.data.leaveDetails,
+        payload: response.data.leaveDetails,
       })
     } else {
       dispatch({
@@ -915,7 +915,7 @@ export const createLeave = (leaveData) => async(dispatch) =>{
           Authorization: `${token}`,
         },
       }
-     
+
     );
     if (response.data.success) {
       dispatch({
@@ -927,20 +927,20 @@ export const createLeave = (leaveData) => async(dispatch) =>{
         payload: true,
       })
       dispatch(getAllLeaves());
-     }
-     else {
+    }
+    else {
       dispatch({
         type: "CREATE_LEAVE_FAILURE",
         payload: response.data.message,
-      }); 
+      });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to create leave.",
-            severity: "error"
-          }
-        });
-     }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to create leave.",
+          severity: "error"
+        }
+      });
+    }
   } catch (error) {
 
     dispatch({
@@ -948,12 +948,12 @@ export const createLeave = (leaveData) => async(dispatch) =>{
       payload: error.message,
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to create leave."),
-            severity: "error"
-          }
-        });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to create leave."),
+        severity: "error"
+      }
+    });
   }
 }
 
@@ -972,10 +972,10 @@ export const getLeaveDetails = (leaveUuid) => async (dispatch) => {
       }
     );
     if (response.data.success) {
-     dispatch({
+      dispatch({
       type:"GET_CURRENT_LEAVE_DETAILS_SUCCESS",
-      payload: response.data.leaveDetails,
-     })
+        payload: response.data.leaveDetails,
+      })
      dispatch({type: "SET_LEAVE_DETAILS_PAGE"});
     } else {
       dispatch({
@@ -1017,31 +1017,31 @@ export const updateLeaveDetails = (updatedLeaveData) => async (dispatch) => {
         payload: true,
       })
       dispatch(getAllLeaves());
-     }
-     else {
+    }
+    else {
       dispatch({
         type: "UPDATED_CURRENT_LEAVE_DETAILS_FAILURE",
         payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to update leave.",
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to update leave.",
+          severity: "error"
+        }
       });
-     }
+    }
   } catch (error) {
     dispatch({
       type: "UPDATED_CURRENT_LEAVE_DETAILS_FAILURE",
       payload: error.message,
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to update leave."),
-            severity: "error"
-          }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to update leave."),
+        severity: "error"
+      }
     });
   }
 }
@@ -1098,8 +1098,8 @@ export const sendChangesToApprover = (changeRequestData) => async (dispatch) => 
     );
     if (response.data.success) {
       dispatch(getAllEmployee());
-      dispatch(getCurrentEmployeeDetails(changeRequestData.requestedFor));  
-      dispatch(getAllManagers());  
+      dispatch(getCurrentEmployeeDetails(changeRequestData.requestedFor));
+      dispatch(getAllManagers());
       dispatch(getCurrentEmployeeNotifications(changeRequestData.requestedFor));
       dispatch({
         type: "SEND_CHANGES_TO_APPROVER_SUCCESS",
@@ -1118,11 +1118,11 @@ export const sendChangesToApprover = (changeRequestData) => async (dispatch) => 
         payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to send changes to approver.",
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to send changes to approver.",
+          severity: "error"
+        }
       });
     }
   } catch (error) {
@@ -1131,12 +1131,12 @@ export const sendChangesToApprover = (changeRequestData) => async (dispatch) => 
       payload: error.message,
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: error?.response?.data?.message || "Failed to send changes to approver.",
-            severity: "error"
-          }
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: error?.response?.data?.message || "Failed to send changes to approver.",
+        severity: "error"
+      }
+    });
   }
 }
 
@@ -1145,7 +1145,7 @@ export const sendChangesToApprover = (changeRequestData) => async (dispatch) => 
  * This function is likely used to get all pending requests for a user.
  */
 export const getPendingRequests = () => async (dispatch) => {
-  const token = localStorage.getItem("token"); 
+  const token = localStorage.getItem("token");
   try {
     dispatch({type:"GET_PENDING_REQUESTS"});
     const response = await axios.get(
@@ -1192,7 +1192,7 @@ export const getPendingRequests = () => async (dispatch) => {
  * This function is likely used to get all approved or rejected requests for a user.
  */
 export const getProcessedRequests = ( startDate, endDate,page = 1, pageSize = 10) => async (dispatch) => {
-  const token = localStorage.getItem("token"); 
+  const token = localStorage.getItem("token");
   try {
     dispatch({type:"GET_PROCESSED_REQUESTS"});
     const response = await axios.get(
@@ -1208,8 +1208,8 @@ export const getProcessedRequests = ( startDate, endDate,page = 1, pageSize = 10
       dispatch({
         type: "GET_PROCESSED_REQUESTS_SUCCESS",
         payload: {
-        data: response.data.allProcessedRequests, 
-        pagination: response.data.pagination      
+          data: response.data.allProcessedRequests,
+          pagination: response.data.pagination
         },
       });
     } else {
@@ -1275,11 +1275,11 @@ export const approveOrRejectRequest = (requestData) => async (dispatch) => {
         payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to process request.",
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to process request.",
+          severity: "error"
+        }
       });
     }
   } catch (error) {
@@ -1288,12 +1288,12 @@ export const approveOrRejectRequest = (requestData) => async (dispatch) => {
       payload: error.message,
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to process request."),
-            severity: "error"
-          }
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to process request."),
+        severity: "error"
+      }
+    });
   }
 };
 
@@ -1376,11 +1376,11 @@ export const createHolidays = (holidayData) => async (dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error"
-        }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
 }
@@ -1389,17 +1389,17 @@ export const deleteHolidays = (holidayIds) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "DELETE_HOLIDAY_TYPE" });
-    
+
     const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empHoliday/deleteHoliday`, {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `${token}`, 
+        "Authorization": `${token}`,
       },
       data: {
-        holidayIds: holidayIds 
+        holidayIds: holidayIds
       }
     });
-    
+
     if (response.data.success) {
       dispatch({
         type: "DELETE_HOLIDAY_SUCCESS",
@@ -1432,12 +1432,12 @@ export const deleteHolidays = (holidayIds) => async (dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: error?.response?.data?.message || await getErrorMessage(error, "Failed to delete holiday"),
-          severity: "error"
-        }
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: error?.response?.data?.message || await getErrorMessage(error, "Failed to delete holiday"),
+        severity: "error"
+      }
+    });
   }
 };
 
@@ -1488,11 +1488,11 @@ export const updateHolidays = (holidayData) => async (dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error"
-        }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
 }
@@ -1576,11 +1576,11 @@ export const createAttendanceLog = (attendanceData, attendanceMonth, attendanceY
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error"
-        }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
 }
@@ -1633,11 +1633,11 @@ export const registerCompOffLeave = (attendanceData, attendanceMonth, attendance
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error"
-        }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
 }
@@ -1705,25 +1705,25 @@ export const getAllPendingLeaveRequests = (startDate, endDate) => async (dispatc
   dispatch({type:"GET_ALL_PENDING_LEAVE_REQUESTS"});
   try {
     const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getAllPendingLeaveRequests/?start=${startDate}&end=${endDate}`, 
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        }
       }
-    }
-  )
+    )
   if(response.data.success) {
-    dispatch({
-      type: "GET_ALL_PENDING_LEAVE_REQUESTS_SUCCESS",
+      dispatch({
+        type: "GET_ALL_PENDING_LEAVE_REQUESTS_SUCCESS",
       payload : response.data.allPendingRequests
 
-    })
-  } else {
-    dispatch({
-      type: "GET_ALL_PENDING_LEAVE_REQUESTS_FAILURE",
-      payload: response.data.message,
-    });
-  }
+      })
+    } else {
+      dispatch({
+        type: "GET_ALL_PENDING_LEAVE_REQUESTS_FAILURE",
+        payload: response.data.message,
+      });
+    }
   } catch (error) {
     dispatch({
       type: "GET_ALL_PENDING_LEAVE_REQUESTS_FAILURE",
@@ -1736,20 +1736,20 @@ export const getAllHistoryLeaveRequests = (startDate, endDate, page = 1, pageSiz
   dispatch({type:"GET_ALL_HISTORY_LEAVE_REQUESTS"});
   try {
     const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getAllHistoryLeaveRequests/?start=${startDate}&end=${endDate}&page=${page}&pageSize=${pageSize}`, 
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        }
       }
-    }
-  )
-  if (response.data.success) {
+    )
+    if (response.data.success) {
       dispatch({
         type: "GET_ALL_HISTORY_LEAVE_REQUESTS_SUCCESS",
         // We now send the whole data object so the reducer can save pagination info
         payload: {
-          data: response.data.allHistoryRequests, 
-          pagination: response.data.pagination 
+          data: response.data.allHistoryRequests,
+          pagination: response.data.pagination
         }
       });
     } else {
@@ -1812,21 +1812,21 @@ export const triggerProofRequiredForLeave = (leaveUuid) => async(dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error"
-        }
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error"
+      }
     });
   }
-} 
+}
 
-export const getEmployeeLeaveHistory = (employeeUuid) => async (dispatch) => {
+export const getEmployeeLeaveHistory = (employeeUuid, page = 1, pageSize = 20) => async (dispatch) => {
   const token = localStorage.getItem("token");
   try {
     dispatch({type:"GET_EMPLOYEE_LEAVE_HISTORY"});
     const response = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${employeeUuid}/getEmployeeLeaveHistory`,
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${employeeUuid}/getEmployeeLeaveHistory?page=${page}&pageSize=${pageSize}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -1837,7 +1837,10 @@ export const getEmployeeLeaveHistory = (employeeUuid) => async (dispatch) => {
     if(response.data.success){
       dispatch({
         type: "GET_EMPLOYEE_LEAVE_HISTORY_SUCCESS",
-        payload: response.data.employeeLeaveHistory,
+        payload: {
+          data: response.data.employeeLeaveHistory,
+          pagination: response.data.pagination,
+        },
       });
     } else {
       dispatch({
@@ -1855,7 +1858,7 @@ export const getEmployeeLeaveHistory = (employeeUuid) => async (dispatch) => {
 
 
 export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
   try {
     dispatch({type:"UPLOAD_PROOF_DOCUMENTS"});
     const response = await axios.post(
@@ -1867,7 +1870,7 @@ export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid)
           Authorization: `${token}`,
         },
       }
-      );
+    );
 
     if (response.data.success) {
       dispatch({
@@ -1875,18 +1878,18 @@ export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid)
         payload: response.data.message,
       });
       dispatch(getEmployeeLeaveHistory(employeeUuid));
-      dispatch({
+    dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
           message: response?.data?.message || "Proof documents uploaded successfully",
           severity: "success"
         }
       });
-    } else {
-        dispatch({
-          type: "UPLOAD_PROOF_DOCUMENTS_FAILURE",
-          payload: response.data.message,
-          });
+      } else {
+         dispatch({
+           type: "UPLOAD_PROOF_DOCUMENTS_FAILURE",
+           payload: response.data.message,
+         });
         dispatch({
           type: "SET_NEW_SNACKBAR_MESSAGE",
           payload: {
@@ -1897,8 +1900,8 @@ export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid)
       }
    } catch (error) {
       dispatch({
-         type: "UPLOAD_PROOF_DOCUMENTS_FAILURE",
-         payload: await getErrorMessage(error, "An error occurred"),
+        type: "UPLOAD_PROOF_DOCUMENTS_FAILURE",
+        payload: await getErrorMessage(error, "An error occurred"),
        });
        dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
@@ -1906,8 +1909,8 @@ export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid)
           message: await getErrorMessage(error, "An error occurred"),
           severity: "error"
         }
-        });
-    }
+      });
+   }
 };
 
 
@@ -1969,7 +1972,7 @@ export const reviewLeaveRequest = (reviewedData, employeeUuid) => async(dispatch
 export const getEmployeeLeaveBalance = (employeeUuid) => async(dispatch) => {
   const token = localStorage.getItem("token");
   if (!employeeUuid) return;
-  
+
   try {
     dispatch({type:"GET_EMPLOYEE_LEAVE_BALANCE"});
     const response = await axios.get(
@@ -2219,7 +2222,7 @@ export const employeeCheckIn = (empUuid) => async (dispatch) => {
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${empUuid}/employeeCheckIn`,
       {
-        timezone: userTimezone  
+        timezone: userTimezone
       },
       {
         headers: {
@@ -2248,11 +2251,11 @@ export const employeeCheckIn = (empUuid) => async (dispatch) => {
         payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to check in.",
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to check in.",
+          severity: "error"
+        }
       });
     }
   } catch (error) {
@@ -2261,12 +2264,12 @@ export const employeeCheckIn = (empUuid) => async (dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to check in."),
-            severity: "error"
-          }
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to check in."),
+        severity: "error"
+      }
+    });
   }
 }
 
@@ -2307,11 +2310,11 @@ export const employeeCheckOut = (empUuid) => async (dispatch) => {
         payload: response.data.message,
       });
       dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: response?.data?.message || "Failed to check out.",
-            severity: "error"
-          }
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response?.data?.message || "Failed to check out.",
+          severity: "error"
+        }
       });
     }
   } catch (error) {
@@ -2320,17 +2323,17 @@ export const employeeCheckOut = (empUuid) => async (dispatch) => {
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-          type: "SET_NEW_SNACKBAR_MESSAGE",
-          payload: {
-            message: await getErrorMessage(error, "Failed to check out."),
-            severity: "error"
-          }
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "Failed to check out."),
+        severity: "error"
+      }
+    });
   }
 }
 
 export const updateEmployeeOutstandingCheckout = (attendanceId, checkOutData, empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");  
+  const token = localStorage.getItem("token");
   try {
     dispatch({type:"UPDATE_EMPLOYEE_OUTSTANDING_CHECKOUT"});
     const response = await axios.patch(
@@ -2456,13 +2459,13 @@ export const getLeaveBalanceWithAccrual = (empUuid, asOfDate = null) => async (d
   if (!empUuid) return;
   try {
     dispatch({ type: "GET_LEAVE_BALANCE_WITH_ACCRUAL" });
-    
+
     // Build URL with optional date parameter for multi-fiscal year support
     let url = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${empUuid}/getLeaveBalanceWithAccrual`;
     if (asOfDate) {
       url += `?asOfDate=${asOfDate}`;
     }
-    
+
     const response = await axios.get(url, {
       headers: {
         "Content-Type": "application/json",
@@ -2524,39 +2527,39 @@ export const getSalaryComponents = (employeeType, employeeLocation, employeeLeve
     });
 
     if(response.data.status === "success") {
-        const globalComponent = response.data.salaryConfigData
-          .filter(
-            (item) =>
-              item.employeeType === "All" &&
-              item.employeeLocation === "All" &&
-              item.employeeLevel === "All"
-          )
-          .map((item) => item.salaryComponents).flat();
+      const globalComponent = response.data.salaryConfigData
+        .filter(
+          (item) =>
+            item.employeeType === "All" &&
+            item.employeeLocation === "All" &&
+            item.employeeLevel === "All"
+        )
+        .map((item) => item.salaryComponents).flat();
 
-        const defaultComponent = response.data.salaryConfigData
-          .filter(
-            (item) =>
-              item.employeeType != "All" &&
-              item.employeeLocation != "All" &&
-              item.employeeLevel != "All"
-          )
-          .map((item) => item.salaryComponents).flat();
+      const defaultComponent = response.data.salaryConfigData
+        .filter(
+          (item) =>
+            item.employeeType != "All" &&
+            item.employeeLocation != "All" &&
+            item.employeeLevel != "All"
+        )
+        .map((item) => item.salaryComponents).flat();
 
-        dispatch({
+      dispatch({
           type:"GET_GLOBAL_SALARY_COMPONENTS_SUCCESS",
-          payload: globalComponent
-        })
+        payload: globalComponent
+      })
 
-        dispatch({
-          type: "GET_DEFAULT_SALARY_COMPONENTS_SUCCESS",
-          payload: defaultComponent
-        })
+      dispatch({
+        type: "GET_DEFAULT_SALARY_COMPONENTS_SUCCESS",
+        payload: defaultComponent
+      })
 
     } else {
       dispatch({
         type: "GET_SALARY_CONFIG_FAILURE",
         payload: response.data.message,
-      })  
+      })
     }
   } catch (error) {
     dispatch({
@@ -2599,14 +2602,14 @@ export const createSalaryConfig = (configData, employeeType, employeeLocation, e
       dispatch({
         type: "CREATE_SALARY_CONFIG_FAILURE",
         payload: response.data.message,
-      })  
+      })
       dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
           message: response.data.message,
           severity: "error",
         },
-      })  
+      })
     }
   } catch (error) {
     dispatch({
@@ -2656,14 +2659,14 @@ export const updateSalaryConfig = (updateData, employeeType, employeeLocation, e
       dispatch({
         type: "UPDATE_SALARY_CONFIG_FAILURE",
         payload: response.data.message,
-      })  
+      })
       dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
           message: response.data.message,
           severity: "error",
         },
-      })  
+      })
     }
   } catch (error) {
     dispatch({
@@ -2715,14 +2718,14 @@ export const deleteSalaryConfig = (deletedData, employeeType, employeeLocation, 
       dispatch({
         type: "DELETE_SALARY_CONFIG_FAILURE",
         payload: response.data.message,
-      })  
+      })
       dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
         payload: {
           message: response.data.message,
           severity: "error",
         },
-      })  
+      })
     }
   } catch (error) {
     dispatch({
@@ -2749,7 +2752,7 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
     const params = new URLSearchParams();
     if (currentPage) params.append("page", currentPage);
     if (pageSize) params.append("limit", pageSize);
-    
+
     // Convert month name to month number (1-12)
     if (selectedMonth) {
       const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -2759,7 +2762,7 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
         params.append("month", monthNumber);
       }
     }
-    
+
     if (selectedYear) params.append("year", selectedYear);
     if (searchQuery) params.append("search", searchQuery);
 
@@ -2813,13 +2816,13 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
 export const updatePayrollItems = (employeeId, employeeName, payslipId, componentType, adjustments, getSalaryComponentsDataParams) => async (dispatch) => {
   const token = localStorage.getItem("token");
   dispatch({ type: "UPDATE_PAYROLL_ITEMS_REQUEST" });
-  const { 
-      currentPage, 
-      pageSize, 
-      selectedMonth, 
-      selectedYear, 
-      searchQuery 
-    } = getSalaryComponentsDataParams;
+  const {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  } = getSalaryComponentsDataParams;
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/UpdatePayrollItems`,
@@ -2886,13 +2889,13 @@ export const updatePayrollItems = (employeeId, employeeName, payslipId, componen
 // Finalize payroll for selected employees
 export const finalizePayroll = (payslipIds, getSalaryComponentsDataParams) => async (dispatch) => {
   const token = localStorage.getItem("token");
-  const { 
-      currentPage, 
-      pageSize, 
-      selectedMonth, 
-      selectedYear, 
-      searchQuery 
-    } = getSalaryComponentsDataParams;
+  const {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  } = getSalaryComponentsDataParams;
   dispatch({ type: "FINALIZE_PAYROLL_REQUEST" });
   try {
     const response = await axios.post(
@@ -2956,13 +2959,13 @@ export const finalizePayroll = (payslipIds, getSalaryComponentsDataParams) => as
 // Mark finalized payslips as pending for selected employees
 export const markFinalizedPayslipsAsPending  = (payslipIds, getSalaryComponentsDataParams) => async (dispatch) => {
   const token = localStorage.getItem("token");
-  const { 
-      currentPage, 
-      pageSize, 
-      selectedMonth, 
-      selectedYear, 
-      searchQuery 
-    } = getSalaryComponentsDataParams;
+  const {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  } = getSalaryComponentsDataParams;
   dispatch({ type: "MARK_PAYSLIPS_AS_PENDING_REQUEST" });
   try {
     const response = await axios.post(
@@ -3095,15 +3098,15 @@ export const deletePayrollRecords = (payslipIds, getSalaryComponentsDataParams) 
 export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatch) => {
   const token = localStorage.getItem("token");
   dispatch({ type: "GENERATE_PAYROLL_REQUEST" });
-  const { 
-      currentPage, 
-      pageSize, 
-      selectedMonth, 
-      selectedYear, 
-      searchQuery
-    } = getSalaryComponentsDataParams;
+  const {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  } = getSalaryComponentsDataParams;
   const queryParams = new URLSearchParams();
-    // Convert month name to month number (1-12)
+  // Convert month name to month number (1-12)
   if (selectedMonth) {
     const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"];
@@ -3112,10 +3115,10 @@ export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatc
       queryParams.append("month", monthNumber);
     }
   }
-    
+
   if (selectedYear) queryParams.append("year", selectedYear);
-  
-  
+
+
   try {
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/generatePayroll?${queryParams.toString()}`,
@@ -3167,7 +3170,7 @@ export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatc
         severity: "error",
       },
     });
-  } 
+  }
 }
 
 export const getEmployeePayslips = (employeeId, year) => async (dispatch) => {
@@ -3332,10 +3335,10 @@ export const downloadPayslipPdf = (payslipId) => async (dispatch) => {
       // Import jsPDF and html2canvas dynamically
       const { default: html2canvas } = await import('html2canvas');
       const { default: jsPDF } = await import('jspdf');
-      
+
       // Get suggested filename from response header
       const suggestedFilename = response.headers['x-filename'] || `payslip_${payslipId}.pdf`;
-      
+
       // Create a temporary container to render HTML
       const tempDiv = document.createElement('div');
       tempDiv.style.position = 'absolute';
@@ -3369,11 +3372,11 @@ export const downloadPayslipPdf = (payslipId) => async (dispatch) => {
       // Calculate PDF dimensions
       const imgWidth = 210; // A4 width in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
+
       // Create PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png');
-      
+
       // Add image to PDF (handle multi-page if needed)
       let heightLeft = imgHeight;
       let position = 0;
@@ -3434,11 +3437,11 @@ export const downloadPayslipPdf = (payslipId) => async (dispatch) => {
 export const getNetPayPayrollAmount = (month, year) => async (dispatch) => {
   const token = localStorage.getItem("token");
   dispatch({ type: "GET_NET_PAY_PAYROLL_AMOUNT_REQUEST" });
-  
+
   try {
     const baseUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/getNetPayAmount`;
     const params = new URLSearchParams();
-    
+
     // Convert month name to month number if month is provided
     if (month) {
       const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -3448,9 +3451,9 @@ export const getNetPayPayrollAmount = (month, year) => async (dispatch) => {
         params.append("month", monthNumber);
       }
     }
-    
+
     if (year) params.append("year", year);
-    
+
     const response = await axios.get(`${baseUrl}?${params.toString()}`, {
       headers: {
         "Content-Type": "application/json",
@@ -3474,7 +3477,7 @@ export const getNetPayPayrollAmount = (month, year) => async (dispatch) => {
       type: "GET_NET_PAY_PAYROLL_AMOUNT_FAILURE",
       payload: await getErrorMessage(error, "Failed to fetch net pay amount"),
     });
-  } 
+  }
 };
 // Payroll filter actions
 export const setPayrollMonth = (month) => (dispatch) => {
@@ -3619,8 +3622,8 @@ export const getExtraWorkLogRequestsHistory = (pageNum=1,pageSize=10,startDate, 
       dispatch({
         type: "GET_EXTRA_WORK_LOG_REQUESTS_HISTORY_SUCCESS",
         payload: {
-        data: response.data.allProcessedRequests, 
-        pagination: response.data.pagination      
+          data: response.data.allProcessedRequests,
+          pagination: response.data.pagination
         },
       });
     } else {
@@ -3764,13 +3767,13 @@ export const getCompOffLeaveEligibility = (empUuid, startDate, endDate, isHalfDa
 }
 
 
-export const getEmployeeExtraWorkHistory = (empUuid) => async (dispatch) => {
+export const getEmployeeExtraWorkHistory = (empUuid, page = 1, pageSize = 10000) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "GET_EMPLOYEE_EXTRA_WORK_HISTORY" });
 
     const response = await axios.get(
-      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${empUuid}/getEmployeeExtraWorkHistory`,
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/${empUuid}/getEmployeeExtraWorkHistory?page=${page}&pageSize=${pageSize}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -3781,7 +3784,10 @@ export const getEmployeeExtraWorkHistory = (empUuid) => async (dispatch) => {
     if (response.data.success) {
       dispatch({
         type: "GET_EMPLOYEE_EXTRA_WORK_HISTORY_SUCCESS",
-        payload: response.data.extraWorkHistory,
+        payload: {
+          data: response.data.extraWorkHistory,
+          pagination: response.data.pagination,
+        },
       });
     }
   } catch (error) {
@@ -3836,7 +3842,7 @@ export const getAllHrmsAccessPermissions = () => async(dispatch) => {
           Authorization: token,
         },
       }
-    ); 
+    );
     if (response.data.success) {
       dispatch({
         type: "GET_ALL_HRMS_ACCESS_PERMISSIONS_SUCCESS",
@@ -3898,11 +3904,11 @@ export const createHrmsRole = (roleData) => async(dispatch) => {
     }
   } catch (error) {
     dispatch({
-        type: "CREATE_HRMS_ROLE_FAILURE",
-        payload: await getErrorMessage(error, "An error occurred"),
-      });
-    }
+      type: "CREATE_HRMS_ROLE_FAILURE",
+      payload: await getErrorMessage(error, "An error occurred"),
+    });
   }
+}
 
 export const getHrmsRoleById = (roleId) => async(dispatch) => {
   if (!roleId) return;
@@ -4319,12 +4325,12 @@ export const getAllOffboardingInitiatedEmployeeDetails = () => async(dispatch) =
       payload: await getErrorMessage(error, "An error occurred"),
     });
     dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: await getErrorMessage(error, "An error occurred"),
-          severity: "error",
-        },
-      });
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: await getErrorMessage(error, "An error occurred"),
+        severity: "error",
+      },
+    });
   }
 }
 
@@ -4343,7 +4349,7 @@ export const hrClearanceStatus = (empUuid) => async(dispatch) => {
       }
     );
     if (response.data.success) {
-      dispatch(getAllOffboardingInitiatedEmployeeDetails());  
+      dispatch(getAllOffboardingInitiatedEmployeeDetails());
       dispatch({
         type: "HR_CLEARANCE_SUCCESS",
         payload: response.data.message,
@@ -4604,10 +4610,10 @@ export const fetchRewardsDashboard = (year) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "FETCH_REWARDS_DASHBOARD" });
-    
+
     const params = {};
     if (typeof year === "number") params.year = year;
-    
+
     const res = await axios.get(`${REWARDS_BASE}/dashboard`, {
       params,
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5051,5 +5057,638 @@ export const announceRewardsWinners = (cycleId, employeeChoiceEmpUuid, leadershi
     dispatch({ type: "ANNOUNCE_WINNERS_FAILED" });
     const msg = await getErrorMessage(e, "Failed to announce winners");
     dispatch({ type: "SET_NEW_SNACKBAR_MESSAGE", payload: { message: msg, severity: "error" } });
+  }
+};
+
+// ================================= Secondary Location =================================
+export const fetchSecondaryLocationOverview = (employeeUuid) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "FETCH_SECONDARY_LOCATION_OVERVIEW" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/getOverview`,
+      {
+        params: employeeUuid ? { employeeUuid } : {},
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_OVERVIEW_SUCCESS",
+        payload: response.data.data || null,
+      });
+    } else {
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_OVERVIEW_FAILURE",
+        payload: response.data?.message || "Failed to fetch overview",
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "FETCH_SECONDARY_LOCATION_OVERVIEW_FAILURE",
+      payload: await getErrorMessage(error, "Failed to fetch overview"),
+    });
+  }
+};
+
+export const fetchSecondaryLocationLogs = ({
+  month,
+  year,
+  statuses = [],
+  sortBy = "createdAt",
+  sortOrder = "DESC",
+  page,
+  lastId = "",
+  limit = 10,
+  employeeUuid,
+  append = false,
+} = {}) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "FETCH_SECONDARY_LOCATION_LOGS" });
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/getLogs`,
+      {
+        params: {
+          limit,
+          sortBy,
+          sortOrder,
+          ...(month ? { month } : {}),
+          ...(year ? { year } : {}),
+          ...(statuses?.length ? { status: statuses.join(",") } : {}),
+          ...(page ? { page } : {}),
+          ...(lastId ? { last_id: lastId } : {}),
+          ...(employeeUuid ? { employeeUuid } : {}),
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      const data = response.data.data || {};
+      const list = data.data || [];
+      const hasCursorMeta =
+        Object.prototype.hasOwnProperty.call(data, "hasNext") ||
+        Object.prototype.hasOwnProperty.call(data, "nextLastId");
+
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_LOGS_SUCCESS",
+        payload: {
+          list,
+          meta: {
+            limit: data.limit || limit,
+            page: data.page || 1,
+            total: data.total || 0,
+            nextLastId: hasCursorMeta ? data.nextLastId || null : null,
+            hasNext: hasCursorMeta ? Boolean(data.hasNext) : false,
+          },
+        },
+        append,
+      });
+    } else {
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_LOGS_FAILURE",
+        payload: response.data?.message || "Failed to fetch logs",
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "FETCH_SECONDARY_LOCATION_LOGS_FAILURE",
+      payload: await getErrorMessage(error, "Failed to fetch logs"),
+    });
+  }
+};
+
+export const fetchSecondaryLocationConfigs = ({
+  search = "",
+  employeeTypes = [],
+  sortBy = "createdAt",
+  sortOrder = "DESC",
+  lastId = "",
+  limit = 10,
+  append = false,
+} = {}) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "FETCH_SECONDARY_LOCATION_CONFIGS" });
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/getConfig`,
+      {
+        params: {
+          ...(search ? { search } : {}),
+          ...(employeeTypes?.length
+            ? {
+              employeeTypes: employeeTypes.join(","),
+            }
+            : {}),
+          sortBy,
+          sortOrder,
+          ...(lastId ? { last_id: lastId } : {}),
+          limit,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      const data = response.data.data;
+
+      if (Array.isArray(data)) {
+        dispatch({
+          type: "FETCH_SECONDARY_LOCATION_CONFIGS_SUCCESS",
+          payload: {
+            list: data,
+            meta: {
+              limit,
+              nextLastId: null,
+              hasNext: false,
+            },
+          },
+          append,
+        });
+        return;
+      }
+
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_CONFIGS_SUCCESS",
+        payload: {
+          list: data?.data || [],
+          meta: {
+            limit: data?.limit || limit,
+            nextLastId: data?.nextLastId || null,
+            hasNext: Boolean(data?.hasNext),
+          },
+        },
+        append,
+      });
+    } else {
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_CONFIGS_FAILURE",
+        payload: response.data?.message || "Failed to fetch configuration",
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: "FETCH_SECONDARY_LOCATION_CONFIGS_FAILURE",
+      payload: await getErrorMessage(error, "Failed to fetch configuration"),
+    });
+  }
+};
+
+export const createSecondaryLocationLog = (payload) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "CREATE_SECONDARY_LOCATION_LOG" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/CreateLog`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "CREATE_SECONDARY_LOCATION_LOG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Secondary location log created successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "CREATE_SECONDARY_LOCATION_LOG_FAILURE",
+      payload: response.data?.message || "Failed to create log",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to create log",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to create log" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to create log");
+    dispatch({ type: "CREATE_SECONDARY_LOCATION_LOG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const updateSecondaryLocationLog = (logId, payload) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "UPDATE_SECONDARY_LOCATION_LOG" });
+    const response = await axios.patch(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/updateLog/${logId}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "UPDATE_SECONDARY_LOCATION_LOG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Secondary location log updated successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "UPDATE_SECONDARY_LOCATION_LOG_FAILURE",
+      payload: response.data?.message || "Failed to update log",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to update log",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to update log" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to update log");
+    dispatch({ type: "UPDATE_SECONDARY_LOCATION_LOG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const deleteSecondaryLocationLog = (logId, reason = "") => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "DELETE_SECONDARY_LOCATION_LOG" });
+    const response = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/deleteLog/${logId}`,
+      {
+        data: { reason },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "DELETE_SECONDARY_LOCATION_LOG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Secondary location log deleted successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "DELETE_SECONDARY_LOCATION_LOG_FAILURE",
+      payload: response.data?.message || "Failed to delete log",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to delete log",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to delete log" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to delete log");
+    dispatch({ type: "DELETE_SECONDARY_LOCATION_LOG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const createSecondaryLocationConfig = (payload) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "CREATE_SECONDARY_LOCATION_CONFIG" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/CreateConfig`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "CREATE_SECONDARY_LOCATION_CONFIG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Configuration created successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "CREATE_SECONDARY_LOCATION_CONFIG_FAILURE",
+      payload: response.data?.message || "Failed to create configuration",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to create configuration",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to create configuration" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to create configuration");
+    dispatch({ type: "CREATE_SECONDARY_LOCATION_CONFIG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const updateSecondaryLocationConfig = (configId, payload) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "UPDATE_SECONDARY_LOCATION_CONFIG" });
+    const response = await axios.patch(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/updateConfig/${configId}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "UPDATE_SECONDARY_LOCATION_CONFIG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Configuration updated successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "UPDATE_SECONDARY_LOCATION_CONFIG_FAILURE",
+      payload: response.data?.message || "Failed to update configuration",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to update configuration",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to update configuration" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to update configuration");
+    dispatch({ type: "UPDATE_SECONDARY_LOCATION_CONFIG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const deleteSecondaryLocationConfig = (configId) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "DELETE_SECONDARY_LOCATION_CONFIG" });
+    const response = await axios.delete(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/deleteConfig/${configId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({ type: "DELETE_SECONDARY_LOCATION_CONFIG_SUCCESS", payload: response.data });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data?.message || "Configuration deleted successfully",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "DELETE_SECONDARY_LOCATION_CONFIG_FAILURE",
+      payload: response.data?.message || "Failed to delete configuration",
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: response.data?.message || "Failed to delete configuration",
+        severity: "error",
+      },
+    });
+    return { success: false, message: response.data?.message || "Failed to delete configuration" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to delete configuration");
+    dispatch({ type: "DELETE_SECONDARY_LOCATION_CONFIG_FAILURE", payload: message });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message,
+        severity: "error",
+      },
+    });
+    return { success: false, message };
+  }
+};
+
+export const fetchSecondaryLocationRequests = ({
+  month,
+  year,
+  requestTypes = [],
+  statuses = [],
+  pendingOnly = false,
+  sortBy = "createdAt",
+  sortOrder = "DESC",
+  lastId = "",
+  limit = 20,
+  append = false,
+} = {}) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "FETCH_SECONDARY_LOCATION_REQUESTS" });
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/getRequests`,
+      {
+        params: {
+          ...(month ? { month } : {}),
+          ...(year ? { year } : {}),
+          ...(requestTypes?.length ? { requestType: requestTypes.join(",") } : {}),
+          ...(statuses?.length ? { status: statuses.join(",") } : {}),
+          ...(pendingOnly ? { pendingOnly: true } : {}),
+          ...(lastId ? { last_id: lastId } : {}),
+          limit,
+          sortBy,
+          sortOrder,
+        },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({
+        type: "FETCH_SECONDARY_LOCATION_REQUESTS_SUCCESS",
+        payload: {
+          requests: response.data?.data || [],
+          meta: response.data?.meta || {
+            pendingCount: 0,
+            historyCount: 0,
+            totalCount: 0,
+            limit,
+            nextLastId: null,
+            hasNext: false,
+          },
+        },
+        append,
+      });
+      return {
+        success: true,
+        data: response.data?.data || [],
+        meta: response.data?.meta || {
+          pendingCount: 0,
+          historyCount: 0,
+          totalCount: 0,
+          limit,
+          nextLastId: null,
+          hasNext: false,
+        },
+      };
+    }
+
+    dispatch({
+      type: "FETCH_SECONDARY_LOCATION_REQUESTS_FAILURE",
+      payload: response.data?.message || "Failed to fetch secondary location requests",
+    });
+    return {
+      success: false,
+      message: response.data?.message || "Failed to fetch secondary location requests",
+    };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to fetch secondary location requests");
+    dispatch({
+      type: "FETCH_SECONDARY_LOCATION_REQUESTS_FAILURE",
+      payload: message,
+    });
+    return { success: false, message };
+  }
+};
+
+export const reviewSecondaryLocationRequest = (requestId, payload) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  try {
+    dispatch({ type: "REVIEW_SECONDARY_LOCATION_REQUEST" });
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/secondaryLocation/reviewRequest/${requestId}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      dispatch({
+        type: "REVIEW_SECONDARY_LOCATION_REQUEST_SUCCESS",
+        payload: response.data,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message:
+            payload?.action === "approve"
+              ? "Approved Secondary Working Location request."
+              : "Rejected Secondary Working Location request.",
+          severity: "success",
+        },
+      });
+      return { success: true, data: response.data };
+    }
+
+    dispatch({
+      type: "REVIEW_SECONDARY_LOCATION_REQUEST_FAILURE",
+      payload: response.data?.message || "Failed to review request",
+    });
+    return { success: false, message: response.data?.message || "Failed to review request" };
+  } catch (error) {
+    const message = await getErrorMessage(error, "Failed to review request");
+    dispatch({ type: "REVIEW_SECONDARY_LOCATION_REQUEST_FAILURE", payload: message });
+    return { success: false, message };
   }
 };

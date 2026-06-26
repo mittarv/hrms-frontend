@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .loading_message {
     flex: 1;
     display: flex;
@@ -18,7 +20,7 @@
         justify-content: center;
         padding: 3rem 1rem;
         text-align: center;
-        background-color: #f9f9f9;
+        background-color: $c93;
         border-radius: 8px;
         min-height: 200px;
 
@@ -26,7 +28,7 @@
             margin: 0 0 0.5rem 0;
             font-size: 1rem;
             font-weight: 500;
-            color: #666;
+            color: $c84;
 
             &:last-child {
                 margin-bottom: 0;
@@ -53,7 +55,7 @@
             border: none;
             border-radius: 0;
             padding: 0;
-            border-bottom: 1px solid #aeb0bc;
+            border-bottom: 1px solid $GREY-40;
 
             .employee-search-icon {
                 width: 20px;
@@ -68,12 +70,12 @@
                 outline: none;
                 font-size: 16px;
                 flex: 1;
-                caret-color: #8f92a3;
+                caret-color: $GREY-50;
                 padding-left: 8px;
-                color: #8f92a3;
+                color: $GREY-50;
 
                 &::placeholder {
-                    color: #8f92a3;
+                    color: $GREY-50;
                 }
             }
         }
@@ -95,7 +97,7 @@
             p {
                 font-size: 16px;
                 font-weight: 600;
-                color: #2e3038;
+                color: $GREY-80;
                 line-height: 24px;
                 letter-spacing: 0.01em;
                 margin: 0;
@@ -105,7 +107,7 @@
         .log-table {
             width: 100%;
             overflow-x: auto;
-            border: 0.5px solid #aeb0bc;
+            border: 0.5px solid $GREY-40;
             border-radius: 8px;
 
             table {
@@ -116,22 +118,22 @@
                 td {
                     padding: 12px 15px;
                     text-align: left;
-                    border-bottom: 1px solid #e0e0e0;
+                    border-bottom: 1px solid $c66;
                     font-size: 14px;
                 }
 
                 th {
                     font-weight: 600;
-                    color: #555;
-                    background-color: #f9f9f9;
+                    color: $c92;
+                    background-color: $c93;
                 }
 
                 td {
-                    color: #333;
+                    color: $c75;
                 }
 
                 tr:nth-child(even) {
-                    background-color: #f7f7f8;
+                    background-color: $GREY-00;
                 }
 
                 .th-with-icons {
@@ -153,7 +155,7 @@
                     cursor: pointer;
                     font-size: 14px;
                     font-weight: 600;
-                    color: #045071;
+                    color: $PRUSSIAN-70;
                     text-decoration: underline;
                     text-underline-offset: 2px;
 
@@ -172,9 +174,9 @@
                         appearance: none;
                         width: 16px;
                         height: 16px;
-                        border: 1px solid #454754;
+                        border: 1px solid $GREY-70;
                         border-radius: 4px;
-                        background-color: #fff;
+                        background-color: $WHITE;
                         margin: 0;
 
                         &:checked {
@@ -196,11 +198,11 @@
 
                     .last-working-day-input {
                         padding: 8px 32px 8px 10px;
-                        border: 1px solid #aeb0bc;
+                        border: 1px solid $GREY-40;
                         border-radius: 4px;
                         font-size: 14px;
-                        color: #2e3038;
-                        background-color: #fff;
+                        color: $GREY-80;
+                        background-color: $WHITE;
                         max-width: 140px;
 
                         &::-webkit-calendar-picker-indicator {
@@ -216,8 +218,8 @@
                         &:disabled {
                             cursor: not-allowed;
                             opacity: 0.5;
-                            background-color: #F1F1F4;
-                            border: 1px solid #8F92A3;
+                            background-color: $GREY-10;
+                            border: 1px solid $GREY-50;
                         }
                     }
 
@@ -237,8 +239,8 @@
                     padding: 8px 14px;
                     border-radius: 8px;
                     border: none;
-                    background-color: #045071;
-                    color: #ffffff;
+                    background-color: $PRUSSIAN-70;
+                    color: $WHITE;
                     font-size: 12px;
                     font-weight: 600;
                     cursor: pointer;
@@ -250,12 +252,12 @@
                     }
 
                     &:hover {
-                        background-color:#033348;
+                        background-color:$PRUSSIAN-80;
                     }
 
                     &:disabled {
                         cursor: not-allowed;
-                        background-color: #8F92A3;
+                        background-color: $GREY-50;
                     }
                 }
             }
@@ -268,14 +270,14 @@
             justify-content: center;
             padding: 3rem 1rem;
             text-align: center;
-            background-color: #f9f9f9;
+            background-color: $c93;
             border-radius: 8px;
 
             p {
                 margin: 0;
                 font-size: 1rem;
                 font-weight: 500;
-                color: #666;
+                color: $c84;
             }
         }
     }

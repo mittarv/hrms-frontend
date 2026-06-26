@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .leave_requests_main_container {
   display: flex;
   flex-direction: column;
@@ -12,56 +14,182 @@
     gap: 20px;
     flex-shrink: 0; /* Prevent header from shrinking */
     margin-bottom: 20px; /* Space between header and table */
+
+
+    .requests_sub_tabs {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      background-color: $WHITE;
+      border: 1px solid $GREY-20; 
+      border-radius: 8px;
+      padding: 6px 8px; 
+      width: fit-content;
+      min-width: 100%;
+      box-shadow: 0 2px 4px $c71;
+      gap:20px;
+      
+      .sub_tab {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border:none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: transparent;
+      transition: all 0.3s ease;
+      
+    }
+
+    
+    .sub_tab.active {
+      background-color: $CYAN-70;
+      color: $WHITE;
+    }
+
+    
+    .sub_tab:not(.active) {
+      color: $GREY-60;
+    }
+
+    /* Optional: Hover effect for inactive tab */
+    .sub_tab:not(.active):hover {
+      background-color: $c157;
+      color: $c158;
+    }
+    }
   }
 
-  .date-filter {
+  
+  .date-filter-dropdowns {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  
+
+  .custom-select-wrapper {
+    position: relative;
+    
+    
+    .filter-select {
+      appearance: none;
+      background-color: $GREY-00;
+      border: 1px solid $GREY-20;
+      border-radius: 12px;
+      padding: 10px 40px 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: $GREY-70;
+      cursor: pointer;
+      outline: none;
+      min-width: 120px;
+      background-image: url('../../../../assets/icons/dropdown_arrow.svg');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px;
+
+      
+
+      &:hover {
+        border-color: $c159;
+      }
+    }
+  }
+}
+
+  .secondary_location_filter_row {
     display: flex;
-    flex-direction: row;
-    gap: 24px;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 
-    .date-input {
-      width: fit-content;
-      object-fit: contain;
-      display: flex;
-      gap: 9px;
-      align-items: center;
+    .date-filter-dropdowns {
+      gap: 8px;
 
-      label {
-        font-size: 14px;
-        font-weight: 600;
-        font-family: "Plus Jakarta Sans";
-        color: #2e3038;
+      .custom-select-wrapper {
+        min-width: 145px;
+        max-width: 145px;
+
+        .secondary-filter-dropdown {
+          width: 100%;
+
+          .custom-dropdown-trigger {
+            min-height: 40px;
+            border: 1.5px solid #d1d5de;
+            border-radius: 14px;
+            background-color: #f3f4f7;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #454754;
+
+            &:hover {
+              background-color: #eceff4;
+              border-color: #c6ccd8;
+            }
+
+            &[data-state="open"] {
+              background-color: #e6f2fb;
+              border-color: #b7d0e5;
+            }
+
+            .selected-value,
+            .placeholder {
+              font-size: 13px;
+              font-weight: 500;
+              color: #454754;
+            }
+          }
+
+          .custom-dropdown-menu {
+            z-index: 30;
+            min-width: 170px;
+
+            .dropdown-option {
+              min-height: 42px;
+              padding: 10px 14px;
+
+              &:hover,
+              &.highlighted,
+              &.selected,
+              &.highlighted.selected {
+                background-color: #f4f6f9;
+              }
+
+              .dropdown-option-label {
+                white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+              }
+            }
+          }
+        }
       }
+    }
 
-      .custom-date-input {
-        position: relative;
-        width: 100%;
+    .filter-dropdown-container {
+      .filter-button-label {
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 13px;
+
+        .filter-title-icon {
+          width: 14px;
+          height: 14px;
+        }
       }
+    }
 
-      .custom-date-input input[type="text"] {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #c7c9d1;
-        border-radius: 4px;
-        background: url("../../../../assets/icons/Calendar_enable_grey_icon.svg")
-          no-repeat left 10px center;
-        color: #454754;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: "Plus Jakarta Sans";
-        text-align: center;
-      }
+    .sort-container {
+      .sort-button-label {
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 13px;
 
-      /* Hide the calendar icon if needed */
-      input[type="date"]::-webkit-calendar-picker-indicator {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        margin: 0;
-        padding: 0;
-        cursor: pointer;
+        .sort-title-icon {
+          width: 14px;
+          height: 14px;
+        }
       }
     }
   }
@@ -77,18 +205,18 @@
       font-weight: 700;
 
       &.leave_requests_approve_button {
-        background-color: #045071;
+        background-color: $PRUSSIAN-70;
         padding: 12px 16px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
 
         &:hover {
-          background-color: #033348;
+          background-color: $PRUSSIAN-80;
         }
 
         span {
-          color: #fff;
+          color: $WHITE;
           font-size: 14px;
           font-weight: 700;
           font-family: "Plus Jakarta Sans";
@@ -96,25 +224,25 @@
           align-items: center;
 
           input {
-            color: #454754;
+            color: $GREY-70;
           }
         }
 
         &.disabled {
           cursor: not-allowed;
-          background-color: #8f92a3;
+          background-color: $GREY-50;
         }
       }
 
       &.leave_requests_reject_button {
-        background-color: #ffffff;
-        border: 1px solid #c73d45;
+        background-color: $WHITE;
+        border: 1px solid $RED-60;
         padding: 12px 16px;
         border-radius: 8px;
         cursor: pointer;
-        color: #c73d45;
+        color: $RED-60;
         &:hover {
-          background-color: #e3e4e8;
+          background-color: $GREY-20;
         }
 
         span {
@@ -123,15 +251,15 @@
           font-family: "Plus Jakarta Sans";
           display: flex;
           align-items: center;
-          color: #c73d45;
+          color: $RED-60;
         }
 
         &.disabled {
            span {
-            color: #e8a1a6;
+            color: $RED-30;
            }
           cursor: not-allowed;
-          border: 1px solid #e8a1a6;
+          border: 1px solid $RED-30;
         }
       }
     }
@@ -139,17 +267,15 @@
 
   .leave_requests_table_container {
     width: 100%;
-    
-    flex: 1; /* Take remaining space */
-    min-height: 0; /* Allow flex item to shrink below content size */
-    overflow-x: auto; 
-    background: #fff;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    background: $WHITE;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 1px 3px $c69;
     /* Ensures clean single borders */
-    border: 1px solid #c7c9d1; /* Outer border */
+    border: 1px solid $GREY-30; /* Outer border */
 
     &::-webkit-scrollbar {
       width: 6px;
@@ -157,49 +283,40 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: $GREY-120;
       border-radius: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #054a68;
+      background: $c3;
       border-radius: 8px;
 
       &:hover {
-        background: #033348;
+        background: $PRUSSIAN-80;
       }
     }
 
     .leave_requests_table {
-      width: 100%;
-      min-width: 800px;
-      flex: 1;
-      display: block;
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+      
 
       thead {
-        display: block;
-        width: 100%;
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        background: #f9fafb;
+        background: $c154;
       }
 
       tbody {
-        display: block;
         width: 100%;
-        max-height: calc(100vh - 200px);
       }
 
       thead tr,
       tbody tr {
-        display: table;
         width: 100%;
-        table-layout: fixed;
       }
 
       .employee_name {
-        color: #045071;
+        color: $PRUSSIAN-70;
         font-weight: 700;
         font-size: 12px;
         font-family: "Plus Jakarta Sans";
@@ -232,13 +349,16 @@
       th {
         padding: 8px;
         text-align: left;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid $c95;
         font-family: "Plus Jakarta Sans";
         font-weight: 700;
-        color: #033348;
-        background-color: #f9fafb;
+        color: $PRUSSIAN-80;
+        background-color: $c154;
         font-size: 14px;
-        min-width: 500px;
+        min-width: 140px;
+        position: sticky;
+        top: 0;
+        z-index: 2;
         white-space: nowrap;
         
       
@@ -246,19 +366,89 @@
       
 
       td {
-        color: #045071;
+        color: $PRUSSIAN-70;
         padding: 8px;
         text-align: left;
-        color: #454754;
+        color: $GREY-70;
         font-size: 14px;
         font-weight: 500;
         font-family: "Plus Jakarta Sans";
-        white-space: nowrap;
+
+        .request-type-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px 16px;
+          border-radius: 999px;
+          font-size: 14px;
+          line-height: 1.3;
+          font-weight: 500;
+          color: $GREY-80;
+          border: 1px solid transparent;
+          background: $c307;
+          white-space: nowrap;
+
+          &.request-type-log {
+            background: $c306;
+            border-color: $c305;
+          }
+
+          &.request-type-edit {
+            background: $c304;
+            border-color: $c303;
+          }
+
+          &.request-type-delete {
+            background: $c302;
+            border-color: $c301;
+          }
+        }
+        
+        //white-space: nowrap;
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px 16px;
+          border-radius: 999px;
+          font-size: 14px;
+          line-height: 1.3;
+          font-weight: 500;
+          text-transform: capitalize;
+          white-space: nowrap;
+          border: 1px solid $c290;
+          color: $GREY-80;
+          background: $c291;
+
+          &.status-accepted,
+          &.status-approved {
+            background-color: $c292;
+            border-color: $c293;
+          }
+
+          &.status-rejected {
+            background-color: $c294;
+            border-color: $c295;
+          }
+
+          &.status-pending {
+            background-color: $c296;
+            border-color: $c297;
+          }
+
+          &.status-default {
+            background-color: $c291;
+            border-color: $c290;
+          }
+        }
+        
       }
+      
       
 
       .checkbox-cell{
         width: 56px;
+        min-width: 56px;
       }
       .reason-cell {
         max-width: 1px;        
@@ -274,26 +464,52 @@
         min-width: 0;
       }
 
+      .view-more-inline-wrap {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .view-more-inline-btn {
+        border: none;
+        background: transparent;
+        color: #0a628f;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.2;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+        white-space: nowrap;
+
+        &:hover {
+          color: #084a6b;
+        }
+      }
+
       tbody tr.checked-row {
-        background-color: #e7f3f8 !important;
+        background-color: $c42 !important;
       }
 
       tbody tr {
         cursor: pointer;
         height: 44px;
         &:nth-child(even) {
-          background-color: #f9fafb;
+          background-color: $c154;
         }
 
         &:hover {
-          background-color: #f3f4f6;
+          background-color: $c94;
         }
       }
 
       .leave-duration {
         .leave-days-info {
           font-size: 12px;
-          color: #666;
+          color: $c84;
           font-style: italic;
           margin-top: 2px;
         }
@@ -301,9 +517,9 @@
 
       .view-proof-button {
         background: none;
-        border: 1px solid #045071;
+        border: 1px solid $PRUSSIAN-70;
         padding: 8px 16px;
-        color: #045071;
+        color: $PRUSSIAN-70;
         font-size: 14px;
         cursor: pointer;
         text-decoration: none;
@@ -315,13 +531,13 @@
         gap: 8px;
 
         &:hover {
-          background-color: #f0f9ff;
+          background-color: $c137;
         }
 
         &:focus {
           outline: none;
           text-decoration: underline;
-          background-color: #f0f9ff;
+          background-color: $c137;
         }
       }
 
@@ -329,10 +545,10 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        background: #045071;
+        background: $PRUSSIAN-70;
         border: none;
         padding: 8px 16px;
-        color: #ffffff;
+        color: $WHITE;
         font-size: 14px;
         cursor: pointer;
         font-weight: 600;
@@ -340,22 +556,22 @@
         transition: all 0.2s;
 
         &:hover {
-          background-color: #033348;
-          color: white;
+          background-color: $PRUSSIAN-80;
+          color: $WHITE;
         }
 
         &:focus {
           outline: none;
-          background-color: #033348;
-          color: white;
+          background-color: $PRUSSIAN-80;
+          color: $WHITE;
         }
       }
 
       .proof-requested-button {
-        background: #045071;
+        background: $PRUSSIAN-70;
         border: none;
         padding: 8px 16px;
-        color: #ffffff;
+        color: $WHITE;
         font-size: 14px;
         cursor: not-allowed;
         font-weight: 600;
@@ -368,6 +584,29 @@
         }
       }
     }
+
+    .sl_requests_infinite_sentinel {
+      height: 1px;
+      width: 100%;
+    }
+
+    .sl_requests_loaded_count {
+      margin: 10px 0 0;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      color: #8f92a3;
+      padding: 0 10px;
+    }
+
+    .sl_requests_loading_more {
+      margin: 10px 0 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #8f92a3;
+      padding-bottom: 10px;
+    }
   }
 
   .no_leave_requests_message {
@@ -376,7 +615,7 @@
     text-align: center;
     top: 400px;
     font-size: 1.2rem;
-    color: #999;
+    color: $c81;
     font-family: "Plus Jakarta Sans";
     font-weight: 500;
     margin-top: 8%;
