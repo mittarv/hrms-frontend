@@ -102,7 +102,6 @@ const PayrollTable = ({
   const [selectAll, setSelectAll] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
-
   const canDelete = hasPermission("Payroll_Edit");
 
   const [modalState, setModalState] = useState({
@@ -161,17 +160,20 @@ const PayrollTable = ({
       // Check if payroll is generated
       const isPayrollGenerated = employee.status === Payroll_Status.PAYROLL_GENERATED;
       
-      // Find LOP component (but don't include it in default deductions calculation)
       const lopComponent = employee.defaultDeductions.find(
         ded => LOP_KEYWORDS.some(keyword => ded.componentName.toLowerCase().includes(keyword))
       );
-      const lopPerDay = lopComponent ? lopComponent.amount : 0;
       
-      // For generated payrolls, use LOP amount directly from API
-      // For non-generated payrolls, calculate using unpaidLeave * lopPerDay
-      const lopDeduction = isPayrollGenerated 
-        ? (lopComponent?.amount || 0)
-        : (employee.unpaidLeave > 0 ? (lopPerDay * employee.unpaidLeave) : 0);
+      const lopTotalDeduction = lopComponent ? (lopComponent.amount || 0) : 0;
+      
+      // The backend returns the TOTAL LOP deduction in lopComponent.amount for non-generated payrolls.
+      // To get the per-day rate, we need to divide it by unpaidLeave (if unpaidLeave > 0)
+      const lopPerDay = (employee.unpaidLeave > 0) 
+        ? lopTotalDeduction / employee.unpaidLeave 
+        : lopTotalDeduction;
+      
+      // Both generated and non-generated payrolls already have the total deduction calculated from the backend
+      const lopDeduction = lopTotalDeduction;
 
       // Calculate total default deductions (exclude LOP component from base deductions)
       const totalDefaultDeductions = employee.defaultDeductions.reduce((sum, ded) => {
@@ -545,7 +547,6 @@ const PayrollTable = ({
         ) : (
           EMPTY_VALUE
         );
- 
       default:
         return renderEditableCell(value, column, employee);
     }
