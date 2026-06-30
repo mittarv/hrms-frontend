@@ -176,7 +176,9 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
               </div>
               <div className="employee_name">
                 <p className='row_title'>UAN Number</p>
-                <p className='row_value'>-</p>
+                <p className='row_value'>
+                  {currentEmployeeDetails?.employeeBankDetails?.empUanNumber || '-'}
+                </p>
               </div>
               <div className="employee_name">
                 <p className='row_title'>Date of Joining</p>

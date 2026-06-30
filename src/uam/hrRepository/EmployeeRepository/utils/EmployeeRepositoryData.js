@@ -181,6 +181,7 @@ export const sectionFieldMapping = {
     { name: "empIFSCCode", label: "IFSC Code" },
     { name: "empAccountNumber", label: "Account Number" },
     { name: "empBenefeciaryName", label: "Beneficiary Name" },
+    { name: "empUanNumber", label: "UAN Number" },
     { name: "empPaymentCountryCode", label: "Payment Country Code" },
   ],
   "leaves-info": [
@@ -398,6 +399,12 @@ export const formSections = [
         label: "Beneficiary Name",
         type: "text",
         validationRules: { required: false, format: "alphabeticSpacesOnly" },
+      },
+      {
+        name: "empUanNumber",
+        label: "UAN Number",
+        type: "text",
+        validationRules: { required: false, format: "numeric" },
       },
     ],
   },
