@@ -7,10 +7,14 @@ import "../styles/RoleManagement.scss";
 import { getAllRoles, getAllHrmsAccessPermissions, deleteHrmsRole } from "../../../../actions/hrRepositoryAction";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ClickAwayListener } from "@mui/material";
+import filter_grey_icon from "../../assets/icons/filter_grey_icon.svg";
 import CreateRolePopup from "./CreateRolePopup";
 import DeleteRolePopup from "./DeleteRolePopup";
 import ViewRolePermissionsPopup from "./ViewRolePermissionsPopup";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import NoResultsContainer from "../../Common/components/NoResultsContainer";
+import Sort from "../../Common/components/Sort";
 
 const RoleManagement = () => {
   const { hrmsAccessRoles, hrmsAccessPermissions, loading, myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
@@ -23,8 +27,20 @@ const RoleManagement = () => {
   const [viewPermissionsPopupOpen, setViewPermissionsPopupOpen] = useState(false);
   const [roleToView, setRoleToView] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentSort, setCurrentSort] = useState("none");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [selectedPermissionIds, setSelectedPermissionIds] = useState(new Set());
   const dispatch = useDispatch();
   const hasInitialized = useRef(false);
+
+  const sortOptions = [
+    { key: "none", label: "None" },
+    { key: "date_asc", label: "Date created (Ascending)" },
+    { key: "date_desc", label: "Date created (Descending)" },
+    { key: "role_asc", label: "Role (A - Z)" },
+    { key: "role_desc", label: "Role (Z - A)" },
+  ];
 
   // Helper function to check if user has permission
   const hasPermission = (permissionName) => {
@@ -38,8 +54,6 @@ const RoleManagement = () => {
   const canUpdate = hasPermission("HrmsRoleManagement_update");
   const canDelete = hasPermission("HrmsRoleManagement_delete");
   
-  // User can edit if they have create, update, or delete permission
-  const hasAccessToEditRole = canCreate || canUpdate || canDelete;
   // Fetch roles and permissions only once on mount
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -56,17 +70,70 @@ const RoleManagement = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
+  // Permission map: category names from hrmsAccessPermissions
+  const permissionCategories = useMemo(() => {
+    if (!hrmsAccessPermissions || typeof hrmsAccessPermissions !== "object") return [];
+    return Object.keys(hrmsAccessPermissions).sort();
+  }, [hrmsAccessPermissions]);
+
   // Filter roles based on search query
   const filteredRoles = useMemo(() => {
     if (!searchQuery.trim()) {
       return hrmsAccessRoles;
     }
     const query = searchQuery.toLowerCase();
-    return hrmsAccessRoles.filter(role => 
+    return hrmsAccessRoles.filter(role =>
       role.roleName?.toLowerCase().includes(query) ||
       role.description?.toLowerCase().includes(query)
     );
   }, [hrmsAccessRoles, searchQuery]);
+
+  // Filter roles by selected permissions: show only roles that have at least one of the selected permissions
+  const filteredByPermissionRoles = useMemo(() => {
+    if (selectedPermissionIds.size === 0) return filteredRoles;
+    return filteredRoles.filter((role) => {
+      if (role.allPermission) return true;
+      const rolePermissionIds = (role.permissions || []).map((p) => p.permissionId);
+      return rolePermissionIds.some((id) => selectedPermissionIds.has(id));
+    });
+  }, [filteredRoles, selectedPermissionIds]);
+
+  const handleSortSelect = (clickedKey) => {
+    setCurrentSort(clickedKey);
+    setIsSortDropdownOpen(false);
+  };
+
+  const handlePermissionToggle = (permissionId) => {
+    setSelectedPermissionIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(permissionId)) next.delete(permissionId);
+      else next.add(permissionId);
+      return next;
+    });
+  };
+
+  const handleClearPermissionFilter = () => {
+    setSelectedPermissionIds(new Set());
+  };
+
+  // Apply sort to filtered roles (after permission filter)
+  const sortedRoles = useMemo(() => {
+    const list = [...filteredByPermissionRoles];
+    if (currentSort === "none") return list;
+    if (currentSort === "date_asc") {
+      return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    }
+    if (currentSort === "date_desc") {
+      return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    if (currentSort === "role_asc") {
+      return list.sort((a, b) => (a.roleName || "").localeCompare(b.roleName || ""));
+    }
+    if (currentSort === "role_desc") {
+      return list.sort((a, b) => (b.roleName || "").localeCompare(a.roleName || ""));
+    }
+    return list;
+  }, [filteredByPermissionRoles, currentSort]);
 
   const handleCreateRolePopupOpen = () => {
     setEditingRoleId(null);
@@ -117,7 +184,7 @@ const RoleManagement = () => {
       <div className="role_management_container">
         <div style={{ textAlign: "center", padding: "40px" }}>
           <p style={{ fontSize: "16px", color: "#666" }}>
-            You don't have permission to view role management
+            You don&apos;t have permission to view role management
           </p>
         </div>
       </div>
@@ -140,6 +207,79 @@ const RoleManagement = () => {
               src={Search_icon_grey}
               alt="Search_icon_grey"
               className="role_management_search_icon"
+            />
+            <ClickAwayListener onClickAway={() => setIsFilterDropdownOpen(false)}>
+              <div className="role_management_filter_wrapper">
+                <button
+                  type="button"
+                  className={`role_management_filter_button ${selectedPermissionIds.size > 0 ? "active" : ""}`}
+                  onClick={() => {
+                    setIsFilterDropdownOpen((prev) => !prev);
+                    setIsSortDropdownOpen(false);
+                  }}
+                  aria-label="Filter by permission"
+                >
+                  <img src={filter_grey_icon} alt="Filter" />
+                  {selectedPermissionIds.size > 0 && (
+                    <span className="role_management_filter_badge">{selectedPermissionIds.size}</span>
+                  )}
+                </button>
+                {isFilterDropdownOpen && (
+                  <div className="role_management_filter_dropdown">
+                    <div className="role_management_filter_dropdown_header">
+                      <span>Filter by permission</span>
+                      {selectedPermissionIds.size > 0 && (
+                        <button type="button" className="role_management_filter_clear" onClick={handleClearPermissionFilter}>
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    <div className="role_management_filter_dropdown_list">
+                      {permissionCategories.map((categoryName) => {
+                        const categoryPermissions = hrmsAccessPermissions[categoryName];
+                        if (!Array.isArray(categoryPermissions) || categoryPermissions.length === 0) return null;
+                        return (
+                          <div key={categoryName} className="role_management_filter_category">
+                            <div className="role_management_filter_category_name">{categoryName}</div>
+                            {categoryPermissions.map((permission) => {
+                              const isChecked = selectedPermissionIds.has(permission.permissionId);
+                              return (
+                                <label
+                                  key={permission.permissionId}
+                                  className="role_management_filter_permission_item"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => handlePermissionToggle(permission.permissionId)}
+                                  />
+                                  <span>{permission.displayName || permission.name}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                      {permissionCategories.length === 0 && (
+                        <div className="role_management_filter_empty">No permissions available</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ClickAwayListener>
+            <Sort
+              options={sortOptions}
+              currentSort={currentSort}
+              onSortSelect={handleSortSelect}
+              isOpen={isSortDropdownOpen}
+              setIsOpen={(fn) => {
+                setIsSortDropdownOpen((prev) => {
+                  const next = typeof fn === "function" ? fn(prev) : fn;
+                  if (next) setIsFilterDropdownOpen(false);
+                  return next;
+                });
+              }}
             />
           </div>
           <div className="header_actions_container">
@@ -164,12 +304,20 @@ const RoleManagement = () => {
             </div>
           </div>
         ) : filteredRoles.length === 0 && searchQuery ? (
-          <div className="no_roles_container">
-            <p>No roles found matching &quot;{searchQuery}&quot;</p>
-          </div>
+          <NoResultsContainer
+            showImage={true}
+            message="We couldn't find anyone matching your search."
+            subMessage="Try searching with different details."
+          />
+        ) : sortedRoles.length === 0 && selectedPermissionIds.size > 0 ? (
+          <NoResultsContainer
+            showImage={true}
+            message="We couldn't find anyone matching your search."
+            subMessage="Try searching with different details."
+          />
         ):(
           <>
-            <p>All Roles ({filteredRoles.length})</p>
+            <p>All Roles ({sortedRoles.length})</p>
             {loading ? (
               <div style={{ padding: "2rem", minHeight: "200px" }}>
                 <LoadingSpinner message="Loading roles..." height="150px" />
@@ -187,7 +335,7 @@ const RoleManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRoles.map((role) => {
+                  {sortedRoles.map((role) => {
                     const formatDate = (dateString) => {
                       const date = new Date(dateString);
                       const day = String(date.getDate()).padStart(2, '0');

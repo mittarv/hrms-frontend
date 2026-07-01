@@ -2,15 +2,18 @@
 // This file contains all constants used by HR Repository module
 // Separated from main constant/data.js to enable HR Repository to act as a separate repository
 
-import dashboard from "../assets/icons/dashboard.svg";
-import policy from "../assets/icons/policies.svg";
-import link from "../assets/icons/links.svg";
-import employee_repo from "../assets/icons/employee_repo.svg";
-import leave_configurator from "../assets/icons/leave_configurator.svg";
-import Requests from "../assets/icons/hr_repo_requests_icon.svg";
-import leave_attendance from "../assets/icons/leave_and_attendance_icon.svg";
-import Payroll_icon from "../assets/icons/Payroll_icon.svg";
-import Notepad_icon from "../assets/icons/notepad_icon.svg";
+import dashboard from "../assets/icons/dashboard_new.svg";
+import policy from "../assets/icons/policies_new.svg";
+import link from "../assets/icons/links_new.svg";
+import employee_repo from "../assets/icons/employee_repo_new.svg";
+import leave_configurator from "../assets/icons/leave_configurator_new.svg";
+import Requests from "../assets/icons/Requests_new.svg";
+import leave_attendance from "../assets/icons/leave_attendance_new.svg";
+import Payroll_icon from "../assets/icons/Payroll_icon_new.svg";
+import Notepad_icon from "../assets/icons/Access_Management.svg";
+import Rewards_icon from "../assets/icons/Rewards_icon_new.svg";
+import organization_settings from "../assets/icons/organisation_settings_new.svg";
+import secondary_location from "../assets/icons/secondary_location.svg";
 
 // HR Repository Router Data - defines navigation menu items
 export const hrRepoRouterData = [
@@ -30,7 +33,7 @@ export const hrRepoRouterData = [
     path: "/imp-link",
   },
   { 
-    title: "Employee-Repo",
+    title: "Employee Repo",
     icon: employee_repo,
     path: "/employee-repo",
   },
@@ -38,11 +41,6 @@ export const hrRepoRouterData = [
     title: "Employee Directory",
     icon: employee_repo,
     path: "/employee-directory",
-  },
-  {
-    title:"Leave Configurator",
-    icon: leave_configurator,
-    path: "/leave-configurator",
   },
   {
     title: "Leave & Attendance",
@@ -55,15 +53,35 @@ export const hrRepoRouterData = [
     path: "/payroll-reimbursements",
   },
   {
+    title: "Secondary Location Log",
+    icon: secondary_location,         
+    path:"/secondary-working-location",
+  },
+  {
+    title: "Rewards & Recognitions",
+    icon: Rewards_icon,
+    path: "/rewards-recognitions",
+  },
+  {
+    title:"Leave Configurator",
+    icon: leave_configurator,
+    path: "/leave-configurator",
+  },
+  {
     title: "Requests",
     icon: Requests,
     path: "/hr-repo-requests",
   },
   {
-    title: "HRMS Access",
+    title: "Access Management",
     icon: Notepad_icon,
     path: "/hrms-access",
-  }
+  },
+  // {
+  //   title: "Organization Settings",
+  //   icon: organization_settings,      //Button is created /hello path specified for this button.
+  //   path:"/hello",
+  // }
 ];
 
 // HR Repository Screen Page Data

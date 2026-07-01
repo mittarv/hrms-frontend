@@ -1,23 +1,26 @@
+@use "../../../../design/colors/customFonts" as fonts;
+@use '../../design/colors/customColors' as *;
+
 .view_role_permissions_popup_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 
     .view_role_permissions_popup_container {
-        background-color: #ffffff;
+        background-color: $WHITE;
         border-radius: 16px;
         width: 100%;
         max-width: 700px;
         max-height: 90vh;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px $c118;
         font-family: "Plus Jakarta Sans";
         display: flex;
         flex-direction: column;
@@ -35,18 +38,15 @@
                 padding: 1.5rem 2rem 1rem 2rem;
 
                 p {
-                    font-size: 18px;
-                    font-weight: 700;
-                    font-family: "Plus Jakarta Sans";
-                    color: #2e3038;
+                    color: $GREY-80;
                     line-height: 28px;
                     letter-spacing: 0.01em;
-                    border-bottom: 2px solid #2e3038;
+                    border-bottom: 2px solid $GREY-80;
                     padding-bottom: 8px;
                 }
 
                 .view_role_permissions_popup_close_button {
-                    background: #f1f1f4;
+                    background: $GREY-10;
                     border: none;
                     cursor: pointer;
                     border-radius: 8px;
@@ -57,7 +57,7 @@
                     transition: background-color 0.2s ease;
 
                     &:hover {
-                        background: #e5e7eb;
+                        background: $c95;
                     }
                 }
             }
@@ -76,42 +76,42 @@
                 }
 
                 &::-webkit-scrollbar-track {
-                    background: #f3f4f6;
+                    background: $c94;
                     border-radius: 4px;
                 }
 
                 &::-webkit-scrollbar-thumb {
-                    background: #d1d5db;
+                    background: $c86;
                     border-radius: 4px;
 
                     &:hover {
-                        background: #9ca3af;
+                        background: $c98;
                     }
                 }
 
                 // Firefox scrollbar
                 scrollbar-width: thin;
-                scrollbar-color: #d1d5db #f3f4f6;
+                scrollbar-color: $c86 $c94;
 
                 .role_name_display {
                     display: flex;
                     align-items: center;
 
                     .role_value {
-                        font-size: 16px;
-                        font-weight: 600;
-                        font-family: "Plus Jakarta Sans";
-                        color: #2E3038;
+                        font-size: fonts.$font-size-base;
+                        font-weight: fonts.$font-weight-semibold;
+                        font-family: fonts.$font-family;
+                        color: $GREY-80;
                         line-height: 24px;
                         letter-spacing: 0.01em;
                     }
                 }
 
                 .all_permissions_container {
-                    border: 1px solid #e5e7eb;
+                    border: 1px solid $c95;
                     border-radius: 8px;
                     padding: 1.5rem;
-                    background-color: #ffffff;
+                    background-color: $WHITE;
                     display: flex;
                     flex-direction: column;
                     gap: 1.5rem;
@@ -123,16 +123,16 @@
 
                         .category_separator {
                             height: 1px;
-                            background-color: #e5e7eb;
+                            background-color: $c95;
                             margin: 0.5rem 0;
                         }
 
                         .permission_category_header {
                             h4 {
-                                font-size: 14px;
-                                font-weight: 600;
-                                font-family: "Plus Jakarta Sans";
-                                color: #2e3038;
+                                font-size: fonts.$font-size-small;
+                                font-weight: fonts.$font-weight-semibold;
+                                font-family: fonts.$font-family;
+                                color: $GREY-80;
                                 margin: 0;
                                 padding-bottom: 0.5rem;
                             }
@@ -146,22 +146,18 @@
                             .role_permission_item {
                                 display: flex;
                                 align-items: center;
-                                border: 1px solid #8F92A3;
+                                border: 1px solid $GREY-50;
                                 border-radius: 32px;
                                 padding: 4px 12px;
-                                background-color: #F7F7F8;
+                                background-color: $GREY-00;
 
                                 span {
-                                    font-size: 14px;
-                                    font-weight: 400;
-                                    font-family: "Plus Jakarta Sans";
-                                    color: #2e3038;
                                     white-space: nowrap;
                                 }
 
                                 &.checked {
-                                    border-color: #8F92A3;
-                                    background-color: #F7F7F8;
+                                    border-color: $GREY-50;
+                                    background-color: $GREY-00;
                                 }
                             }
                         }
@@ -176,22 +172,18 @@
                         .role_permission_item {
                             display: flex;
                             align-items: center;
-                            border: 1px solid #e5e7eb;
+                            border: 1px solid $c95;
                             border-radius: 32px;
                             padding: 4px 12px;
-                            background-color: #f3f4f6;
+                            background-color: $c94;
 
                             span {
-                                font-size: 14px;
-                                font-weight: 400;
-                                font-family: "Plus Jakarta Sans";
-                                color: #2e3038;
                                 white-space: nowrap;
                             }
 
                             &.checked {
-                                border-color: #8F92A3;
-                                background-color: #F7F7F8;
+                                border-color: $GREY-50;
+                                background-color: $GREY-00;
                             }
                         }
                     }

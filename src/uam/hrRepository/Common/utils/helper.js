@@ -91,10 +91,12 @@ export const convertFileToBase64 = (file, maxSizeInBytes = null) => {
       return;
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      reject(new Error('Only JPG, PNG, and PDF files are allowed'));
+    // Validate file type using MIME type or file extension
+    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'image/heic', 'image/heif'];
+    const allowedExtensions = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.pdf'];
+    const fileExtension = '.' + (file.name || '').split('.').pop().toLowerCase();
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      reject(new Error('Only JPG, PNG, HEIC, HEIF and PDF files are allowed'));
       return;
     }
 
@@ -166,6 +168,119 @@ export const getFileDisplayType = (file) => {
 export const isFilePDF = (file) => {
   return file?.type === 'application/pdf' ||
     file?.name?.toLowerCase().endsWith('.pdf');
+};
+
+/**
+ * Shared file upload processing: validates slots, duplicates, type, size, and converts to base64.
+ * @param {File[]} inputFiles - Files from the input element
+ * @param {Object[]} existingFiles - Already uploaded file objects (need .name and .size)
+ * @param {Function} dispatch - Redux dispatch
+ * @param {Object} proofUpload - PROOF_UPLOAD constants from enums
+ * @returns {Promise<{validFiles: Object[], hasErrors: boolean}>}
+ */
+export const processProofFiles = async (inputFiles, existingFiles, dispatch, proofUpload) => {
+  let files = Array.from(inputFiles);
+  if (!files.length) return { validFiles: [], hasErrors: false };
+
+  // Trim to remaining slots
+  const remainingSlots = proofUpload.MAX_FILES - existingFiles.length;
+  if (remainingSlots <= 0) {
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: `Maximum ${proofUpload.MAX_FILES} files allowed. Remove a file to upload more.`,
+        severity: "warning",
+      },
+    });
+    return { validFiles: [], hasErrors: true };
+  }
+  if (files.length > remainingSlots) {
+    const skipped = files.length - remainingSlots;
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: `Only ${remainingSlots} more file${remainingSlots > 1 ? 's' : ''} can be uploaded. ${skipped} file${skipped > 1 ? 's were' : ' was'} skipped.`,
+        severity: "warning",
+      },
+    });
+    files = files.slice(0, remainingSlots);
+  }
+
+  // Filter out duplicates
+  const duplicateFiles = files.filter(file =>
+    existingFiles.some(existing => existing.name === file.name && existing.size === file.size)
+  );
+  if (duplicateFiles.length > 0) {
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: `Duplicate file(s) skipped: ${duplicateFiles.map(f => f.name).join(', ')}`,
+        severity: "warning",
+      },
+    });
+    files = files.filter(file =>
+      !existingFiles.some(existing => existing.name === file.name && existing.size === file.size)
+    );
+    if (files.length === 0) return { validFiles: [], hasErrors: true };
+  }
+
+  // Validate type and size
+  const tooLargeFiles = [];
+  const invalidTypeFiles = [];
+  const accepted = [];
+
+  for (const file of files) {
+    const ext = '.' + file.name.split('.').pop().toLowerCase();
+    if (!proofUpload.ALLOWED_TYPES.includes(file.type) && !proofUpload.ALLOWED_EXTENSIONS.includes(ext)) {
+      invalidTypeFiles.push(file.name);
+    } else if (file.size > proofUpload.MAX_FILE_SIZE) {
+      tooLargeFiles.push(file.name);
+    } else {
+      accepted.push(file);
+    }
+  }
+
+  if (tooLargeFiles.length > 0) {
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: `${tooLargeFiles.join(', ')}: ${proofUpload.ERROR_FILE_TOO_LARGE}`,
+        severity: "warning",
+      },
+    });
+  }
+  if (invalidTypeFiles.length > 0) {
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: `${invalidTypeFiles.join(', ')}: ${proofUpload.ERROR_INVALID_TYPE}`,
+        severity: "warning",
+      },
+    });
+  }
+
+  if (accepted.length === 0) return { validFiles: [], hasErrors: tooLargeFiles.length > 0 || invalidTypeFiles.length > 0 };
+
+  // Convert to base64
+  const validFiles = [];
+  for (const file of accepted) {
+    try {
+      const fileData = await convertFileToBase64(file, proofUpload.MAX_FILE_SIZE);
+      validFiles.push({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+        base64Data: fileData.base64,
+        pureBase64: fileData.pureBase64,
+        fileMetadata: fileData
+      });
+    } catch (error) {
+      console.error('Error processing file:', error);
+    }
+  }
+
+  return { validFiles, hasErrors: false };
 };
 
 export const convertBufferToString = (bufferData) => {

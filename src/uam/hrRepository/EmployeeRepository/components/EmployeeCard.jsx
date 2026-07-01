@@ -6,6 +6,9 @@ import dropdown_arrow from "../../assets/icons/dropdown_arrow.svg";
 import MinLoader from "../../Common/components/MinLoader";
 const EMPLOYEE_STATUS = {
     ACTIVE: "Active",
+    NOT_INITIATED: "not_initiated",
+    INITIATED: "Offboarding Initiated",
+
 };
 const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,getAllManagersDetails ,hasAccess }) => {
   const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
@@ -16,37 +19,24 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
     onToggle(employee.employeeUuid);
   };
   
-    const { currentEmployeeDetails,currentEmployeeDetailsLoading } = useSelector((state) => state.hrRepositoryReducer);
+    const { currentEmployeeDirectoryDetails,currentEmployeeDirectoryDetailsLoading } = useSelector((state) => state.hrRepositoryReducer);
 
-    const employeeDetails = currentEmployeeDetails && currentEmployeeDetails.employeeBasicDetails?.empUuid === employee.employeeUuid 
-        ? currentEmployeeDetails 
+    const employeeDetails = currentEmployeeDirectoryDetails && currentEmployeeDirectoryDetails.employeeDirectoryDetails?.employeeUuid === employee.employeeUuid 
+        ? currentEmployeeDirectoryDetails.employeeDirectoryDetails 
         : null;
             const showDetailsLoader =
   isExpanded &&
-  currentEmployeeDetailsLoading &&
-  (!employeeDetails || employeeDetails.employeeBasicDetails.empUuid !== employee.employeeUuid);
-    const hasLoadedDetailsForThisEmployee = employeeDetails && !currentEmployeeDetailsLoading;
-    const manager = getAllManagersDetails?.find(m => m.empUuid === employeeDetails?.employeeCurrentJobDetails?.empManager);
-    const ManagerName = manager ? `${manager.empFirstName} ${manager.empLastName}` : '---';
-    const HiringDate = employeeDetails?.employeeBasicDetails?.empHireDate;
+  currentEmployeeDirectoryDetailsLoading &&
+  !employeeDetails;
+    const hasLoadedDetailsForThisEmployee = employeeDetails && !currentEmployeeDirectoryDetailsLoading;
+    const manager = getAllManagersDetails?.find(m => m.empUuid === employeeDetails?.reportingManager?.empUuid);
+    const ManagerName = employeeDetails?.reportingManager?.name || (manager ? `${manager.empFirstName} ${manager.empLastName}` : '---');
+    const HiringDate = employeeDetails?.hiringDate;
     const formattedHiringDate = HiringDate ? new Date(HiringDate).toLocaleDateString('en-GB') : '---';
-    const phone = employeeDetails?.employeeContactDetails?.empOfficialPhone || employee.employeePhone || '---';
-    const email = employeeDetails?.employeeContactDetails?.empOfficialEmail || employee.employeeEmail || '---';
-    const formatWorkLocation = (locationKey) => {
-      if (!locationKey) return "---";
-
-      const parts = locationKey.split("_");
-      if (parts.length <= 1) return "---";
-      const trimmed = parts.slice(0, -1);
-      const formatted = trimmed
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-
-      return formatted || "---";
-    };
-    
-    const workLocationKey = employeeDetails?.employeeAddressDetails?.state || '---';
-    const displayWorkLocation = formatWorkLocation(workLocationKey);
+    const phone = employeeDetails?.phone || employee.employeePhone || '---';
+    const email = employeeDetails?.emailId || employee.employeeEmail || '---';
+    const displayWorkLocation = employeeDetails?.workLocation || '---';
+    const showSensitiveFields = employeeDetails?.canViewSensitiveFields;
   return (
     <div className={`employee-card ${isExpanded ? "expanded" : ""}`}>
       <div className="employee-default-details" onClick={handleToggle}>
@@ -70,7 +60,7 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
               {employee?.employeeFirstName} {employee?.employeeLastName}
             </h4>
             {(hasAccess || hasEmployeeDirectoryAdminAccess) && (
-            <p>{EMPLOYEE_STATUS.ACTIVE}</p>
+            <p className={employee.offboarding_status === EMPLOYEE_STATUS.NOT_INITIATED ? "active_employee" : "Offboarding_initiated"}>{employee.offboarding_status === EMPLOYEE_STATUS.NOT_INITIATED ? EMPLOYEE_STATUS.ACTIVE : EMPLOYEE_STATUS.INITIATED}</p>
             )}
           </div>
           <p className="emp-subinfo">
@@ -93,10 +83,10 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
             
         ) : hasLoadedDetailsForThisEmployee ? (
         <div className="details">
-          {(hasAccess || hasEmployeeDirectoryAdminAccess) && (
+          {showSensitiveFields && (
           <div className="each">
             <h3>Employee ID</h3>
-            <p>{employeeDetails?.employeeBasicDetails?.empCompanyId || "---"}</p>
+            <p>{employeeDetails?.employeeId || "---"}</p>
           </div>)}
           <div className="each">
             <h3>Work Location</h3>
@@ -107,7 +97,7 @@ const EmployeeCard = ({ employee, departmentMap, jobTypeMap,isExpanded,onToggle,
             <p>{formattedHiringDate}</p>
           </div>
           
-          {(hasAccess || hasEmployeeDirectoryAdminAccess) && <div className="each">
+          {showSensitiveFields && <div className="each">
             <h3>Reporting Manager</h3>
             <p>{ManagerName}</p>
           </div>}

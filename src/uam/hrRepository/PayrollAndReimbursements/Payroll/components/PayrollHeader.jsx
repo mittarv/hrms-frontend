@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount } from "../../../../../actions/hrRepositoryAction.js";
-import { Payroll_Status, CURRENCY_SYMBOL } from "../utils/PayrollUtils.js";
+import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount, deletePayrollRecords } from "../../../../../actions/hrRepositoryAction.js";
+import { Payroll_Status, CURRENCY_SYMBOL, getAllMonthsLocale } from "../utils/PayrollUtils.js";
 import Export_File from "../../../assets/icons/export_file_icon.svg";
 import Finalize_Icon from "../../../assets/icons/finalize_icon.svg";
 import Edit_Icon_Active from "../../../assets/icons/edit_icon_blue.svg";
 import Edit_Icon_Disabled from "../../../assets/icons/edit_icon_grey.svg";
+import Delete_Icon_Active from "../../../assets/icons/delete_red_icon.svg";
 import ConfirmationPopup from "../../../Common/components/ConfirmationPopup.jsx";
 import "../styles/PayrollHeader.scss";
 
@@ -49,6 +50,35 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const currentDate = new Date();
   const monthName = currentDate.toLocaleDateString("en-US", { month: "long" });
   const year = currentDate.getFullYear();
+
+  const normalizeMonthName = (monthValue) => {
+    if (monthValue === null || monthValue === undefined || monthValue === "") {
+      return "";
+    }
+
+    if (typeof monthValue === 'number') {
+      return getAllMonthsLocale()[monthValue - 1] || "";
+    }
+
+    const numericMonth = Number(monthValue);
+    if (!Number.isNaN(numericMonth) && numericMonth >= 1 && numericMonth <= 12) {
+      return getAllMonthsLocale()[numericMonth - 1] || "";
+    }
+
+    return String(monthValue).trim();
+  };
+
+  const firstLoadedPayrollDate = payrollData?.[0]?.payrollStartDate;
+  const loadedPayrollDate = firstLoadedPayrollDate ? new Date(firstLoadedPayrollDate) : currentDate;
+  const loadedPayrollMonthName = loadedPayrollDate.toLocaleDateString("en-US", { month: "long" });
+  const loadedPayrollYear = loadedPayrollDate.getFullYear();
+
+  // Determine if current view is the current month/year
+  const resolvedSelectedMonth = selectedMonth != null ? normalizeMonthName(selectedMonth) : loadedPayrollMonthName;
+  const resolvedSelectedYear = selectedYear != null ? Number(selectedYear) : loadedPayrollYear;
+  const isCurrentMonthView =
+    String(resolvedSelectedMonth).toLowerCase() === String(monthName).toLowerCase() &&
+    Number(resolvedSelectedYear) === Number(year);
 
   // Handle finalize payroll
   const handleFinalizePayroll = async () => {
@@ -239,6 +269,78 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
     }
   };
 
+  const handleDeletePayroll = async () => {
+    if (!canEdit) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to delete payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    if (!selectedRows || selectedRows.size === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to delete payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    const selectedEmployees = payrollData.filter((emp) =>
+      selectedRows.has(emp.payslipId || emp.empUuid)
+    );
+
+    if (selectedEmployees.length === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to delete payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    setModalState({
+      isOpen: true,
+      type: 'confirm',
+      heading: 'Delete Payroll',
+      message: `Are you sure you want to delete payroll for ${selectedEmployees.length} employee(s)? This action cannot be undone.`,
+      confirmText: 'Yes, Delete',
+      cancelText: 'Cancel',
+      onConfirm: () => proceedWithDelete(selectedEmployees)
+    });
+  };
+
+  const proceedWithDelete = async (selectedEmployees) => {
+    setModalState({ ...modalState, isOpen: false });
+    setIsProcessing(true);
+    try {
+      const selectedPayslipIds = selectedEmployees.map((emp) => emp.payslipId).filter(Boolean);
+      const getSalaryComponentsDataParams = {
+          currentPage,
+          pageSize,
+          selectedMonth,
+          selectedYear,
+          searchQuery
+      };
+      await dispatch(deletePayrollRecords(selectedPayslipIds, getSalaryComponentsDataParams));
+    } catch (error) {
+      console.error('Error deleting payroll:', error);
+    } finally {
+      setIsProcessing(false);
+      if (resetSelections) {
+        resetSelections();
+      }
+    }
+  };
+
   const handleGeneratePayroll = () => {
     if (!canGenerate) {
       setModalState({
@@ -289,6 +391,10 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const handleEditButton = () => {
     handleEditPayroll();
   };  
+  const handleDeleteButton = () => {
+    handleDeletePayroll();
+  };
+
   const handleExportPayslip = () => {
     if (!canEdit) {
       setModalState({
@@ -334,6 +440,20 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
             <span className="download_payslip_button_text">Export</span>
           </button>
           <div className="payroll_button_container">
+            {isCurrentMonthView && (
+              <button
+                className={`delete_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit ? "disabled" : ""}`}
+                onClick={handleDeleteButton}
+                disabled={!hasSelectedRows || isProcessing || !canEdit}
+              >
+                <img
+                  src={Delete_Icon_Active}
+                  alt="delete icon"
+                  className="delete_Payroll_button_icon"
+                />
+                <span className="delete_Payroll_button_text">Delete</span>
+              </button>
+            )}
             <button
               className={`edit_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit ? "disabled" : ""}`}
               onClick={handleEditButton}

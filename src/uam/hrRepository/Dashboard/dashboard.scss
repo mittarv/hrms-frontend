@@ -1,9 +1,16 @@
 @use "../../../design/colors/Colors";
+@use '../design/colors/customColors' as *;
 
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+.dashboard_page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 }
 
 
@@ -18,16 +25,16 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    color: #FFFFFF;
+    color: $WHITE;
     padding: 12px 24px;
     font-weight: 700;
     font-size: 14px;
-    background: #033348;
+    background: $PRUSSIAN-80;
     border-radius: 4rem;
     cursor: pointer;
 
     &.disabled {
-        background-color: #AEB0BC;
+        background-color: $GREY-40;
         cursor: not-allowed;
         
         * {
@@ -38,12 +45,12 @@
 }
 
 .my-updates-container {
-    width: 480px;
-    max-width: auto; 
-    height: 285px; 
+    flex: 1;
+    min-width: 0;
+    height: 285px;
     padding: 0px 25px 24px 24px;
     border-radius: 24.29px;
-    border: 1px solid Colors.$c32; 
+    border: 1px solid Colors.$c32;
     overflow-y: auto;
     box-sizing: border-box;
     position: relative;
@@ -60,14 +67,14 @@
         font-weight: 400 !important;
         font-size: 16px !important;
         color: Colors.$c40 !important;
-        border-bottom: 1px solid #ccc; /* Add your border style here */
+        border-bottom: 1px solid $c76; /* Add your border style here */
 
        
     }
 
     .css-apqrd9-MuiTableBody-root {
         tr {
-                border-bottom: 1px solid #E3E4E8;
+                border-bottom: 1px solid $GREY-20;
                 
                 &:last-child {
                     border-bottom: none;
@@ -144,15 +151,19 @@
     color: Colors.$c40; 
 }
 
+.dashboard_top_section {
+    width: 100%;
+    padding: 0 2rem;
+    margin-top: 5.96vh;
+}
+
 .main_table_header_div_dashboard {
     height: 8.9418vh;
-    width: 90%;
-    // background-color: pink;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 5.96vh;
-    margin-left: 40px;
+    margin-left: 0;
 
     .inner-div-left-section_dashboard {
         height: 100%;
@@ -182,48 +193,215 @@
 .main-body-container {
     height: fit-content;
     width: 100%;
+    max-width: 100%;
     display: flex;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column;
+    gap: 24px;
     margin: 3rem 0;
     padding: 0 2rem;
+    box-sizing: border-box;
 
-    .inner-body-container{
+    .dashboard-winner-banner-wrap {
+        width: 100%;
+    }
+
+    .main-body-columns {
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    .dashboard-left-column {
         flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .dashboard-profile-column {
+        flex-shrink: 0;
+    }
+
+    .inner-body-container {
+        flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         gap: 20px;
     }
 
-    .inner-container{
+    .inner-container {
         display: flex;
-        gap:20px;
+        gap: 20px;
+        min-width: 0;
 
         .coverClass {
             overflow: hidden;
             border-radius: 24.29px;
             height: fit-content;
             flex: 1;
-            .my-updates-container, .leave-main-container{
+            min-width: 0;
+            .my-updates-container,
+            .leave-main-container {
                 width: 100%;
+                min-width: 0;
             }
         }
 
-        .event-card-container{
+        .event-card-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+    }
+
+    // Winner Banner - matches RewardsTabs single winner card design
+    .winner_banner {
+        --winner-banner-scroll-track: $c242;
+        --winner-banner-scroll-thumb: $c243;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 16px;
+        overflow: hidden;
+        padding: 0;
+        border: 1px solid transparent;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 20px $c82;
+        font-family: "Plus Jakarta Sans", sans-serif;
+
+        .winner_banner_header {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 12px 0 12px 0;
+            align-self: flex-start;
+        }
+
+        .winner_banner_header_icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            img {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .winner_banner_header_text {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            color: $WHITE;
+        }
+
+        .winner_banner_citation_box {
+            padding: 1.25rem 1.5rem 1.5rem;
+            background: transparent ;
+            border-radius: 0 0 16px 16px;
+            font-size: 15px;
+            color: $c88;
+            line-height: 1.6;
+            word-break: break-word;
+            box-shadow: 0 2px 4px $c89;
+
+            p {
+                margin: 0;
+                font-size: 15px;
+                font-weight: 400;
+                color: $c88;
+                background-color: $WHITE;
+                border-radius: 12px;
+                padding: 12px;
+                max-height: 180px;
+                overflow-y: auto;
+                scrollbar-width: thin;
+                scrollbar-color: var(--winner-banner-scroll-thumb) var(--winner-banner-scroll-track);
+
+                &::-webkit-scrollbar {
+                    width: 6px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: var(--winner-banner-scroll-track);
+                    border-radius: 999px;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: var(--winner-banner-scroll-thumb);
+                    border-radius: 999px;
+                }
+
+                &::-webkit-scrollbar-thumb:hover {
+                    filter: brightness(0.95);
+                }
+            }
+        }
+
+        &.winner_banner--employee {
+            --winner-banner-scroll-track: $c242;
+            --winner-banner-scroll-thumb: $c243;
+            border-color: $BLUE-60;
+            background: $BLUE-10;
+            .winner_banner_header {
+                background: $BLUE-50;
+            }
+        }
+
+        &.winner_banner--leadership {
+            --winner-banner-scroll-track: $c244;
+            --winner-banner-scroll-thumb: $c245;
+            border-color: $CYAN-70;
+            background: $CYAN-10;
+            .winner_banner_header {
+                background: $CYAN-70;
+            }
+        }
+
+        &.winner_banner--double {
+            --winner-banner-scroll-track: $c246;
+            --winner-banner-scroll-thumb: $c247;
+            border-color: $PRUSSIAN-70;
+            background: $PRUSSIAN-10;
+            .winner_banner_header {
+                background: $PRUSSIAN-50;
+            }
+        }
+    }
+
+    @media screen and (max-width: 1100px) {
+        .inner-body-container {
+            .inner-container {
+                flex-direction: column;
+
+                .coverClass {
+                    display: flex;
+                    justify-content: center;
+                    .event-container {
+                        width: 100%;
+                    }
+                }
+            }
         }
     }
 }
 
 
-.dashboard-container { 
+.dashboard-container {
     display: flex;
     flex-direction: column;
-    width: 300px;
+    flex-shrink: 0;
+    width: 320px;
+    min-width: 280px;
     border-radius: 24.29px;
     border: 1px solid Colors.$c32;
+    height: 100%;
 
     .btn-container{
         width: 100%;
@@ -267,7 +445,7 @@
         font-weight: 600;
         font-size: 16px;
         font-family: 'Plus Jakarta Sans', sans-serif;
-        box-shadow: 0px 2px 4px 0px #BDBDBD40;
+        box-shadow: 0px 2px 4px 0px $c248;
         border: none;
         cursor: pointer;
         max-width: 128px;
@@ -304,15 +482,67 @@
     }
 }
 
-.event-container{
-    width: 350px;
-    max-width: 394px; 
-    height: 220px; 
+.event-container {
+    flex: 1;
+    min-width: 0;
+    height: 220px;
     padding: 0px 25px 24px 20px;
     border-radius: 24.29px;
-    border: 1px solid Colors.$c32; 
+    border: 1px solid Colors.$c32;
     overflow-y: auto;
     position: relative;
+
+    // Work Anniversaries: title + month dropdown in one row
+    &--work-anniversary {
+        .event-container__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-bottom: 12px;
+        }
+        .inner-div-title {
+            margin: 0;
+            padding-bottom: 0;
+        }
+    }
+
+    .work-anniversary-month-dropdown {
+        flex-shrink: 0;
+        &__select {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: Colors.$c31;
+            background-color: $c71;
+            border: 1px solid Colors.$c32;
+            border-radius: 8px;
+            padding: 8px 32px 8px 12px;
+            min-width: 120px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%23033348' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            &:hover {
+                border-color: $PRUSSIAN-80;
+                background-color: $c64;
+            }
+            &:focus {
+                outline: none;
+                border-color: $PRUSSIAN-80;
+                box-shadow: 0 0 0 2px $c249;
+            }
+            option {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-weight: 500;
+                color: Colors.$c31;
+                background-color: Colors.$c12;
+            }
+        }
+    }
 
     .css-1ex1afd-MuiTableCell-root {
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -323,7 +553,7 @@
 
     .css-apqrd9-MuiTableBody-root {
         tr {
-                border-bottom: 1px solid #E3E4E8;
+                border-bottom: 1px solid $GREY-20;
                 
                 &:last-child {
                     border-bottom: none;
@@ -366,20 +596,20 @@
     }
 }
 
-.leave-main-container{
-    width: 480px;
-    max-width: auto; 
-    height: 285px; 
+.leave-main-container {
+    flex: 1;
+    min-width: 0;
+    height: 285px;
     padding: 0px 25px 24px 20px;
     border-radius: 24.29px;
-    border: 1px solid Colors.$c32; 
+    border: 1px solid Colors.$c32;
     overflow-y: auto;
     box-sizing: border-box;
     position: relative;
 
     .css-apqrd9-MuiTableBody-root {
         tr {
-                border-bottom: 1px solid #E3E4E8;
+                border-bottom: 1px solid $GREY-20;
                 
                 &:last-child {
                     border-bottom: none;
@@ -403,7 +633,7 @@
         position: -webkit-sticky;
         position: sticky;
         top: 0;
-        background-color: Colors.$c12;
+        background-color: $WHITE;
         z-index: 1;
         padding-top: 1rem;
         padding-bottom: 16px;
@@ -447,7 +677,7 @@
         margin-left: 18px;
         border-radius: 5px;
         border: none;
-        background-color: #0333480D;
+        background-color: $c71;
         color: Colors.$c31;
         font-size: 1rem;
 
@@ -473,7 +703,7 @@
 .employee-chart-container {
     height: 100%;
     flex: 1;
-    background-color: #fff;
+    background-color: $WHITE;
     border-radius: 1.5rem; 
     padding: 1.5rem 1.5rem 0rem 1.5rem; 
     border: 1px solid Colors.$c32; 
@@ -485,7 +715,7 @@
     align-items: center;
 
     .seperator{
-        color:#C7C9D1;
+        color:$GREY-30;
         padding: 0px 5px;
     }
   }
@@ -502,7 +732,7 @@
     padding-left: 10px;
     text-underline-position: from-font;
     text-decoration: none;
-    color: Colors.$c40; 
+    color: Colors.$c40;
   }
 
   .employee-chart {
@@ -541,7 +771,7 @@
         font-weight: 600;
         font-size: 16px;
         font-family: 'Plus Jakarta Sans', sans-serif;
-        box-shadow: 0px 2px 4px 0px #BDBDBD40;
+        box-shadow: 0px 2px 4px 0px $c248;
         border: none;
         cursor: pointer;
         max-width: 128px;
@@ -568,20 +798,5 @@
             }
         }
     }
-}
-
-@media screen and (max-width: 1100px) {
-    .inner-body-container {
-        .inner-container {
-            flex-direction: column;
-
-            .coverClass {
-                display: flex;
-                justify-content: center;
-                .event-container {
-                    width: 100%;
-                }
-            }
-        }
-    }
+    
 }

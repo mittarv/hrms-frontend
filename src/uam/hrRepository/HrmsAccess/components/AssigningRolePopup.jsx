@@ -334,7 +334,7 @@ const AssigningRolePopup = ({ isOpen, onClose, employee, onSuccess }) => {
           </p>
           <p className="confirmation_description">
             {hasAllPermissions 
-              ? "This role has **full access** to all modules of HRMS"
+              ? <p>This role has <strong>full access</strong> to all modules of HRMS.</p>
               : `This role has access to ${selectedRole?.permissions?.length || 0} permissions.`
             }
           </p>

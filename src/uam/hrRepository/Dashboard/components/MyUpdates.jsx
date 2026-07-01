@@ -1,5 +1,7 @@
-import { useState} from 'react';
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableRow, Tabs, Tab, Box } from "@mui/material";
+import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import { hrRepositoryTableStyle as tableStyle } from '../../constant/hrRepositoryTableStyle';
 import '../dashboard.scss';
 import { useSelector } from 'react-redux';
@@ -24,10 +26,36 @@ const MyUpdates = () => {
   const getTabStyle = (index) => ({
     color: tabValue === index ? "#2E3038" : "#676B7E",
     fontWeight: tabValue === index ? "700" : "500",
-    
     fontSize: "16px",
     fontFamily: "Plus Jakarta Sans"
   });
+
+  const emptyStateStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: "100px",
+    color: "#888",
+    fontSize: "18px",
+    fontWeight: 500,
+    textAlign: "center",
+    fontFamily: "Plus Jakarta Sans",
+    gap: "12px"
+  };
+
+  const EmptyUpdatesMessage = ({ message }) => (
+    <div style={emptyStateStyle}>
+      <Box display="flex" alignItems="center" gap={1} sx={{ color: "#888" }}>
+        <MailOutlineOutlinedIcon sx={{ fontSize: 28 }} />
+        <span>{message}</span>
+      </Box>
+      <Box display="flex" alignItems="center" gap={1} sx={{ color: "#888", fontSize: "16px" }}>
+        <NotificationsNoneOutlinedIcon sx={{ fontSize: 22 }} />
+        <span>We&apos;ll notify you when something exciting happens!</span>
+      </Box>
+    </div>
+  );
 
   return (
     <div className='coverClass'>
@@ -67,19 +95,7 @@ const MyUpdates = () => {
             fontWeight={500}
             style={{ letterSpacing: "0.5px" }}
           >
-            <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minHeight: "100px",
-            color: "#888",
-            fontSize: "18px",
-            fontWeight: 500,
-            textAlign: "center",
-            fontFamily: "Plus Jakarta Sans"
-          }}>
-            📬 No personal updates yet <br /> 🔔 We&apos;ll notify you when something exciting happens!
-          </div>
+            <EmptyUpdatesMessage message="No personal updates yet" />
           </Box>
         )
       )}
@@ -90,15 +106,27 @@ const MyUpdates = () => {
           <Table>
             <TableBody>
               {organizationUpdates.map((orgnaization_updates, index) => {
-                const messageContent = JSON.parse(orgnaization_updates.message);
+                let messageContent;
+                try {
+                  messageContent = typeof orgnaization_updates.message === 'string'
+                    ? JSON.parse(orgnaization_updates.message)
+                    : orgnaization_updates.message;
+                } catch {
+                  messageContent = null;
+                }
+                const isStructured = messageContent && typeof messageContent === 'object' && messageContent.linkUrl;
                 return (
                   <TableRow key={index}>
                     <TableCell style={MyUpdateStyle}>
-                      <Link to={ messageContent?.linkUrl} className="update-link" style={{ color: '#2E3038' }}>
-                        {messageContent?.prefix} 
-                        <span style={{ fontWeight: 'bold' }}>&nbsp;{messageContent?.linkText}&nbsp;</span> 
-                        {messageContent?.suffix}
-                      </Link>
+                      {isStructured ? (
+                        <Link to={messageContent.linkUrl} className="update-link" style={{ color: '#2E3038' }}>
+                          {messageContent.prefix}
+                          <span style={{ fontWeight: 'bold' }}>&nbsp;{messageContent.linkText}&nbsp;</span>
+                          {messageContent.suffix}
+                        </Link>
+                      ) : (
+                        <span style={{ color: '#2E3038' }}>{orgnaization_updates.message}</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -118,20 +146,7 @@ const MyUpdates = () => {
             fontWeight={500}
             style={{ letterSpacing: "0.5px" }}
           >
-            
-            <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minHeight: "100px",
-            color: "#888",
-            fontSize: "18px",
-            fontWeight: 500,
-            textAlign: "center",
-            fontFamily: "Plus Jakarta Sans"
-          }}>
-            📬 No Organizational updates yet <br /> 🔔 We&apos;ll notify you when something exciting happens!
-          </div>
+            <EmptyUpdatesMessage message="No Organizational updates yet" />
           </Box>
         )
       )}

@@ -34,6 +34,10 @@ const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {
           ] || currentEmployeeDetails?.employeeCurrentJobDetails?.empLevel;
         return currentLevel;
     }
+
+        const currentEmployeeTypeKey = currentEmployeeDetails?.employeeCurrentJobDetails?.empType;
+        const currentEmployeeTypeValue = getAllComponentType?.emp_type_dropdown?.[currentEmployeeTypeKey] || currentEmployeeTypeKey;
+        const shouldShowLevel = String(currentEmployeeTypeValue || "").toUpperCase() !== "OFTE";
     
   return (
     <>
@@ -54,10 +58,12 @@ const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {
                     <p className='user-labels'>Email:</p>
                     <p className='user-details'>{currentEmployeeDetails?.employeeContactDetails?.empOfficialEmail ?? "---"}</p>
                 </div>
-                <div className='user-email-container'>
-                    <p className='user-labels'>Level:</p>
-                    <p className='user-details'>{getCurrentEmployeeLevel(currentEmployeeDetails?.employeeCurrentJobDetails?.empLevel) || "---"}</p>
-                </div>
+                {shouldShowLevel && (
+                    <div className='user-email-container'>
+                        <p className='user-labels'>Level:</p>
+                        <p className='user-details'>{getCurrentEmployeeLevel(currentEmployeeDetails?.employeeCurrentJobDetails?.empLevel) || "---"}</p>
+                    </div>
+                )}
                 <div className='user-role-container'>
                     <p className='user-labels'>Reporting Manager:</p>
                     <p className='user-details'>{ManagerName || "---"}</p>

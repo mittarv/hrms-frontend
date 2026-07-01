@@ -1,49 +1,80 @@
-import search_icon from "../../assets/icons/search_icon.svg";
+import searchIcon from "../../assets/icons/Search_icon_grey.svg";
+import divider from "../../assets/icons/divider_icon.svg";
+import sortIcon from "../../assets/icons/sort_grey_icon.svg";
+import filterIcon from "../../assets/icons/filter_grey_icon.svg";
 import Info_icon from "../../assets/icons/info_icon.svg";
 import { LeaveConfiguratorTableHeader } from "../utils/LeaveConfiguratorData";
 import { useSelector } from "react-redux";
 import "../styles/LeaveConfiguratorTable.scss";
-import { useState, useEffect } from "react";
-import { Box } from "@mui/material";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getLeaveDetails } from "../../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import NoResultsContainer from "../../Common/components/NoResultsContainer";
+import { createPortal } from "react-dom";
 
 const LeaveConfiguratorTable = () => {
-  const { loading, allExisitingLeaves, getAllComponentType, myHrmsAccess } = useSelector(
+  const { allLeavesLoading, allExisitingLeaves, getAllComponentType, myHrmsAccess, myHrmsAccessLoaded } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
-  
-  // Check if user has read permission
-  const canRead = allToolsAccessDetails?.[selectedToolName] >= 900 || 
-    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveConfigurator_Read");
-  
-  // If user doesn't have read permission, show access denied message
-  if (!canRead) {
-    return (
-      <div className="leave_configurator_table_container">
-        <div style={{ textAlign: "center", padding: "40px" }}>
-          <p style={{ fontSize: "16px", color: "#666" }}>
-            You don't have permission to view leave configurations
-          </p>
-        </div>
-      </div>
-    );
-  }
   const [filteredLeaves, setFilteredLeaves] = useState(allExisitingLeaves);
   const [searchLeaves, setSearchLeaves] = useState("");
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  const tooltipTimeoutRef = useRef(null);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const leaveConfigId = searchParams.get("leaveConfigId");
+  
+  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+  
+  // Check if user has read permission
+  const canRead = isAdmin || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveConfigurator_Read");
+
+  const handleTooltipShow = useCallback((e, description) => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    const tooltipWidth = 220;
+    
+    // Position tooltip below the icon
+    setTooltipPosition({
+      top: rect.bottom + 8,
+      left: rect.left + rect.width / 2 - tooltipWidth / 2,
+    });
+    setActiveTooltip(description);
+  }, []);
+
+  const handleTooltipHide = useCallback(() => {
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setActiveTooltip(null);
+    }, 100);
+  }, []);
+
+  // Hide tooltip on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setActiveTooltip(null);
+    };
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      window.removeEventListener("scroll", handleScroll, true);
+      if (tooltipTimeoutRef.current) {
+        clearTimeout(tooltipTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
-    if (leaveConfigId) {
+    if (leaveConfigId && canRead) {
       dispatch(getLeaveDetails(leaveConfigId));
     }
-  }, [leaveConfigId, dispatch]);
+  }, [leaveConfigId, canRead, dispatch]);
 
   useEffect(() => {
     if (searchLeaves) {
@@ -90,107 +121,148 @@ const LeaveConfiguratorTable = () => {
     }
   };
 
+  // Wait for permissions to load before showing access denied
+  if (!canRead) {
+    if (!myHrmsAccessLoaded && !isAdmin) {
+      return (
+        <div className="leave_configurator_table_container">
+          <LoadingSpinner message="Loading..." height="40vh" />
+        </div>
+      );
+    }
+    return (
+      <div className="leave_configurator_table_container">
+        <div style={{ textAlign: "center", padding: "40px" }}>
+          <p style={{ fontSize: "16px", color: "#666" }}>
+            You don&apos;t have permission to view leave configurations
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="leave_configurator_table_container">
-      <div className="employee_repository_search_bar_container">
-        <input
-          type="text"
-          placeholder="Search for leave type"
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-        <img src={search_icon} alt="search_icon" className="search_icon" />
+      <div className="leave_configurator_header">
+        <div className="search-bar-collapsed">
+          <div className="search-input-group">
+            <img
+              src={searchIcon}
+              alt="search_icon"
+              className="employee-search-icon"
+            />
+            <img src={divider} alt="" />
+            <input
+              type="text"
+              placeholder="Search for leave type"
+              value={searchLeaves}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="employee-search-input"
+            />
+          </div>
+        </div>
       </div>
-      {loading ? (
+
+      {allLeavesLoading ? (
         <LoadingSpinner message="Loading Leaves..." height="40vh" />
       ) : allExisitingLeaves.length === 0 ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="30vh"
-          flexDirection="column"
-        >
-          <p className="leave_configurator_no_leaves_message">
-            No Leaves Configured Yet.
-          </p>
-          <p className="leave_configurator_no_leaves_message">
-            To get started, please create a new Leave.
-          </p>
-        </Box>
+        <NoResultsContainer
+          showImage={true}
+          message="We couldn't find anyone matching your search."
+          subMessage="Try searching with different details."
+        />
       ) : filteredLeaves.length === 0 ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="30vh"
-          flexDirection="column"
-        >
-          <p className="leave_configurator_no_leaves_message">
-            {`No Such Leaves Configured Yet with name "${searchLeaves}"`}.
-          </p>
-        </Box>
+        <NoResultsContainer
+          showImage={true}
+          message="We couldn't find anyone matching your search."
+          subMessage="Try searching with different details."
+        />
       ) : (
-        <div className="leave_configurator_wrapper">
-          <table className="leave_table">
-            <thead className="leave_table_head">
-              <tr className="leave_table_header_row">
-                {LeaveConfiguratorTableHeader.map((header) => (
-                  <th
-                    className="leave_table_header leave_table_header_sr"
-                    key={header.name}
-                  >
-                    <div className="leave_table_header_label">
-                      <span className="leave_table_label">{header.label}</span>
-                      {(header.name === "accrualFrequency" ||
-                        header.name === "accrualRate" ||
-                        header.name === "minNoticePeriod" ||
-                        header.name === "maxNoticePeriod") && (
-                        <span className="info_icon">
-                          <img src={Info_icon} alt="info_icon" />
-                          <span className="tooltip">{header?.description}</span>
+        <div className="leave_configurator_log">
+          <div className="log-header">
+            <p className="text-table-header">Leave Configurations ({filteredLeaves.length})</p>
+          </div>
+          <div className="log-table">
+            <table className="leave_table">
+              <thead>
+                <tr>
+                  {LeaveConfiguratorTableHeader.map((header) => (
+                    <th key={header.name}>
+                      <div className="th-with-icons leave_table_header_label">
+                        <span className={`leave_table_label ${header.name === "leaveType" ? "th-with-icons" : ""}`}>
+                          {header.name === "leaveType" ? (
+                            <>
+                              {header.label}
+                              <img src={sortIcon} alt="Sort" className="th-icon" />
+                              <img src={filterIcon} alt="Filter" className="th-icon" />
+                            </>
+                          ) : (
+                            header.label
+                          )}
                         </span>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="leave_table_body">
-              {filteredLeaves.map((leave, index) => (
-                <tr
-                  className="leave_table_row"
-                  key={leave.leaveConfigId}
-                  onClick={() => handleViewRowClick(leave.leaveConfigId)}
-                >
-                  <td className="leave_table_cell leave_table_cell_sr">
-                    {index + 1}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_type">
-                    {leave.leaveType}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_max">
-                    {leave.totalAllotedLeaves}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_rate">
-                    {leave.accuralRate}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_freq">
-                    {leave.accuralFrequency}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_min">
-                    {leave.minimumNoticePeriod}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_max_notice">
-                    {leave.maximumNoticePeriod}
-                  </td>
-                  <td className="leave_table_cell leave_table_cell_employee_type">
-                    {getEmployeeTypeValue(JSON.parse(leave.employeeType))}
-                  </td>
+                        {(header.name === "accrualFrequency" ||
+                          header.name === "accrualRate" ||
+                          header.name === "minNoticePeriod" ||
+                          header.name === "maxNoticePeriod") &&
+                          header?.description && (
+                            <span 
+                              className="info_icon"
+                              onMouseEnter={(e) => handleTooltipShow(e, header.description)}
+                              onMouseLeave={handleTooltipHide}
+                            >
+                              <img src={Info_icon} alt="info_icon" />
+                            </span>
+                          )}
+                      </div>
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredLeaves.map((leave, index) => (
+                  <tr
+                    key={leave.leaveConfigId}
+                    onClick={() => handleViewRowClick(leave.leaveConfigId)}
+                  >
+                    <td>{index + 1}</td>
+                    <td>{leave.leaveType}</td>
+                    <td>{leave.totalAllotedLeaves}</td>
+                    <td>{leave.accuralRate}</td>
+                    <td>{leave.accuralFrequency}</td>
+                    <td>{leave.minimumNoticePeriod}</td>
+                    <td>{leave.maximumNoticePeriod}</td>
+                    <td>{getEmployeeTypeValue(JSON.parse(leave.employeeType))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
+      )}
+
+      {/* Tooltip Portal */}
+      {activeTooltip && createPortal(
+        <div 
+          className="leave_configurator_tooltip_portal"
+          style={{
+            position: 'fixed',
+            top: tooltipPosition.top,
+            left: tooltipPosition.left,
+            zIndex: 99999,
+          }}
+          onMouseEnter={() => {
+            if (tooltipTimeoutRef.current) {
+              clearTimeout(tooltipTimeoutRef.current);
+            }
+          }}
+          onMouseLeave={handleTooltipHide}
+        >
+          <div className="tooltip_content text-tooltip-small">
+            {activeTooltip}
+          </div>
+          <div className="tooltip_arrow" />
+        </div>,
+        document.body
       )}
     </div>
   );

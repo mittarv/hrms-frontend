@@ -21,7 +21,7 @@ const EmployeeRepositoryDashboard = () => {
   
   const { user } = useSelector((state) => state.user);
   const { 
-        loading,
+        allEmployeesLoading,
         myHrmsAccess,
       } = useSelector((state) => state.hrRepositoryReducer);
   const allToolsAccessDetails = useSelector(state => state.user.allToolsAccessDetails);
@@ -102,7 +102,7 @@ const EmployeeRepositoryDashboard = () => {
                   </button>}
                 </div>
               </div>
-              {loading ? (
+              {allEmployeesLoading ? (
                 <LoadingSpinner message="Loading Employees Data..." height="40vh" />
               ) : (
                 <EmployeeRepositoryTable />

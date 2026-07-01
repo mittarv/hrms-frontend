@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .role_management_container {
     width: 100%;
     height: 100%;
@@ -25,20 +27,20 @@
                 width: 100%;
                 height: auto;
                 border: none;
-                border-bottom: 0.5px solid #aeb0bc;
+                border-bottom: 0.5px solid $GREY-40;
                 padding: 12px 16px 12px 32px;
                 font-family: "Plus Jakarta Sans";
                 font-weight: 500;
                 font-size: 14px;
                 line-height: 20px;
                 letter-spacing: 0.01em;
-                color: #8f92a3;
+                color: $GREY-50;
 
                 &:focus {
                     outline: none;
                 }
                 &::placeholder {
-                    color: #8f92a3;
+                    color: $GREY-50;
                     font-family: "Plus Jakarta Sans";
                     font-weight: 400;
                     font-size: 14px;
@@ -52,6 +54,157 @@
                 left: 0;
                 padding: 12px 0px;
             }
+
+            .role_management_filter_wrapper {
+              position: relative;
+
+              .role_management_filter_button {
+                min-width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                border: 2px solid $CYAN-50;
+                background-color: $WHITE;
+                transition: background-color 0.2s ease;
+                position: relative;
+
+                img {
+                  width: 20px;
+                  height: 20px;
+                }
+
+                &:hover {
+                  background-color: $CYAN-20;
+                }
+
+                &.active {
+                  background-color: $CYAN-20;
+                  border-color: $CYAN-50;
+                }
+
+                .role_management_filter_badge {
+                  position: absolute;
+                  top: -4px;
+                  right: -4px;
+                  min-width: 18px;
+                  height: 18px;
+                  padding: 0 4px;
+                  border-radius: 9px;
+                  background-color: $PRUSSIAN-70;
+                  color: $WHITE;
+                  font-size: 11px;
+                  font-weight: 600;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+              }
+
+              .role_management_filter_dropdown {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                min-width: 280px;
+                max-width: 320px;
+                max-height: 360px;
+                background: $WHITE;
+                border: 0.5px solid $GREY-30;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px $c69;
+                z-index: 100;
+                display: flex;
+                flex-direction: column;
+
+                .role_management_filter_dropdown_header {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 10px 12px;
+                  border-bottom: 1px solid $c236;
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: $GREY-70;
+
+                  .role_management_filter_clear {
+                    background: none;
+                    border: none;
+                    color: $PRUSSIAN-70;
+                    font-size: 13px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    padding: 0 4px;
+
+                    &:hover {
+                      text-decoration: underline;
+                    }
+                  }
+                }
+
+                .role_management_filter_dropdown_list {
+                  overflow-y: auto;
+                  padding: 8px 0;
+                }
+
+                .role_management_filter_category {
+                  padding: 4px 0;
+
+                  .role_management_filter_category_name {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: $GREY-50;
+                    text-transform: uppercase;
+                    letter-spacing: 0.02em;
+                  }
+
+                  .role_management_filter_permission_item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 6px 12px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: $GREY-70;
+                    margin: 0;
+
+                    &:hover {
+                      background-color: $c237;
+                    }
+
+                    
+                  input[type="checkbox"] {
+                    cursor: pointer;
+                    appearance: none;
+                    width: 16px;
+                    height: 16px;
+                    border: 1px solid $GREY-70;
+                    border-radius: 4px;
+                    background-color: $WHITE;
+                    position: relative;
+
+                    &:checked {
+                      background: url("../../assets/icons/checkbox_leave_management.svg") no-repeat center center;
+                      background-size: contain;
+                      border: none;
+                    }
+                  }
+                  }
+                }
+
+                .role_management_filter_empty {
+                  padding: 16px 12px;
+                  font-size: 14px;
+                  color: $GREY-50;
+                  text-align: center;
+                }
+              }
+            }
+
         }
 
         .header_actions_container {
@@ -67,8 +220,8 @@
                 justify-content: center;
                 align-items: center;
                 gap: 0.5rem;
-                background-color: #045071;
-                color: #ffffff;
+                background-color: $PRUSSIAN-70;
+                color: $WHITE;
                 border: none;
                 padding: 10px 20px;
                 border-radius: 5px;
@@ -77,7 +230,7 @@
                 p {
                     font-size: 16px;
                     font-weight: 500;
-                    color: #ffffff;
+                    color: $WHITE;
                     font-family: "Plus Jakarta Sans";
                     line-height: 20px;
                     letter-spacing: 0.01em;
@@ -85,8 +238,8 @@
             }
 
             .create_role_btn:hover {
-                background-color: #033348;
-                color: #ffffff;
+                background-color: $PRUSSIAN-80;
+                color: $WHITE;
             }
         }
     }
@@ -103,11 +256,26 @@
         p {
             font-size: 22px;
             font-weight: 500;
-            color: #033348;
+            color: $PRUSSIAN-80;
             font-family: "Plus Jakarta Sans";
             font-weight: 400;
             line-height: 20px;
             letter-spacing: 0.01em;
+        }
+
+        .role_management_filter_clear_link {
+            background: none;
+            border: none;
+            color: $PRUSSIAN-70;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 4px 0;
+
+            &:hover {
+                color: $PRUSSIAN-70;
+            }
         }
 
         .create_role_btn {
@@ -115,8 +283,8 @@
             justify-content: center;
             align-items: center;
             gap: 0.5rem;
-            background-color: #045071;
-            color: #ffffff;
+            background-color: $PRUSSIAN-70;
+            color: $WHITE;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
@@ -125,7 +293,7 @@
             p {
                 font-size: 16px;
                 font-weight: 500;
-                color: #ffffff;
+                color: $WHITE;
                 font-family: "Plus Jakarta Sans";
                 line-height: 20px;
                 letter-spacing: 0.01em;
@@ -133,15 +301,15 @@
         }
 
         .create_role_btn:hover {
-            background-color: #033348;
-            color: #ffffff;
+            background-color: $PRUSSIAN-80;
+            color: $WHITE;
         }
     }
 
     .roles_table_container {
         width: 100%;
         overflow-x: auto;
-        border: 0.5px solid #aeb0bc;
+        border: 0.5px solid $GREY-40;
         border-radius: 8px;
     
         table {
@@ -152,18 +320,18 @@
           td {
             padding: 8px 15px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid $c66;
             font-size: 14px;
           }
     
           th {
             font-weight: 600;
-            color: #555;
-            background-color: #f9f9f9;
+            color: $c92;
+            background-color: $c93;
           }
     
           td {
-            color: #333;
+            color: $c75;
             
             .role_description_text {
               margin: 0;
@@ -179,7 +347,7 @@
               cursor: pointer;
               font-size: 14px;
               font-family: "Plus Jakarta Sans";
-              color: #333;
+              color: $c75;
               line-height: 1.5;
 
               .description_tooltip {
@@ -189,8 +357,8 @@
                 bottom: calc(100% + 8px);
                 left: 0;
                 right: 0;
-                background-color: #f3f4f6;
-                color: #2e3038;
+                background-color: $c94;
+                color: $GREY-80;
                 padding: 8px 12px;
                 border-radius: 6px;
                 font-size: 12px;
@@ -199,8 +367,8 @@
                 white-space: normal;
                 word-wrap: break-word;
                 z-index: 1000;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                border: 1px solid #e5e7eb;
+                box-shadow: 0 2px 8px $c69;
+                border: 1px solid $c95;
                 max-width: 300px;
                 line-height: 1.4;
                 transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
@@ -213,7 +381,7 @@
                   top: 100%;
                   left: 20px;
                   border: 6px solid transparent;
-                  border-top-color: #f3f4f6;
+                  border-top-color: $c94;
                 }
                 
                 // Arrow border
@@ -223,7 +391,7 @@
                   top: 100%;
                   left: 19px;
                   border: 7px solid transparent;
-                  border-top-color: #e5e7eb;
+                  border-top-color: $c95;
                   z-index: -1;
                 }
               }
@@ -235,7 +403,7 @@
             }
           }
           tr:nth-child(even) {
-            background-color: #f7f7f8;
+            background-color: $GREY-00;
           }
 
           .permissions_tags_container {
@@ -248,8 +416,8 @@
               display: inline-flex;
               align-items: center;
               padding: 6px 12px;
-              background-color: #f3f4f6;
-              color: #2e3038;
+              background-color: $c94;
+              color: $GREY-80;
               border-radius: 20px;
               font-size: 12px;
               font-weight: 400;
@@ -260,31 +428,31 @@
               transition: all 0.2s ease;
 
               &:hover {
-                background-color: #e5e7eb;
+                background-color: $c95;
                 transform: translateY(-1px);
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 4px $c69;
               }
             }
 
             .all_permissions_tag {
-              background-color: #f3f4f6;
-              color: #2e3038;
+              background-color: $c94;
+              color: $GREY-80;
 
               &:hover {
-                background-color: #e5e7eb;
+                background-color: $c95;
                 transform: translateY(-1px);
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 4px $c69;
               }
             }
 
             .more_permissions_tag {
-              background-color: #f3f4f6;
-              color: #2e3038;
+              background-color: $c94;
+              color: $GREY-80;
 
               &:hover {
-                background-color: #e5e7eb;
+                background-color: $c95;
                 transform: translateY(-1px);
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 4px $c69;
               }
             }
           }
@@ -309,7 +477,7 @@
             //   text-decoration: underline;
             //   text-underline-offset: 3px;
             //   transition: opacity 0.2s ease;
-            border-bottom: 0.5px solid #aeb0bc;
+            border-bottom: 0.5px solid $GREY-40;
 
               img {
                 width: 16px;
@@ -327,14 +495,14 @@
 
               &.edit_button {
                 margin: 0px;
-                color: #045071;
-                border-bottom: 1px solid #045071;
+                color: $PRUSSIAN-70;
+                border-bottom: 1px solid $PRUSSIAN-70;
               }
 
               &.delete_button {
                 margin: 0px;
-                color: #C73D45;
-                border-bottom: 1px solid #C73D45;
+                color: $RED-60;
+                border-bottom: 1px solid $RED-60;
               }
             }
           }

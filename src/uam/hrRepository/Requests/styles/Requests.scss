@@ -1,6 +1,9 @@
+@use "../../../../design/colors/customFonts" as fonts;
+@use '../../design/colors/customColors' as *;
+
 .requests_container * {
     box-sizing: border-box;
-    font-family: "Plus Jakarta Sans";
+    font-family: fonts.$font-family;
 }
 
 .requests_container {
@@ -13,12 +16,12 @@
     }
     
     &::-webkit-scrollbar-track {
-        background: #D2D9DF;
+        background: $c7;
         border-radius: 4px;
     }
     
     &::-webkit-scrollbar-thumb {
-        background: #054A68;
+        background: $c3;
         border-radius: 4px;
     }
 
@@ -42,36 +45,26 @@
         }
 
         .active_tab {
-            background-color: #ebfafa;
+            background-color: $CYAN-10;
             padding: 0.75rem 0.875rem;
-            border-bottom: 0.25rem solid #28a2a2;
+            border-bottom: 0.25rem solid $CYAN-70;
             border-radius: 0.5rem 0.5rem 0rem 0rem;
-            font-size: 0.875rem;
-            font-weight: 700;
-            color: #2e3038;
-            font-family: "Plus Jakarta Sans";
-            line-height: 1.25rem;
-            letter-spacing: 0.01em;
+            font-weight: fonts.$font-weight-bold;
             cursor: pointer;
         }
         .inactive_tab {
-            background-color: #ebfafa;
+            background-color: $CYAN-10;
             padding: 0.75rem 0.875rem;
             border-bottom: none;
             border-radius: 0.5rem 0.5rem 0rem 0rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #2e3038;
-            font-family: "Plus Jakarta Sans";
-            line-height: 1.25rem;
-            letter-spacing: 0.01em;
+            font-weight:fonts.$font-weight-semibold;
             cursor: pointer;
         }
     }
 
     hr {
         border: none;
-        border-top: 0.5px solid #8f92a3;
+        border-top: 0.5px solid $GREY-50;
         flex-shrink: 0;
         margin: 0;
     }
@@ -81,10 +74,9 @@
         margin-top: 1rem;
 
         p {
-            font-size: 16px;
-            font-weight: 400;
-            font-family: "Plus Jakarta Sans";
-            color: #033348;
+            font-size: fonts.$font-size-md;
+            font-weight: fonts.$font-weight-regular;
+            color: $PRUSSIAN-80;
         }
     }
 

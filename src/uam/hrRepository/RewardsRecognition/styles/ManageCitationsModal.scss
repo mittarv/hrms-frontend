@@ -1,0 +1,280 @@
+@use '../../design/colors/customColors' as *;
+
+.manage_citations_modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $c131;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.manage_citations_modal {
+  background: $WHITE;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 660px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px $c138;
+
+  .manage_citations_modal_header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.5rem 1.5rem 0;
+
+    .manage_citations_modal_title_block {
+      .manage_citations_modal_employee_name {
+        margin: 0;
+        font-size: 1.375rem;
+        font-weight: 700;
+        color: $c91;
+      }
+
+      .manage_citations_modal_employee_role {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.9375rem;
+        font-weight: 400;
+        color: $c87;
+      }
+    }
+
+    .close_btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: $c98;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      &:hover {
+        color: $c88;
+      }
+    }
+
+    .close_btn_icon {
+      background: $GREY-10;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      img {
+        display: block;
+        width: 14px;
+        height: 14px;
+      }
+
+      &:hover {
+        background: $c95;
+      }
+    }
+  }
+
+  .manage_citations_modal_hr {
+    border: none;
+    border-top: 1px solid $c95;
+    margin: 1rem 1.5rem 0;
+  }
+
+  .manage_citations_modal_content {
+    padding: 1.25rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+
+    .loading_text {
+      margin: 0;
+      color: $c87;
+    }
+
+    .citations_list_section {
+      margin-bottom: 1.5rem;
+
+      .citations_list_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+
+        h3 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: $c88;
+        }
+
+        .copy_citations_btn {
+          background: none;
+          border: none;
+          color: $c132;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          padding: 0;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .citations_list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: $BLUE-10;
+        border-radius: 8px;
+        padding: 1rem;
+
+        .citation_item {
+          margin-bottom: 1rem;
+          padding: 0.75rem 0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .citation_text {
+            margin: 0;
+            font-size: 0.9375rem;
+            color: $c139;
+            line-height: 1.5;
+            font-style: normal;
+          }
+
+          .citation_meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+
+            .citation_author {
+              font-size: 0.875rem;
+              color: $c87;
+            }
+
+            .remove_citation_link {
+              background: none;
+              border: none;
+              color: $c121;
+              font-size: 0.875rem;
+              cursor: pointer;
+              padding: 0;
+
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .form_group.group_citations_section {
+      label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: $c88;
+        margin-bottom: 0.5rem;
+      }
+
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid $c86;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .textarea_footer {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+
+        .word_count_hint {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-size: 0.8125rem;
+
+          .hint_icon {
+            font-size: 0.875rem;
+          }
+
+          &.sufficient {
+            color: $c140;
+          }
+
+          &.insufficient {
+            color: $c87;
+          }
+        }
+
+        .word_count {
+          font-size: 0.8125rem;
+          font-weight: 500;
+
+          &.insufficient {
+            color: $c134;
+          }
+
+          &.sufficient {
+            color: $c140;
+          }
+        }
+      }
+    }
+  }
+
+  .manage_citations_modal_footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid $c95;
+
+    .cancel_btn {
+      padding: 8px 16px;
+      border: 1px solid $c86;
+      background: $WHITE;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      color: $c88;
+      cursor: pointer;
+    }
+
+    .save_btn {
+      padding: 8px 16px;
+      background: $PRUSSIAN-70;
+      color: $WHITE;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

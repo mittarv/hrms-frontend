@@ -1,0 +1,604 @@
+// These are all the colors acording to figma design system. In any SCSS file no hardcoded colors must be used instead they need to be imported from here
+
+$c1: #151515;
+$c2: #033348;
+$c3: #054a68;
+$c4: #033348;
+$c5: #84b5d2;
+$c6: #b7bfc6;
+$c7: #d2d9df;
+$c8: #054a68;
+$c9: #f6f8fa;
+$c10: #7cc25b;
+$c11: #ff8b8b;
+$c12: #ffffff;
+$c13: #fff5f5;
+$c14: #225676;
+$c15: #eef2f4;
+$c16: #f9f9fb;
+$c17: #efefef;
+$c18: #525252;
+$c19: #ffd600;
+$c20: #aeaeaf;
+$c21: rgba(132, 181, 210, 0.3);
+$c22: #022737;
+$c23: rgba(253, 147, 32, 0.8);
+$c24:#022737;
+$c25: #6e96a7;
+$c26: #8dadbb;
+$c27: #d9dfe4;
+$c28: rgba(253, 147, 32, 0.05);
+$c29: #f1faff;
+$c30: #022737;
+$c31: #033348;
+$c32: #b7bfc6;
+$c33: #225676;
+$c34: #688591;
+$c35: #7cc25b;
+$c36: #525252;
+$c37: #ff8b8b;
+$c38: rgba(238, 242, 244, 0.9);
+$c39: rgba(255, 255, 255, 0.5);
+$c40: rgba(5, 74, 104, 0.07);
+$c41: #7e96a0;
+$c42: #e7f3f8;
+$c43:#054a6863;
+$c44: #7C7C7C;
+$c45: #03334861;
+$c46: #E6E6E6;
+$c47: #FCFCFD;
+$c48: #054A681A;
+$c60:#054A68;
+$c61:#fcfcfde5;
+$c62: #D2D9DFCC;
+$c63:#525252;
+$c64: #0000001A;
+$c65:#aaa;
+$c66:#e0e0e0;
+$c67:#004060;
+$c68:rgba(158, 185, 197, 0.25);
+$c69:rgba(0, 0, 0, 0.1);
+$c70:#ddd;
+$c71:rgba(3, 51, 72, 0.1);
+$c72:rgba(3, 51, 72, 0.2);
+$c73:#fff;
+$c74:#0056b3;
+$c75:#333;
+$c76:#ccc;
+$c77:#dc3545;
+$c78:#c82333;
+$c79:#FF0000;
+$c80:#2c5785;
+$c81:#999;
+$c82:rgba(0, 0, 0, 0.08);
+$c83:#e8e9eb;
+$c84:#666;
+$c85:#e4e7ec;
+$c86:#d1d5db;
+$c87:#6b7280;
+$c88:#374151;
+$c89:rgba(0, 0, 0, 0.06);
+$c90:#023b54;
+$c91:#1f2937;
+$c92:#555;
+$c93:#f9f9f9;
+$c94:#f3f4f6;
+$c95:#e5e7eb;
+$c96:#d1fae5;
+$c97:#065f46;
+$c98:#9ca3af;
+$c99:#111827;
+$c100:#0d9488;
+$c101:#202534;
+$c102:#2a3045;
+$c103:#1c1f2e;
+$c104:#b0d4e3;
+$c105:#c5cff0;
+$c106:#a7dede;
+$c107:rgba(0, 0, 0, 0.4);
+$c108:rgba(0, 0, 0, 0.3);
+$c109:#b7c7d2;
+$c110:#eef3f6;
+$c111:#9fb2bf;
+$c112:rgba(0, 0, 0, 0.25);
+$c113:rgba(255, 255, 255, 0.9);
+$c114:#333333;
+$c115:#666666;
+$c116:#e8f0fe;
+$c117:#e0f2f2;
+$c118:rgba(0, 0, 0, 0.15);
+$c119:rgba(0, 0, 0, 0.04);
+$c120:#034060;
+$c121:#dc2626;
+$c122:#fef2f2;
+$c123:#f0f9fc;
+$c124:#b91c1c;
+$c125:#eff6ff;
+$c126:#a5d7ed;
+$c127:#424242;
+$c128:#f0f0f0;
+$c129:#8d9092;
+$c130:#1a527f;
+$c131:rgba(0, 0, 0, 0.5);
+$c132:#0284c7;
+$c133:rgba(2, 132, 199, 0.1);
+$c134:#ef4444;
+$c135:#167e7e;
+$c136:#10b981;
+$c137:#f0f9ff;
+$c138:rgba(0, 0, 0, 0.2);
+$c139:#4b5563;
+$c140:#059669;
+$c141:rgba(79, 70, 229, 0.3);
+$c142:rgba(79, 70, 229, 0.4);
+$c143:rgba(0, 0, 0, 0.12);
+$c144:rgba(0, 0, 0, 0.45);
+$c145:rgba(0, 0, 0, 0.18);
+$c146:#f8fbfd;
+$c147:#eaf4f9;
+$c148:#03374e;
+$c149:#fde8dc;
+$c150:#c0522a;
+$c151:#f5c4af;
+$c152:#a0cfe3;
+$c153:rgba(0, 0, 0, 0.16);
+$c154:#f9fafb;
+$c155:#99b9d9;
+$c156:#03405a;
+$c157:#f4f5f7;
+$c158:#26a69a;
+$c159:#cbd5e0;
+$c160:#f8f9fc;
+$c161:#e2e8f0;
+$c162:#4a5568;
+$c163:#bbb;
+$c164:#2563eb;
+$c165:#fff6c5;
+$c166:rgba(0, 0, 0, 0.6);
+$c167:#f5f5f5;
+$c168:#eee;
+$c169:#f8f9fa;
+$c170:#6c757d;
+$c171:#007bff;
+$c172:rgba(0, 123, 255, 0.15);
+$c173:#e9ecef;
+$c174:#495057;
+$c175:#e5e5e5;
+$c176:rgba(220, 53, 69, 0.15);
+$c177:#e7f5ff;
+$c178:#e1e5e9;
+$c179:#ced4da;
+$c180:#f1f3f4;
+$c181:#c1c8cd;
+$c182:#a8b2ba;
+$c183:#212529;
+$c184:#003349;
+$c185:#1a1a1a;
+$c186:#f1f5f9;
+$c187:#f8fafc;
+$c188:#dbeafe;
+$c189:#fef3c7;
+$c190:#92400e;
+$c191:#fbbf24;
+$c192:#1e40af;
+$c193:#3b82f6;
+$c194:rgba(18, 38, 63, 0.08);
+$c195:rgba(0, 0, 0, 0.75);
+$c196:#777;
+$c197:rgba(255, 255, 255, 0.3);
+$c198:#0e50d5;
+$c199:#1e3a5f;
+$c200:#2c5282;
+$c201:#888;
+$c202:#e0f6ff;
+$c203:#454745;
+$c204:#e6e7eb;
+$c205:rgba(119, 184, 207, 0.39);
+$c206:#f5222d;
+$c207:#fff1f0;
+$c208:#64748b;
+$c209:#1890ff;
+$c210:#bfbfbf;
+$c211:#ff3b30;
+$c212:#d1d1d1;
+$c213:#005a8c;
+$c214:#e90f1e;
+$c215:#b0b0b0;
+$c216:#00486f;
+$c217:#f2f2f6;
+$c218:#e4e6e7;
+$c219:#000;
+$c220:#656b8a;
+$c221:#77b8cf;
+$c222:#f8fcfd;
+$c223:#5ba5c0;
+$c224:#034a63;
+$c225:#a8a8a8;
+$c226:rgba(59, 130, 246, 0.1);
+$c227:#033f5a;
+$c228:#8CACBA;
+$c229:#E3E4E8CC;
+$c230:#e3e3e7;
+$c231:#e8e8e8;
+$c232:#003950;
+$c233:rgba(4, 80, 113, 0.1);
+$c234:#A63137;
+$c235:#A8D5E8;
+$c236:#e8e8ec;
+$c237:#f5f5f7;
+$c238:rgba(0, 0, 0, 0.05);
+$c239:#131416;
+$c240:#e3f2fd;
+$c241:#f8f8f8;
+$c242:#dce3f2;
+$c243:#b5c4e8;
+$c244:#d4efef;
+$c245:#9ecfcf;
+$c246:#d9eaf1;
+$c247:#aac8d6;
+$c248:#BDBDBD40;
+$c249:#03334826;
+$c250:rgba(4, 80, 113, 0.08);
+$c251:#f59e0b;
+$c252:#fecaca;
+$c253:rgba(99, 102, 241, 0.1);
+$c254:rgba(99, 102, 241, 0.3);
+$c255:#475bae;
+$c256:rgba(0, 123, 255, 0.25);
+$c257:#c1c1c1;
+$c258:#1976d2;
+$c259:#bbdefb;
+$c260:#1565c0;
+$c261:rgba(255, 255, 255, 0.1);
+$c262:#667085;
+$c263:#c3e6cb;
+$c264:#f8d7da;
+$c265:#f5c6cb;
+$c266:#721c24;
+$c267:#fff3cd;
+$c268:#ffeaa7;
+$c269:#856404;
+$c270:#d1ecf1;
+$c271:#bee5eb;
+$c272:#0c5460;
+$c273:rgba(174, 176, 188, 0.3);
+$c274:rgba(174, 176, 188, 0.6);
+$c275:rgba(255, 255, 255, 0.4);
+$c277:rgba(132, 181, 210, 0.25);
+$c278:rgba(132, 181, 210, 0.4);
+$c280:rgba(132, 181, 210, 0.2);
+$c281:#ff6b6b;
+$c282:rgba(255, 107, 107, 0.25);
+$c283:#02303F;
+$c284:rgba(255, 255, 255, 0.3);
+$c285:rgba(255, 255, 255, 0.5);
+$c286:rgba(255, 255, 255, 0.08);
+$c287:#f8fbff;
+$c288:rgba(255, 255, 255, 0.7);
+$c289:rgba(255, 255, 255, 0.6);
+$c290:#bcc7d0;
+$c291:#f5f7f9;
+$c292:#e8f8ef;
+$c293:#20b46a;
+$c294:#fdeeee;
+$c295:#ea5d66;
+$c296:#fff7e9;
+$c297:#efc477;
+$c298:#991b1b;
+$c299:#0052a3;
+$c300:#0066cc;
+$c301:#ee6222;
+$c302:#fce8dd;
+$c303:#b9a41f;
+$c304:#f7f4d5;
+$c305:#28a4de;
+$c306:#d9edf8;
+$c307:#edf1f3;
+$c308:#c4c4c4;
+$c309:#f0f2f5;
+$boxBackgroundGradient1: rgba(238, 242, 244, 0.9);
+$boxBackgroundGradient2: rgba(233, 239, 241, 0.72);
+
+//primary colors
+$PRUSSIAN-10:#E7F3F8;
+$PRUSSIAN-20:#C3E1EF;
+$PRUSSIAN-30:#87C4DE;
+$PRUSSIAN-40:#4FA8CF;
+$PRUSSIAN-50:#1888B9;
+$PRUSSIAN-60:#066893;
+$PRUSSIAN-70:#045071;
+$PRUSSIAN-80:#033348;
+$PRUSSIAN-90:#002231;
+$PRUSSIAN-100:#001924;
+
+// this will be used as color class
+// for new design system so that we can use it as class
+$prussian: (
+  10: $PRUSSIAN-10,
+  20: $PRUSSIAN-20,
+  30: $PRUSSIAN-30,
+  40: $PRUSSIAN-40,
+  50: $PRUSSIAN-50,
+  60: $PRUSSIAN-60,
+  70: $PRUSSIAN-70,
+  80: $PRUSSIAN-80,
+  90: $PRUSSIAN-90,
+  100: $PRUSSIAN-100
+);
+
+// it is just like key value pair data structure to create 
+// classes for color instead of coding again and again for repetitive task
+@each $key, $value in $prussian {
+  .prussian-#{$key} {
+    color: $value !important;
+  }
+}
+
+
+$CYAN-10:#EBFAFA;
+$CYAN-20:#C2F0F0;
+$CYAN-30:#91E3E3;
+$CYAN-40:#5CD6D6;
+$CYAN-50:#2FBCBC;
+$CYAN-60:#259EA5;
+$CYAN-70:#28A2A2;
+$CYAN-80:#115F5F;
+$CYAN-90:#0B4141;
+$CYAN-100:#082B2B;
+
+
+$cyan: (
+  10: $CYAN-10,
+  20: $CYAN-20,
+  30: $CYAN-30,
+  40: $CYAN-40,
+  50: $CYAN-50,
+  60: $CYAN-60,
+  70: $CYAN-70,
+  80: $CYAN-80,
+  90: $CYAN-90,
+  100: $CYAN-100
+);
+
+@each $key, $value in $cyan {
+  .cyan-#{$key} {
+    color: $value !important;
+  }
+}
+
+//Neutrals Colors
+$GREY-00:#F7F7F8;
+$GREY-10:#F1F1F4;
+$GREY-20:#E3E4E8;
+$GREY-30:#C7C9D1;
+$GREY-40:#AEB0BC;
+$GREY-50:#8F92A3;
+$GREY-60:#676B7E;
+$GREY-70:#454754;
+$GREY-80:#2E3038;
+$GREY-90:#202127;
+$GREY-100:#191A1F;
+$GREY-110:#121316;
+$GREY-120:#F1F1F1;
+
+$grey: (
+  00: $GREY-00,
+  10: $GREY-10,
+  20: $GREY-20,
+  30: $GREY-30,
+  40: $GREY-40,
+  50: $GREY-50,
+  60: $GREY-60,
+  70: $GREY-70,
+  80: $GREY-80,
+  90: $GREY-90,
+  100: $GREY-100,
+  110: $GREY-110
+);
+
+@each $key, $value in $grey {
+  .grey-#{$key} {
+    color: $value !important;
+  }
+}
+
+//Not Confirmed
+$WHITE-COOL:#F0FCFF;
+$WHITE:#FFFFFF;
+$WHITE-WARM:#FFFBF0;
+$BLACK-COOL:#12151C;
+$BLACK-WARM:#1F1E1C;
+$BLACK:#151515;
+
+//Secondary colors
+$GREEN-10:#EBFAF3;
+$GREEN-20:#CAF2DF;
+$GREEN-30:#A9EACC;
+$GREEN-40:#81E0B4;
+$GREEN-50:#A9EACC;
+$GREEN-60:#32C681;
+$GREEN-70:#1EAB69;
+$GREEN-80:#178552;
+$GREEN-90:#136A41;
+$GREEN-100:#0D4A2D;
+
+$green: (
+  10: $GREEN-10,
+  20: $GREEN-20,
+  30: $GREEN-30,
+  40: $GREEN-40,
+  50: $GREEN-50,
+  60: $GREEN-60,
+  70: $GREEN-70,
+  80: $GREEN-80,
+  90: $GREEN-90,
+  100: $GREEN-100
+);
+
+@each $key, $value in $green {
+  .green-#{$key} {
+    color: $value !important;
+  }
+}
+
+$BLUE-10:#ECEFF9;
+$BLUE-20:#C6CFF1;
+$BLUE-30:#97A8E5;
+$BLUE-40:#778DDD;
+$BLUE-50:#5D78D7;
+$BLUE-60:#4362D0;
+$BLUE-70:#2E4CB8;
+$BLUE-80:#19318B;
+$BLUE-90:#13266B;
+$BLUE-100:#0E1D51;
+
+$blue: (
+  10: $BLUE-10,
+  20: $BLUE-20,
+  30: $BLUE-30,
+  40: $BLUE-40,
+  50: $BLUE-50,
+  60: $BLUE-60,
+  70: $BLUE-70,
+  80: $BLUE-80,
+  90: $BLUE-90,
+  100: $BLUE-100
+);
+
+@each $key, $value in $blue {
+  .blue-#{$key} {
+    color: $value !important;
+  }
+}
+
+$PURPLE-10:#F1EDF9;
+$PURPLE-20:#D5CAED;
+$PURPLE-30:#B8A6E2;
+$PURPLE-40:#9C83D6;
+$PURPLE-50:#7E5DC9;
+$PURPLE-60:#6E49C3;
+$PURPLE-70:#5635A1;
+$PURPLE-80:#412879;
+$PURPLE-90:#2B1B50;
+$PURPLE-100:#20143C;
+
+$purple: (
+  10: $PURPLE-10,
+  20: $PURPLE-20,
+  30: $PURPLE-30,
+  40: $PURPLE-40,
+  50: $PURPLE-50,
+  60: $PURPLE-60,
+  70: $PURPLE-70,
+  80: $PURPLE-80,
+  90: $PURPLE-90,
+  100: $PURPLE-100
+);
+
+@each $key, $value in $purple {
+  .purple-#{$key} {
+    color: $value !important;
+  }
+}
+
+$RED-10:#FAEBEC;
+$RED-20:#F0C2C5;
+$RED-30:#E8A1A6;
+$RED-40:#DD787F;
+$RED-50:#D4545C;
+$RED-60:#C73D45;
+$RED-70:#AF2C35;
+$RED-80:#93252C;
+$RED-90:#6A1B20;
+$RED-100:#521418;
+
+$red: (
+  10: $RED-10,
+  20: $RED-20,
+  30: $RED-30,
+  40: $RED-40,
+  50: $RED-50,
+  60: $RED-60,
+  70: $RED-70,
+  80: $RED-80,
+  90: $RED-90,
+  100: $RED-100
+);
+
+@each $key, $value in $red {
+  .red-#{$key} {
+    color: $value !important;
+  }
+}
+
+$ORANGE-10:#FCEFE9;
+$ORANGE-20:#F5CFBC;
+$ORANGE-30:#F0B294;
+$ORANGE-40:#EA966C;
+$ORANGE-50:#E47944;
+$ORANGE-60:#D9642A;
+$ORANGE-70:#C9561D;
+$ORANGE-80:#A54718;
+$ORANGE-90:#703010;
+$ORANGE-100:#50220B;
+
+$orange: (
+  10: $ORANGE-10,
+  20: $ORANGE-20,
+  30: $ORANGE-30,
+  40: $ORANGE-40,
+  50: $ORANGE-50,
+  60: $ORANGE-60,
+  70: $ORANGE-70,
+  80: $ORANGE-80,
+  90: $ORANGE-90,
+  100: $ORANGE-100
+);
+
+@each $key, $value in $orange {
+  .orange-#{$key} {
+    color: $value !important;
+  }
+}
+
+$YELLOW-10:#FDFBE7;
+$YELLOW-20:#F9F3B8;
+$YELLOW-30:#F6EB8E;
+$YELLOW-40:#F2E25A;
+$YELLOW-50:#EDD926;
+$YELLOW-60:#DFCA0C;
+$YELLOW-70:#C6B410;
+$YELLOW-80:#97890C;
+$YELLOW-90:#6D6309;
+$YELLOW-100:#423C05;
+
+$yellow: (
+  10: $YELLOW-10,
+  20: $YELLOW-20,
+  30: $YELLOW-30,
+  40: $YELLOW-40,
+  50: $YELLOW-50,
+  60: $YELLOW-60,
+  70: $YELLOW-70,
+  80: $YELLOW-80,
+  90: $YELLOW-90,
+  100: $YELLOW-100
+);
+
+@each $key, $value in $yellow {
+  .yellow-#{$key} {
+    color: $value !important;
+  }
+}
+
+//Shades
+$LIGHT:#ffffff;
+$DARK:#151515;
+
+.light{
+    color:$LIGHT !important;
+}
+
+.dark{
+    color:$DARK !important;
+}

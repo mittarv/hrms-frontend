@@ -1,21 +1,23 @@
+@use '../../design/colors/customColors' as *;
+
 .edit-attendance-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(119, 184, 207, 0.39);
+  background-color: $c205;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 
   .edit-attendance-modal-content {
-    background-color: #fff;
+    background-color: $WHITE;
     border-radius: 8px;
     width: 100%;
     max-width: 500px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px $c118;
     max-height: 90vh;
     overflow-y: auto;
     padding: 32px 40px;
@@ -30,14 +32,14 @@
         font-family: "Plus Jakarta Sans";
         font-size: 18px;
         font-weight: 700;
-        color: #2e3038;
+        color: $GREY-80;
         line-height: 28px;
         letter-spacing: 0.05%;
-        border-bottom: 2px solid #2e3038;
+        border-bottom: 2px solid $GREY-80;
       }
 
       .edit-attendance-close-button {
-        background: #f1f1f4;
+        background: $GREY-10;
         border-radius: 8px;
         border: none;
         cursor: pointer;
@@ -51,25 +53,25 @@
     .modal-body {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 24px;
       font-family: "Plus Jakarta Sans";
 
         .application-status {
-        background-color: #f5f5f5;
+        background-color: $c167;
         border-radius: 4px;
         padding: 16px;
 
         &.info {
-          background-color: #c3e1ef;
+          background-color: $PRUSSIAN-20;
         }
 
         &.warning {
-          background-color: #f0c2c5;
+          background-color: $RED-20;
         }
 
         &.error {
-          border-left-color: #f5222d;
-          background-color: #fff1f0;
+          border-left-color: $c206;
+          background-color: $c207;
         }
         
         .status-header{
@@ -83,12 +85,12 @@
             .balance-summary{
                 margin: 0;
                 font-size: 13px;
-                color: #676b7e;
+                color: $GREY-60;
                 font-weight: 500;
             }     
 
             .success-text{
-             color: #045071;
+             color: $PRUSSIAN-70;
               margin: 5px 0 0 0;
               font-size: 13px;
               font-weight: 600;
@@ -99,7 +101,7 @@
             .warning-text{
               font-weight: 600;
               margin: 0 0 5px 0;  
-              color: #93252c;
+              color: $RED-80;
               margin: 5px 0 0 0;
               font-size: 13px;
               font-weight: 600;
@@ -118,12 +120,12 @@
           &.status-details {
             margin: 0;
             font-size: 13px;
-            color: #676b7e;
+            color: $GREY-60;
             font-weight: 500;
           }
 
           &.status-warning {
-            color: #93252c;
+            color: $RED-80;
             margin: 5px 0 0 0;
             font-size: 13px;
             font-weight: 600;
@@ -137,20 +139,20 @@
           margin-bottom: 8px;
           font-size: 14px;
           font-weight: 600;
-          color: #333;
+          color: $c75;
         }
 
         .employee-field {
           display: flex;
           align-items: center;
-          border: 1px solid #ddd;
+          border: 1px solid $c70;
           border-radius: 4px;
           padding: 8px 12px;
 
           .employee-avatar {
             width: 30px;
             height: 30px;
-            background-color: #e0e0e0;
+            background-color: $c66;
             border-radius: 50%;
             margin-right: 10px;
           }
@@ -166,10 +168,10 @@
         .date-field {
           display: flex;
           align-items: center;
-          border: 1px solid #ddd;
+          border: 1px solid $c70;
           border-radius: 4px;
           padding: 12px;
-          background-color: #f5f5f5;
+          background-color: $c167;
           font-size: 14px;
         }
 
@@ -180,9 +182,9 @@
 
           button {
             padding: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid $c70;
             border-radius: 32px;
-            background-color: #fff;
+            background-color: $WHITE;
             cursor: pointer;
             font-size: 14px;
             font-family: "Plus Jakarta Sans";
@@ -192,18 +194,18 @@
             transition: all 0.2s;
 
             &:hover {
-              background-color: #f5f5f5;
+              background-color: $c167;
             }
 
             &.active {
-              background-color: #045071;
+              background-color: $PRUSSIAN-70;
               border-color: none;
-              color: #ffffff;
+              color: $WHITE;
               font-weight: 600;
             }
 
             &.error {
-              border-color: #f5222d;
+              border-color: $c206;
             }
           }
         }
@@ -211,7 +213,7 @@
         input[type="text"] {
           width: 100%;
           padding: 12px 16px;
-          border: 1px solid #c7c9d1;
+          border: 1px solid $GREY-30;
           border-radius: 4px;
           resize: vertical;
           font-size: 14px;
@@ -219,7 +221,7 @@
           font-weight: 600;
 
           &::placeholder {
-            color: #8f92a3;
+            color: $GREY-50;
             font-size: 14px;
             font-family: "Plus Jakarta Sans";
             font-weight: 500;
@@ -233,7 +235,7 @@
 
         input[type="time"] {
           &.error {
-            border-color: #f5222d;
+            border-color: $c206;
           }
         }
 
@@ -246,9 +248,9 @@
 
             button {
               padding: 8px;
-              border: 1px solid #ddd;
+              border: 1px solid $c70;
               border-radius: 32px;
-              background-color: #fff;
+              background-color: $WHITE;
               cursor: pointer;
               font-size: 14px;
               font-family: "Plus Jakarta Sans";
@@ -258,18 +260,18 @@
               transition: all 0.2s;
 
               &:hover {
-                background-color: #f5f5f5;
+                background-color: $c167;
               }
 
               &.active {
-                background-color: #045071;
+                background-color: $PRUSSIAN-70;
                 border-color: none;
-                color: #ffffff;
+                color: $WHITE;
                 font-weight: 600;
               }
 
               &.error {
-                border-color: #f5222d;
+                border-color: $c206;
               }
             }
           }
@@ -280,14 +282,14 @@
           align-items: center;
           justify-content: center;
           padding: 10px;
-          border: 0.5px solid #dd787f;
+          border: 0.5px solid $RED-40;
           border-radius: 4px;
-          color: #dd787f;
+          color: $RED-40;
           margin-bottom: 10px;
         }
 
         .validation-error {
-          color: #f5222d;
+          color: $c206;
           font-size: 12px;
           margin-top: 5px;
           font-weight: 500;
@@ -295,12 +297,12 @@
 
         .profile-update-note{
           font-size: 0.9rem;
-          color: #64748b;
+          color: $c208;
 
           text-decoration: none;
 
           .update-link {
-            color: #045071;
+            color: $PRUSSIAN-70;
             text-decoration: none;
             font-weight: 600;
 
@@ -312,7 +314,6 @@
       }
 
       .file_upload_container {
-          margin-bottom: 20px;
           display: flex;
           flex-direction: column;
           gap: 10px;
@@ -320,79 +321,93 @@
           // Add to your LeaveApplication.scss
             .custom_file_Upload {
               display: flex;
-              align-items: center;
-              justify-content: center;
+              flex-direction: column;
               width: 100%;
-              border: 0.5px solid #AEB0BC;
+              border: 0.5px solid $GREY-40;
               padding: 8px 12px;
               border-radius: 8px;
+              gap: 8px;
 
               &.clickable {
                 cursor: pointer;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
               }
               
               .uploaded-file-row {
-                display: flex;
+                display: grid;
+                grid-template-columns: 24px 1fr auto auto;
                 align-items: center;
-                justify-content: space-between;
+                gap: 8px;
                 width: 100%;
+                padding: 4px 0;
+
+                &:not(:last-child) {
+                  border-bottom: 1px solid $c128;
+                  padding-bottom: 8px;
+                }
               }
 
               .file-icon-container{
                 display: flex;
                 align-items: center;
-                gap: 8px;
+                justify-content: center;
+                width: 24px;
+                flex-shrink: 0;
 
-                .file-icon {
-                  width: 24px;
-                  height: 24px;
-                  background-size: contain;
-                  background-repeat: no-repeat;
-                }
-
-                .file-name {
-                  font-size: 14px;
-                  color: #454754;
-                  font-weight: 600;
-                  flex-grow: 1;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
+                .file-type-icon {
+                  width: 20px;
+                  height: 20px;
                 }
               }
 
               .file-name{
                 font-size: 14px;
-                color: #454754;
+                color: $GREY-70;
                 font-weight: 600;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                min-width: 0;
+                background: none;
+                border: none;
+                padding: 0;
+                text-align: left;
+                cursor: pointer;
+                text-decoration: underline;
+
+                &:disabled {
+                  cursor: default;
+                  text-decoration: none;
+                }
               }
 
               .file-meta{
-                color:#676B7E;
+                color:$GREY-60;
                 font-size: 12px;
                 font-weight: 500;
+                white-space: nowrap;
+                text-align: right;
               }
 
               .delete-file-btn{
                 background: none;
                 border: none;
-                color: #f5222d;
+                color: $c206;
                 cursor: pointer;
                 font-size: 14px;
                 padding: 0;
-                margin-left: 10px;
                 display: flex;
                 align-items: center;
+                flex-shrink: 0;
               }
             }
             .file-upload-label {
               display: flex;
               align-items: center;
               justify-content: center;
-              color: #454754;
+              color: $GREY-70;
               font-size: 14px;
               cursor: pointer;
               transition: all 0.2s;
@@ -411,14 +426,22 @@
               background: none;
               cursor: pointer;
               text-decoration: underline;
-              color: #066893;
+              color: $PRUSSIAN-60;
 
             }
 
             .file-info {
               margin-top: 6px;
               font-size: 13px;
-              color: #066893;
+              color: $PRUSSIAN-60;
+            }
+
+            .file-note {
+              display: flex;
+              align-items: center;
+              font-size: 12px;
+              color: $GREY-60;
+              margin-top: 6px;
             }
         }
 
@@ -433,18 +456,18 @@
           input[type="time"] {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #ddd;
+            border: 1px solid $c70;
             border-radius: 4px;
             font-size: 14px;
             font-family: "Plus Jakarta Sans";
 
             &:focus {
               outline: none;
-              border-color: #1890ff;
+              border-color: $c209;
             }
 
             &.error {
-              border-color: #f5222d;
+              border-color: $c206;
             }
           }
         }
@@ -476,24 +499,24 @@
           font-weight: 600;
 
           &.delete-button {
-            background-color: #fff;
-            border: 1px solid #C73D45;
-            color: #C73D45;
+            background-color: $WHITE;
+            border: 1px solid $RED-60;
+            color: $RED-60;
             cursor: pointer;
 
           &.disabled {
-            background-color: #f5f5f5;
-            border: 1px solid #ddd;
-            color: #bfbfbf;
+            background-color: $c167;
+            border: 1px solid $c70;
+            color: $c210;
             cursor: not-allowed;
           }
 
           }
 
           &.update-button {
-            background-color: #045071;
+            background-color: $PRUSSIAN-70;
             border: none;
-            color: #fff;
+            color: $WHITE;
           }
         }
       }

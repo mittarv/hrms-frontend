@@ -5,6 +5,7 @@ import PayslipPreview from "./PayslipPreview";
 import View_Icon from "../../../assets/icons/view_icon.svg";
 import downloadIconBlue from "../../../assets/icons/download_icon_blue.svg";
 import LoadingSpinner from "../../../Common/components/LoadingSpinner";
+import NoResultsContainer from "../../../Common/components/NoResultsContainer";
 import { downloadPayslipPdf } from "../../../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
 const PayslipTable = () => {
@@ -67,21 +68,23 @@ const PayslipTable = () => {
         <h2>Payslips</h2>
       </div>
 
-      {payslipLoading ? <LoadingSpinner message="Loading Payslips"/> : <div className="payslip-table-wrapper">
-        <table className="payslip-table">
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>Earnings</th>
-              <th>Reimbursements</th>
-              <th>Deductions</th>
-              <th>Net Pay</th>
-              <th>Action(s)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payslipData && payslipData.length > 0 ? (
-              payslipData.map((payslip) => {
+      {payslipLoading ? (
+        <LoadingSpinner message="Loading Payslips"/>
+      ) : payslipData && payslipData.length > 0 ? (
+        <div className="payslip-table-wrapper">
+          <table className="payslip-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Earnings</th>
+                <th>Reimbursements</th>
+                <th>Deductions</th>
+                <th>Net Pay</th>
+                <th>Action(s)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payslipData.map((payslip) => {
                 const { earnings, reimbursements, deductions } =
                   calculateTotals(payslip.payslipItems);
 
@@ -114,17 +117,17 @@ const PayslipTable = () => {
                     </td>
                   </tr>
                 );
-              })
-            ) : (
-              <tr>
-                <td colSpan="6" className="no-data">
-                  No payslip data available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>}
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <NoResultsContainer
+          showImage={true}
+          message="We couldn't find anyone matching your search."
+          subMessage="Try searching with different details."
+        />
+      )}
 
       {/* Payslip Preview Modal */}
       {selectedPayslip && (

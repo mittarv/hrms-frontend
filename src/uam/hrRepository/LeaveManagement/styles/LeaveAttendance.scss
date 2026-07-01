@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .leave_attendance_main_container {
     display: flex;
     flex-direction: column;
@@ -9,7 +11,7 @@
     .leave_attendance_header_container {
         width: 100%;
         height: auto;
-        border: 0.5px solid #aeb0bc;
+        border: 0.5px solid $GREY-40;
         border-radius: 8px;
         display: flex;
         justify-content: space-between;
@@ -26,7 +28,7 @@
                 font-weight: 700;
                 font-size: 12px;
                 line-height: 20px;
-                color: #676b7e;
+                color: $GREY-60;
                 text-transform: uppercase;
                 letter-spacing: 0.03em;
             }
@@ -35,7 +37,7 @@
                 font-weight: 600;
                 font-size: 16px;
                 line-height: 24px;
-                color: #2e3038;
+                color: $GREY-80;
                 letter-spacing: 0.005em;
             }
         }
@@ -52,21 +54,21 @@
                 gap: 4px;
                 background-color: transparent;
                 padding: 12px 16px;
-                border: 1px solid #045071;
+                border: 1px solid $PRUSSIAN-70;
                 border-radius: 8px;
                 font-family: "Plus Jakarta Sans";
                 font-weight: 600;
                 font-size: 14px;
                 line-height: 20px;
                 letter-spacing: 0.01em;
-                color: #045071;
+                color: $PRUSSIAN-70;
                 cursor: pointer;
             }
 
             .leave_attendance_header_button {
                 display: flex;
                 gap: 4px;
-                background-color: #045071;
+                background-color: $PRUSSIAN-70;
                 padding: 12px 16px;
                 border: none;
                 border-radius: 8px;
@@ -75,7 +77,7 @@
                 font-size: 14px;
                 line-height: 20px;
                 letter-spacing: 0.01em;
-                color: #fff;
+                color: $WHITE;
                 cursor: pointer;
             }
         }
@@ -92,20 +94,20 @@
             width: 100%;
             height: auto;
             border: none;
-            border-bottom: 0.5px solid #aeb0bc;
+            border-bottom: 0.5px solid $GREY-40;
             padding: 12px 16px 12px 32px;
             font-family: "Plus Jakarta Sans";
             font-weight: 500;
             font-size: 14px;
             line-height: 20px;
             letter-spacing: 0.01em;
-            color: #8f92a3;
+            color: $GREY-50;
 
             &:focus {
                 outline: none;
             }
             &::placeholder {
-                color: #8f92a3;
+                color: $GREY-50;
                 font-family: "Plus Jakarta Sans";
                 font-weight: 400;
                 font-size: 14px;
@@ -118,8 +120,8 @@
             position: absolute;
             right: 0;
             padding: 8px 12px;
-            background-color: #045071;
-            color: #ffffff;
+            background-color: $PRUSSIAN-70;
+            color: $LIGHT;
             font-family: "Plus Jakarta Sans";
             font-weight: 600;
             font-size: 14px;
@@ -140,9 +142,9 @@
             top: 120%;
             left: 0;
             width: 100%;
-            background-color: #fff;
+            background-color: $WHITE;
             border-radius: 4px;
-            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 16px $c69;
             z-index: 1;
             max-height: 200px;
             overflow-y: auto;
@@ -156,7 +158,7 @@
                 cursor: pointer;
 
                 &:hover {
-                    background-color: #F1F1F4;
+                    background-color: $GREY-10;
                 }
 
                 img {
@@ -172,7 +174,7 @@
                     font-family: "Plus Jakarta Sans";
                     font-weight: 600;
                     font-size: 12px;
-                    color: #454754;
+                    color: $GREY-70;
                     letter-spacing: 0.01em;
                 }
             }
@@ -180,9 +182,9 @@
 
         .no_result_found{
             width: 100%;
-            background-color: #fff;
+            background-color: $WHITE;
             border-radius: 4px;
-            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 4px 16px $c69;
             z-index: 1;
             padding: 12px 16px;
             font-family: "Plus Jakarta Sans";
@@ -190,7 +192,7 @@
             font-size: 14px;
             line-height: 20px;
             letter-spacing: 0.01em;
-            color: #8f92a3;
+            color: $GREY-50;
         }
     }
 
@@ -204,7 +206,7 @@
             font-weight: 600;
             font-size: 12px;
             line-height: 20px;
-            color: #676b7e;
+            color: $GREY-60;
             letter-spacing: 0.01em;
         }
 
@@ -219,7 +221,7 @@
                 font-weight: 600;
                 font-size: 16px;
                 line-height: 24px;
-                color: #2e3038;
+                color: $GREY-80;
                 letter-spacing: 0.01em;
                 padding: 4px 0px;
             }
@@ -234,7 +236,7 @@
 
             .reset_slected_employee{
                 margin-left: 16px;
-                background-color: #F1F1F4;
+                background-color: $GREY-10;
                 border: none;
                 border-radius: 8px;
                 padding: 8px 10px;
@@ -249,7 +251,7 @@
         justify-content: space-between;
         font-family: "Plus Jakarta Sans";
         margin-top: 8px;
-        border: 0.5px solid #aeb0bc;
+        border: 0.5px solid $GREY-40;
         border-radius: 8px;
         padding: 16px;
 
@@ -257,7 +259,7 @@
             font-weight: 600;
             font-size: 16px;
             line-height: 24px;
-            color: #2e3038;
+            color: $GREY-80;
             letter-spacing: 0.01em;
         }
 
@@ -273,7 +275,7 @@
 
         &:hover {
             cursor: pointer;
-            background-color: #f2f2f6;
+            background-color: $c217;
         }
 
     }

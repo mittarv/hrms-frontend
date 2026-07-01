@@ -2,26 +2,25 @@ import "../styles/LeaveStatus.scss";
 import Plus_icon from "../../assets/icons/Plus_icon.svg";
 import { useEffect, useState } from "react";
 import LeaveApplication from "./LeaveApplication";
-import UploadProofPopup from "./UploadProofPopup";
-import Upload_icon from "../../assets/icons/upload_icon_blue.svg";
-import Upload_icon_disable from "../../assets/icons/upload_icon_grey.svg";
 import View_icon from "../../assets/icons/view_icon.svg";
 import {
   getEmployeeLeaveHistory,
-  uploadProofDocuments,
   getCurrentEmployeeDetails,
 } from "../../../../actions/hrRepositoryAction";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { getLeaveType, getComponentTypeValue } from "../../Common/utils/helper";
+import FileViewer from "../../Common/components/FileViewerPop";
+import { getLeaveType, getComponentTypeValue, handleViewProofClick } from "../../Common/utils/helper";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 const LeaveStatus = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 20;
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const [applyLeave, setApplyLeave] = useState(false);
-  const [uploadProof, setUploadProof] = useState(false);
-  const [selectedLeaveForUpload, setSelectedLeaveForUpload] = useState(null);
-  const { loading, currentEmployeeDetailsLoading,  employeeLeaveHistory, currentEmployeeDetails, allExisitingLeaves, getAllComponentType, myHrmsAccess} = useSelector(
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [filesToView, setFilesToView] = useState([]);
+  const { loading, currentEmployeeDetailsLoading,  employeeLeaveHistory,employeeLeavePagination, currentEmployeeDetails, allExisitingLeaves, getAllComponentType, myHrmsAccess} = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
@@ -29,13 +28,34 @@ const LeaveStatus = () => {
   const hasAccessToLeaveStatus=myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
 
   useEffect(() => {
-    dispatch(
-      getEmployeeLeaveHistory(
-        user?.employeeUuid
-      )
-    );
     dispatch(getCurrentEmployeeDetails(user?.employeeUuid));
   }, [dispatch, user]);
+
+  useEffect(() => {
+    if (user?.employeeUuid) {
+      dispatch(getEmployeeLeaveHistory(user.employeeUuid, currentPage, pageSize));
+    }
+  }, [dispatch, user, currentPage]);
+  const paginatedLeaveHistory = employeeLeaveHistory || [];
+  const totalPagesState = employeeLeavePagination?.totalPages || Math.max(
+    1,
+    Math.ceil((employeeLeaveHistory?.length || 0) / pageSize)
+  );
+  const getVisiblePages = () => {
+    const totalPages = totalPagesState;
+    const visibleCount = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(visibleCount / 2));
+    let endPage = startPage + visibleCount - 1;
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - visibleCount + 1);
+    }
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
 
   const formatDateRange = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -80,150 +100,179 @@ const LeaveStatus = () => {
     return leaveType || "Leave";
   };
 
-  const handleUpload = (leaveRequestId) => {
-    // Find the leave data for the selected request
-    const leaveData = employeeLeaveHistory.find(
-      (leave) => leave.leaveRequestId === leaveRequestId
-    );
-
-    if (leaveData) {
-      setSelectedLeaveForUpload(leaveData);
-      setUploadProof(true);
-    }
-  };
-
   const handleViewProof = (leaveRequestId) => {
-    // Handle viewing uploaded proof
     const leaveData = employeeLeaveHistory.find(
       (leave) => leave.leaveRequestId === leaveRequestId
     );
-    if (leaveData && leaveData.attachmentPath) {
-      // Open the attachment - you might want to open in a modal or new tab
-      window.open(leaveData.attachmentPath, "_blank");
+    if (leaveData?.attachmentPath) {
+      handleViewProofClick(leaveData.attachmentPath, setFilesToView, setViewerOpen);
     }
   };
 
-  const handleUploadSubmit = (uploadData, leaveReqeustId) => {
-    dispatch(
-      uploadProofDocuments(
-        uploadData,
-        leaveReqeustId,
-        currentEmployeeDetails.employeeBasicDetails?.empUuid
-      )
-    );
+  const handleCloseViewer = () => {
+    setViewerOpen(false);
+    setFilesToView([]);
   };
 
-  const closeUploadPopup = () => {
-    setUploadProof(false);
-    setSelectedLeaveForUpload(null);
+  const hasValidProofAttachment = (attachmentPath) => {
+    let parsedAttachments = [];
+
+    if (typeof attachmentPath === "string") {
+      try {
+        parsedAttachments = JSON.parse(attachmentPath);
+      } catch {
+        parsedAttachments = attachmentPath.trim() !== "" ? [attachmentPath] : [];
+      }
+    } else if (attachmentPath && typeof attachmentPath === "object" && attachmentPath.type === "Buffer") {
+      try {
+        const decoder = new TextDecoder("utf-8");
+        const bufferString = decoder.decode(new Uint8Array(attachmentPath.data || []));
+        if (!bufferString || bufferString.trim() === "") return false;
+        parsedAttachments = JSON.parse(bufferString);
+      } catch {
+        return false;
+      }
+    } else if (Array.isArray(attachmentPath)) {
+      parsedAttachments = attachmentPath;
+    }
+
+    if (!Array.isArray(parsedAttachments)) {
+      parsedAttachments = [parsedAttachments];
+    }
+
+    return parsedAttachments.some((item) =>
+        item && (
+          (typeof item === "object" && item.base64) ||
+          (typeof item === "string" && item.trim() !== "")
+        )
+    );
   };
 
   const renderProofButton = (leave) => {
-    const isProofRequired = leave.approvalStatus === "proof_required";
-    const hasAttachment = leave.attachmentPath !== null;
+    const hasAttachment = hasValidProofAttachment(leave?.attachmentPath);
 
-    if (isProofRequired) {
-      if (hasAttachment) {
-        // Proof required and attachment exists 
-        return (
-          <button
-            className="view-proof-button"
-            onClick={() => handleViewProof(leave.leaveRequestId)}
-          >
-            <img src={View_icon} alt="View" /> View Proof Uploaded
-          </button>
-        );
-      } else {
-        // Proof required but no attachment 
-        return (
-          <button
-            className="upload-button"
-            onClick={() => handleUpload(leave.leaveRequestId)}
-          >
-            <img src={Upload_icon} alt="Upload" /> Upload
-          </button>
-        );
-      }
-    } else {
-      // Proof not required - show disabled "Upload" button
+    if (hasAttachment) {
       return (
-        <button className="upload_button_disable" disabled>
-          <img src={Upload_icon_disable} alt="Upload disabled" /> Upload
+        <button
+          className="view-proof-button"
+          onClick={() => handleViewProof(leave.leaveRequestId)}
+        >
+          <img src={View_icon} alt="View" /> View proof
         </button>
       );
     }
+
+    return "N/A";
   };
 
   return (
     <>
-      {(loading || currentEmployeeDetailsLoading)? <LoadingSpinner message="Loading Your Leave Status..." height="40vh" />
-      :
-      <div className="leave_status_main_container">
-        <div className="leave_status_header_container">
-          <span className="leave_status_header">
-            <p className="leave_status_header_title">{`Employee Type`}</p>
-            <p className="leave_status_header_subtitle">
-              {getComponentTypeValue(
-                currentEmployeeDetails?.employeeCurrentJobDetails?.empType,
-                getAllComponentType
-              ) || ""}
-              {` ${(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToLeaveStatus) ? " | Admin" : ""}`}
-            </p>
-          </span>
-          <button
-            className="leave_status_header_button"
-            onClick={() => setApplyLeave(true)}
-          >
-            <img src={Plus_icon} alt="Plus_icon" />
-            <span>Apply For Leave</span>
-          </button>
-        </div>
-
-        <div className="applied_leaves_container">
-          <div className="applied_leaves_header">
-            <p>{`Applied Leaves (${new Date().getFullYear()} - ${
-              new Date().getFullYear() + 1
-            })`}</p>
+      {(loading || currentEmployeeDetailsLoading)?(<LoadingSpinner message="Loading Your Leave Status..." height="40vh" />
+      ) : (
+        <div className="leave_status_main_container">
+          <div className="leave_status_header_container">
+            <span className="leave_status_header">
+              <p className="leave_status_header_title">{`Employee Type`}</p>
+              <p className="leave_status_header_subtitle">
+                {getComponentTypeValue(
+                  currentEmployeeDetails?.employeeCurrentJobDetails?.empType,
+                  getAllComponentType
+                ) || ""}
+                {` ${(allToolsAccessDetails?.[selectedToolName] >= 900 || hasAccessToLeaveStatus) ? " | Admin" : ""}`}
+              </p>
+            </span>
+            <button
+              className="leave_status_header_button"
+              onClick={() => setApplyLeave(true)}
+            >
+              <img src={Plus_icon} alt="Plus_icon" />
+              <span>Apply For Leave</span>
+            </button>
           </div>
 
-          <div className="leaves_table_container">
-            <table className="leaves_table">
-              <thead>
-                <tr>
-                  <th>Leave Duration</th>
-                  <th>Leave Type</th>
-                  <th>Reason</th>
-                  <th>Application Status</th>
-                  <th>Proof (if required)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employeeLeaveHistory &&
-                  employeeLeaveHistory.map((leave) => (
-                    <tr key={leave.leaveRequestId}>
-                      <td>{formatDateRange(leave.startDate, leave.endDate)}</td>
-                      <td>{getLeaveTypeName(leave.leaveConfigId)}</td>
-                      <td className="reason-cell" title={leave.remarks}>
-                        {leave.remarks || "No remarks"}
+          <div className="applied_leaves_container">
+            <div className="applied_leaves_header">
+              <p>{`Applied Leaves (${new Date().getFullYear()} - ${
+                new Date().getFullYear() + 1
+                })`}</p>
+            </div>
+
+            <div className="leaves_table_container">
+              <table className="leaves_table">
+                <thead>
+                  <tr>
+                    <th>Leave Duration</th>
+                    <th>Leave Type</th>
+                    <th>Reason</th>
+                    <th>Application Status</th>
+                    <th>Proof</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedLeaveHistory?.length > 0 ? (
+                    paginatedLeaveHistory.map((leave) => (
+                      <tr key={leave.leaveRequestId}>
+                        <td>{formatDateRange(leave.startDate, leave.endDate)}</td>
+                        <td>{getLeaveTypeName(leave.leaveConfigId)}</td>
+                        <td className="reason-cell" title={leave.remarks}>
+                          {leave.remarks || "No remarks"}
+                        </td>
+                        <td>
+                          <span
+                            className={`status-badge ${getStatusClass(
+                              leave.approvalStatus
+                            )}`}
+                          >
+                            {leave.approvalStatus.replace("_", " ")}
+                          </span>
+                        </td>
+                        <td>{renderProofButton(leave)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>
+                        No Leave History Found
                       </td>
-                      <td>
-                        <span
-                          className={`status-badge ${getStatusClass(
-                            leave.approvalStatus
-                          )}`}
-                        >
-                          {leave.approvalStatus.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td>{renderProofButton(leave)}</td>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+
+              <div className="leave-pagination-wrapper">
+                <button
+                  className="leave-page-btn nav-btn"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                >
+                  Prev
+                </button>
+
+                {getVisiblePages().map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    className={`leave-page-btn ${currentPage === pageNum ? "active-page" : ""
+                      }`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+
+                <button
+                  className="leave-page-btn nav-btn"
+                  disabled={currentPage === totalPagesState}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPagesState))
+                  }
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      }
+      )}
 
       {applyLeave && (
         <LeaveApplication
@@ -231,15 +280,12 @@ const LeaveStatus = () => {
           onClose={() => setApplyLeave(false)}
         />
       )}
-      {uploadProof && (
-        <UploadProofPopup
-          isOpen={uploadProof}
-          onClose={closeUploadPopup}
-          leaveData={selectedLeaveForUpload}
-          onUpload={handleUploadSubmit}
-          loading={loading}
-        />
-      )}
+      <FileViewer
+        fileUrls={filesToView}
+        open={viewerOpen}
+        onClose={handleCloseViewer}
+        initialIndex={0}
+      />
     </>
   );
 };

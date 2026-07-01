@@ -1,18 +1,19 @@
+@use '../../design/colors/customColors' as *;
 
-$primary-color: #045071;
-$primary-hover: #033348;
-$warning-color: #f59e0b;
-$error-color: #dc2626;
-$success-color: #10b981;
-$text-primary: #033348;
-$text-secondary: #6b7280;
-$text-light: #9ca3af;
-$border-color: #e5e7eb;$border-light: #f3f4f6;
-$background-light: #f8fafc;
-$background-error: #fef2f2;
-$border-error: #fecaca;
-$shadow-light: rgba(0, 0, 0, 0.1);
-$shadow-medium: rgba(0, 0, 0, 0.15);
+$primary-color: $PRUSSIAN-70;
+$primary-hover: $PRUSSIAN-80;
+$warning-color: $c251;
+$error-color: $c121;
+$success-color: $c136;
+$text-primary: $PRUSSIAN-80;
+$text-secondary: $c87;
+$text-light: $c98;
+$border-color: $c95;$border-light: $c94;
+$background-light: $c187;
+$background-error: $c122;
+$border-error: $c252;
+$shadow-light: $c69;
+$shadow-medium: $c118;
 $border-radius: 8px;
 $border-radius-large: 16px;
 $border-radius-medium: 12px;
@@ -53,7 +54,7 @@ $font-family: 'Plus Jakarta Sans';
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: $c166;
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   display: flex;
@@ -65,7 +66,7 @@ $font-family: 'Plus Jakarta Sans';
 }
 
 .checkout-popup {
-  background: #ffffff;
+  background: $WHITE;
   border-radius: $border-radius-large;
   box-shadow: 0 20px 40px $shadow-medium;
   width: 100%;
@@ -117,7 +118,7 @@ $font-family: 'Plus Jakarta Sans';
 
     &:hover {
       background: $border-light;
-      color: #374151;
+      color: $c88;
     }
 
     &:focus {
@@ -133,7 +134,7 @@ $font-family: 'Plus Jakarta Sans';
 
   &__info {
     background: $background-light;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $c161;
     border-radius: $border-radius-medium;
     padding: 1.25rem;
     margin-bottom: 1.5rem;
@@ -202,7 +203,7 @@ $font-family: 'Plus Jakarta Sans';
     align-items: center;
     gap: 0.5rem;
     font-weight: 600;
-    color: #374151;
+    color: $c88;
     font-size: 0.875rem;
   }
 
@@ -212,17 +213,17 @@ $font-family: 'Plus Jakarta Sans';
     border-radius: $border-radius;
     font-size: 1rem;
     transition: $transition;
-    background: #ffffff;
+    background: $WHITE;
     font-family: inherit;
 
     &:focus {
       outline: none;
       border-color: $primary-color;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      box-shadow: 0 0 0 3px $c253;
     }
 
     &:disabled {
-      background: #f9fafb;
+      background: $c154;
       cursor: not-allowed;
       opacity: 0.7;
     }
@@ -286,24 +287,24 @@ $font-family: 'Plus Jakarta Sans';
     }
 
     &--secondary {
-      background: #ffffff;
+      background: $WHITE;
       color: $text-secondary;
-      border: 1px solid #d1d5db;
+      border: 1px solid $c86;
 
       &:hover:not(:disabled) {
-        background: #f9fafb;
+        background: $c154;
         border-color: $text-light;
       }
     }
 
     &--primary {
       background: $primary-color;
-      color: #ffffff;
+      color: $WHITE;
 
       &:hover:not(:disabled) {
         background: $primary-hover;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 12px $c254;
       }
     }
   }

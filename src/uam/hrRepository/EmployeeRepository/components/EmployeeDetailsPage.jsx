@@ -3,6 +3,11 @@ import { formSections, govIdTypes, sectionFieldMapping } from "../utils/Employee
 import Back_icon from "../../assets/icons/leftEmployeeArrow.svg";
 import Dropdown_Arrow from "../../assets/icons/dropdow_arrow.svg";
 import Edit_Button from "../../assets/icons/edit_button.svg";
+import Checkbox_Checked from "../../assets/icons/checkbox_checked.svg";
+import Checkbox_Unchecked from "../../assets/icons/checkbox_unchecked.svg";
+import EmployeeChoiceIcon from "../../assets/icons/award_blue_icon.svg";
+import LeadershipChoiceIcon from "../../assets/icons/achivement_green_icon.svg";
+import Cross_icon from "../../assets/icons/cross_icon.svg";
 import { Link, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { formatDate } from "../utils/EmployeeRepositoryData";
@@ -14,8 +19,10 @@ import {
   getAllLeaves,
   getEmployeeLeaveBalance,
   getSalaryComponents,
+  getAllCountriesDetails,
 } from "../../../../actions/hrRepositoryAction";
 import "../styles/EmployeeDetailsPage.scss";
+import "../../RewardsRecognition/styles/RewardsTabs.scss";
 import { useDispatch } from "react-redux";
 import EmployeeRepositoryPopup from "./EmployeeRepositoryPopup";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
@@ -23,6 +30,28 @@ import ConversionDatePopup from "../../Common/components/ConversionDatePopup";
 import CustomDropdown from "../../Common/components/CustomDropdown";
 import CurrencyInput from "../../Common/components/CurrencyInput";
 import { findMatchingKey, getComponentTypeValue } from "../../Common/utils/helper";
+import { getFilteredLevelValues } from "../../Common/utils/payrollLevelUtils";
+import { OFFBOARDING_STATUS } from "../../Common/utils/enums";
+import Snackbar from "../../Common/components/Snackbar";
+import { State } from "country-state-city";
+
+const INDIA_COUNTRY_CODE = "IN";
+
+const BASIC_INFO_ADDITIONAL_FIELDS = [
+  {
+    name: "secondaryLocation",
+    label: "Secondary Working Location",
+    type: "india-state-select",
+    validationRules: { required: false },
+    placeholder: "Select secondary working state",
+  },
+  {
+    name: "isSecondarySameAsPrimary",
+    label: "Same as Primary Location",
+    type: "manager-toggle",
+    validationRules: { required: false },
+  },
+];
 
 const EmployeeDetailsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,13 +63,12 @@ const EmployeeDetailsPage = () => {
   const [formData, setFormData] = useState({});
   const [initialFormData, setInitialFormData] = useState({});
   const [expandedSections, setExpandedSections] = useState({});
-  const [changedFields, setChangedFields] = useState({});
   const [errors, setErrors] = useState({});
   const hrRepositoryReducer = useSelector((state) => state?.hrRepositoryReducer);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
-  const loading = hrRepositoryReducer?.loading ?? false;
+  const currentEmployeeDetailsLoading = hrRepositoryReducer?.currentEmployeeDetailsLoading ?? false;
   const getAllComponentType = useMemo(
     () => hrRepositoryReducer?.getAllComponentType ?? {},
     [hrRepositoryReducer?.getAllComponentType]
@@ -69,12 +97,107 @@ const EmployeeDetailsPage = () => {
     () => hrRepositoryReducer?.defaultComponents ?? {},
     [hrRepositoryReducer?.defaultComponents]
   );
+  const indiaStateDropdownOptions = useMemo(() => {
+    const states = State.getStatesOfCountry(INDIA_COUNTRY_CODE) || [];
+
+    return states
+      .map((state) => ({
+        key: state?.isoCode || state?.name,
+        value: state?.name,
+      }))
+      .filter((option) => option.value)
+      .sort((a, b) => a.value.localeCompare(b.value));
+  }, []);
+  const mergedFormSections = useMemo(
+    () =>
+      formSections.map((section) => {
+        if (section.id !== "basic-info") {
+          return section;
+        }
+
+        const hasSecondaryLocation = section.fields.some(
+          (field) => field.name === "secondaryLocation"
+        );
+        const hasSameAsPrimary = section.fields.some(
+          (field) => field.name === "isSecondarySameAsPrimary"
+        );
+
+        if (hasSecondaryLocation && hasSameAsPrimary) {
+          return section;
+        }
+
+        const nextFields = [];
+        section.fields.forEach((field) => {
+          nextFields.push(field);
+
+          if (field.name === "state") {
+            if (!hasSecondaryLocation) {
+              nextFields.push(BASIC_INFO_ADDITIONAL_FIELDS[0]);
+            }
+            if (!hasSameAsPrimary) {
+              nextFields.push(BASIC_INFO_ADDITIONAL_FIELDS[1]);
+            }
+          }
+        });
+
+        return {
+          ...section,
+          fields: nextFields,
+        };
+      }),
+    []
+  );
+  const effectiveSectionFieldMapping = useMemo(() => {
+    const existingBasicInfo = sectionFieldMapping["basic-info"] || [];
+    const existingOtherInfo = sectionFieldMapping["other-info"] || [];
+    const hasSecondaryLocation = existingBasicInfo.some(
+      (field) => field.name === "secondaryLocation"
+    );
+    const hasSameAsPrimary = existingBasicInfo.some(
+      (field) => field.name === "isSecondarySameAsPrimary"
+    );
+
+    return {
+      ...sectionFieldMapping,
+      "basic-info": [
+        ...existingBasicInfo,
+        ...(hasSecondaryLocation
+          ? []
+          : [{ name: "secondaryLocation", label: "Secondary Working Location" }]),
+        ...(hasSameAsPrimary
+          ? []
+          : [{ name: "isSecondarySameAsPrimary", label: "Same as Primary Location" }]),
+      ],
+      "other-info": existingOtherInfo.filter(
+        (field) => field.name !== "secondaryLocation" && field.name !== "isSecondarySameAsPrimary"
+      ),
+    };
+  }, []);
 
   // Latest job details of employee
   // latest job details of employee would include the latest employee job de
   const latestJobDetails = useMemo(
     () => hrRepositoryReducer?.currentEmployeeDetails?.employeeLatestJobDetails ?? {},
     [hrRepositoryReducer?.currentEmployeeDetails?.employeeLatestJobDetails]
+  );
+  const resolveLocationLabel = useCallback(
+    (locationValue) => {
+      const normalized = String(locationValue || "").trim();
+      if (!normalized) return "";
+
+      const locationMap = getAllComponentType?.location_dropdown || {};
+      if (locationMap[normalized]) {
+        return locationMap[normalized];
+      }
+
+      const matchedEntry = Object.entries(locationMap).find(([, label]) => label === normalized);
+      if (matchedEntry) {
+        return matchedEntry[1];
+      }
+
+      return normalized;
+    },
+    [getAllComponentType?.location_dropdown]
   );
 
   
@@ -88,21 +211,35 @@ const EmployeeDetailsPage = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [multiFieldStates, setMultiFieldStates] = useState({});
   const [showJoiningPopup, setShowJoiningPopup] = useState(false);
+  const [offboardingDetails, setOffboardingDetails] = useState({});
+  const [selectedAwardModal, setSelectedAwardModal] = useState(null);
   const lastApiCallRef = useRef(null);
   const hasAccessToEditEmployee = allToolsAccessDetails?.[selectedToolName] >= 900 || 
     myHrmsAccess?.permissions?.some(perm => perm.name === "ActiveEmployee_update");
 
+  // Fetch component types once if not already loaded
+  useEffect(() => {
+    if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
+      dispatch(getAllComponentTypes());
+    }
+  }, [dispatch, getAllComponentType]);
+
+  // Fetch employee-specific data when employeeUuid changes
   useEffect(() => {
     if (employeeUuid) {
-      if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
-            dispatch(getAllComponentTypes());
-      }
+      // Reset stale state from previous employee
+      setFormData({});
+      setInitialFormData({});
+      setOffboardingDetails({});
+      setErrors({});
+
       dispatch(getAllManagers());
+      dispatch(getAllCountriesDetails());
       dispatch(getCurrentEmployeeDetails(employeeUuid));
       dispatch(getAllLeaves());
       dispatch(getEmployeeLeaveBalance(employeeUuid));
     }
-  }, [employeeUuid, dispatch, getAllComponentType]);
+  }, [employeeUuid, dispatch]);
 
 
   useEffect(() => {
@@ -141,11 +278,6 @@ const EmployeeDetailsPage = () => {
         ...prev,
         empLevel: ""
       }));
-
-      setChangedFields(prev => ({
-        ...prev,
-        empLevel: true
-      }));
     }
 
     // Clear year of study if employee type is not Intern or Extended Intern
@@ -158,11 +290,6 @@ const EmployeeDetailsPage = () => {
       setErrors(prev => ({
         ...prev,
         empYearOfStudy: ""
-      }));
-
-      setChangedFields(prev => ({
-        ...prev,
-        empYearOfStudy: true
       }));
     }
   }, [formData?.empType, isEditing, formData?.empYearOfStudy]);
@@ -288,7 +415,11 @@ const EmployeeDetailsPage = () => {
         employeeAddressDetails,
         employeeBankDetails,
         employeeAdvanceSalaryDetails,
+        employeeOffboardingDetails,
       } = currentEmployeeDetails;
+
+      // Store offboarding details separately (read-only, not part of formData)
+      setOffboardingDetails(employeeOffboardingDetails || {});
 
       const initialFormData = {
         ...employeeBasicDetails,
@@ -349,6 +480,12 @@ const EmployeeDetailsPage = () => {
           initialFormData?.state;
       }
 
+      if (initialFormData?.isSecondarySameAsPrimary) {
+        initialFormData.secondaryLocation = resolveLocationLabel(
+          employeeAddressDetails?.state || initialFormData?.state || ""
+        );
+      }
+
       if (initialFormData?.empLevel != null && initialFormData.empLevel.toString()) {
         initialFormData.empLevel =
         getAllComponentType?.level_dropdown && getAllComponentType?.level_dropdown[
@@ -366,17 +503,24 @@ const EmployeeDetailsPage = () => {
       setFormData(initialFormData);
       setInitialFormData(initialFormData);
     }
-  }, [currentEmployeeDetails, getAllComponentType, getEmployeeType, getEmployeeDepartment, getManagerName]);
+  }, [
+    currentEmployeeDetails,
+    getAllComponentType,
+    getEmployeeType,
+    getEmployeeDepartment,
+    getManagerName,
+    resolveLocationLabel,
+  ]);
 
   useEffect(() => {
     if (isEditing) {
-      const allExpanded = formSections?.reduce((acc, section) => {
+      const allExpanded = mergedFormSections?.reduce((acc, section) => {
         acc[section.id] = true;
         return acc;
       }, {});
       setExpandedSections(allExpanded);
     }
-  }, [isEditing]);
+  }, [isEditing, mergedFormSections]);
 
   // Separate effect for parsing empGovId data to avoid infinite loops
   useEffect(() => {
@@ -430,11 +574,47 @@ const EmployeeDetailsPage = () => {
     }
   };
 
+  // Compare two values (current vs initial); handles strings, empGovId JSON, and empty equivalence.
+  const isValueEqual = useCallback((key, current, initial) => {
+    const empty = (v) => v === undefined || v === null || v === "";
+    if (empty(current) && empty(initial)) return true;
+    if (typeof current === "string" && typeof initial === "string") {
+      if (current.trim() === initial.trim()) return true;
+      if (key === "empGovId") {
+        try {
+          const pa = JSON.parse(current);
+          const pb = JSON.parse(initial);
+          return pa?.govIdType === pb?.govIdType && pa?.govIdNumber === pb?.govIdNumber;
+        } catch {
+          return current === initial;
+        }
+      }
+    }
+    return current === initial;
+  }, []);
+
+  // Build payload with only fields whose value actually changed from initial (so we never send unchanged data).
+  const getActuallyChangedFormData = useCallback(() => {
+    const allKeys = new Set([
+      ...Object.keys(formData || {}),
+      ...Object.keys(initialFormData || {}),
+    ]);
+    const changed = {};
+    allKeys.forEach((key) => {
+      const current = formData?.[key];
+      const initial = initialFormData?.[key];
+      if (!isValueEqual(key, current, initial)) {
+        changed[key] = formData[key];
+      }
+    });
+    return changed;
+  }, [formData, initialFormData, isValueEqual]);
+
   //Validation to ensure that all required fields are filled in before sending changes to the approver.
   //This validation is applied only if the user is not an admin or if the user is
   const validateFormData = () => {
     const newErrors = {};
-    formSections?.forEach((section) => {
+    mergedFormSections?.forEach((section) => {
       section?.fields?.forEach((field) => {
         let value = formData[field?.name];
         const rules = field?.validationRules;
@@ -484,10 +664,8 @@ const emailValidation = (updatedFormData) => {
 };
 
   const handleSave = () => {
-    const updatedFormData = Object.keys(changedFields).reduce((acc, key) => {
-      acc[key] = formData[key];
-      return acc;
-    }, {});
+    // Send only fields that actually changed (value diff), not just "touched" fields.
+    const updatedFormData = getActuallyChangedFormData();
 
     // Users with userType <= 100 must pass validation, Admins with userType > 100 can skip validation.
     if (isAdmin < 900 && !hasAccessToEditEmployee) {
@@ -506,9 +684,22 @@ const emailValidation = (updatedFormData) => {
     }
 
     const transformedFormData = { ...updatedFormData };
-  
-    if (selectedCountry?.code !== initialFormData.empPaymentCountryCode) {
-      transformedFormData.empPaymentCountryCode = selectedCountry?.code;
+
+    // Include payment country code only when user actually edited this field.
+    if (Object.prototype.hasOwnProperty.call(updatedFormData, "empPaymentCountryCode")) {
+      const normalizedPaymentCountryCode =
+        typeof updatedFormData.empPaymentCountryCode === "string"
+          ? updatedFormData.empPaymentCountryCode.trim()
+          : updatedFormData.empPaymentCountryCode;
+
+      if (
+        normalizedPaymentCountryCode &&
+        normalizedPaymentCountryCode !== initialFormData?.empPaymentCountryCode
+      ) {
+        transformedFormData.empPaymentCountryCode = normalizedPaymentCountryCode;
+      } else {
+        delete transformedFormData.empPaymentCountryCode;
+      }
     }
   
     if (updatedFormData.empType) {
@@ -585,6 +776,10 @@ const emailValidation = (updatedFormData) => {
       matched_location_type_keys || updatedFormData?.state;
     }
 
+    if (Object.prototype.hasOwnProperty.call(updatedFormData, "secondaryLocation")) {
+      transformedFormData.secondaryLocation = updatedFormData?.secondaryLocation;
+    }
+
     if(updatedFormData?.empLevel){
       const matched_level_type_keys = findMatchingKey(
         getAllComponentType?.level_dropdown,
@@ -602,9 +797,22 @@ const emailValidation = (updatedFormData) => {
       transformedFormData.empYearOfStudy =
       matched_year_of_study_keys || updatedFormData?.empYearOfStudy;
     }
+
+    if (
+      Object.prototype.hasOwnProperty.call(transformedFormData, "isSecondarySameAsPrimary") &&
+      transformedFormData.isSecondarySameAsPrimary
+    ) {
+      delete transformedFormData.secondaryLocation;
+    }
+
+    if (
+      typeof transformedFormData.secondaryLocation === "string" &&
+      !transformedFormData.isSecondarySameAsPrimary
+    ) {
+      transformedFormData.secondaryLocation = transformedFormData.secondaryLocation.trim();
+    }
   
     if (Object.keys(transformedFormData).length <= 0) {
-      setChangedFields({});
       setExpandedSections({});
       setMultiFieldStates({});
       setSearchParams((prev) => {
@@ -615,8 +823,8 @@ const emailValidation = (updatedFormData) => {
       return;
     }
   
-    const sectionChanged = Object.keys(sectionFieldMapping).reduce((acc, sectionId) => {
-      const changedFieldsInSection = sectionFieldMapping[sectionId].reduce((fieldsAcc, field) => {
+    const sectionChanged = Object.keys(effectiveSectionFieldMapping).reduce((acc, sectionId) => {
+      const changedFieldsInSection = effectiveSectionFieldMapping[sectionId].reduce((fieldsAcc, field) => {
         if (transformedFormData[field.name] !== undefined) {
           fieldsAcc[field.name] = transformedFormData[field.name];
         }
@@ -642,7 +850,6 @@ const emailValidation = (updatedFormData) => {
       prev.delete("isEditing");
       return prev;
     });
-    setChangedFields({});
     setExpandedSections({});
     setMultiFieldStates({});
   };
@@ -662,16 +869,32 @@ const emailValidation = (updatedFormData) => {
   };
 
   const handleInputChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-    setChangedFields((prev) => {
-      const newChangedFields = {
+    setFormData((prev) => {
+      const updated = {
         ...prev,
-        [name]: true,
+        [name]: value,
       };
-      return newChangedFields;
+
+      if (name === "isSecondarySameAsPrimary") {
+        updated.secondaryLocation = value ? resolveLocationLabel(prev?.state || "") : "";
+      }
+
+      if (name === "state" && prev?.isSecondarySameAsPrimary) {
+        updated.secondaryLocation = resolveLocationLabel(value || "");
+      }
+
+      if (name === "secondaryLocation" && prev?.isSecondarySameAsPrimary) {
+        updated.isSecondarySameAsPrimary = false;
+      }
+
+      return updated;
+    });
+
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const nextErrors = { ...prev };
+      delete nextErrors[name];
+      return nextErrors;
     });
   };
 
@@ -683,10 +906,7 @@ const emailValidation = (updatedFormData) => {
     setMultiFieldStates(prev => ({...prev, [fieldName]: {type, value}}));
     
     if (hasData) {
-      setChangedFields(prev => ({...prev, [fieldName]: true}));
       setErrors(prev => {const newErrors = {...prev}; delete newErrors[fieldName]; return newErrors;});
-    } else {
-      setChangedFields(prev => {const newFields = {...prev}; delete newFields[fieldName]; return newFields;});
     }
   };
 
@@ -725,7 +945,6 @@ const emailValidation = (updatedFormData) => {
     });
     setFormData(initialFormData);
     setExpandedSections({});
-    setChangedFields({});
     setErrors({});
     setMultiFieldStates({});
   };
@@ -842,38 +1061,10 @@ const emailValidation = (updatedFormData) => {
             getAllComponentType?.location_dropdown || {}
           );
         } else if (field?.name === "empLevel") {
-          options = Object.values(
-            getAllComponentType?.level_dropdown || {}
+          options = getFilteredLevelValues(
+            getAllComponentType?.level_dropdown || {},
+            formData?.empType
           );
-          
-          // Filter options for OFTE employee type - only allow levels 1, 2, 3
-          if (formData?.empType === "OFTE" || formData?.empType === "PTE") {
-            options = options.filter(option => {
-              const levelValue = option.toString().toLowerCase();
-              return levelValue.includes('1') || levelValue.includes('2') || levelValue.includes('3') || 
-                     levelValue === 'level 1' || levelValue === 'level 2' || levelValue === 'level 3' ||
-                     levelValue === '1' || levelValue === '2' || levelValue === '3';
-            });
-          }
-          
-          // Filter options for FTE employee type - exclude levels 1, 2, 3
-          if (formData?.empType === "FTE") {
-            options = options.filter(option => {
-              const levelValue = option.toString().toLowerCase();
-              return !(levelValue.includes('1') || levelValue.includes('2') || levelValue.includes('3') || 
-                      levelValue === 'level 1' || levelValue === 'level 2' || levelValue === 'level 3' ||
-                      levelValue === '1' || levelValue === '2' || levelValue === '3' || 
-                      levelValue === 'intern' || levelValue === 'trainee');
-            });
-          }
-
-          // Filter options for Intern and Extended Intern employee types - only allow intern and trainee levels
-          if (formData?.empType === "Intern" || formData?.empType === "Extended Intern") {
-            options = options.filter(option => {
-              const levelValue = option.toString().toLowerCase();
-              return levelValue === 'intern' || levelValue === 'trainee';
-            });
-          }
         } else if (field?.name === "empYearOfStudy") {
           options = Object.values(
             getAllComponentType?.year_of_study || {}
@@ -903,6 +1094,25 @@ const emailValidation = (updatedFormData) => {
             {error && <span className="form_error_message">{error}</span>}
           </div>
         );
+      } else if (field.type === "india-state-select" || field.type === "india-city-select") {
+        return (
+          <div>
+            <CustomDropdown
+              options={indiaStateDropdownOptions}
+              value={formData[field.name] || ""}
+              onChange={(e) => handleInputChange(field.name, e.target.value, sectionId)}
+              placeholder={field.placeholder || "Select secondary location state"}
+              fieldName={field.name}
+              error={!!error}
+              disabled={isFieldDisabled || Boolean(formData?.isSecondarySameAsPrimary)}
+              searchable={true}
+            />
+            {formData?.isSecondarySameAsPrimary && (
+              <span className="field_helper_message">Secondary location will match primary location.</span>
+            )}
+            {error && <span className="form_error_message">{error}</span>}
+          </div>
+        );
       } else if (field.type === "date") {
         return (
           <>
@@ -915,18 +1125,18 @@ const emailValidation = (updatedFormData) => {
             {error && <span className="form_error_message">{error}</span>}
           </>
         );
-      } else if (field.type === "checkbox") {
+      } else if (field.type === "checkbox" || field.type === "manager-toggle") {
         return (
           <>
-          <div className="checkbox-wrapper">
-            <input
-              type="checkbox"
-              checked={formData[field.name] || false}
-              onChange={(e) => handleInputChange(field.name, e.target.checked, sectionId)}
-              disabled={isFieldDisabled}
-            />
-            {error && <span className="form_error_message">{error}</span>}
-          </div>
+            <div className="checkbox-wrapper">
+              <input
+                type="checkbox"
+                checked={formData[field.name] || false}
+                onChange={(e) => handleInputChange(field.name, e.target.checked, sectionId)}
+                disabled={isFieldDisabled}
+              />
+              {error && <span className="form_error_message">{error}</span>}
+            </div>
           </>
         );
       } else if (field.type === "number"){
@@ -1004,6 +1214,12 @@ const emailValidation = (updatedFormData) => {
             {formData[field.name] ? "Yes" : "No"}
           </div>
         );
+      } else if (field.name === "isSecondarySameAsPrimary") {
+        return (
+          <div className="field-value">
+            {formData[field.name] ? "Yes" : "No"}
+          </div>
+        );
       } else if(field.name === "empAnnualSalary" || field.name === "empCurrentAdvanceSalaryAmount") {
         return (
           <div className="field-value">
@@ -1039,6 +1255,13 @@ const emailValidation = (updatedFormData) => {
         }
         
         return <div className="field-value">-</div>;
+      } else if (field.name === "secondaryLocation") {
+        const displaySecondaryLocation =
+          formData?.isSecondarySameAsPrimary && formData?.state
+            ? `${resolveLocationLabel(formData.state)} (Same as Primary)`
+            : formData[field.name] || "-";
+
+        return <div className="field-value">{displaySecondaryLocation}</div>;
       } else {
         // Handle all other field types in display mode
         const displayValue = formData[field.name];
@@ -1229,9 +1452,89 @@ const renderSalaryConfigField = () => {
 
 };
 
+const renderOffboardingField = () => {
+  const hasOffboardingData = offboardingDetails && Object.keys(offboardingDetails).length > 0;
+
+  if (!hasOffboardingData) {
+    return (
+      <div className="offboarding-container">
+        <div className="no-offboarding-data">No offboarding details available for this employee.</div>
+      </div>
+    );
+  }
+
+  if (isEditing) {
+    return (
+      <div className="offboarding-container">
+        <div className="offboarding-field-item">
+          <label className="offboarding-label">HR Clearance</label>
+          <div className="offboarding-checkbox-disabled">
+            <img
+              src={offboardingDetails.hrClearanceStatus ? Checkbox_Checked : Checkbox_Unchecked}
+              alt={offboardingDetails.hrClearanceStatus ? "Cleared" : "Pending"}
+              className="offboarding-checkbox-icon"
+            />
+          </div>
+        </div>
+        <div className="offboarding-field-item">
+          <label className="offboarding-label">Finance Clearance</label>
+          <div className="offboarding-checkbox-disabled">
+            <img
+              src={offboardingDetails.financeClearanceStatus ? Checkbox_Checked : Checkbox_Unchecked}
+              alt={offboardingDetails.financeClearanceStatus ? "Cleared" : "Pending"}
+              className="offboarding-checkbox-icon"
+            />
+          </div>
+        </div>
+        <div className="offboarding-field-item">
+          <label className="offboarding-label">Last Working Day</label>
+          <input
+            type="text"
+            value={offboardingDetails.lastWorkingDay ? formatDate(offboardingDetails.lastWorkingDay) : "N/A"}
+            disabled
+            readOnly
+            className="offboarding-input"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="offboarding-container">
+      <div className="offboarding-field-item">
+        <div className="offboarding-label">HR Clearance</div>
+        <div className="offboarding-value">
+          <img
+            src={offboardingDetails.hrClearanceStatus ? Checkbox_Checked : Checkbox_Unchecked}
+            alt={offboardingDetails.hrClearanceStatus ? "Cleared" : "Pending"}
+            className="offboarding-checkbox-icon"
+          />
+        </div>
+      </div>
+      <div className="offboarding-field-item">
+        <div className="offboarding-label">Finance Clearance</div>
+        <div className="offboarding-value">
+          <img
+            src={offboardingDetails.financeClearanceStatus ? Checkbox_Checked : Checkbox_Unchecked}
+            alt={offboardingDetails.financeClearanceStatus ? "Cleared" : "Pending"}
+            className="offboarding-checkbox-icon"
+          />
+        </div>
+      </div>
+      <div className="offboarding-field-item">
+        <div className="offboarding-label">Last Working Day</div>
+        <div className="offboarding-date-value">
+          {offboardingDetails.lastWorkingDay ? formatDate(offboardingDetails.lastWorkingDay) : "N/A"}
+        </div>
+      </div>
+    </div>
+  );
+};
+
   return (
     <>
-      {loading ? (
+      {currentEmployeeDetailsLoading ? (
         <LoadingSpinner message="Loading Your Profile Data..." height="40vh" />
       ) : (
         <div className="employee-form">
@@ -1242,33 +1545,51 @@ const renderSalaryConfigField = () => {
             {isEditing ? (
               <div className="action-buttons">
                 <button className="save-button" onClick={handleSave}>
-                  <span>Save Changes</span>
+                  <span className="text-btn-primary">Save Changes</span>
                 </button>
                 <button className="cancel-button" onClick={handleCancel}>
-                  <span>Cancel</span>
+                  <span className="text-btn-primary">Cancel</span>
                 </button>
               </div>
             ) : (
-              <>
-              {/* Show Edit button if user is editing their own profile OR has admin access OR has permission */}
-              {(user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid || isAdmin >= 900 || hasAccessToEditEmployee) && (
-                <button className="edit-button" onClick={handleEdit}>
-                  <img src={Edit_Button} alt="Edit Button" />
-                  <span>Edit</span>
+            <div className="employee-details-action-buttons">
+              {currentEmployeeDetails?.employeeOffboardingDetails?.offboardingStatus === OFFBOARDING_STATUS.INITIATED && (
+                <button className="offboarding-in-progress-status-button">
+                  <span className="text-btn-primary">Offboarding In Progress</span>
                 </button>
               )}
-              </>
+              {currentEmployeeDetails?.employeeOffboardingDetails?.offboardingStatus === OFFBOARDING_STATUS.APPROVED && (
+                <button className="offboarded-employee-status-button">
+                  <span className="text-btn-primary">Offboarded Employee</span>
+                </button>
+              )}
+              {/* Show Edit button if user is editing their own profile OR has admin access OR has permission */}
+              {currentEmployeeDetails?.employeeBasicDetails?.isActive &&(user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid || isAdmin >= 900 || hasAccessToEditEmployee) && (
+                <button className="edit-button" onClick={handleEdit}>
+                  <img src={Edit_Button} alt="Edit Button" />
+                  <span className="text-btn-primary">Edit</span>
+                </button>
+              )}
+            </div>
             )}
           </div>
 
           <div className="form-sections">
-            {formSections.map((section) => (
+            {mergedFormSections
+              .filter((section) => {
+                // Hide offboarding section when no offboarding data
+                if (section.id === "offboarding-details") {
+                  if (!offboardingDetails || Object.keys(offboardingDetails).length === 0) return false;
+                }
+                return true;
+              })
+              .map((section) => (
               <div key={section.id} className="form-section">
                 <div
                   className="section-header"
                   onClick={() => toggleSection(section.id)}
                 >
-                  <p>{section.title}</p>
+                  <p className="text-tab-common">{section.title}</p>
                   <span
                     className={`arrow ${
                       expandedSections[section.id] ? "expanded" : ""
@@ -1290,6 +1611,8 @@ const renderSalaryConfigField = () => {
                             ? "leaves-info-grid"
                             : section.id === "salary-config"
                             ? "salary-config-grid"
+                            : section.id === "offboarding-details"
+                            ? "offboarding-details-grid"
                             : [
                                 "fields-grid",
                                 isEditing ? "editing" : "",
@@ -1305,6 +1628,9 @@ const renderSalaryConfigField = () => {
                           if (section.id === "leaves-info") {
                             return renderLeaveField();
                           }
+                          if (section.id === "offboarding-details") {
+                            return renderOffboardingField();
+                          }
                           
                           // Handle regular sections with field mapping
                           return section.fields
@@ -1313,6 +1639,9 @@ const renderSalaryConfigField = () => {
                                 return false;
                               }
                               if (isEditing && field.name === "empFullName") {
+                                return false;
+                              }
+                              if (isEditing && (field.name === "isManager" || field.name === "isSecondarySameAsPrimary")) {
                                 return false;
                               }
                               // Hide year of study field if employee type is not Intern or Extended Intern
@@ -1324,15 +1653,60 @@ const renderSalaryConfigField = () => {
                               }
                               return true;
                             })
-                            .map((field, fieldIndex) => (
-                              <div
-                                key={field.name || `field-${fieldIndex}`}
-                                className="field"
-                              >
-                                <label>{field?.validationRules?.required ? `${field.label} *` : field.label}</label>
-                                {renderField(field, section.id)}
-                              </div>
-                            ));
+                            .map((field, fieldIndex) => {
+                              const isReportingManagerField = isEditing && field.name === "empManager";
+                              const isSecondaryLocationField = isEditing && field.name === "secondaryLocation";
+                              const inlineToggleFieldName = isReportingManagerField
+                                ? "isManager"
+                                : isSecondaryLocationField
+                                ? "isSecondarySameAsPrimary"
+                                : null;
+                              const inlineToggleLabel = isReportingManagerField
+                                ? "Is Manager"
+                                : isSecondaryLocationField
+                                ? "Same as Primary"
+                                : "";
+
+                              const inlineToggleFieldConfig = inlineToggleFieldName
+                                ? section.fields.find((sectionField) => sectionField.name === inlineToggleFieldName)
+                                : null;
+                              const isInlineToggleDisabled =
+                                (section.id === "leaves-info" || inlineToggleFieldName === "empLastLogin")
+                                  ? Boolean(inlineToggleFieldConfig?.disabled)
+                                  : Boolean(
+                                      (isAdmin < 900 && !hasAccessToEditEmployee) &&
+                                        inlineToggleFieldConfig?.disabled
+                                    );
+
+                              return (
+                                <div
+                                  key={field.name || `field-${fieldIndex}`}
+                                  className="field"
+                                >
+                                  <label className={inlineToggleFieldName ? "field_label_with_toggle" : ""}>
+                                    <span>{field?.validationRules?.required ? `${field.label} *` : field.label}</span>
+                                    {inlineToggleFieldName && (
+                                      <span className="inline_checkbox_control">
+                                        <input
+                                          type="checkbox"
+                                          checked={Boolean(formData?.[inlineToggleFieldName])}
+                                          onChange={(event) =>
+                                            handleInputChange(
+                                              inlineToggleFieldName,
+                                              event.target.checked,
+                                              section.id
+                                            )
+                                          }
+                                          disabled={isInlineToggleDisabled}
+                                        />
+                                        <span>{inlineToggleLabel}</span>
+                                      </span>
+                                    )}
+                                  </label>
+                                  {renderField(field, section.id)}
+                                </div>
+                              );
+                            });
                         })()}
                       </div>
 
@@ -1354,6 +1728,69 @@ const renderSalaryConfigField = () => {
                 )}
               </div>
             ))}
+
+            {/* Rewards & Recognition Section */}
+            {currentEmployeeDetails?.employeeAwards?.length > 0 && (
+              <div className="form-section">
+                <div
+                  className="section-header"
+                  onClick={() => toggleSection("rewards-recognition")}
+                >
+                  <p className="text-tab-common">Rewards & Recognition</p>
+                  <span
+                    className={`arrow ${
+                      expandedSections["rewards-recognition"] ? "expanded" : ""
+                    }`}
+                  >
+                    <img src={Dropdown_Arrow} alt="Dropdown Arrow" />
+                  </span>
+                </div>
+
+                {expandedSections["rewards-recognition"] && (
+                  <>
+                    <div className="hr_line">
+                      <hr />
+                    </div>
+                    <div className="section-content">
+                      <div className="rt_cards_grid">
+                        {currentEmployeeDetails.employeeAwards.map((award) => {
+                          const isEmp = award.awardType === "employee_choice";
+                          const month = award.cycle?.month;
+                          const year = award.cycle?.year;
+                          const monthYear = month && year
+                            ? new Date(year, month - 1).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+                            : "";
+                          return (
+                            <div
+                              key={award.id}
+                              className={`rt_award_card rt_award_card--${isEmp ? "employee" : "leadership"}`}
+                              onClick={() => setSelectedAwardModal({ ...award, monthYear })}
+                            >
+                              <div className={`rt_award_icon_wrap rt_award_icon_wrap--${isEmp ? "employee" : "leadership"}`}>
+                                <img src={isEmp ? EmployeeChoiceIcon : LeadershipChoiceIcon} alt="" />
+                              </div>
+                              <div className="rt_award_info">
+                                <span className="rt_award_title">
+                                  {isEmp ? "Employee's Choice Winner" : "Leadership Choice Winner"}
+                                </span>
+                                <span className="rt_award_month">{monthYear}</span>
+                              </div>
+                              <button
+                                type="button"
+                                className="rt_view_link"
+                                onClick={(e) => { e.stopPropagation(); setSelectedAwardModal({ ...award, monthYear }); }}
+                              >
+                                View
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
           {popupOpen && (
             <EmployeeRepositoryPopup
@@ -1365,6 +1802,47 @@ const renderSalaryConfigField = () => {
         </div>
       )}
       {showJoiningPopup && <ConversionDatePopup onCancel={handleJoiningPopupClose} onSave={handleJoiningPopupSave}/>}
+      
+      {/* Award Detail Modal - matches RewardsTabs SingleWinnerModal design (icon + title + date + quote) */}
+      {selectedAwardModal && (() => {
+        const isEmp = selectedAwardModal.awardType === "employee_choice";
+        const monthYear = selectedAwardModal.monthYear || "";
+        const citationText = (selectedAwardModal.finalCitation || "").trim();
+
+        return (
+          <div className="rt_citation_overlay" onClick={() => setSelectedAwardModal(null)}>
+            <div className={`rt_single_winner_card rt_single_winner_card--award rt_single_winner_card--${isEmp ? "employee" : "leadership"}`} onClick={(e) => e.stopPropagation()}>
+              <button type="button" className="rt_single_winner_close_btn" onClick={() => setSelectedAwardModal(null)}>
+                <img src={Cross_icon} alt="close" />
+              </button>
+              <div className="rt_single_winner_card_header">
+                <span className="rt_single_winner_card_header_icon">
+                  <img src={isEmp ? EmployeeChoiceIcon : LeadershipChoiceIcon} alt="" />
+                </span>
+                <div className="rt_single_winner_card_header_text_block">
+                  <span className="rt_single_winner_card_header_text">
+                    {isEmp ? "Employee's Choice Winner" : "Leadership Choice Winner"}
+                  </span>
+                  {monthYear && <span className="rt_single_winner_card_header_date">{monthYear}</span>}
+                </div>
+              </div>
+              <div className="rt_single_winner_card_body">
+                {citationText ? (
+                  <div className="rt_single_winner_card_citation_box">
+                    <p className="rt_single_winner_card_citation_text">&ldquo;{citationText}&rdquo;</p>
+                  </div>
+                ) : (
+                  <div className="rt_single_winner_card_citation_box">
+                    <p className="rt_single_winner_card_citation_empty">No citation available.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      
+      <Snackbar/>
     </>
   );
 };

@@ -45,7 +45,7 @@ export const isValidField = (value, type, rowData = null, columnKey = null, tabl
 };
 
 // Helper function to calculate Loss of Pay amount
-export const calculateLossOfPayAmount = (allTableRows = []) => {
+export const calculateLossOfPayAmount = (allTableRows = [], backendLopAmount = null) => {
   // Get basic salary from the Basic Salary row
   const basicSalaryRow = allTableRows.find(row => row.componentName === "Basic Salary");
   const basicSalary = basicSalaryRow?.amount || 0;
@@ -83,6 +83,11 @@ export const calculateLossOfPayAmount = (allTableRows = []) => {
     return sum + (isNaN(effectiveAmount) ? 0 : effectiveAmount);
   }, 0);
   
+  const baseAmount = (backendLopAmount !== null && backendLopAmount !== undefined && !isNaN(backendLopAmount)) 
+                     ? parseFloat(backendLopAmount) : 0;
+                     
+  const totalLopBase = totalAmount > 0 ? totalAmount : baseAmount;
+  
   // Get days in current month
   const now = new Date();
   const year = now.getFullYear();
@@ -90,7 +95,7 @@ export const calculateLossOfPayAmount = (allTableRows = []) => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   
   // Calculate per day amount
-  const perDayAmount = daysInMonth > 0 ? (totalAmount / daysInMonth) : 0;
+  const perDayAmount = daysInMonth > 0 ? (totalLopBase / daysInMonth) : 0;
   
   return parseFloat(perDayAmount.toFixed(2));
 };

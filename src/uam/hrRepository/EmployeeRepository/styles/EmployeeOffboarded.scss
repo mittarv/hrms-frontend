@@ -1,0 +1,170 @@
+@use '../../design/colors/customColors' as *;
+
+.loading_message {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.employee_offboarded_container {
+    padding: 24px 0px;
+    overflow-y: auto;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+
+    .employee_offboarded_header {
+        margin-bottom: 24px;
+    }
+
+    .search-bar-collapsed {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        gap: 12px;
+
+        .search-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-grow: 1;
+            max-width: 450px;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            border-bottom: 1px solid $GREY-40;
+
+            .employee-search-icon {
+                width: 20px;
+                margin-left: 0;
+                margin-right: 8px;
+            }
+
+            .employee-search-input {
+                border: none;
+                padding: 10px 0;
+                margin: 0;
+                outline: none;
+                font-size: 16px;
+                flex: 1;
+                caret-color: $GREY-50;
+                padding-left: 8px;
+                color: $GREY-50;
+
+                &::placeholder {
+                    color: $GREY-50;
+                }
+            }
+        }
+    }
+
+    .offboarded_log {
+        width: 100%;
+        border-radius: 8px;
+        background-color: transparent;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        padding-bottom: 1.5rem;
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0 12px 0;
+
+            p {
+                font-size: 16px;
+                font-weight: 600;
+                color: $GREY-80;
+                line-height: 24px;
+                letter-spacing: 0.01em;
+                margin: 0;
+            }
+        }
+
+        .log-table {
+            width: 100%;
+            overflow-x: auto;
+            border: 0.5px solid $GREY-40;
+            border-radius: 8px;
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+
+                th,
+                td {
+                    padding: 12px 15px;
+                    text-align: left;
+                    border-bottom: 1px solid $c66;
+                    font-size: 14px;
+                }
+
+                th {
+                    font-weight: 600;
+                    color: $c92;
+                    background-color: $c93;
+                }
+
+                td {
+                    color: $c75;
+                }
+
+                tr {
+                    cursor: pointer;
+                    &:hover {
+                        background-color: $c94;
+                    }
+                    &:nth-child(even) {
+                        background-color: $GREY-00;
+                    }
+                }
+
+                .th-with-icons {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+
+                    .th-icon {
+                        width: 14px;
+                        height: 14px;
+                        opacity: 0.7;
+                    }
+                }
+
+                .employee-name-link {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $PRUSSIAN-70;
+                    text-decoration: underline;
+                    text-underline-offset: 2px;
+
+                    &:hover {
+                        text-decoration-thickness: 2px;
+                    }
+                }
+            }
+        }
+
+        .no-data-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            text-align: center;
+            background-color: $c93;
+            border-radius: 8px;
+
+            p {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 500;
+                color: $c84;
+            }
+        }
+    }
+}

@@ -3,12 +3,16 @@ import LeaveAttendance from "./components/LeaveAttendance";
 import LeaveHolidays from "./components/LeaveHolidays";
 import LeaveStatus from "./components/LeaveStatus";
 import "./styles/LeaveManagement.scss";
-import Inactive_calendar_icon from "../assets/icons/Inactive_calendar_icon.svg";
-import Active_calendar_icon from "../assets/icons/Active_calendar_icon.svg";
-import Inactive_Leave_status_icon from "../assets/icons/Inactive_Leave_status_icon.svg";
-import Active_leave_status_icon from "../assets/icons/Active_leave_status_icon.svg";
-import Inactive_holiday_tab_icon from "../assets/icons/Inactive_holiday_tab_icon.svg";
-import Active_holiday_tab_icon from "../assets/icons/Active_holiday_tab_icon.svg";
+
+import Inactive_calendar_icon from "../../../assets/icons/Inactive_calendar_icon.svg";
+import Active_calendar_icon from "../../../assets/icons/Active_calendar_icon.svg";
+import Inactive_Leave_status_icon from "../../../assets/icons/Inactive_Leave_status_icon.svg";
+import Active_leave_status_icon from "../../../assets/icons/Active_leave_status_icon.svg";
+import Inactive_holiday_tab_icon from "../../../assets/icons/Inactive_holiday_tab_icon.svg";
+import Active_holiday_tab_icon from "../../../assets/icons/Active_holiday_tab_icon.svg";
+import clock_inactive_icon from "../../../assets/icons/clock_inactive_icon.svg";
+import clock_active_icon from "../../../assets/icons/clock_active_icon.svg";
+
 import { useSelector } from "react-redux";
 import {
   getCurrentEmployeeDetails,
@@ -21,7 +25,10 @@ import {
 import { useDispatch } from "react-redux";
 import Snackbar from "../Common/components/Snackbar";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
+
 import { hrToolHomePageData } from "../constant/data";
+import CompfOffTracker from "./components/CompOffTracker";
+
 const LeaveManagement = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
@@ -59,7 +66,7 @@ const LeaveManagement = () => {
     if (Array.isArray(checkInCheckOutStatus) && checkInCheckOutStatus.length === 0) {
           dispatch(getCheckInCheckOutStatus(user.employeeUuid));
     }
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, user]);
 
     useEffect(() => {
@@ -85,6 +92,8 @@ const LeaveManagement = () => {
         return <LeaveStatus />;
       case "tab3":
         return <LeaveHolidays />;
+      case "tab4":
+        return <CompfOffTracker setActiveTab={setActiveTab}/>;
       default:
         return null;
     }
@@ -141,6 +150,21 @@ const LeaveManagement = () => {
                   className="leave_calendar_icon"
                 />
                 <p>Holidays</p>
+              </span>
+              <span
+                onClick={() => setActiveTab("tab4")}
+                className={activeTab === "tab4" ? "active_tab" : "inactive_tab"}
+              >
+                <img
+                  src={
+                    activeTab === "tab4"
+                      ? clock_active_icon
+                      : clock_inactive_icon
+                  }
+                  alt="Leave Calendar Icon"
+                  className="leave_calendar_icon"
+                />
+                <p>Comp Off Tracker</p>
               </span>
             </div>
         <hr />

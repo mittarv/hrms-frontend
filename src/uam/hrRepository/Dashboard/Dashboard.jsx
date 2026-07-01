@@ -3,9 +3,11 @@ import MyUpdates from "../Dashboard/components/MyUpdates";
 import MyProfile from "./components/MyProfile";
 import EventCard from "./components/EventCard";
 import LeaveCard from "./components/LeaveCard";
+import WinnerBanner from "./components/WinnerBanner";
 import "./dashboard.scss";
 import EmployeeChart from "./components/EmployeeChart";
 import EmployeeDetailsPage from "../EmployeeRepository/components/EmployeeDetailsPage";
+import AccessDenied from "../Common/components/AccessDenied";
 import { 
     getAllBirthdayAndAnniversary, 
     getCurrentEmployeeDetails, 
@@ -50,7 +52,10 @@ const Dashboard = () => {
     } = useSelector((state) => state.hrRepositoryReducer);
     const [searchParams, setSearchParams] = useSearchParams();
     const viewProfilePage = searchParams.get('showEmployeeDetails') === 'true';
-    const employeeUuid = searchParams.get('employeeUuid') || user.employeeUuid;
+    const employeeUuidParam = searchParams.get('employeeUuid');
+    const employeeUuid = employeeUuidParam || user.employeeUuid;
+    // On Dashboard, only allow viewing own profile
+    const isOwnProfile = !employeeUuidParam || employeeUuidParam === user?.employeeUuid;
     const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
     const Year = new Date().getFullYear();
     const BirthdayTitle = `Birthdays - ${monthName} ${Year}`;
@@ -78,10 +83,14 @@ const Dashboard = () => {
     // Single useEffect for all data fetching to prevent multiple loading states
     useEffect(() => {
         const fetchData = async () => {
-            // Birthday and Anniversary data
+            // Birthday and Anniversary data (single endpoint: fetch when either payload is not yet loaded)
+            const anniversaryNotLoaded = Array.isArray(allEmployeesAnniversary)
+                ? allEmployeesAnniversary.length === 0
+                : (allEmployeesAnniversary?.workAnniversary12Month === undefined ||
+                   allEmployeesAnniversary?.workAnniversary14Month === undefined);
             if (
                 Array.isArray(allEmployeesBirthday) && allEmployeesBirthday.length === 0 &&
-                Array.isArray(allEmployeesAnniversary) && allEmployeesAnniversary.length === 0
+                anniversaryNotLoaded
             ) {
                 dispatch(getAllBirthdayAndAnniversary());
             }
@@ -126,6 +135,7 @@ const Dashboard = () => {
         };
 
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, user.employeeUuid]);
 
     useEffect(() => {
@@ -135,11 +145,15 @@ const Dashboard = () => {
     }, [outStandingCheckOut]);
 
     const handleCheckIn = () => {
-        dispatch(employeeCheckIn(user.employeeUuid))
+        if (user?.employeeUuid) {
+            dispatch(employeeCheckIn(user.employeeUuid))
+        }
     }
 
     const handleCheckOut = () => {
-        dispatch(employeeCheckOut(user.employeeUuid))
+        if (user?.employeeUuid) {
+            dispatch(employeeCheckOut(user.employeeUuid))
+        }
     }
 
     const handleOustandingCheckout = (checkOutTime) => {
@@ -155,62 +169,85 @@ const Dashboard = () => {
     <>
     {
         viewProfilePage ? (
-            <EmployeeDetailsPage />
+            isOwnProfile ? <EmployeeDetailsPage /> : 
+            <AccessDenied 
+              message="You can only view your own profile from the Dashboard."
+              submessage="To view other employee details, please go to Employee Repository."
+              showDashboardButton={false}
+              extraAction={{ label: "Go to Employee Repo", onClick: () => window.location.href = "/employee-repo" }}
+            />
         ) : 
     
      <>
-        {(loading  || currentEmployeeDetailsLoading)?  (
+        {(loading || currentEmployeeDetailsLoading) ? (
             <LoadingSpinner message="Loading dashboard..." height="40vh" />
         ) : (
-        <>
-            <div className="main_table_header_div_dashboard" id="top">
-                <div className="inner-div-left-section_dashboard">
-                    <p className="inner-div-left-title_dashboard">Welcome, {user?.name}!</p>
-                    <p className="inner-div-left-subtitle-2_dashboard">
-                        Here you can view key insights and stay updated on important details.
-                    </p>         
-                </div>
-                <div className="check_in_check_out_container">
-                    <div 
-                        className={`check_in ${!checkInCheckOutStatus?.checkInStatus ? 'disabled' : ''}`}
-                        onClick={handleCheckIn}>
-                        <img 
-                            src={user?.checkInStatus ? check_in_icon : check_in_disable_icon} 
-                            alt="check-in-icon"
-                            className="check_in_icon" 
-                        />
-                        <p className="check_in_text">Check-In</p>
+        <div className="dashboard_page">
+            <div className="dashboard_top_section">
+                <div className="main_table_header_div_dashboard" id="top">
+                    <div className="inner-div-left-section_dashboard">
+                        <p className="inner-div-left-title_dashboard">Welcome, {user?.name}!</p>
+                        <p className="inner-div-left-subtitle-2_dashboard">
+                            Here you can view key insights and stay updated on important details.
+                        </p>
                     </div>
-                    <div 
-                        className={`check_out ${!checkInCheckOutStatus?.checkOutStatus ? 'disabled' : ''}`}
-                        onClick={handleCheckOut}>
-                        <img 
-                            src={user?.checkOutStatus ? check_out_icon : check_out_disable_icon} 
-                            alt="check-out-icon" 
-                            className="check_in_icon" 
-                        />
-                        <p className="check_out_text">Check-Out</p>
+                    <div className="check_in_check_out_container">
+                        <div
+                            className={`check_in ${!checkInCheckOutStatus?.checkInStatus ? "disabled" : ""}`}
+                            onClick={handleCheckIn}
+                        >
+                            <img
+                                src={user?.checkInStatus ? check_in_icon : check_in_disable_icon}
+                                alt="check-in-icon"
+                                className="check_in_icon"
+                            />
+                            <p className="check_in_text">Check-In</p>
+                        </div>
+                        <div
+                            className={`check_out ${!checkInCheckOutStatus?.checkOutStatus ? "disabled" : ""}`}
+                            onClick={handleCheckOut}
+                        >
+                            <img
+                                src={user?.checkOutStatus ? check_out_icon : check_out_disable_icon}
+                                alt="check-out-icon"
+                                className="check_in_icon"
+                            />
+                            <p className="check_out_text">Check-Out</p>
+                        </div>
                     </div>
                 </div>
+
             </div>
 
             <div className="main-body-container">
-                <div className="inner-body-container">
-                    <div className="inner-container">
-                        <MyUpdates />
-                        <LeaveCard />
-                    </div>
-                    <div className="inner-container">
-                        <div className="event-card-container">
-                            <EventCard name={BirthdayTitle} data={allEmployeesBirthday}/>
-                            <EventCard name={WorkAnniversariesTitle} data={allEmployeesAnniversary}/>
+                <div className="main-body-columns">
+                    <div className="dashboard-left-column">
+                        {currentEmployeeDetails?.currentWinnerStatus && (
+                            <div className="dashboard-winner-banner-wrap">
+                                <WinnerBanner currentWinnerStatus={currentEmployeeDetails.currentWinnerStatus} />
+                            </div>
+                        )}
+                        <div className="inner-body-container">
+                            <div className="inner-container">
+                                <MyUpdates />
+                                <LeaveCard />
+                            </div>
+                            <div className="inner-container">
+                                <div className="event-card-container">
+                                    <EventCard name={BirthdayTitle} data={allEmployeesBirthday}/>
+                                    <EventCard name={WorkAnniversariesTitle} data={allEmployeesAnniversary}/>
+                                </div>
+                                <EmployeeChart/>
+                            </div>
                         </div>
-                        <EmployeeChart/>
+                    </div>
+                    <div className="dashboard-profile-column">
+                        <MyProfile currentEmployeeDetails={currentEmployeeDetails} getAllManagersDetails={getAllManagersDetails}/>
                     </div>
                 </div>
-                <MyProfile currentEmployeeDetails={currentEmployeeDetails} getAllManagersDetails={getAllManagersDetails}/>
             </div>
-        </>)}   
+        </div>
+        )}   
      </>
     }
     <Snackbar />

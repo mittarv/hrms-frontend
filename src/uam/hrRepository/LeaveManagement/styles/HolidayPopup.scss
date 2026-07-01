@@ -1,23 +1,25 @@
+@use '../../design/colors/customColors' as *;
+
 .holiday-popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
   
     .holiday-popup-container {
-      background-color: white;
+      background-color: $WHITE;
       border-radius: 16px;
       width: 90%;
       max-width: 600px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px $c118;
       font-family: 'Plus Jakarta Sans';
       padding: 5px 15px;
   
@@ -38,23 +40,23 @@
                     width: auto;
                     max-width: 400px;
                     padding: 10px 12px;
-                    border-bottom: 2px solid #2E3038;
+                    border-bottom: 2px solid $GREY-80;
                     display: flex;
                     justify-content: start;
                     align-items: center;
                     cursor: pointer;
-                    background-color: white;
+                    background-color: $WHITE;
                     gap:0.5rem;
 
                     .holiday_dropdown_title{
                         font-size: 18px;
                         font-weight: 600;
                         line-height: 28px;
-                        color: #2E3038;
+                        color: $GREY-80;
                     }
                     
                     .dropdown-arrow {
-                      background-color: #F1F1F4;
+                      background-color: $GREY-10;
                       border-radius: 50%;
                       width: 28px;
                       height: 28px;
@@ -74,7 +76,7 @@
                   }
 
                   .holiday_close_button {
-                    background: #F1F1F4;
+                    background: $GREY-10;
                     border: none;
                     cursor: pointer;
                     border-radius: 8px;
@@ -93,11 +95,11 @@
                 left: 0;
                 right: 0;
                 z-index: 10;
-                background-color: white;
-                border: 1px solid #ccc;
+                background-color: $WHITE;
+                border: 1px solid $c76;
                 border-radius: 4px;
                 margin-top: 4px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 2px 8px $c69;
                 max-width: 350px;
                 
                 .dropdown-item {
@@ -108,11 +110,11 @@
                   align-items: center;
                   
                   &:hover {
-                    background-color: #f5f5f5;
+                    background-color: $c167;
                   }
                   
                   &.active {
-                    color: #045071;
+                    color: $PRUSSIAN-70;
                     font-weight: 500;
                   }
                 }
@@ -144,7 +146,7 @@
             &.to-delete {
               input {
                 text-decoration: line-through;
-                color: #999;
+                color: $c81;
               }
             }
   
@@ -159,14 +161,14 @@
                 display: block;
                 margin-bottom: 8px;
                 font-size: 14px;
-                color: #2E3038;
+                color: $GREY-80;
                 font-weight: 600;
               }
   
               input {
                 width: 100%;
                 padding: 12px 16px;
-                border: 1px solid #C7C9D1;
+                border: 1px solid $GREY-30;
                 border-radius: 4px;
                 font-size: 14px;
                 font-family: 'Plus Jakarta Sans';
@@ -186,7 +188,7 @@
                 background: url('../../../../assets/icons/Calendar_disabled_icon.svg') no-repeat right 10px center; /* Use your disabled image here */
                 background-size: 20px;
                 cursor: not-allowed;
-                border: 1px solid #8F92A3;
+                border: 1px solid $GREY-50;
                 text-decoration: line-through;
               }
               
@@ -222,7 +224,7 @@
                 }
   
                 &.restore-button {
-                    border : 1.5px solid #2E3038;
+                    border : 1.5px solid $GREY-80;
                     border-radius: 8px
                 }
               }
@@ -236,15 +238,15 @@
             .add-entry-button {      
               background: none;
               border : none;
-              border-bottom: 1px solid #066893;
-              color: #066893;
+              border-bottom: 1px solid $PRUSSIAN-60;
+              color: $PRUSSIAN-60;
               font-size: 14px;
               font-weight: 600;
               cursor: pointer;
   
               &:disabled {
-                color: #999;
-                border-bottom: 1px solid #999;
+                color: $c81;
+                border-bottom: 1px solid $c81;
                 cursor: not-allowed;
               }
             }
@@ -259,19 +261,19 @@
               flex: 1;
               font-size: 14px;
               font-weight: 600;
-              color: #2E3038;
+              color: $GREY-80;
             }
           
             .event-label {
               flex: 2;
               font-size: 14px;
               font-weight: 600;
-              color: #2E3038;
+              color: $GREY-80;
             }
           }
   
           .error-message {
-            color: #ff3b30;
+            color: $c211;
             font-size: 14px;
             margin-top: 16px;
           }
@@ -286,8 +288,8 @@
   
         .cancel-button {
           background: none;
-          border: 1px solid #045071;
-          color: #045071;
+          border: 1px solid $PRUSSIAN-70;
+          color: $PRUSSIAN-70;
           border-radius: 8px;
           padding: 12px 20px;
           font-size: 14px;
@@ -296,8 +298,8 @@
         }
 
         .create-button-disabled{
-          background-color: #8F92A3;
-          color: #E3E4E8;
+          background-color: $GREY-50;
+          color: $GREY-20;
           border: none;
           border-radius: 8px;
           padding: 12px 20px;
@@ -307,8 +309,8 @@
         }
   
         .create-button {
-          background-color: #045071;
-          color: white;
+          background-color: $PRUSSIAN-70;
+          color: $WHITE;
           border: none;
           border-radius: 8px;
           padding: 12px 20px;
@@ -319,5 +321,3 @@
       }
     }
   }
-
-

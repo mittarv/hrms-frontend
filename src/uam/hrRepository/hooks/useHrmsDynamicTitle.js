@@ -22,6 +22,9 @@ const useHrmsDynamicTitle = () => {
     if (pathname === '/leave-attendance') {
       return 'MittArv Toolbox | HRMS - Leave & Attendance';
     }
+    if (pathname === '/secondary-working-location') {
+      return 'MittArv Toolbox | HRMS - Secondary Working Location';
+    }
     if (pathname === '/hr-repo') {
       return 'MittArv Toolbox | HRMS - Home';
     }
@@ -36,6 +39,12 @@ const useHrmsDynamicTitle = () => {
     }
     if (pathname === '/hrms-access') {
       return 'MittArv Toolbox | HRMS - Access Management';
+    }
+    if (pathname === '/rewards-recognitions') {
+      return 'MittArv Toolbox | HRMS - Rewards & Recognitions';
+    }
+    if (pathname === '/rewards-recognitions/vote') {
+      return 'MittArv Toolbox | HRMS - Rewards & Recognitions';
     }
     
     // Default title for HRMS routes

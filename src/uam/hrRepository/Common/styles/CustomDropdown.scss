@@ -1,55 +1,64 @@
 /* CustomDropdown.scss */
+@use '../../design/colors/customColors' as *;
+
 .custom-dropdown-container {
   position: relative;
   width: 100%;
-  font-family: 'plus jakarta sans';
+  font-family: "Plus Jakarta Sans", sans-serif;
   
   .custom-dropdown-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     padding: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid $c76;
     border-radius: 6px;
-    background-color: white;
+    background-color: $WHITE;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: "Plus Jakarta Sans", sans-serif;
     min-height: 20px;
 
     &:hover {
-      border-color: #007bff;
+      border-color: $c171;
     }
 
     &:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      border-color: $c171;
+      box-shadow: 0 0 0 2px $c256;
     }
 
-    &:focus-within {
-      border-color: none;
-    //   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    &[data-state="open"] {
+      border-color: $c171;
     }
 
     &.error {
-      border-color: #dc3545;
+      border-color: $c77;
     }
 
     &.disabled {
-      background-color: #f8f9fa;
+      background-color: $c169;
       cursor: not-allowed;
       opacity: 0.6;
     }
 
     .selected-value {
-      color: #212529;
+      color: $c183;
       font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .placeholder {
-      color: #6c757d;
+      color: $c170;
       font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .dropdown-arrow {
@@ -71,51 +80,52 @@
 
   .custom-dropdown-menu {
     position: absolute;
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    background: $WHITE;
+    border: 0.5px solid $GREY-30;
+    border-radius: 4px;
+    box-shadow: none;
+    z-index: 1200;
     max-height: 200px;
     overflow: hidden;
     transition: all 0.2s ease;
 
     &.position-below {
-      top: calc(100% + 4px);
+      top: calc(100% + 8px);
     }
 
     &.position-above {
-      bottom: calc(100% + 4px);
+      bottom: calc(100% + 8px);
     }
 
     .dropdown-search {
       padding: 8px;
-      border-bottom: 1px solid #e9ecef;
-      white-space: nowrap;       /* Keep text on one line */
-      overflow: hidden;          /* Hide overflow */
-      text-overflow: ellipsis;   /* Show "..." when too long */
+      border-bottom: 1px solid $c173;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       .search-input {
         max-height: 30px;
         width: 100%;
         padding: 4px 10px;
-        border: 1px solid #ccc;
+        border: 1px solid $c76;
         border-radius: 4px;
         outline: none;
         font-size: 14px;
         font-family: "Plus Jakarta Sans", sans-serif;
-        white-space: nowrap;       /* Keep text on one line */
-        overflow: hidden;          /* Hide overflow */
-        text-overflow: ellipsis;   /* Show "..." when too long */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:focus {
-          border-color: none;
+          border-color: $CYAN-50;
         }
 
         &::placeholder {
-          color: #6c757d;
+          color: $c170;
         }
       }
     }
@@ -131,58 +141,77 @@
       }
 
       &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: $GREY-120;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
+        background: $c257;
         border-radius: 3px;
       }
 
       &::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
+        background: $c225;
       }
     }
 
     .dropdown-option {
-      padding: 10px 12px;
+      min-height: 44px;
+      padding: 12px 16px;
       cursor: pointer;
       transition: background-color 0.2s ease;
       font-size: 14px;
-      border-bottom: 1px solid #f8f9fa;
+      font-weight: 600;
+      line-height: 1.2;
+      color: $c203;
+      // border-bottom: 1px solid #eef2f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
 
       &:hover {
-        background-color: #f8f9fa;
+        background-color: $GREY-10;
       }
 
       &.highlighted {
-        background-color: #e3f2fd;
-        border-radius: 0;
+        background-color: $GREY-10;
+        border-radius: 0%;
       }
 
       &.selected {
-        background-color: #e3f2fd;
-        color: #1976d2;
-        font-weight: 500;
+        background-color: $GREY-10;
+        color: $c203;
       }
 
       &.highlighted.selected {
-        background-color: #bbdefb;
-        color: #1565c0;
-        border-radius: 0;
+        background-color: $GREY-10;
+        color: $c203;
       }
 
       &.disabled {
-        background-color: #f8f9fa;
-        color: #6c757d;
+        background-color: $c169;
+        color: $c170;
         cursor: not-allowed;
         opacity: 0.6;
       }
 
-      &.placeholder-option {
-        color: #999 !important;
-        font-style: italic;
-        opacity: 0.7;
+      .dropdown-option-label {
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .dropdown-option-check {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+
+      .dropdown-option-check-placeholder {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
       }
 
       &:last-child {
@@ -193,7 +222,7 @@
     .no-results {
       padding: 20px;
       text-align: center;
-      color: #6c757d;
+      color: $c170;
       font-style: italic;
       font-size: 14px;
     }
@@ -211,6 +240,7 @@
       }
 
       .dropdown-option {
+        min-height: 40px;
         padding: 8px 10px;
         font-size: 13px;
       }

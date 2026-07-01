@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .attendance-log {
   width: 100%;
   border-radius: 8px;
@@ -14,7 +16,7 @@
     p {
       font-size: 16px;
       font-weight: 600;
-      color: #2e3038;
+      color: $GREY-80;
       line-height: 24px;
       letter-spacing: 0.01em;
     }
@@ -34,7 +36,7 @@
         padding: 5px;
 
         &:hover {
-          background-color: #f5f5f5;
+          background-color: $c167;
           border-radius: 50%;
         }
 
@@ -53,14 +55,14 @@
 
   .filter-controls {
     padding: 5px 20px 12px 0px;
-    //   border-bottom: 1px solid #e0e0e0;
+    //   border-bottom: 1px solid $c66;
 
     .filter-checkbox {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 14px;
-      color: #555;
+      color: $c92;
       cursor: pointer;
 
       input[type="checkbox"] {
@@ -68,9 +70,9 @@
         appearance: none;
         width: 16px;
         height: 16px;
-        border: 1px solid #454754;
+        border: 1px solid $GREY-70;
         border-radius: 4px;
-        background-color: #fff;
+        background-color: $WHITE;
         position: relative;
 
         &:checked {
@@ -81,7 +83,7 @@
       }
 
       span {
-        color: #454754;
+        color: $GREY-70;
         font-size: 14px;
         font-weight: 500;
         line-height: 20px;
@@ -93,7 +95,7 @@
   .log-table {
     width: 100%;
     overflow-x: auto;
-    border: 0.5px solid #aeb0bc;
+    border: 0.5px solid $GREY-40;
     border-radius: 8px;
 
     table {
@@ -104,21 +106,21 @@
       td {
         padding: 12px 15px;
         text-align: left;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid $c66;
         font-size: 14px;
       }
 
       th {
         font-weight: 600;
-        color: #555;
-        background-color: #f9f9f9;
+        color: $c92;
+        background-color: $c93;
       }
 
       td {
-        color: #333;
+        color: $c75;
       }
       tr:nth-child(even) {
-        background-color: #f7f7f8;
+        background-color: $GREY-00;
       }
 
       .status-badge {
@@ -129,37 +131,37 @@
         font-weight: 500;
 
         &.working {
-          background-color: #ebfaf3;
-          color: #2e3038;
-          border: 1px solid #1eab69;
+          background-color: $GREEN-10;
+          color: $GREY-80;
+          border: 1px solid $GREEN-70;
           font-weight: 500;
         }
 
         &.half-day {
-          background-color: #fdfbe7;
-          color: #2e3038;
-          border: 1px solid #c6b410;
+          background-color: $YELLOW-10;
+          color: $GREY-80;
+          border: 1px solid $YELLOW-70;
           font-weight: 500;
         }
 
         &.on-leave {
-          background-color: #fcefe9;
-          color: #2e3038;
-          border: 1px solid #d9642a;
+          background-color: $ORANGE-10;
+          color: $GREY-80;
+          border: 1px solid $ORANGE-60;
           font-weight: 500;
         }
 
         &.weekend {
-          background-color: #f7f7f8;
-          color: #8f92a3;
-          border: 1px solid #8f92a3;
+          background-color: $GREY-00;
+          color: $GREY-50;
+          border: 1px solid $GREY-50;
           font-weight: 500;
         }
 
         &.not-set {
-          background-color: #f7f7f8;
-          color: #8f92a3;
-          border: 1px solid #8f92a3;
+          background-color: $GREY-00;
+          color: $GREY-50;
+          border: 1px solid $GREY-50;
           font-weight: 500;
         }
       }
@@ -176,7 +178,7 @@
         transition: background-color 0.2s;
 
         &:hover {
-          text-decoration: underline solid #045071 1px;
+          text-decoration: underline solid $PRUSSIAN-70 1px;
           text-underline-offset: 2px;
         }
 
@@ -187,7 +189,7 @@
 
         span {
           font-size: 12px;
-          color: #045071;
+          color: $PRUSSIAN-70;
           font-weight: 700;
         }
       }
@@ -201,7 +203,7 @@
     justify-content: center;
     padding: 3rem 1rem;
     text-align: center;
-    background-color: #f9f9f9;
+    background-color: $c93;
     border-radius: 8px;
 
     p {
@@ -210,14 +212,14 @@
       &:first-child {
         font-size: 1.2rem;
         font-weight: 500;
-        color: #666;
+        color: $c84;
       }
     }
 
     .no-data-subtext {
       margin-top: 0.5rem;
       font-size: 0.9rem;
-      color: #888;
+      color: $c201;
     }
   }
 }
