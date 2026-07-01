@@ -1,0 +1,125 @@
+name: Build, Deploy to Docker and Create Release Self Hosted
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_NAME: hrms-frontend
+  DOCKER_CONTAINER_NAME: hrms-frontend
+
+jobs:
+  build-and-deploy-using-docker:
+    name: Build and Deploy using Docker
+    environment: hrms-frontend
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Generate release tag
+        id: tag
+        shell: pwsh
+        run: |
+          $RELEASE_DATE = Get-Date -Format "yyyy-MM-dd"
+          $SHORT_SHA = git rev-parse --short HEAD
+          $RELEASE_TAG = "release-$RELEASE_DATE-$SHORT_SHA"
+
+          Write-Host "Release tag: $RELEASE_TAG"
+
+          "release_tag=$RELEASE_TAG" >> $env:GITHUB_OUTPUT
+          "RELEASE_TAG=$RELEASE_TAG" >> $env:GITHUB_ENV
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git tag -a $RELEASE_TAG -m "Release $RELEASE_TAG"
+          git push origin $RELEASE_TAG
+
+      - name: Create .env file from GitHub variables
+        shell: pwsh
+        env:
+          VITE_REACT_APP_GOOGLE_CLIENT_ID: ${{ vars.VITE_REACT_APP_GOOGLE_CLIENT_ID }}
+          VITE_REACT_APP_GOOGLE_SECRET: ${{ secrets.VITE_REACT_APP_GOOGLE_SECRET }}
+          VITE_REACT_APP_HOSTED_URL: ${{ vars.VITE_REACT_APP_HOSTED_URL }}
+          VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
+          VITE_ALLOWED_EMAIL_DOMAIN: ${{ vars.VITE_ALLOWED_EMAIL_DOMAIN }}
+          HOST_PORT: ${{ vars.HOST_PORT }}
+        run: |
+          @"
+          VITE_REACT_APP_GOOGLE_CLIENT_ID=$env:VITE_REACT_APP_GOOGLE_CLIENT_ID
+          VITE_REACT_APP_GOOGLE_SECRET=$env:VITE_REACT_APP_GOOGLE_SECRET
+          VITE_REACT_APP_HOSTED_URL=$env:VITE_REACT_APP_HOSTED_URL
+          VITE_ENCRYPTION_KEY=$env:VITE_ENCRYPTION_KEY
+          VITE_ALLOWED_EMAIL_DOMAIN=$env:VITE_ALLOWED_EMAIL_DOMAIN
+          HOST_PORT=$env:HOST_PORT
+          "@ | Set-Content .env
+
+      - name: Stop and remove existing container
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          docker compose down --remove-orphans
+          docker stop hrms-frontend
+          docker rm hrms-frontend
+
+      - name: Build and deploy with Docker Compose
+        shell: pwsh
+        env:
+          VITE_REACT_APP_GOOGLE_SECRET: ${{ secrets.VITE_REACT_APP_GOOGLE_SECRET }}
+          VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
+        run: |
+          docker compose up -d --build hrms-frontend
+
+      - name: Verify container is running
+        shell: pwsh
+        run: |
+          Start-Sleep -Seconds 15
+          docker ps -f name=hrms-frontend
+
+      - name: Clean up .env file
+        if: always()
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          Remove-Item .env -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
+          body: |
+            ## Deployment Information
+
+            - **Docker Image:** `${{ env.DOCKER_IMAGE_NAME }}:${{ env.RELEASE_TAG }}`
+            - **Container Name:** `${{ env.DOCKER_CONTAINER_NAME }}`
+            - **Port:** `${{ vars.HOST_PORT || 3050 }}`
+            - **Commit:** `${{ github.sha }}`
+            - **Branch:** `${{ github.ref_name }}`
+            - **Deployed by:** @${{ github.actor }}
+
+            ---
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deployment Summary
+        shell: pwsh
+        run: |
+          @"
+          ## Deployment Successful! 🚀
+
+          **Release Tag:** ${{ env.RELEASE_TAG }}
+
+          **Commit:** ${{ github.sha }}
+          **Branch:** ${{ github.ref_name }}
+          **Release:** https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}
+          "@ >> $env:GITHUB_STEP_SUMMARY
