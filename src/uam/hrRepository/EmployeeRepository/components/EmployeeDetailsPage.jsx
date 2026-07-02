@@ -451,7 +451,7 @@ const EmployeeDetailsPage = () => {
           getAllComponentType?.gender_type_dropdown[initialFormData?.empGender] ||
           initialFormData?.empGender;
       }
-      if (initialFormData?.empBloodGroup != null && initialFormData.empBloodGroup.toString()) {
+      if (initialFormData?.empBloodGroup !== null && initialFormData?.empBloodGroup !== undefined && initialFormData.empBloodGroup.toString() !== "") {
         initialFormData.empBloodGroup =
         getAllComponentType?.blood_group_dropdown && getAllComponentType?.blood_group_dropdown[
             initialFormData?.empBloodGroup
