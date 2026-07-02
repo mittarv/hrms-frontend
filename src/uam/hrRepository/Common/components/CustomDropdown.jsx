@@ -35,7 +35,7 @@ const CustomDropdown = ({
       )
     : options;
 
-  const resolvedValue = String(value || "");
+  const resolvedValue = String(value ?? "");
   const renderedOptions = allowClearSelection
     ? [{ value: clearOptionLabel, isClearOption: true }, ...filteredOptions]
     : filteredOptions;
@@ -58,17 +58,23 @@ const CustomDropdown = ({
     let position = 'below';
     let maxHeight = defaultDropdownHeight;
     
-    // If there's not enough space below and there's more space above, position above
-    if (spaceBelow < defaultDropdownHeight && spaceAbove > spaceBelow) {
+    if (spaceBelow >= defaultDropdownHeight) {
+      // Enough space below — open downward
+      position = 'below';
+      maxHeight = defaultDropdownHeight;
+    } else if (spaceAbove >= defaultDropdownHeight) {
+      // Not enough below but enough above — open upward
       position = 'above';
-      maxHeight = Math.min(defaultDropdownHeight, spaceAbove);
+      maxHeight = defaultDropdownHeight;
+    } else if (spaceAbove > spaceBelow) {
+      // Neither side has full space, but above has more — open upward
+      position = 'above';
+      maxHeight = Math.max(spaceAbove, 160);
     } else {
-      // Position below but adjust height if needed
-      maxHeight = Math.min(defaultDropdownHeight, spaceBelow);
+      // Below has more or equal space — open downward
+      position = 'below';
+      maxHeight = Math.max(spaceBelow, 160);
     }
-    
-    // Ensure minimum height
-    maxHeight = Math.max(maxHeight, 100);
     
     setDropdownMaxHeight(maxHeight);
     return position;
@@ -270,7 +276,7 @@ const CustomDropdown = ({
       {isOpen && !disabled && (
         <div 
           className={`custom-dropdown-menu ${dropdownPosition === 'above' ? 'position-above' : 'position-below'}`}
-          style={{ maxHeight: `${dropdownMaxHeight}px` }}
+          style={{ maxHeight: `${dropdownMaxHeight}px`, zIndex: 9999 }}
         >
           {searchable && (
             <div className="dropdown-search">
@@ -290,12 +296,12 @@ const CustomDropdown = ({
             className="dropdown-options"
             role="listbox"
             style={{ 
-              maxHeight: searchable ? `${dropdownMaxHeight - 60}px` : `${dropdownMaxHeight - 20}px` 
+              maxHeight: searchable ? `${dropdownMaxHeight - 60}px` : `${dropdownMaxHeight - 20}px`
             }}
           >
             {renderedOptions.length > 0 ? (
               renderedOptions.map((option, index) => {
-                const optionValue = String(option?.value || "");
+                const optionValue = String(option?.value ?? "");
                 const isSelected = option?.isClearOption
                   ? !resolvedValue
                   : resolvedValue === optionValue;
