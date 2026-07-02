@@ -29,7 +29,7 @@ export default function DynamicTable({
     // Auto-calculate Loss of Pay amount after merging data from API
     const updatedRows = mergedRows.map(row => {
       if (title === "Default Deduction" && row.componentName === "Loss of Pay(per day)") {
-        const calculatedAmount = calculateLossOfPayAmount(mergedRows);
+        const calculatedAmount = calculateLossOfPayAmount(mergedRows, row._originalData?.amount || row.amount);
         return {
           ...row,
           amount: calculatedAmount
@@ -47,7 +47,7 @@ export default function DynamicTable({
     if (title === "Default Deduction") {
       return updatedRows.map(row => {
         if (row.componentName === "Loss of Pay(per day)") {
-          const calculatedAmount = calculateLossOfPayAmount(updatedRows);
+          const calculatedAmount = calculateLossOfPayAmount(updatedRows, row._originalData?.amount || row.amount);
           return {
             ...row,
             amount: calculatedAmount,
@@ -208,7 +208,7 @@ export default function DynamicTable({
         setTableRows(prevRows => {
           const updatedRows = prevRows.map(row => {
             if (row.componentName === "Loss of Pay(per day)" || row.componentName === "Loss of Payper day)" || row.componentName.includes("Loss of Pay")) {
-              const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows);
+              const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows, row._originalData?.amount || row.amount);
               return {
                 ...row,
                 amount: calculatedAmount,
@@ -402,6 +402,7 @@ export default function DynamicTable({
         rowData.componentName === "Loss of Payper day)" || 
         rowData.componentName.includes("Loss of Pay")
       );
+      console.log(fieldValue)
       
       return isSalaryConfigEditing ? (
         <input
@@ -466,13 +467,13 @@ export default function DynamicTable({
       // For Default Deduction: Loss of pay (per Day) auto-calc logic
       if (isLossOfPayRow) {
         // Get all Default Addition rows from all tables (need to access global state or use event system)
-        const calculatedAmount = calculateLossOfPayAmount(tableRows);
+        const calculatedAmount = calculateLossOfPayAmount(tableRows, rowData._originalData?.amount || rowData.amount);
         displayValue = calculatedAmount;
         isFieldDisabled = true;
         
         // Also check if we can get Default Addition data from global state or events
         if (typeof window !== 'undefined' && window.defaultAdditionTableData) {
-          const globalCalculatedAmount = calculateLossOfPayAmount(window.defaultAdditionTableData);
+          const globalCalculatedAmount = calculateLossOfPayAmount(window.defaultAdditionTableData, rowData._originalData?.amount || rowData.amount);
           displayValue = globalCalculatedAmount;
         }
       } else if (isDefaultAddition) {

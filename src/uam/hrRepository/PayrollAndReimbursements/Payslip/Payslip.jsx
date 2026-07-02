@@ -15,12 +15,15 @@ const Payslip = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(
-      getEmployeePayslips(
-        user.employeeUuid,
-        selectedPayslipYear
-      )
-    );
+    // Only fetch payslips if user has an employeeUuid (is onboarded)
+    if (user?.employeeUuid) {
+      dispatch(
+        getEmployeePayslips(
+          user.employeeUuid,
+          selectedPayslipYear
+        )
+      );
+    }
   }, [selectedPayslipYear, user, dispatch]);
 
 

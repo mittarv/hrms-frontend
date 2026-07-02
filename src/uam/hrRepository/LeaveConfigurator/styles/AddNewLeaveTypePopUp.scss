@@ -1,23 +1,25 @@
+@use '../../design/colors/customColors' as *;
+
 .modal_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(158, 185, 197, 0.25);
+    background-color: $c68;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
 
     .modal_container {
-        background-color: #ffffff;
+        background-color: $LIGHT;
         border-radius: 26px;
         padding: 24px;
         width: auto;
         height: auto;
         position: relative;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px $c69;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -26,11 +28,11 @@
             font-size: 18px;
             font-weight: 700;
             font-family: 'Plus Jakarta Sans';
-            color: #033348;
+            color: $PRUSSIAN-80;
         }
 
         .horizontal_line{
-            border: 0.25px solid #C7C9D1;
+            border: 0.25px solid $GREY-30;
             margin: 24px 0px;
 
         }
@@ -45,7 +47,7 @@
                 font-size: 14px;
                 font-weight: 700;
                 font-family: 'Plus Jakarta Sans';
-                color: #033348;
+                color: $PRUSSIAN-80;
             }
 
             input {
@@ -53,15 +55,15 @@
                 max-width: 500px;
                 height: 40px;
                 padding: 10px;
-                border: 0.35px solid #8CACBA;
+                border: 0.35px solid $c228;
                 border-radius: 5px;
                 font-size: 14px;
                 font-weight: 400;
                 font-family: 'Plus Jakarta Sans';
-                color: #033348;
+                color: $PRUSSIAN-80;
 
                 &::placeholder {
-                    color: #6B7280;
+                    color: $c87;
                 }
 
                 &:focus {
@@ -73,7 +75,7 @@
                 font-size: 14px;
                 font-weight: 400;
                 font-family: 'Plus Jakarta Sans';
-                color: #FF0000;
+                color: $c79;
             }
 
         }
@@ -85,10 +87,10 @@
 
 
             .cancel_leave_button{
-                border: 2px solid #033348;
+                border: 2px solid $PRUSSIAN-80;
                 padding: 10px 25px;
-                background-color: #ffffff;
-                color: #033348;
+                background-color: $LIGHT;
+                color: $PRUSSIAN-80;
                 border-radius: 10px;
                 font-size: 16px;
                 font-weight: 600;
@@ -97,10 +99,10 @@
             }
 
             .submit_leave_button{
-                border: 2px solid #045071;
+                border: 2px solid $PRUSSIAN-70;
                 padding: 10px 25px;
-                background-color: #045071;
-                color: #ffffff;
+                background-color: $PRUSSIAN-70;
+                color: $LIGHT;
                 border-radius: 10px;
                 font-size: 16px;
                 font-weight: 600;

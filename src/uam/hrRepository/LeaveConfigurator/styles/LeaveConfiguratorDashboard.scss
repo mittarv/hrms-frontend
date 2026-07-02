@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .leave_configurator_container * {
     box-sizing: border-box;
     font-family: "Plus Jakarta Sans";
@@ -5,28 +7,9 @@
 
 .leave_configurator_container {
     padding: 1.5rem 2.25rem;
-    height: 100%;
-    overflow: auto;
-
-    &::-webkit-scrollbar {
-        width: 10px;
-    }
-    
-    &::-webkit-scrollbar-track {
-        background: #D2D9DF;
-        border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        background: #054A68;
-        border-radius: 4px;
-    }
 
     .leave_configurator_dashboard_body_container {
         width: 100%;
-        height: 100%;
-        overflow-y: hidden;
-        object-fit: contain;
 
             .leave_configurator_dashboard_heading_container {
                 display: flex;
@@ -41,14 +24,14 @@
                     .leave_configurator_dashboard_title {
                         font-size: 28px;
                         font-weight: 700;
-                        color: #033348;
+                        color: $PRUSSIAN-80;
                         font-family: "Plus Jakarta Sans";
                     }
 
                     .leave_configurator_dashboard_sub_title {
                         font-size: 16px;
                         font-weight: 400;
-                        color: #033348;
+                        color: $PRUSSIAN-80;
                         font-family: "Plus Jakarta Sans";
                     }
                 }
@@ -59,8 +42,8 @@
 
                     .leave_configurator_dashboard_button:first-child {
                         cursor: not-allowed;
-                        background-color: white;
-                        border: 2px solid #045071;
+                        background-color: $WHITE;
+                        border: 2px solid $PRUSSIAN-70;
                         padding: 0px 10px !important;
 
                         .request_button_container {
@@ -70,7 +53,7 @@
                             
                                                    
                             p {
-                                color: #045071 !important;
+                                color: $PRUSSIAN-70 !important;
                                 font-size: 16px;
                                 font-weight: 600;
                                 font-family: "Plus Jakarta Sans";
@@ -87,7 +70,7 @@
                         padding: 10px;
                         border: none;
                         border-radius: 5px;
-                        background-color: #045071;
+                        background-color: $PRUSSIAN-70;
                         cursor: pointer;
 
 
@@ -97,7 +80,7 @@
                             gap: 12px;
                             font-size: 16px;
                             font-weight: 400;
-                            color: #ffffff;
+                            color: $LIGHT;
                             font-family: "Plus Jakarta Sans";
                         }
                     }
@@ -115,11 +98,11 @@
                             padding: 10px;
                             border: none;
                             border-radius: 5px;
-                            background-color: #045071;
+                            background-color: $PRUSSIAN-70;
                             cursor: pointer;
 
                             &:hover {
-                                background-color: #033348;
+                                background-color: $PRUSSIAN-80;
                             }
 
                             .Add_leaves_button{
@@ -128,15 +111,15 @@
                                 gap: 12px;
                                 font-size: 16px;
                                 font-weight: 400;
-                                color: #ffffff;
+                                color: $LIGHT;
                                 font-family: "Plus Jakarta Sans";
                             }
                         
                         }
                         .Add_leaves_button_dropdown{
                             position: absolute;
-                            background-color: #ffffff;
-                            border: 0.25px solid #E3E4E8CC;
+                            background-color: $LIGHT;
+                            border: 0.25px solid $c229;
                             border-radius: 5px;
                             z-index: 1;
                             width: 140px;
@@ -150,16 +133,16 @@
                             }
                         
                             &::-webkit-scrollbar-track {
-                                background: #d2d9df;
+                                background: $c7;
                                 border-radius: 4px;
                             }
                         
                             &::-webkit-scrollbar-thumb {
-                                background: #054a68;
+                                background: $c3;
                                 border-radius: 4px;
                         
                                 &:hover {
-                                background: #bbb;
+                                background: $c163;
                                 }
                             }
                             
@@ -168,7 +151,7 @@
                                 height: auto;
                                 display: flex;
                                 align-items: center;
-                                color: #045071;
+                                color: $PRUSSIAN-70;
                                 font-size: 16px;
                                 font-weight: 600;
                                 font-family: "Plus Jakarta Sans";
@@ -176,7 +159,7 @@
                                 cursor: pointer;
 
                                 &:hover{
-                                    background-color: #E7F3F8;
+                                    background-color: $PRUSSIAN-10;
                                 }
                             }
                         }
@@ -185,4 +168,3 @@
             }
         }
     }
-

@@ -9,7 +9,7 @@ import LeaveAvailable from "./LeaveAvailable";
 import AttendanceLog from "./AttendanceLog";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
 import { useSelector } from "react-redux";
-import { normalizeTime } from "../../Common/utils/helper";
+import { normalizeTime, handleViewProofClick } from "../../Common/utils/helper";
 import {
   createAttendanceLog,
   getAttendanceLogs,
@@ -22,6 +22,8 @@ import {
 import { useDispatch } from "react-redux";
 import { getLeaveType } from "../../Common/utils/helper";
 import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
+import FileViewer from "../../Common/components/FileViewerPop";
+import Redirect_Icon from "../../assets/icons/redirect_icon_blue.svg";
 
 export default function AttendanceCalendar() {
   const {
@@ -37,9 +39,13 @@ export default function AttendanceCalendar() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [filesToView, setFilesToView] = useState([]);
   const dispatch = useDispatch();
   const monthDropdownRef = useRef(null);
   const yearDropdownRef = useRef(null); 
+  const calendarContainerRef = useRef(null);
+  const [leavePanelHeight, setLeavePanelHeight] = useState(null);
   const { allExisitingLeaves } = useSelector(
     (state) => state.hrRepositoryReducer
   );
@@ -95,6 +101,7 @@ export default function AttendanceCalendar() {
             leaveRequestId: record?.leaveRequestId,
             leaveConfigId: record?.leaveConfigId,
             leaveType: getLeaveTypeFromConfigId(record?.leaveConfigId),
+            attachmentPath: record?.attachmentPath || null,
           };
         }
       });
@@ -138,6 +145,33 @@ export default function AttendanceCalendar() {
       }
     }
   }, [showYearDropdown, currentDate]);
+
+  useEffect(() => {
+    if (!showCalendarAndTable) return;
+
+    const calendarNode = calendarContainerRef.current;
+    if (!calendarNode) return;
+
+    const updateLeavePanelHeight = () => {
+      setLeavePanelHeight(Math.ceil(calendarNode.getBoundingClientRect().height));
+    };
+
+    updateLeavePanelHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(() => {
+      updateLeavePanelHeight();
+    });
+
+    observer.observe(calendarNode);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [showCalendarAndTable]);
 
   const handleDateClick = (day) => {
     const date = new Date(
@@ -290,7 +324,10 @@ const handleEdit = (currentAttendance) => {
     const isCompOffLeave = (leaveConfigId) => {
       if (!leaveConfigId) return false;
       const leave = allExisitingLeaves.find(l => l.leaveConfigId === leaveConfigId);
-      return leave && (leave.leaveType?.toLowerCase().includes('comp') || leave.leaveType?.toLowerCase().includes('comp off'));
+      //return leave && leave.leaveExpiresAfter !== null && leave.leaveExpiresAfter !== undefined;
+       const expiry = leave?.leaveExpiresAfter;
+       const expiryDays = Number(expiry);
+       return Number.isFinite(expiryDays) && expiryDays > 0;
     };
 
     if (isUpdate) {
@@ -390,49 +427,9 @@ const handleEdit = (currentAttendance) => {
             <LoadingSpinner message="Loading attendance data..." height="200px" />
           </div>
         )}
-        <div className="calendar-container">
+        <div className="calendar-container" ref={calendarContainerRef}>
           <div className="calendar-inner-container">
             <div className="calendar-header">
-              <div className="month-navigation">
-                <button onClick={() => navigateMonth(-1)}>
-                  <img src={Left_arrow} alt="left_arrow" />
-                </button>
-                <div className="custom-dropdown">
-                  <div
-                    className="dropdown-selector"
-                    onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-                  >
-                    {months[currentDate.getMonth()]}
-                    <span className="dropdown-arrow">▼</span>
-                  </div>
-                  {showMonthDropdown && (
-                    <div
-                      className="dropdown-menu month-menu"
-                      ref={monthDropdownRef}
-                    >
-                      {months.map((month, index) => (
-                        <div
-                          key={month}
-                          className={`dropdown-item ${
-                            currentDate.getMonth() === index ? "active" : ""
-                          }`}
-                          onClick={() => {
-                            setCurrentDate(
-                              (prev) => new Date(prev.getFullYear(), index, 1)
-                            );
-                            setShowMonthDropdown(false);
-                          }}
-                        >
-                          {month}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <button onClick={() => navigateMonth(1)}>
-                  <img src={Right_arrow} alt="right_arrow" />
-                </button>
-              </div>
               <div className="year-navigation">
                 <button onClick={() => navigateYear(-1)}>
                   <img src={Left_arrow} alt="left_arrow" />
@@ -473,6 +470,46 @@ const handleEdit = (currentAttendance) => {
                   <img src={Right_arrow} alt="right_arrow" />
                 </button>
               </div>
+                <div className="month-navigation">
+                <button onClick={() => navigateMonth(-1)}>
+                  <img src={Left_arrow} alt="left_arrow" />
+                </button>
+                <div className="custom-dropdown">
+                  <div
+                    className="dropdown-selector"
+                    onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+                  >
+                    {months[currentDate.getMonth()]}
+                    <span className="dropdown-arrow">▼</span>
+                  </div>
+                  {showMonthDropdown && (
+                    <div
+                      className="dropdown-menu month-menu"
+                      ref={monthDropdownRef}
+                    >
+                      {months.map((month, index) => (
+                        <div
+                          key={month}
+                          className={`dropdown-item ${
+                            currentDate.getMonth() === index ? "active" : ""
+                          }`}
+                          onClick={() => {
+                            setCurrentDate(
+                              (prev) => new Date(prev.getFullYear(), index, 1)
+                            );
+                            setShowMonthDropdown(false);
+                          }}
+                        >
+                          {month}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button onClick={() => navigateMonth(1)}>
+                  <img src={Right_arrow} alt="right_arrow" />
+                </button>
+              </div>
             </div>
             <div className="calendar-grid">
               {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
@@ -502,7 +539,7 @@ const handleEdit = (currentAttendance) => {
             </div>
           </div>
         </div>
-        <LeaveAvailable />
+        <LeaveAvailable panelHeight={leavePanelHeight} />
         {showViewModal && selectedDate && (
           <div className="modal click-modal">
             <div className="modal-content">
@@ -588,6 +625,42 @@ const handleEdit = (currentAttendance) => {
                       : "A short, optional description of your day"}
                   </p>
                 </div>
+                {currentAttendance?.attachmentPath && (() => {
+                  try {
+                    let attachments;
+                    if (typeof currentAttendance.attachmentPath === 'string') {
+                      try {
+                        attachments = JSON.parse(currentAttendance.attachmentPath);
+                      } catch {
+                        // Legacy single-string format (URL or base64)
+                        attachments = [currentAttendance.attachmentPath];
+                      }
+                    } else if (currentAttendance.attachmentPath?.type === 'Buffer') {
+                      attachments = [currentAttendance.attachmentPath];
+                    } else {
+                      attachments = currentAttendance.attachmentPath;
+                    }
+                    if (!Array.isArray(attachments)) attachments = [attachments];
+                    if (attachments.length > 0) {
+                      return (
+                        <div className="proof-details">
+                          <p className="proof-title">Proof ({attachments.length} {attachments.length > 1 ? "Files" : "File"})</p>
+                          <button
+                            className="view-proof-link"
+                            onClick={() => handleViewProofClick(currentAttendance.attachmentPath, setFilesToView, setViewerOpen)}
+                          >
+                            <span>View All</span>
+                            <img src={Redirect_Icon} alt="View" />
+                          </button>
+                        </div>
+                      );
+                    }
+                    return null;
+                  } catch (e) {
+                    console.warn('Failed to parse attachmentPath:', e);
+                    return null;
+                  }
+                })()}
               </div>
             </div>
           </div>
@@ -628,6 +701,12 @@ const handleEdit = (currentAttendance) => {
           setShowEditModal={setShowEditModal}
         />
       </div>
+      <FileViewer
+        fileUrls={filesToView}
+        open={viewerOpen}
+        onClose={() => { setViewerOpen(false); setFilesToView([]); }}
+        initialIndex={0}
+      />
     </>
   );
 }

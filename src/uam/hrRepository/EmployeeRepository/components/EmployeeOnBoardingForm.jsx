@@ -11,6 +11,7 @@ import LoadingSpinner from "../../Common/components/LoadingSpinner";
 import CustomDropdown from "../../Common/components/CustomDropdown";
 import CurrencyInput from "../../Common/components/CurrencyInput";
 import { findMatchingKey } from "../../Common/utils/helper";
+import { getFilteredLevelOptions } from "../../Common/utils/payrollLevelUtils";
 const EmployeeOnBoardingForm = () => {
   // Redux state selectors for component types and manager details
   const {loading, getAllComponentType, getAllManagersDetails, getAllCountries, defaultComponents } = useSelector(
@@ -393,42 +394,10 @@ const EmployeeOnBoardingForm = () => {
     };
   }, [getAllComponentType, getAllManagersDetails]);
 
-  // Memoize filtered level options based on employee type
-  const levelOptions = useMemo(() => {
-    let options = [...dropdownOptions.levelBase];
-    
-    // Filter options for OFTE and PTE employee types - only allow levels 1, 2, 3
-    if (formData?.emp_type === "OFTE" || formData?.emp_type === "PTE") {
-      options = options.filter(option => {
-        const levelValue = option.value.toString().toLowerCase();
-        return levelValue.includes('1') || levelValue.includes('2') || levelValue.includes('3') || 
-               levelValue === 'level 1' || levelValue === 'level 2' || levelValue === 'level 3' ||
-               levelValue === '1' || levelValue === '2' || levelValue === '3';
-      });
-    }
-    
-    // Filter options for FTE employee type - exclude levels 1, 2, 3
-    if (formData?.emp_type === "FTE") {
-      options = options.filter(option => {
-        const levelValue = option.value.toString().toLowerCase();
-        return !(levelValue.includes('1') || levelValue.includes('2') || levelValue.includes('3') || 
-                levelValue === 'level 1' || levelValue === 'level 2' || levelValue === 'level 3' ||
-                levelValue === '1' || levelValue === '2' || levelValue === '3' || 
-                levelValue === 'intern' || levelValue === 'trainee');
-      });
-    }
-
-    // Filter options for Intern and extended intern employee type - only allow level Intern
-    if (formData?.emp_type === "Intern" || formData?.emp_type === "Extended Intern") {
-      options = options.filter(option => {
-        const levelValue = option.value.toString().toLowerCase();
-        return levelValue === 'intern' || levelValue === 'trainee';
-      });
-    }
-
-    // options.push({ key: "create_new", value: "Create New Level", disabled: true });
-    return options;
-  }, [dropdownOptions.levelBase, formData?.emp_type]);
+  const levelOptions = useMemo(
+    () => getFilteredLevelOptions(getAllComponentType?.level_dropdown || {}, formData?.emp_type),
+    [getAllComponentType?.level_dropdown, formData?.emp_type]
+  );
 
   /**
    * Renders form field based on input type

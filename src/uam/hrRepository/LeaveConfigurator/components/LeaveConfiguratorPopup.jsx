@@ -201,4 +201,5 @@ const LeaveDiscardPopup = ({searchParams,setSearchParams = () => {}, setFormData
   );
 };
 
+
 export {AddNewLeaveTypePopUp, MandatoryFieldPopup, LeaveCreatedSuccess, LeaveDiscardPopup};

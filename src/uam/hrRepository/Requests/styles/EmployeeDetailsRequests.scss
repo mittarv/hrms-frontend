@@ -1,3 +1,6 @@
+@use "../../../../design/colors/customFonts" as fonts;
+@use '../../design/colors/customColors' as *;
+
 .employee_details_requests_main_container {
   display: flex;
   flex-direction: column;
@@ -9,61 +12,88 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap:20px;
+    gap: 20px;
+
+    .requests_sub_tabs {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      background-color: $WHITE;
+      border: 1px solid $GREY-20; 
+      border-radius: 8px;
+      padding: 6px 8px;
+      width: fit-content;
+      min-width: 100%;
+      box-shadow: 0 2px 4px $c71;
+      gap:20px;
+      
+      .sub_tab {
+        padding: 8px 16px;
+        font-size: fonts.$font-size-small;
+        font-weight: fonts.$font-weight-semibold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: fonts.$font-family;
+      }
+
+    
+    .sub_tab.active {
+      background-color: $CYAN-70;
+      color: $WHITE;
+    }
+
+    
+    .sub_tab:not(.active) {
+      color: $GREY-60;
+    }
+
+    /* Optional: Hover effect for inactive tab */
+    .sub_tab:not(.active):hover {
+      background-color: $c157;
+      color: $c158;
+    }
+    }
+
+    /* Base style for both tabs */
+
   }
 
-  .date-filter {
+  .date-filter-dropdowns {
     display: flex;
-    flex-direction: row;
-    gap: 24px;
+    gap: 12px;
+    align-items: center;
 
-    .date-input {
-      width: fit-content;
-      object-fit: contain;
-      display: flex;
-      gap: 9px;
-      align-items: center;
+    .custom-select-wrapper {
+      position: relative;
 
-      label {
-        font-size: 14px;
-        font-weight: 600;
-        font-family: "Plus Jakarta Sans";
-        color: #2e3038;
-      }
-
-      .custom-date-input {
-        position: relative;
-        width: 100%;
-      }
-
-      .custom-date-input input[type="text"] {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #c7c9d1;
-        border-radius: 4px;
-        background: url("../../../../assets/icons/Calendar_enable_grey_icon.svg") no-repeat left 10px center;
-        color: #454754;
-        font-size: 14px;
-        font-weight: 600;
-        font-family: "Plus Jakarta Sans";
-        text-align: center;
-        
-       
-      }
-
-      /* Hide the calendar icon if needed */
-      input[type="date"]::-webkit-calendar-picker-indicator {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        margin: 0;
-        padding: 0;
+      .filter-select {
+        appearance: none;
+        background-color: $c160;
+        border: 1px solid $c161;
+        border-radius: 12px;
+        padding: 10px 40px 10px 16px;
+        font-size: fonts.$font-size-small;
+        font-weight: fonts.$font-weight-semibold;
+        font-family: fonts.$font-family;
+        color: $c162;
         cursor: pointer;
+        outline: none;
+        min-width: 120px;
+        background-image: url('../../../../assets/icons/dropdown_arrow.svg');
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 10px;
+
+        &:hover {
+          border-color: $c159;
+        }
       }
     }
   }
+
 
   .requests_action_buttons {
     display: flex;
@@ -76,55 +106,55 @@
       font-weight: 700;
 
       &.requests_approve_button {
-        background-color: #045071;
+        background-color: $PRUSSIAN-70;
         padding: 12px 16px;
         border: none;
         border-radius: 8px;
         cursor: pointer;
 
         &:hover {
-          background-color: #033348;
+          background-color: $PRUSSIAN-80;
         }
 
         span {
-          color: #fff;
-          font-size: 14px;
-          font-weight: 700;
-          font-family: "Plus Jakarta Sans";
+          color: $WHITE;
+          font-size: fonts.$font-size-small;
+          font-weight: fonts.$font-weight-bold;
+          font-family: fonts.$font-family;
           display: flex;
           align-items: center;
         }
 
-        &.disabled{
+        &.disabled {
           cursor: not-allowed;
-          background-color: #8f92a3; 
+          background-color: $GREY-50; 
         }
       }
 
       &.requests_reject_button {
-        background-color: #ffffff;
+        background-color: $WHITE;
         padding: 12px 16px;
-        border: 1px solid #c73d45;
+        border: 1px solid $RED-60;
         border-radius: 8px;
         cursor: pointer;
-        color: #c73d45;
+        color: $RED-60;
 
         &:hover {
-          background-color: #e3e4e8;
+          background-color: $GREY-20;
         }
 
         span {
-          font-size: 14px;
-          font-weight: 700;
-          font-family: "Plus Jakarta Sans";
+          font-size: fonts.$font-size-small;
+          font-weight: fonts.$font-weight-bold;
+          font-family: fonts.$font-family;
           display: flex;
           align-items: center;
         }
 
-        &.disabled{
+        &.disabled {
           cursor: not-allowed;
-          color: #e8a1a6;
-          border: 1px solid #e8a1a6;
+          color: $RED-30;
+          border: 1px solid $RED-30;
         }
       }
     }
@@ -132,47 +162,46 @@
 
   .employee_requests_table_container {
     width: 100%;
-    flex:1;
-    min-height: 0;
+    max-width: 100%;
     overflow-x: auto;
-    background: #fff;
-    overflow-y: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    background: $WHITE;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 1px 3px $c69;
     margin-top: 22px;
-    border: 1px solid #c7c9d1;
+    border: 1px solid $GREY-30;
 
     &::-webkit-scrollbar {
       width: 4px;
     }
 
     &::-webkit-scrollbar-track {
-      background: #d2d9df;
+      background: $c7;
       border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #054a68;
+      background: $c3;
       border-radius: 4px;
 
       &:hover {
-        background: #bbb;
+        background: $c163;
       }
     }
 
     .employee_requests_table {
-      width: 100%;
+      width: max-content;
+      min-width: 100%;
       border-collapse: collapse;
-      // min-width: 600px;
-      font-size: 160px;
+      font-size: fonts.$font-size-small;
+
       .checked-row {
-        background-color: #e7f3f8 !important;  
+        background-color: $PRUSSIAN-10 !important;  
       }
 
 
-    
+
 
       input[type="checkbox"] {
         width: 16px;
@@ -203,48 +232,93 @@
         top: 0;
         padding: 8px;
         text-align: left;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid $c95;
         z-index: 0;
-         font-family: "Plus Jakarta Sans";
-        font-weight: 700;
-        color: #033348;
-        background-color: #f9fafb;
-        font-size: 14px;
+        font-family: fonts.$font-family;
+        font-weight: fonts.$font-weight-bold;
+        color: $PRUSSIAN-70;
+        background-color: $c154;
+        font-size: fonts.$font-size-small;
+        min-width: 140px;
+        white-space: nowrap;
       }
-    
 
-     
-      .person_name{
-        color: #045071;;
-        font-weight: 700;
-        font-size: 12px;
-        font-family: "Plus Jakarta Sans";
+
+
+      .person_name {
+        color: #045071;
+        font-weight: fonts.$font-weight-bold;
+        font-size: fonts.$font-size-xs;
+        font-family: fonts.$font-family;
         text-decoration: underline;
         text-underline-offset: 4px;
-      
+
       }
+
       td {
-        height: 44px;
+
         padding: 8px;
         text-align: left;
-        color: #454754;
-        font-size: 14px;
-        font-weight: 500;
-        font-family: "Plus Jakarta Sans";
-      
+        color:  $GREY-70;
+        font-size: fonts.$font-size-small;
+        font-weight: fonts.$font-weight-medium;
+        font-family: fonts.$font-family;
+        white-space: nowrap;
+
       }
-      
-      .checkbox-cell{
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 16px;
+        border-radius: 999px;
+        font-size: fonts.$font-size-small;
+        line-height: 1.3;
+        font-weight: fonts.$font-weight-medium;
+        text-transform: capitalize;
+        white-space: nowrap;
+        border: 1px solid $c290;
+        color: $GREY-80;
+        background: $c291;
+
+        &.status-accepted,
+        &.status-approved {
+          background-color: $c292;
+          border-color: $c293;
+        }
+
+        &.status-rejected {
+          background-color: $c294;
+          border-color: $c295;
+        }
+
+        &.status-pending {
+          background-color: $c296;
+          border-color: $c297;
+        }
+
+        &.status-default {
+          background-color: $c291;
+          border-color: $c290;
+        }
+      }
+
+
+      .checkbox-cell {
         width: 56px;
+        min-width: 56px;
       }
+
       tr {
         cursor: pointer;
+
         &:nth-child(even) {
-          background-color: #f9fafb;
+          background-color: $c154;
         }
 
         &:hover {
-          background-color: #f3f4f6;
+          background-color: $c94;
         }
       }
 
@@ -252,11 +326,11 @@
         background: none;
         border: none;
         padding: 0;
-        color: #2563eb;
-        font-size: 14px;
+        color: $c164;
+        font-size: fonts.$font-size-small;
         cursor: pointer;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: fonts.$font-weight-medium;
 
         &:hover {
           text-decoration: underline;
@@ -267,6 +341,59 @@
           text-decoration: underline;
         }
       }
+
+      .action-cell {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        white-space: nowrap;
+
+        .edit-button,
+        .delete-button {
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: fonts.$font-size-13;
+          font-weight: fonts.$font-weight-semibold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: fonts.$font-family;
+        }
+
+        .edit-button {
+          color: $c300;
+          background-color: transparent;
+          text-decoration: underline;
+
+          &:hover:not(:disabled) {
+            color: $c299;
+          }
+
+          &:disabled {
+            color: $c76;
+            cursor: not-allowed;
+            text-decoration: none;
+            opacity: 0.5;
+          }
+        }
+
+        .delete-button {
+          color: $c121;
+          background-color: transparent;
+          text-decoration: underline;
+
+          &:hover:not(:disabled) {
+            color: $c298;
+          }
+
+          &:disabled {
+            color: $c76;
+            cursor: not-allowed;
+            text-decoration: none;
+            opacity: 0.5;
+          }
+        }
+      }
     }
   }
 
@@ -274,17 +401,17 @@
     width: 100%;
     text-align: center;
     top: 400px;
-    font-size: 1.2rem;
-    color: #999;
-    font-family: "Plus Jakarta Sans";
-    font-weight: 500;
+    font-size: fonts.$font-size-12rem;
+    color: $c81;
+    font-family: fonts.$font-family;
+    font-weight: fonts.$font-weight-medium;
     margin-top: 10%;
   }
 
-  .table-cell-title{
-    font-family: "Plus Jakarta Sans";
-    font-weight: 700;
-    color: #454754;
-    font-size: 14px;   
+  .table-cell-title {
+    font-family: fonts.$font-family;
+    font-weight: fonts.$font-weight-bold;
+    color: $GREY-70;
+    font-size: fonts.$font-size-small;
   }
 }

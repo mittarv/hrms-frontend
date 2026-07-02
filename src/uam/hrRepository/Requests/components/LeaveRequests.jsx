@@ -1,23 +1,27 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   getAllPendingLeaveRequests,
+  getAllHistoryLeaveRequests,
   getAllEmployee,
   getAllLeaves,
   triggerProofRequiredForLeave,
   reviewLeaveRequest,
 } from "../../../../actions/hrRepositoryAction";
 import { useSelector, useDispatch } from "react-redux";
+import Pagination from "../../Common/components/Pagination"
 import "../styles/LeaveRequests.scss";
 import Plus_icon from "../../assets/icons/plus_inside_circle.svg";
 import FileViewer from "../../Common/components/FileViewerPop";
 import View_Icon from "../../assets/icons/view_icon.svg";
 import LoadingSpinner from "../../Common/components/LoadingSpinner";
+import ViewMoreText from "../../Common/components/ViewMoreText";
 import approve_icon from "../../assets/icons/approve_icon.svg";
 import reject_icon_enable from "../../assets/icons/reject_icon_enable.svg";
 import reject_icon_disable from "../../assets/icons/reject_icon_disable.svg";
 import sort from "../../assets/icons/sort.svg";
 import filter from "../../assets/icons/filter.svg";
 import { convertBufferToString, handleViewProofClick } from "../../Common/utils/helper";
+import RequestsSubTabs from "./RequestsSubTabs";
 // Define the ENUM for status
 export const LeaveRequestStatus = {
   APPROVED: "approved",
@@ -25,16 +29,23 @@ export const LeaveRequestStatus = {
 };
 
 // Table headers for leave requests
-const LeaveRequestsTableHeader = [
-  { name: "employeeUuid", label: "Employee" },
-  { name: "requestedDate", label: "Requested On",icon: sort },
-  { name: "leaveRequestId", label: "Leave Type",icon: filter },
-  { name: "leaveDuration", label: "Leave Duration" },
-  { name: "reason", label: "Reason" },
-  { name: "proof", label: "Proof" },
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
+const START_YEAR = 2020;
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: CURRENT_YEAR - START_YEAR + 1 }, (_, i) => START_YEAR + i);
+
 const LeaveRequests = () => {
+  const [activeTab, setActiveTab] = useState("pending");
+  const [currentPage, setCurrentPage] = useState(1);
+ 
+  const pageSize = 10;
+  const [selectedMonth, setSelectedMonth] = useState("all"); // 0-indexed
+  const [selectedYear, setSelectedYear] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [displayStartDate, setDisplayStartDate] = useState("");
@@ -48,6 +59,12 @@ const LeaveRequests = () => {
   const leavePendingRequests = useMemo(() => 
     hrRepositoryReducer?.leavePendingRequests ?? [], 
     [hrRepositoryReducer?.leavePendingRequests]
+  );
+
+  const pagination = hrRepositoryReducer?.pagination ?? null;
+  const leaveHistoryRequests = useMemo(() => 
+    hrRepositoryReducer?.leaveHistoryRequests ?? [], 
+    [hrRepositoryReducer?.leaveHistoryRequests]
   );
   const allExistingRequests = useMemo(() => 
     hrRepositoryReducer?.allExisitingLeaves ?? [], 
@@ -71,8 +88,66 @@ const LeaveRequests = () => {
     return myHrmsAccess?.permissions?.some(perm => perm.name === permissionName);
   };
 
+  useEffect(() => {
+  // If user sets either to "Month" or "Year" (value "all"), 
+  // we clear the dates so the backend fetches everything.
+  if (selectedMonth === "all" || selectedYear === "all") {
+    setStartDate("");
+    setEndDate("");
+  } else {
+    const start = new Date(selectedYear, selectedMonth, 1);
+    const end = new Date(selectedYear, selectedMonth + 1, 0);
+    
+    setStartDate(start.toISOString().split('T')[0]);
+    setEndDate(end.toISOString().split('T')[0]);
+  }
+}, [selectedMonth, selectedYear]);
+
+  
+
+  const handleMonthChange = (e) => {
+  const val = e.target.value;
+  // If they click the placeholder "Month", val is "all", which resets the filter
+  setSelectedMonth(val === "all" ? "all" : parseInt(val));
+};
+
+const handleYearChange = (e) => {
+  const val = e.target.value;
+  // If they click the placeholder "Year", val is "all", which resets the filter
+  setSelectedYear(val === "all" ? "all" : parseInt(val));
+};
+
   const canRead = hasPermission("LeaveRequest_read");
   const hasAccessToEditLeave = hasPermission("LeaveRequest_write");
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, startDate, endDate]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const tableHeaders = useMemo(() => {
+    const LeaveRequestsTableHeader = [
+      { name: "employeeUuid", label: "Employee" },
+      { name: "requestedDate", label: "Requested On",icon: sort },
+      { name: "leaveRequestId", label: "Leave Type",icon: filter },
+      { name: "leaveDuration", label: "Leave Duration" },
+      { name: "reason", label: "Reason" },
+      { name: "proof", label: "Proof" },
+    ];
+    if (activeTab === "history") {
+          return [
+            ...LeaveRequestsTableHeader,
+            
+            { name: "status", label: "Status" },
+            { name: "reviewedBy", label: "Reviewed By" },
+          ];
+    }
+
+    return [...LeaveRequestsTableHeader];
+  }, [activeTab]);
 
   // Convert YYYY-MM-DD to DD/MM/YYYY for display
   const formatDateForDisplay = (isoDate) => {
@@ -143,6 +218,7 @@ const LeaveRequests = () => {
     }
   };
 
+
   const getLeaveTypeByUuid = (uuid) => {
     if (!uuid) return "Unknown";
     try {
@@ -157,15 +233,18 @@ const LeaveRequests = () => {
   };
   // Format pending leave requests
   const formatPendingLeaveRequests = useCallback(() => {
+    const sourceData = activeTab === "pending" 
+    ? leavePendingRequests 
+    : leaveHistoryRequests;
     if (
-      !Array.isArray(leavePendingRequests) ||
-      leavePendingRequests.length === 0
+      !Array.isArray(sourceData) ||
+      sourceData.length === 0
     ) {
       return [];
     }
 
     try {
-      return leavePendingRequests
+      return sourceData
         .map((request) => {
           if (!request) return null;
 
@@ -202,6 +281,7 @@ const LeaveRequests = () => {
             attachmentPath: request?.attachmentPath ?? null,
             totalDays: request?.totalDays ?? "0",
             isHalfDay: request?.isHalfDay ?? false,
+            reviewedByName: request?.approvedBy ?? "N/A",
             // Keep the original request data for later use if needed
             originalRequest: request ?? {},
           };
@@ -211,20 +291,24 @@ const LeaveRequests = () => {
       console.error("Error in formatPendingLeaveRequests:", error);
       return [];
     }
-  }, [leavePendingRequests, formatLeaveDuration]);
+  }, [leavePendingRequests, formatLeaveDuration,leaveHistoryRequests, activeTab ]);
 
   // Fetch data when component mounts or dates change
   useEffect(() => {
     try {
       if (typeof dispatch === "function") {
-        dispatch(getAllPendingLeaveRequests(startDate, endDate));
+        if (activeTab === "pending") {
+          dispatch(getAllPendingLeaveRequests(startDate, endDate));
+        } else {
+          dispatch(getAllHistoryLeaveRequests(startDate, endDate,currentPage, pageSize));
+        }
         dispatch(getAllEmployee());
         dispatch(getAllLeaves());
       }
     } catch (error) {
       console.error("Error dispatching get pending leave requests:", error);
     }
-  }, [dispatch, startDate, endDate]);
+  }, [dispatch, startDate, endDate, activeTab,currentPage]);
 
   // Update display dates when the actual dates change
   useEffect(() => {
@@ -260,28 +344,7 @@ const LeaveRequests = () => {
     }
   }, [checkedRequestIds, leavePendingRequests, allExistingRequests, allEmployeeDetails, formatPendingLeaveRequests]);
 
-  // Handle date changes
-  const handleStartDateChange = (e) => {
-    try {
-      if (e && e.target) {
-        setStartDate(e.target.value ?? "");
-      }
-    } catch (error) {
-      console.error("Error handling start date change:", error);
-      setStartDate("");
-    }
-  };
-
-  const handleEndDateChange = (e) => {
-    try {
-      if (e && e.target) {
-        setEndDate(e.target.value ?? "");
-      }
-    } catch (error) {
-      console.error("Error handling end date change:", error);
-      setEndDate("");
-    }
-  };
+  
 
   const handleCheck = (request) => {
     try {
@@ -394,58 +457,60 @@ const LeaveRequests = () => {
     setFilesToView([]);
   };
 
-  // Render proof status with updated logic
-  const renderProofStatus = (
-    approvalStatus,
-    attachmentPath,
-    leaveRequestId
-  ) => {
-    // Parse attachmentPath if it's a stringified array, Buffer, or direct data
+  const hasValidProofAttachment = (attachmentPath) => {
     let parsedAttachmentPath = [];
-    let hasValidAttachments = false;
-    
+
     if (typeof attachmentPath === "string") {
       try {
         parsedAttachmentPath = JSON.parse(attachmentPath);
-        // Check if parsed data contains valid base64 attachments
-        hasValidAttachments = Array.isArray(parsedAttachmentPath) && 
-          parsedAttachmentPath.some(item => 
-            item && (
-              (typeof item === "object" && item.base64) || 
-              (typeof item === "string" && item.trim() !== "")
-            )
-          );
       } catch {
-        // If JSON parsing fails, check if it's a direct URL or base64 string
-        hasValidAttachments = attachmentPath.trim() !== "";
-        parsedAttachmentPath = hasValidAttachments ? [attachmentPath] : [];
+        parsedAttachmentPath = attachmentPath.trim() !== "" ? [attachmentPath] : [];
       }
     } else if (attachmentPath && typeof attachmentPath === "object" && attachmentPath.type === "Buffer") {
-      // Handle Buffer data from backend
       const bufferString = convertBufferToString(attachmentPath);
-      if (bufferString) {
-        try {
-          parsedAttachmentPath = JSON.parse(bufferString);
-          hasValidAttachments = Array.isArray(parsedAttachmentPath) && 
-            parsedAttachmentPath.some(item => 
-              item && (
-                (typeof item === "object" && item.base64) || 
-                (typeof item === "string" && item.trim() !== "")
-              )
-            );
-        } catch {
-          hasValidAttachments = bufferString.trim() !== "";
-          parsedAttachmentPath = hasValidAttachments ? [bufferString] : [];
-        }
+      if (!bufferString || bufferString.trim() === "") return false;
+      try {
+        parsedAttachmentPath = JSON.parse(bufferString);
+      } catch {
+        parsedAttachmentPath = [bufferString];
       }
     } else if (Array.isArray(attachmentPath)) {
       parsedAttachmentPath = attachmentPath;
-      hasValidAttachments = attachmentPath.some(item => 
-        item && (
-          (typeof item === "object" && item.base64) || 
-          (typeof item === "string" && item.trim() !== "")
-        )
-      );
+    }
+
+    if (!Array.isArray(parsedAttachmentPath)) {
+      parsedAttachmentPath = [parsedAttachmentPath];
+    }
+
+    return parsedAttachmentPath.some((item) =>
+      item && (
+        (typeof item === "object" && item.base64) ||
+        (typeof item === "string" && item.trim() !== "")
+      )
+    );
+  };
+
+  // Render proof status with tab-aware behavior
+  const renderProofStatus = (
+    approvalStatus,
+    attachmentPath,
+    leaveRequestId,
+    isHistoryTab = false
+  ) => {
+    const hasValidAttachments = hasValidProofAttachment(attachmentPath);
+
+    if (isHistoryTab) {
+      if (hasValidAttachments) {
+        return (
+          <button
+            className="view-proof-button"
+            onClick={() => handleViewProofClick(attachmentPath, setFilesToView, setViewerOpen)}
+          >
+            <img src={View_Icon} alt="View" /> View proof
+          </button>
+        );
+      }
+      return "N/A";
     }
 
     if (approvalStatus !== "proof_required" && !hasValidAttachments) {
@@ -467,13 +532,13 @@ const LeaveRequests = () => {
       );
     }
 
-    if (approvalStatus === "pending" && hasValidAttachments) {
+    if (hasValidAttachments) {
       return (
         <button
           className="view-proof-button"
           onClick={() => handleViewProofClick(attachmentPath, setFilesToView, setViewerOpen)}
         >
-          <img src={View_Icon} /> View proof
+          <img src={View_Icon} alt="View" /> View proof
         </button>
       );
     }
@@ -490,7 +555,7 @@ const LeaveRequests = () => {
       <div className="leave_requests_main_container">
         <div style={{ textAlign: "center", padding: "40px" }}>
           <p style={{ fontSize: "16px", color: "#666" }}>
-            You don't have permission to view leave requests
+            You don&apos;t have permission to view leave requests
           </p>
         </div>
       </div>
@@ -500,65 +565,46 @@ const LeaveRequests = () => {
   return (
     <div className="leave_requests_main_container">
       <div className="leave_requests_header">
-        {/* Date filter */}
-        <div className="date-filter">
-          <div className="date-input">
-            <label>From</label>
-            <div className="custom-date-input">
-              <input
-                type="text"
-                value={displayStartDate ?? ""}
-                placeholder="DD/MM/YYYY"
-                readOnly
-              />
-              <input
-                type="date"
-                onChange={handleStartDateChange}
-                value={startDate ?? ""}
-                max={endDate || undefined}
-                style={{
-                  opacity: 0,
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  cursor: "pointer",
-                }}
-              />
-            </div>
+        <RequestsSubTabs
+          tabs={[
+            { value: "pending", label: `Pending(${leavePendingRequests.length})` },
+            { value: "history", label: `History(${leaveHistoryRequests.length})` },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+        
+        <div className="date-filter-dropdowns">
+          <div className="custom-select-wrapper">
+            <select 
+              value={selectedMonth} 
+              onChange={handleMonthChange}
+              className="filter-select"
+            >
+              <option value="all">Month</option> 
+              {MONTHS.map((month, index) => (
+                <option key={month} value={index}>{month}</option>
+              ))}
+            </select>
           </div>
-          <div className="date-input">
-            <label>To</label>
-            <div className="custom-date-input">
-              <input
-                type="text"
-                value={displayEndDate ?? ""}
-                placeholder="DD/MM/YYYY"
-                readOnly
-              />
-              <input
-                type="date"
-                onChange={handleEndDateChange}
-                value={endDate ?? ""}
-                min={startDate || undefined}
-                style={{
-                  opacity: 0,
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  cursor: "pointer",
-                }}
-              />
-            </div>
+
+          <div className="custom-select-wrapper">
+            <select 
+              value={selectedYear} 
+              onChange={handleYearChange}
+              className="filter-select"
+            >
+              <option value="all">Year</option>
+              {YEARS.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
           </div>
         </div>
-
         {/* Action buttons */}
         <div className="leave_requests_action_buttons">
-          {hasAccessToEditLeave && <button
+      
+          {activeTab === "pending"  && hasAccessToEditLeave && <button
             className={`leave_requests_approve_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0 ||
@@ -590,7 +636,7 @@ const LeaveRequests = () => {
               Approve
             </span>
           </button>}
-          {hasAccessToEditLeave && <button
+          {activeTab === "pending"  && hasAccessToEditLeave && <button
             className={`leave_requests_reject_button ${
               !Array.isArray(checkedRequestIds) ||
               checkedRequestIds.length === 0
@@ -626,14 +672,16 @@ const LeaveRequests = () => {
         formattedRequests.length === 0 ? (
         <div className="no_leave_requests_message">
           {startDate || endDate
-            ? "No pending leave requests between the selected dates."
-            : "No pending leave requests available."}
+            ? "No leave requests between the selected dates."
+            : "No leave requests available."}
         </div>
       ) : (
         <div className="leave_requests_table_container">
           <table className="leave_requests_table">
             <thead>
               <tr>
+                {activeTab === "pending" && (
+                      <>
                 <th className="checkbox-cell">
                   <input 
                     type="checkbox"
@@ -641,7 +689,9 @@ const LeaveRequests = () => {
                     onChange={handleSelectAllClick}
                   />
                 </th>
-                {LeaveRequestsTableHeader.map((header, index) => (
+                </>
+                  )}
+                {tableHeaders.map((header, index) => (
                   <th key={(header?.name ?? index) || `header-${index}`}>
                     {header?.label ?? ""}
                   </th>
@@ -655,6 +705,8 @@ const LeaveRequests = () => {
 
                 return (
                   <tr key={requestId || `row-${index}`} className={isRequestChecked(requestId) ? "checked-row" : ""}>
+                    {activeTab === "pending" && (
+                      <>
                     <td className="checkbox-cell">
                       <input
                         type="checkbox"
@@ -662,6 +714,8 @@ const LeaveRequests = () => {
                         onChange={() => handleCheck(request)}
                       />
                     </td>
+                    </>
+                    )}
                     <td className="employee_name">
                       {getEmployeeNameByUuid(request.employeeUuid) ?? "N/A"}
                     </td>
@@ -677,21 +731,42 @@ const LeaveRequests = () => {
                     </td>
                     
                     <td className="reason-cell">
-                      <div className="reason-text">{request.reason ?? "N/A"}</div>
+                      <ViewMoreText
+                        text={request.reason ?? "N/A"}
+                        maxLength={45}
+                        modalTitle="Reason"
+                        textClassName="reason-text"
+                      />
                     </td>
                     <td>
                       {renderProofStatus(
                         request.approvalStatus,
                         request.attachmentPath,
-                        request.id
+                        request.id,
+                        activeTab === "history"
                       )}
                     </td>
+                    {activeTab === "history" && (
+                      <>
+                        <td> <span className={`status-badge status-${request.approvalStatus?.toLowerCase()}`}>{request.approvalStatus ?? "N/A"}</span></td>
+                         
+                        <td>{getEmployeeNameByUuid(request.reviewedByName) }</td>
+                        
+                      </>
+                    )}
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
+      )}
+      {!loading && activeTab === "history" && formattedRequests.length > 0 && (
+        <Pagination
+          pagination={pagination}
+          currentPage={currentPage}
+          onPageChange={handlePageChange}
+        />
       )}
       <FileViewer
         fileUrls={filesToView}

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-// import { X, Clock, Calendar, AlertCircle } from 'lucide-react';
 import "../styles/CheckoutPopup.scss";
 
 const CheckoutPopup = ({ 

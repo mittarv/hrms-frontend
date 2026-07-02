@@ -1,0 +1,1344 @@
+@use '../../design/colors/customColors' as *;
+
+// RewardsTabs.scss
+// ─────────────────────────────────────────────────────────────────────────────
+// SEGREGATION: Styles are split so changing one area does not affect others.
+//   • WINNER:    .rt_wfm_* (Winners For Month modal), .rt_single_winner_card:not(.rt_single_winner_card--award) (single winner modal)
+//   • YOUR REWARDS: .rt_award_* (list cards), .rt_single_winner_card.rt_single_winner_card--award (award modal)
+//   • NOMINATIONS: .rt_citation_modal*, .rt_nominations_*
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Rewards Tabs (layout) ────────────────────────────────────────────────────
+.rewards_tabs_container {
+  width: 100%;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  border: 1px solid $c85;
+  border-radius: 12px;
+}
+
+// ─── Tab Header ────────────────────────────────────────────────────────────────
+.rewards_tabs_header {
+  display: flex;
+  background: $WHITE;
+  border-radius: 10px;
+  padding: 4px 8px;
+  box-shadow: 0 1px 3px $c82;
+  border: 0.5px solid $c95;
+  margin: 24px 24px 0 24px;
+  width: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 768px) {
+    margin: 16px 16px 0 16px;
+    padding: 3px 6px;
+  }
+
+  .rewards_tab {
+    padding: 9px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s;
+    white-space: nowrap;
+
+    @media (max-width: 768px) {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    &.active {
+      background: $c100;
+      color: $WHITE;
+    }
+
+    &.inactive {
+      background: transparent;
+      color: $c87;
+
+      &:hover {
+        color: $c88;
+        background: $c94;
+      }
+    }
+  }
+}
+
+// ─── Year Selector ────────────────────────────────────────────────────────────
+.rt_year_selector {
+  margin: 14px 26px 0 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    margin: 10px 16px 0 16px;
+    gap: 6px;
+  }
+}
+
+.rt_year_nav_btn {
+  border: none;
+  background: transparent;
+  color: $c101;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+.rt_year_value {
+  font-size: 18px;
+  font-weight: 600;
+  color: $c102;
+  min-width: 64px;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    min-width: 50px;
+  }
+}
+
+// ─── Tab Content ───────────────────────────────────────────────────────────────
+.rewards_tabs_content {
+  min-height: 120px;
+  padding: 1.5rem 1.25rem;
+  background: $WHITE;
+
+  @media (max-width: 768px) {
+    padding: 1rem 0.75rem;
+  }
+}
+
+.rewards_tab_panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+// ─── 2-column months grid ──────────────────────────────────────────────────────
+.rt_months_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Month Section ─────────────────────────────────────────────────────────────
+.rt_month_section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  border: 1px solid $c85;
+  border-radius: 12px;
+  padding: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    gap: 0.7rem;
+  }
+}
+
+.rt_month_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
+}
+
+.rt_month_title {
+  font-size: 16px;
+  font-weight: 600;
+  color: $c103;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+  }
+}
+
+.rt_view_link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: $PRUSSIAN-70;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+// ─── 2-column card grid ────────────────────────────────────────────────────────
+.rt_cards_grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 540px) {
+    grid-template-columns: 1fr;
+  }
+
+  // Full width for single item
+  &--single {
+    grid-template-columns: 1fr;
+  }
+
+  // 2 columns for two items
+  &--double {
+    grid-template-columns: repeat(2, 1fr);
+
+    @media (max-width: 540px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ─── Person Card (Winners + Nominations) ──────────────────────────────────────
+.rt_person_card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: $WHITE;
+  border: 1px solid $c95;
+  border-radius: 12px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  &:hover {
+    border-color: $c104;
+    box-shadow: 0 2px 8px $c89;
+  }
+}
+
+.rt_person_card_badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 0 10px 0 10px;
+  background: $BLUE-50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 28px;
+    height: 28px;
+  }
+
+  img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+
+    @media (max-width: 768px) {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+.rt_person_card_avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: $c95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $c87;
+    text-transform: uppercase;
+  }
+}
+
+.rt_person_card_info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rt_person_card_name {
+  font-size: 15px;
+  font-weight: 500;
+  color: $GREY-80;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
+}
+
+.rt_person_card_dept {
+  font-size: 14px;
+  color: $GREY-60;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+  }
+}
+
+.rt_person_card_votes {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 11px;
+  }
+}
+
+.rt_card_view_btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  align-self: center;
+}
+
+// ─── Winner Card (Winners tab) ────────────────────────────────────────────────
+.rt_winner_card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid $c95;
+  background: $WHITE;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  @media (max-width: 768px) {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  &:hover {
+    border-color: $c104;
+    box-shadow: 0 2px 8px $c89;
+  }
+
+  &--employee {
+    background: $BLUE-10;
+    border-color: $c105;
+  }
+
+  &--leadership {
+    background: $CYAN-10;
+    border-color: $c106;
+  }
+}
+
+.rt_winner_icon_wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  background: $c95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rt_winner_photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rt_winner_initial {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: $c87;
+  text-transform: uppercase;
+}
+
+.rt_winner_badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 12px;
+    height: 12px;
+    filter: brightness(0) invert(1);
+  }
+}
+
+.rt_winner_info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rt_winner_name {
+  font-size: 15px;
+  font-weight: 600;
+  color: $c103;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rt_winner_dept {
+  font-size: 13px;
+  color: $c87;
+}
+
+.rt_winner_votes {
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// YOUR REWARDS: Award list cards (Your awards tab grid)
+// All styles under .rt_award_* — must NOT affect Winner or Nominations.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_award_card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid $c95;
+  background: $WHITE;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+
+  &:hover {
+    border-color: $c104;
+    box-shadow: 0 2px 8px $c89;
+  }
+
+  &--employee .rt_award_icon_wrap {
+    background: $BLUE-10;
+  }
+
+  &--leadership .rt_award_icon_wrap {
+    background: $CYAN-10;
+  }
+}
+
+.rt_award_icon_wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.rt_award_info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rt_award_title {
+  font-size: 16px;
+  font-weight: 500;
+  color: $c103;
+}
+
+.rt_award_card--employee .rt_award_title {
+  color: $BLUE-80;
+}
+
+.rt_award_card--leadership .rt_award_title {
+  color: $CYAN-80;
+}
+
+.rt_award_month {
+  font-size: 13px;
+  color: $c87;
+}
+
+// ─── Shared overlay (used by Winner modal, Your rewards modal, Nominations modal) ─
+.rt_citation_overlay {
+  position: fixed;
+  inset: 0;
+  background: $c107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: rt_fade 0.18s ease;
+}
+
+@keyframes rt_fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOMINATIONS: Citation modal (single/multi citation view)
+// All styles under .rt_citation_modal* — must NOT affect Winner or Your rewards.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_citation_modal {
+  background: $WHITE;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 620px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px $c108;
+  animation: rt_slide 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes rt_slide {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.rt_citation_modal_header {
+  padding: 1rem 1.5rem 0;
+
+  .rt_citation_modal_header_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.rt_citation_modal_title {
+  margin: 0;
+  padding: 10px 0px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28px;
+  color: $GREY-80;
+  text-decoration: underline;
+  text-decoration-color: $GREY-80;
+  text-underline-offset: 0.5rem;
+  text-decoration-thickness: 2px;
+}
+
+.rt_citation_modal_sub {
+  margin: 3px 0 0;
+  font-size: 0.8125rem;
+  color: $c87;
+}
+
+.rt_citation_close_icon {
+  background: $GREY-10;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  img {
+    display: block;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: $c95;
+  }
+}
+
+.rt_citation_divider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid $c95;
+}
+
+.rt_citation_modal_body {
+  padding: 1rem 1.25rem 1.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.rt_citation_text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: $c88;
+  line-height: 1.65;
+  background: $c94;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+}
+
+.rt_citation_empty {
+  margin: 0;
+  font-size: 0.875rem;
+  color: $c98;
+  font-style: italic;
+}
+
+.rt_citation_nominators {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: $c87;
+  font-style: italic;
+}
+
+// multi-entry nomination block
+.rt_citation_entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  & + & {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid  $c95;
+  }
+}
+
+.rt_citation_entry_name {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: $c103;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WINNER: Winners For Month modal (View → month → list of winner cards)
+// All styles under .rt_wfm_* — must NOT affect Your rewards or Nominations.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_wfm_modal {
+  background: $WHITE;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px $c108;
+  animation: rt_slide 0.2s ease;
+  overflow: hidden;
+}
+
+.rt_wfm_modal_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.rt_wfm_modal_header_left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rt_wfm_modal_header_title {
+  font-size: 14px;
+  font-weight: 500;
+  color: $c87;
+}
+
+.rt_wfm_modal_header_month {
+  font-size: 20px;
+  font-weight: 600;
+  color: $GREY-80;
+  border-bottom: 2px solid $GREY-80;
+  padding-bottom: 4px;
+}
+
+.rt_wfm_modal_body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.rt_wfm_no_winners {
+  text-align: center;
+  color: $c87;
+  font-size: 14px;
+  padding: 2rem;
+}
+
+.rt_wfm_winner_card {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 0.5px solid transparent;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.rt_wfm_winner_card--employee {
+    background: $BLUE-10;
+    border-color: $BLUE-60;
+
+    .rt_wfm_winner_card_header {
+      background: $BLUE-50;
+    }
+    .rt_wfm_winner_card_votes--employee {
+      font-size: 14px;
+      font-weight: 500;
+      color: $BLUE-80;
+    }
+  }
+
+  &.rt_wfm_winner_card--leadership {
+    background: $CYAN-10;
+    border-color: $CYAN-70;
+
+    .rt_wfm_winner_card_header {
+      background: $CYAN-70;
+    }
+    .rt_wfm_winner_card_votes--leadership {
+      color: $CYAN-80;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
+
+.rt_wfm_winner_card_header {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 10px 0 10px 0;
+  align-self: flex-start;
+}
+
+.rt_wfm_winner_card_header_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.rt_wfm_winner_card_header_text {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: $WHITE;
+}
+
+.rt_wfm_winner_card_body {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.125rem;
+}
+
+.rt_wfm_winner_card_body_left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.rt_wfm_winner_card_avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: $c86;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.rt_wfm_winner_card_avatar_initial {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $c87;
+  text-transform: uppercase;
+}
+
+.rt_wfm_winner_card_info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rt_wfm_winner_card_name {
+  font-size: 18px;
+  font-weight: 500;
+  color: $GREY-80;
+}
+
+.rt_wfm_winner_card_dept {
+  font-size: 0.875rem;
+  color: $c87;
+}
+
+.rt_wfm_winner_card_votes {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.rt_wfm_winner_card_citation_box {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  background: $WHITE;
+  border-radius: 10px;
+  font-size: 14px;
+  color: $c88;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 1px 2px $c89;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: $c109 $c110;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $c110;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $c109;
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $c111;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// WINNER: Single winner modal (opened from Winners tab / View month modal)
+// All styles scoped under .rt_single_winner_card:not(.rt_single_winner_card--award)
+// Changing these must NOT affect Your rewards or Nominations.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_single_winner_card:not(.rt_single_winner_card--award) {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 750px;
+  border-radius: 12px;
+  border: 0.5px solid transparent;
+  animation: rt_slide 0.2s ease;
+  box-shadow: 0 20px 60px $c112;
+
+  &.rt_single_winner_card--employee {
+    background: $BLUE-10;
+    border-color: $BLUE-60;
+    .rt_single_winner_card_header {
+      background: $BLUE-50;
+    }
+    .rt_single_winner_card_header_text {
+      color: $WHITE;
+    }
+    .rt_single_winner_card_votes--employee {
+      font-size: 14px;
+      font-weight: 500;
+      color: $BLUE-80;
+    }
+  }
+  &.rt_single_winner_card--leadership {
+    background: $CYAN-10;
+    border-color: $CYAN-70;
+    .rt_single_winner_card_header {
+      background: $CYAN-70;
+    }
+    .rt_single_winner_card_header_text {
+      color: $WHITE;
+    }
+    .rt_single_winner_card_votes--leadership {
+      font-size: 14px;
+      font-weight: 500;
+      color: $CYAN-80;
+    }
+  }
+
+  .rt_single_winner_close_btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: $c113;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      display: block;
+    }
+  }
+
+  .rt_single_winner_card_header {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 10px 0 10px 0;
+    align-self: flex-start;
+  }
+  .rt_single_winner_card_header_icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+  }
+  .rt_single_winner_card_header_text {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+
+  .rt_single_winner_card_body {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 2rem 1.25rem 1.125rem;
+  }
+  .rt_single_winner_card_body_left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+  .rt_single_winner_card_avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: $c86;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  .rt_single_winner_card_avatar_initial {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $c87;
+    text-transform: uppercase;
+  }
+  .rt_single_winner_card_info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .rt_single_winner_card_name {
+    font-size: 18px;
+    font-weight: 500;
+    color: $GREY-80;
+  }
+  .rt_single_winner_card_dept {
+    font-size: 0.875rem;
+    color: $c87;
+  }
+  .rt_single_winner_card_votes {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .rt_single_winner_card_citation_box {
+    flex: 1;
+    min-width: 0;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: $c114;
+    word-break: break-word;
+    box-sizing: border-box;
+    background: $WHITE;
+    box-shadow: 0 1px 2px $c89;
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $c109 $c110;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $c110;
+      border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $c109;
+      border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: $c111;
+    }
+  }
+  .rt_single_winner_card_citation_text {
+    margin: 0;
+    font-weight: 400;
+    color: $c114;
+  }
+  .rt_single_winner_card_citation_empty {
+    margin: 0;
+    color: $c87;
+    font-style: italic;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// YOUR REWARDS: Award modal (opened from Your awards tab / Employee details)
+// All styles scoped under .rt_single_winner_card.rt_single_winner_card--award
+// Changing these must NOT affect Winner or Nominations.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_single_winner_card.rt_single_winner_card--award {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 560px;
+  max-height: 85vh;
+  border-radius: 16px;
+  border: 1px solid $c95;
+  background: $WHITE;
+  animation: rt_slide 0.2s ease;
+  box-shadow: 0 4px 20px $c82;
+
+  .rt_single_winner_close_btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    padding: 8px;
+    border: none;
+    background: $GREY-10;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $c114;
+    img {
+      display: block;
+    }
+  }
+
+  .rt_single_winner_card_header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 1.5rem 1.5rem 0.75rem;
+    padding-right: 3rem;
+  }
+  .rt_single_winner_card_header_icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+  }
+  .rt_single_winner_card_header_text_block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .rt_single_winner_card_header_text {
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 1.3;
+  }
+  .rt_single_winner_card_header_date {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: $c115;
+    line-height: 1.3;
+  }
+
+  .rt_single_winner_card_body {
+    padding: 0 1.5rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+  }
+  .rt_single_winner_card_citation_box {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: $c114;
+    word-break: break-word;
+    box-sizing: border-box;
+    background: $BLUE-10;
+  }
+  .rt_single_winner_card_citation_text {
+    margin: 0;
+    font-weight: 400;
+    color: $c114;
+  }
+  .rt_single_winner_card_citation_empty {
+    margin: 0;
+    color: $c87;
+    font-style: italic;
+  }
+
+  &.rt_single_winner_card--employee {
+    .rt_single_winner_card_header_icon {
+      background: $c116;
+    }
+    .rt_single_winner_card_header_text {
+      color: $BLUE-80;
+    }
+  }
+  &.rt_single_winner_card--leadership {
+    .rt_single_winner_card_header_icon {
+      background: $c117;
+    }
+    .rt_single_winner_card_header_text {
+      color: $CYAN-80;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOMINATIONS: Your Nominations modal (list of nominations)
+// All styles under .rt_nominations_* — must NOT affect Winner or Your rewards.
+// ═══════════════════════════════════════════════════════════════════════════════
+.rt_nominations_modal {
+  background: $WHITE;
+  border-radius: 12px;
+  max-width: 550px;
+  width: 90%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px $c118;
+  animation: rt_slide 0.2s ease;
+}
+
+.rt_nominations_modal_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.rt_nominations_modal_title_block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.rt_nominations_modal_title {
+  font-size: 14px;
+  font-weight: 500;
+  color: $c87;
+}
+
+.rt_nominations_modal_subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: $c91;
+  border-bottom: 2px solid $c91;
+  padding-bottom: 4px;
+  display: inline-block;
+}
+
+.rt_nominations_modal_close {
+  background: $GREY-10;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  img {
+    display: block;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: $c95;
+  }
+}
+
+.rt_nominations_modal_content {
+  padding: 0 1.5rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.rt_nominations_modal_list_header {
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: $c91;
+  }
+}
+
+.rt_nominations_modal_list {
+  display: flex;
+  flex-direction: column;
+  background: $BLUE-10;
+  border-radius: 12px;
+}
+
+.rt_nominations_modal_item {
+  padding: 1rem 1.25rem;
+}
+
+.rt_nominations_modal_quote {
+  margin: 0 0 0.5rem;
+  font-size: 14px;
+  color: $c91;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.rt_nominations_modal_author {
+  font-size: 13px;
+  color: $c87;
+  font-weight: 500;
+}

@@ -1,5 +1,5 @@
 @use "../../../../design/colors/Colors";
-
+@use '../../design/colors/customColors' as *;
 // Important Link specific table styles - standalone to avoid conflicts
 .important_link_tool_input_div {
   display: flex;
@@ -17,7 +17,7 @@
     }
   }
   .important_link_edited_input_box {
-    background-color: #fff6c5;
+    background-color: $c165;
     border: 1px solid Colors.$c34;
     border-radius: 10px;
     text-align: center;
@@ -36,7 +36,7 @@
 
 .important_link_tool_link {
   font-size: 16px;
-  color: #525252;
+  color: $c18;
   font-weight: 400;
   text-decoration: none;
 }
@@ -86,7 +86,7 @@
 }
 /* Track */
 .MuiTableContainer-root::-webkit-scrollbar-track {
-  background: #c4c4c4;
+  background: $c308;
   opacity: 0.13%;
 }
 /* Handle */

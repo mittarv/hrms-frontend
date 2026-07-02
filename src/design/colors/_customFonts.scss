@@ -1,0 +1,55 @@
+//font family
+$font-family: 'Plus Jakarta Sans', sans-serif;
+
+//font-size from header.scss(vw)
+$font-size-header: 1.24vw;
+$font-size-user-name: 1vw;
+$font-size-user-small: 0.83vw;
+//font-size from leaveApplicable.scss(px),mandatoryFieldPopup,leaveConfiguration,Tooltip,viewRolepermissionspopup
+$font-size-md: 16px;
+$font-size-small: 14px;
+//UserMangement
+$font-size-13: 13px;
+//LeaveConfiguratorForm
+$font-size-xs: 12px;
+//userMangement
+$font-size-xxs: 11px;
+$font-size-22: 22px;
+//EmployeeDetailsPage
+$font-size-20: 20px;
+$font-size-15: 15px;
+//deleteRolepopup,viewRolePermissions
+$font-size-lg: 18px;
+//leaveConfigurationTable(rem)
+$font-size-base: 1rem;
+$font-size-sm: 0.875rem;
+
+
+//font-weights,mandatoryFieldPopup
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+//rem-scale sizes for SecondaryLocation & SecondaryLocationLog modules
+$font-size-075rem: 0.75rem;
+$font-size-078rem: 0.78rem;
+$font-size-08rem: 0.8rem;
+$font-size-082rem: 0.82rem;
+$font-size-084rem: 0.84rem;
+$font-size-085rem: 0.85rem;
+$font-size-086rem: 0.86rem;
+$font-size-088rem: 0.88rem;
+$font-size-09rem: 0.9rem;
+$font-size-092rem: 0.92rem;
+$font-size-095rem: 0.95rem;
+$font-size-096rem: 0.96rem;
+$font-size-12rem: 1.2rem;
+$font-size-125rem: 1.125rem;
+$font-size-12vw: 1.2rem;
+$font-size-135rem: 1.35rem;
+$font-size-15rem: 1.5rem;
+
+// line-height token
+$line-height-base: 1.4;
+$line-height-tight: 1.25;

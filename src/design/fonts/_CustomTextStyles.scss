@@ -235,4 +235,68 @@ color: Colors.$c37;
   color: Colors.$c2;
 }
 
+.text-header-main {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 500;
+  font-size: 1.24vw;
+  color: Colors.$c31;
+}
 
+.text-time-label {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #2E3038;
+}
+
+.text-btn-primary {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+
+.text-input-field {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #033348;
+}
+
+.text-tooltip-small-bold {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.text-tooltip-small {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.text-tab-common {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px; 
+  font-weight: 400; 
+  color: #2e3038;
+  line-height: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+
+.text-permission-item {
+  font-size: 14px;      
+  font-weight: 400;      
+  font-family: "Inter", sans-serif; 
+  color: #2e3038;
+}
+
+.text-table-header {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 14px; /* or fonts.$font-size-md */
+  font-weight: 600;
+  color: #2e3038;
+  line-height: 24px;
+  letter-spacing: 0.01em;
+}

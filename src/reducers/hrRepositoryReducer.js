@@ -1,17 +1,26 @@
 import { createReducer } from "@reduxjs/toolkit";
+
 const initialState = {
   allEmployees: [],
+  allEmployeesLoading: false,
   getAllComponentType: [],
+  payrollLevels: [],
+  payrollLevelsLoading: false,
+  payrollLevelsMutationLoading: false,
+  payrollLevelsError: null,
   isEdit: false,
   isAddPeople: false,
   isEmployeeDetailsPage: false,
   snackbarMessage: "",
   currentEmployeeDetails:[],
+  currentEmployeeDirectoryDetails: [],
+  currentEmployeeDirectoryDetailsLoading: false,
   getAllManagersDetails: [],
   viewProfilePage: false,
   allEmployeesBirthday: [],
-  allEmployeesAnniversary: [],
+  allEmployeesAnniversary: {}, // { workAnniversary12Month: [], workAnniversary14Month: [] }
   allExisitingLeaves: [],
+  allLeavesLoading: false,
   currentLeaveDetails: [],
   isCurrentLeaveDetails: false,
   isCurrentLeaveDeatilsView: false,
@@ -19,6 +28,7 @@ const initialState = {
   snackbarSeverity: "info",
   snackbarOpen: false,
   pendingRequests: [],
+  processedRequests: [],
   leaveCreatedSuccess: false,
   leaveUpdateSuccess: false,
   unpaidLeaveDisabled: false,
@@ -30,6 +40,7 @@ const initialState = {
   setAttendanceYear: "",
   setAttendanceMonth: "",
   leavePendingRequests: [],
+  leaveHistoryRequests:[],
   employeeLeaveHistory: [],
   balanceDetails:[],
   showCalendarAndTable: false,
@@ -57,6 +68,7 @@ const initialState = {
   },
   selectedDropdownOptions: {},
   payrollData: [],
+  payrollNotFetchedEmployees: [],
   payrollLoading: false,
   payrollError: null,
   payrollPagination: {
@@ -83,14 +95,91 @@ const initialState = {
   netPayPayrollAmount:0,
   extraWorkLogLoading: false,
   extraWorkLogRequestsData: [],
+  extraWorkLogRequestsHistoryData:[],
   compOffleaveBalance: [],
   compOffLeaveEligibility: null,
   compOffLeaveEligibilityLoading: false,
+
+  employeeExtraWorkHistory:[],
+
   hrmsAccessRoles: [],
   hrmsAccessPermissions: [],
   hrmsAccessRole: null,
   employeeRoles: [],
   myHrmsAccess: [],
+
+  myHrmsAccessLoaded: false,
+  offboardingLoading: false,
+  offboardingInitiatedEmployeeDetails: [],
+  offboardingInitiatedEmployeeDetailsLoading: false,
+  offboardingInitiatedEmployeeDetailsError: null,
+  hrClearanceLoading: false,
+  financeClearanceLoading: false,
+  setLastWorkingDayLoading: false,
+  approveOffboardingLoading: false,
+  getAllOffboardedEmployeesLoading: false,
+  offboardedEmployees: [],
+
+  // Rewards & Recognition
+secondaryLocationOverview: null,
+  secondaryLocationLogs: [],
+  secondaryLocationLogsMeta: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationConfigs: [],
+  secondaryLocationRequests: [],
+  secondaryLocationConfigsMeta: {
+    limit: 10,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationRequestsMeta: {
+    pendingCount: 0,
+    historyCount: 0,
+    totalCount: 0,
+    limit: 20,
+    nextLastId: null,
+    hasNext: false,
+  },
+  secondaryLocationLoading: false,
+  secondaryLocationRequestsLoading: false,
+
+  rewardsDashboardLoading: false,
+  rewardsDashboardData: null,
+  rewardsDashboardError: null,
+  rewardsCurrentCycle: null,
+  rewardsCurrentCycleLoading: false,
+  rewardsEmployeeSearchResults: [],
+  rewardsNominateLoading: false,
+  rewardsCycleNominations: [],
+  rewardsCycleNominationsLoading: false,
+  rewardsVotingList: [],
+  rewardsVotingListLoading: false,
+  rewardsVotedNomineeEmpUuid: null,
+  rewardsMyCitations: [],
+  rewardsMyCitationsLoading: false,
+  rewardsPastReceivedCitations: [],
+  rewardsPastReceivedCitationsLoading: false,
+  rewardsPastReceivedCitationsLoaded: false,
+  rewardsPastReceivedCitationsLoadedYear: null,
+  rewardsNomineeCitations: null,
+  rewardsNomineeCitationsLoading: false,
+  rewardsNomineesForAnnounce: [],
+  rewardsNomineesForAnnounceLoading: false,
+  rewardsPhaseActionLoading: false,
+  rewardsPhaseActionError: null,
+  rewardsReviewNominees: [],
+  rewardsReviewNomineesLoading: false,
+  // UI State
+  nominationModalOpen: false,
+  votingModalOpen: false,
+  manageCitationsModalOpen: false,
+  manageCitationsModalData: null,
+  announceWinnersModalOpen: false,
 };
 
 export const hrRepositoryReducer = createReducer(initialState, (builder) => {
@@ -223,6 +312,40 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
     state.loading = false;
     state.error = action.payload;
   })
+  .addCase('GET_PAYROLL_LEVELS_REQUEST', (state) => {
+    state.payrollLevelsLoading = true;
+    state.payrollLevelsError = null;
+  })
+  .addCase('GET_PAYROLL_LEVELS_SUCCESS', (state, action) => {
+    state.payrollLevelsLoading = false;
+    state.payrollLevels = action.payload;
+  })
+  .addCase('GET_PAYROLL_LEVELS_FAILURE', (state, action) => {
+    state.payrollLevelsLoading = false;
+    state.payrollLevelsError = action.payload;
+  })
+  .addCase('CREATE_PAYROLL_LEVEL_REQUEST', (state) => {
+    state.payrollLevelsMutationLoading = true;
+    state.payrollLevelsError = null;
+  })
+  .addCase('CREATE_PAYROLL_LEVEL_SUCCESS', (state) => {
+    state.payrollLevelsMutationLoading = false;
+  })
+  .addCase('CREATE_PAYROLL_LEVEL_FAILURE', (state, action) => {
+    state.payrollLevelsMutationLoading = false;
+    state.payrollLevelsError = action.payload;
+  })
+  .addCase('UPDATE_PAYROLL_LEVEL_REQUEST', (state) => {
+    state.payrollLevelsMutationLoading = true;
+    state.payrollLevelsError = null;
+  })
+  .addCase('UPDATE_PAYROLL_LEVEL_SUCCESS', (state) => {
+    state.payrollLevelsMutationLoading = false;
+  })
+  .addCase('UPDATE_PAYROLL_LEVEL_FAILURE', (state, action) => {
+    state.payrollLevelsMutationLoading = false;
+    state.payrollLevelsError = action.payload;
+  })
       .addCase('SET_EMPLOYEES_DETAILS_PAGE', (state) => {
         state.isEmployeeDetailsPage = true;
       })
@@ -235,18 +358,19 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.snackbarOpen = action.payload !== ""; 
       })
       .addCase('GET_ALL_EMPLOYEE', (state,) => {
-        state.loading = true;
+        state.allEmployeesLoading = true;
       })
       .addCase('GET_ALL_EMPLOYEE_SUCCESS', (state, action) => {
-        state.loading = false;
+        state.allEmployeesLoading = false;
         state.allEmployees = action.payload;
       })
       .addCase('GET_ALL_EMPLOYEE_FAILURE', (state, action) => {
-        state.loading = false;
+        state.allEmployeesLoading = false;
         state.error = action.payload;
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS', (state) => {
         state.currentEmployeeDetailsLoading = true;
+        state.currentEmployeeDetails = [];
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS_SUCCESS', (state, action) => {
         state.currentEmployeeDetailsLoading = false;
@@ -254,6 +378,18 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       })
       .addCase('GET_CURRENT_EMPLOYEE_DETAILS_FAILURE', (state, action) => {
         state.currentEmployeeDetailsLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_EMPLOYEE_DIRECTORY_DETAILS', (state) => {
+        state.currentEmployeeDirectoryDetailsLoading = true;
+        state.currentEmployeeDirectoryDetails = [];
+      })
+      .addCase('GET_EMPLOYEE_DIRECTORY_DETAILS_SUCCESS', (state, action) => {
+        state.currentEmployeeDirectoryDetailsLoading = false;
+        state.currentEmployeeDirectoryDetails = action.payload;
+      })
+      .addCase('GET_EMPLOYEE_DIRECTORY_DETAILS_FAILURE', (state, action) => {
+        state.currentEmployeeDirectoryDetailsLoading = false;
         state.error = action.payload;
       })
       .addCase('EMPLOYEE_ONBOARDING_DETAILS', (state) => {
@@ -309,14 +445,14 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.loading = true;
       })
       .addCase('GET_ALL_LEAVE_DETAILS', (state) => {
-        state.loading = true;
+        state.allLeavesLoading = true;
       })
       .addCase('GET_ALL_LEAVE_DETAILS_SUCCESS', (state, action) => {
-        state.loading = false;
+        state.allLeavesLoading = false;
         state.allExisitingLeaves = action.payload;
       })
       .addCase('GET_ALL_LEAVE_DETAILS_FAILURE', (state, action) => {
-        state.loading = false;
+        state.allLeavesLoading = false;
         state.error = action.payload;
       })
       .addCase('CREATE_LEAVE', (state) => {
@@ -400,6 +536,17 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.error = action.payload;
       })
       .addCase('GET_PENDING_REQUESTS', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_PROCESSED_REQUESTS_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.processedRequests = action.payload;
+      })
+      .addCase('GET_PROCESSED_REQUESTS_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_PROCESSED_REQUESTS', (state) => {
         state.loading = true;
       })
       .addCase('APPROVE_OR_REJECT_REQUEST_SUCCESS', (state) => {
@@ -514,6 +661,18 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.leavePendingRequests = action.payload;
       })
       .addCase('GET_ALL_PENDING_LEAVE_REQUESTS_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_ALL_HISTORY_LEAVE_REQUESTS', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_ALL_HISTORY_LEAVE_REQUESTS_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.leaveHistoryRequests = action.payload.data;
+        state.pagination = action.payload.pagination;
+      })
+      .addCase('GET_ALL_HISTORY_LEAVE_REQUESTS_FAILURE', (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -780,9 +939,11 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       .addCase('GET_ALL_EMPLOYEE_PAYROLL_REQUEST', (state) => {
         state.payrollLoading = true;
         state.payrollError = null;
+        state.payrollNotFetchedEmployees = [];
       })
       .addCase('GET_ALL_EMPLOYEE_PAYROLL_SUCCESS', (state, action) => {
         state.payrollData = action.payload.data;
+        state.payrollNotFetchedEmployees = action.payload.notFetchedEmployees || [];
         state.payrollPagination = action.payload.pagination;
         state.isAllPayrollFinalized = action.payload.isAllPayrollFinalized;
         state.isAllPayrollGenerated = action.payload.isAllPayrollGenerated;
@@ -792,6 +953,7 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       .addCase('GET_ALL_EMPLOYEE_PAYROLL_FAILURE', (state, action) => {
         state.payrollLoading = false;
         state.payrollError = action.payload;
+        state.payrollNotFetchedEmployees = [];
       })
 
       // Update payroll items actions
@@ -947,6 +1109,17 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.extraWorkLogLoading = false;
         state.extraWorkLogError = action.payload; 
       })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS_HISTORY', (state) => {
+        state.extraWorkLogLoading = true;
+      })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS_HISTORY_SUCCESS' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogRequestsHistoryData = action.payload;
+      })
+      .addCase('GET_EXTRA_WORK_LOG_REQUESTS_HISTORY_FAILURE' , (state, action) => {
+        state.extraWorkLogLoading = false;
+        state.extraWorkLogError = action.payload; 
+      })
       .addCase('UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS', (state) => { 
         state.extraWorkLogLoading = true;
       })
@@ -981,6 +1154,19 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.compOffLeaveEligibility = null;
         state.error = action.payload;
       })
+
+      .addCase('GET_EMPLOYEE_EXTRA_WORK_HISTORY', (state) => {
+        state.loading = true;
+      })
+      .addCase('GET_EMPLOYEE_EXTRA_WORK_HISTORY_SUCCESS', (state, action) => {
+        state.loading = false;
+        state.employeeExtraWorkHistory = action.payload;
+      })
+      .addCase('GET_EMPLOYEE_EXTRA_WORK_HISTORY_FAILURE', (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase('GET_ALL_ROLES', (state) => {
         state.loading = true;
       })
@@ -1057,14 +1243,467 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.error = action.payload;
       })
       .addCase('GET_MY_HRMS_ACCESS', (state) => {
-        state.loading = true;
+        state.myHrmsAccessLoaded = false;
       })
       .addCase('GET_MY_HRMS_ACCESS_SUCCESS', (state, action) => {
-        state.loading = false;
         state.myHrmsAccess = action.payload;
+        state.myHrmsAccessLoaded = true;
       })
       .addCase('GET_MY_HRMS_ACCESS_FAILURE', (state, action) => {
+
         state.loading = false;
+
+        state.error = action.payload;
+        state.myHrmsAccessLoaded = true;
+      })
+      .addCase('INITIATE_OFFBOARDING', (state) => {
+        state.offboardingLoading = true;
+      })
+      .addCase('INITIATE_OFFBOARDING_SUCCESS', (state, action) => {
+        state.offboardingLoading = false;
+        state.message = action.payload;
+      })
+      .addCase('INITIATE_OFFBOARDING_FAILURE', (state, action) => {
+        state.offboardingLoading = false;
         state.error = action.payload;
       })
+      .addCase('GET_ALL_OFFBOARDING_INITIATED_EMPLOYEE_DETAILS', (state) => {
+        state.offboardingInitiatedEmployeeDetailsLoading = true;
+      })
+      .addCase('GET_ALL_OFFBOARDING_INITIATED_EMPLOYEE_DETAILS_SUCCESS', (state, action) => {
+        state.offboardingInitiatedEmployeeDetailsLoading = false;
+        state.offboardingInitiatedEmployeeDetails = action.payload;
+      })
+      .addCase('GET_ALL_OFFBOARDING_INITIATED_EMPLOYEE_DETAILS_FAILURE', (state, action) => {
+        state.offboardingInitiatedEmployeeDetailsLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('HR_CLEARANCE', (state) => {
+        state.hrClearanceLoading = true;
+      })
+      .addCase('HR_CLEARANCE_SUCCESS', (state, action) => {
+        state.hrClearanceLoading = false;
+        state.message = action.payload;
+      })
+      .addCase('HR_CLEARANCE_FAILURE', (state, action) => {
+        state.hrClearanceLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('FINANCE_CLEARANCE', (state) => {
+        state.financeClearanceLoading = true;
+      })
+      .addCase('FINANCE_CLEARANCE_SUCCESS', (state, action) => {
+        state.financeClearanceLoading = false;
+        state.message = action.payload;
+      })
+      .addCase('FINANCE_CLEARANCE_FAILURE', (state, action) => {
+        state.financeClearanceLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('SET_LAST_WORKING_DAY', (state) => {
+        state.setLastWorkingDayLoading = true;
+      })
+      .addCase('SET_LAST_WORKING_DAY_SUCCESS', (state) => {
+        state.setLastWorkingDayLoading = false;
+      })
+      .addCase('SET_LAST_WORKING_DAY_FAILURE', (state, action) => {
+        state.setLastWorkingDayLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('APPROVE_OFFBOARDING', (state) => {
+        state.approveOffboardingLoading = true;
+      })
+      .addCase('APPROVE_OFFBOARDING_SUCCESS', (state) => {
+        state.approveOffboardingLoading = false;
+      })
+      .addCase('APPROVE_OFFBOARDING_FAILURE', (state, action) => {
+        state.approveOffboardingLoading = false;
+        state.error = action.payload;
+      })
+      .addCase('GET_ALL_OFFBOARDED_EMPLOYEES', (state) => {
+        state.getAllOffboardedEmployeesLoading = true;
+      })
+      .addCase('GET_ALL_OFFBOARDED_EMPLOYEES_SUCCESS', (state, action) => {
+        state.getAllOffboardedEmployeesLoading = false;
+        state.offboardedEmployees = action.payload;
+      })
+      .addCase('GET_ALL_OFFBOARDED_EMPLOYEES_FAILURE', (state, action) => {
+        state.getAllOffboardedEmployeesLoading = false;
+
+        state.error = action.payload;
+      })
+
+    // Rewards & Recognition
+    .addCase('FETCH_REWARDS_DASHBOARD', (state) => {
+      state.rewardsDashboardLoading = true;
+      state.rewardsDashboardError = null;
+    })
+    .addCase('FETCH_REWARDS_DASHBOARD_SUCCESS', (state, action) => {
+      state.rewardsDashboardLoading = false;
+      state.rewardsDashboardData = action.payload;
+      state.rewardsDashboardError = null;
+      state.rewardsPhaseActionError = null;
+    })
+    .addCase('FETCH_REWARDS_DASHBOARD_FAILED', (state, action) => {
+      state.rewardsDashboardLoading = false;
+      state.rewardsDashboardData = null;
+      state.rewardsDashboardError = action.payload;
+    })
+    .addCase('REWARDS_EMPLOYEE_SEARCH_SUCCESS', (state, action) => {
+      state.rewardsEmployeeSearchResults = action.payload;
+    })
+    .addCase('REWARDS_NOMINATE', (state) => {
+      state.rewardsNominateLoading = true;
+    })
+    .addCase('REWARDS_NOMINATE_SUCCESS', (state) => {
+      state.rewardsNominateLoading = false;
+    })
+    .addCase('REWARDS_NOMINATE_FAILED', (state) => {
+      state.rewardsNominateLoading = false;
+    })
+    .addCase('FETCH_REWARDS_NOMINEES_FOR_VOTING', (state) => {
+      state.rewardsVotingListLoading = true;
+    })
+    .addCase('FETCH_REWARDS_NOMINEES_FOR_VOTING_SUCCESS', (state, action) => {
+      state.rewardsVotingListLoading = false;
+      state.rewardsVotingList = action.payload?.list ?? [];
+      state.rewardsVotedNomineeEmpUuid = action.payload?.votedNomineeEmpUuid ?? null;
+    })
+    .addCase('FETCH_REWARDS_NOMINEES_FOR_VOTING_FAILED', (state) => {
+      state.rewardsVotingListLoading = false;
+      state.rewardsVotingList = [];
+      state.rewardsVotedNomineeEmpUuid = null;
+    })
+    .addCase('REWARDS_VOTE_SUCCESS', (state, action) => {
+      state.rewardsVotingList = action.payload?.list ?? state.rewardsVotingList;
+      state.rewardsVotedNomineeEmpUuid = action.payload?.votedNomineeEmpUuid ?? null;
+    })
+    .addCase('FETCH_REWARDS_MY_CITATIONS_SUCCESS', (state, action) => {
+      state.rewardsMyCitations = action.payload ?? [];
+    })
+    .addCase('REWARDS_PHASE_ACTION', (state) => {
+      state.rewardsPhaseActionLoading = true;
+      state.rewardsPhaseActionError = null;
+    })
+    .addCase('REWARDS_PHASE_ACTION_SUCCESS', (state, action) => {
+      state.rewardsPhaseActionLoading = false;
+      state.rewardsPhaseActionError = null;
+      if (state.rewardsDashboardData && action.payload) {
+        state.rewardsDashboardData = { ...state.rewardsDashboardData, currentCycle: action.payload };
+      }
+    })
+    .addCase('REWARDS_PHASE_ACTION_FAILED', (state, action) => {
+      state.rewardsPhaseActionLoading = false;
+      state.rewardsPhaseActionError = action.payload;
+    })
+    .addCase('CLEAR_REWARDS_EMPLOYEE_SEARCH', (state) => {
+      state.rewardsEmployeeSearchResults = [];
+    })
+    // Current Cycle
+    .addCase('FETCH_CURRENT_CYCLE', (state) => {
+      state.rewardsCurrentCycleLoading = true;
+    })
+    .addCase('FETCH_CURRENT_CYCLE_SUCCESS', (state, action) => {
+      state.rewardsCurrentCycleLoading = false;
+      state.rewardsCurrentCycle = action.payload;
+    })
+    .addCase('FETCH_CURRENT_CYCLE_FAILED', (state) => {
+      state.rewardsCurrentCycleLoading = false;
+    })
+    // Cycle Nominations
+    .addCase('FETCH_CYCLE_NOMINATIONS', (state) => {
+      state.rewardsCycleNominationsLoading = true;
+    })
+    .addCase('FETCH_CYCLE_NOMINATIONS_SUCCESS', (state, action) => {
+      state.rewardsCycleNominationsLoading = false;
+      state.rewardsCycleNominations = action.payload;
+    })
+    .addCase('FETCH_CYCLE_NOMINATIONS_FAILED', (state) => {
+      state.rewardsCycleNominationsLoading = false;
+    })
+    // Voting
+    .addCase('FETCH_NOMINEES_FOR_VOTING', (state) => {
+      state.rewardsVotingListLoading = true;
+    })
+    .addCase('FETCH_NOMINEES_FOR_VOTING_SUCCESS', (state, action) => {
+      state.rewardsVotingListLoading = false;
+      state.rewardsVotingList = action.payload?.list ?? [];
+      state.rewardsVotedNomineeEmpUuid = action.payload?.votedNomineeEmpUuid ?? null;
+    })
+    .addCase('FETCH_NOMINEES_FOR_VOTING_FAILED', (state) => {
+      state.rewardsVotingListLoading = false;
+    })
+    // Citations
+    .addCase('FETCH_MY_CITATIONS', (state) => {
+      state.rewardsMyCitationsLoading = true;
+    })
+    .addCase('FETCH_MY_CITATIONS_SUCCESS', (state, action) => {
+      state.rewardsMyCitationsLoading = false;
+      state.rewardsMyCitations = action.payload;
+    })
+    .addCase('FETCH_MY_CITATIONS_FAILED', (state) => {
+      state.rewardsMyCitationsLoading = false;
+    })
+    .addCase('FETCH_REWARDS_RECEIVED_CITATIONS_HISTORY', (state) => {
+      state.rewardsPastReceivedCitationsLoading = true;
+    })
+    .addCase('FETCH_REWARDS_RECEIVED_CITATIONS_HISTORY_SUCCESS', (state, action) => {
+      state.rewardsPastReceivedCitationsLoading = false;
+      state.rewardsPastReceivedCitations = action.payload?.data ?? [];
+      state.rewardsPastReceivedCitationsLoaded = true;
+      state.rewardsPastReceivedCitationsLoadedYear = action.payload?.year ?? null;
+    })
+    .addCase('FETCH_REWARDS_RECEIVED_CITATIONS_HISTORY_FAILED', (state, action) => {
+      state.rewardsPastReceivedCitationsLoading = false;
+      state.rewardsPastReceivedCitationsLoaded = true;
+      state.rewardsPastReceivedCitationsLoadedYear = action.payload?.year ?? null;
+    })
+    .addCase('FETCH_NOMINEE_CITATIONS', (state) => {
+      state.rewardsNomineeCitationsLoading = true;
+    })
+    .addCase('FETCH_NOMINEE_CITATIONS_SUCCESS', (state, action) => {
+      state.rewardsNomineeCitationsLoading = false;
+      state.rewardsNomineeCitations = action.payload;
+    })
+    .addCase('FETCH_NOMINEE_CITATIONS_FAILED', (state) => {
+      state.rewardsNomineeCitationsLoading = false;
+    })
+    // Admin: Announce
+    .addCase('FETCH_NOMINEES_FOR_ANNOUNCE', (state) => {
+      state.rewardsNomineesForAnnounceLoading = true;
+    })
+    .addCase('FETCH_NOMINEES_FOR_ANNOUNCE_SUCCESS', (state, action) => {
+      state.rewardsNomineesForAnnounceLoading = false;
+      state.rewardsNomineesForAnnounce = action.payload;
+    })
+    .addCase('FETCH_NOMINEES_FOR_ANNOUNCE_FAILED', (state) => {
+      state.rewardsNomineesForAnnounceLoading = false;
+    })
+    .addCase('FETCH_REVIEW_NOMINEES', (state) => {
+      state.rewardsReviewNomineesLoading = true;
+    })
+    .addCase('FETCH_REVIEW_NOMINEES_SUCCESS', (state, action) => {
+      state.rewardsReviewNomineesLoading = false;
+      state.rewardsReviewNominees = action.payload ?? [];
+    })
+    .addCase('FETCH_REVIEW_NOMINEES_FAILED', (state) => {
+      state.rewardsReviewNomineesLoading = false;
+    })
+    // Phase Management
+    .addCase('START_PHASE', (state) => {
+      state.rewardsPhaseActionLoading = true;
+    })
+    .addCase('START_PHASE_SUCCESS', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('START_PHASE_FAILED', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('END_PHASE', (state) => {
+      state.rewardsPhaseActionLoading = true;
+    })
+    .addCase('END_PHASE_SUCCESS', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('END_PHASE_FAILED', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('ANNOUNCE_WINNERS', (state) => {
+      state.rewardsPhaseActionLoading = true;
+    })
+    .addCase('ANNOUNCE_WINNERS_SUCCESS', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('ANNOUNCE_WINNERS_FAILED', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    // Remove Nomination
+    .addCase('REMOVE_NOMINATION', (state) => {
+      state.rewardsPhaseActionLoading = true;
+    })
+    .addCase('REMOVE_NOMINATION_SUCCESS', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    .addCase('REMOVE_NOMINATION_FAILED', (state) => {
+      state.rewardsPhaseActionLoading = false;
+    })
+    // UI State
+    .addCase('SET_NOMINATION_MODAL_OPEN', (state, action) => {
+      state.nominationModalOpen = action.payload;
+    })
+    .addCase('SET_VOTING_MODAL_OPEN', (state, action) => {
+      state.votingModalOpen = action.payload;
+    })
+    .addCase('SET_MANAGE_CITATIONS_MODAL_OPEN', (state, action) => {
+      state.manageCitationsModalOpen = action.payload.isOpen;
+      state.manageCitationsModalData = action.payload.data;
+    })
+    .addCase('SET_ANNOUNCE_WINNERS_MODAL_OPEN', (state, action) => {
+      state.announceWinnersModalOpen = action.payload;
+    })
+
+    // Secondary Location
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationOverview = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_OVERVIEW_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      const incomingList = action.payload?.list || [];
+      if (action.append) {
+        const existing = state.secondaryLocationLogs || [];
+        const seen = new Set(existing.map((item) => item.logId));
+        state.secondaryLocationLogs = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.logId)),
+        ];
+      } else {
+        state.secondaryLocationLogs = incomingList;
+      }
+      state.secondaryLocationLogsMeta = action.payload?.meta || state.secondaryLocationLogsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_LOGS_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS', (state) => {
+      state.secondaryLocationLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS_SUCCESS', (state, action) => {
+      state.secondaryLocationLoading = false;
+      if (Array.isArray(action.payload)) {
+        state.secondaryLocationConfigs = action.payload;
+        state.secondaryLocationConfigsMeta = {
+          limit: 10,
+          nextLastId: null,
+          hasNext: false,
+        };
+        return;
+      }
+
+      const incomingList = action.payload?.list || [];
+      if (action.append) {
+        const existing = state.secondaryLocationConfigs || [];
+        const seen = new Set(existing.map((item) => item.configId));
+        state.secondaryLocationConfigs = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.configId)),
+        ];
+      } else {
+        state.secondaryLocationConfigs = incomingList;
+      }
+
+      state.secondaryLocationConfigsMeta = action.payload?.meta || state.secondaryLocationConfigsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_CONFIGS_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS', (state) => {
+      state.secondaryLocationRequestsLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS_SUCCESS', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      const incomingList = action.payload?.requests || [];
+      if (action.append) {
+        const existing = state.secondaryLocationRequests || [];
+        const seen = new Set(existing.map((item) => item.requestId));
+        state.secondaryLocationRequests = [
+          ...existing,
+          ...incomingList.filter((item) => !seen.has(item.requestId)),
+        ];
+      } else {
+        state.secondaryLocationRequests = incomingList;
+      }
+      state.secondaryLocationRequestsMeta = action.payload?.meta || state.secondaryLocationRequestsMeta;
+    })
+    .addCase('FETCH_SECONDARY_LOCATION_REQUESTS_FAILURE', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST', (state) => {
+      state.secondaryLocationRequestsLoading = true;
+      state.secondaryLocationError = null;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST_SUCCESS', (state) => {
+      state.secondaryLocationRequestsLoading = false;
+    })
+    .addCase('REVIEW_SECONDARY_LOCATION_REQUEST_FAILURE', (state, action) => {
+      state.secondaryLocationRequestsLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_LOG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('CREATE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('UPDATE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG', (state) => {
+      state.secondaryLocationLoading = true;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG_SUCCESS', (state) => {
+      state.secondaryLocationLoading = false;
+    })
+    .addCase('DELETE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
+      state.secondaryLocationLoading = false;
+      state.secondaryLocationError = action.payload;
+    });
 });

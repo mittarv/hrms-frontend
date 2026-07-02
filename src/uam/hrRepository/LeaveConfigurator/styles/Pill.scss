@@ -1,13 +1,15 @@
+@use '../../design/colors/customColors' as *;
+
 .pill-container {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 
     .pill {
-        background-color: #FFFFFF;
-        border: 1px solid #AEB0BC;
+        background-color: $WHITE;
+        border: 1px solid $GREY-40;
         border-radius: 30px;
-        color: #454754;
+        color: $GREY-70;
         cursor: pointer;
         font-size: 16px;
         font-weight: 500;
@@ -17,22 +19,21 @@
         outline: none;
         
         &:hover {
-          background-color: #e8e8e8;
+          background-color: $c231;
         }
         
         &.selected {
-          background-color: #003950;
-          border-color: #003950;
-          color: white;
+          background-color: $c232;
+          border-color: $c232;
+          color: $WHITE;
         }
         
         &.disabled {
-          background-color: #F1F1F4;
-          color:#2E3038;
+          background-color: $GREY-10;
+          color:$GREY-80;
           cursor: not-allowed !important;
           opacity: 0.5;
         }
       
       }
   }
-  

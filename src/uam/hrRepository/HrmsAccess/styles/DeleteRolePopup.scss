@@ -1,22 +1,25 @@
+@use "../../../../design/colors/customFonts" as fonts;
+@use '../../design/colors/customColors' as *;
+
 .delete_role_popup_overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: $c131;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
 
     .delete_role_popup_container {
-        background-color: #ffffff;
+        background-color: $WHITE;
         border-radius: 8px;
         padding: 24px;
         width: 400px;
         position: relative;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px $c69;
         display: flex;
         flex-direction: column;
         gap: 24px;
@@ -54,18 +57,18 @@
             margin-top: 8px;
 
             .delete_role_popup_heading {
-                font-size: 18px;
-                font-weight: 600;
-                font-family: "Plus Jakarta Sans";
-                color: #C73D45;
+                font-size: fonts.$font-size-lg;
+                font-weight: fonts.$font-weight-semibold;
+                font-family: fonts.$font-family;
+                color: $RED-60;
                 margin: 0 0 12px 0;
             }
 
             .delete_role_popup_message {
-                font-size: 14px;
-                font-weight: 400;
-                font-family: "Plus Jakarta Sans";
-                color: #045071;
+                font-size: fonts.$font-size-small;
+                font-weight: fonts.$font-weight-regular;
+                font-family: fonts.$font-family;
+                color: $PRUSSIAN-70;
                 margin: 0;
                 line-height: 1.5;
             }
@@ -81,9 +84,9 @@
                 max-width: 167px;
                 padding: 8px 20px;
                 border-radius: 6px;
-                font-size: 14px;
-                font-weight: 600;
-                font-family: "Plus Jakarta Sans";
+                font-size: fonts.$font-size-md;         
+                font-weight: fonts.$font-weight-semibold;;
+                font-family: fonts.$font-family;
                 cursor: pointer;
                 transition: all 0.2s ease;
                 border: none;
@@ -97,20 +100,20 @@
                 }
 
                 &.delete_role_confirm_button {
-                    background-color: #C73D45;
-                    color: #ffffff;
+                    background-color: $RED-60;
+                    color: $WHITE;
 
                     &:hover:not(:disabled) {
-                        background-color: #A63137;
+                        background-color: $c234;
                     }
                 }
 
                 &.delete_role_cancel_button {
-                    background-color: #C3E1EF;
-                    color: #045071;
+                    background-color: $PRUSSIAN-20;
+                    color: $PRUSSIAN-70;
 
                     &:hover:not(:disabled) {
-                        background-color: #A8D5E8;
+                        background-color: $c235;
                     }
                 }
             }

@@ -9,7 +9,12 @@ import PDF_icon from "../../assets/icons/pdf_icon.svg";
 import Delete_icon from "../../assets/icons/delete_icon.svg";
 import { Link } from "react-router-dom";
 import {
-  convertFileToBase64
+  convertFileToBase64,
+  getFileDisplayName,
+  getFileDisplaySize,
+  getFileDisplayType,
+  isFilePDF,
+  processProofFiles
 } from "../../Common/utils/helper";
 import {
   validateBulkLeave,
@@ -18,11 +23,13 @@ import {
   isReasonRequired as checkReasonRequired
 } from "../utils/LeaveManagementUtils";
 import { checkCdlLimit } from "../../../../actions/hrRepositoryAction";
-import { ATTENDANCE_STATUS } from "../../Common/utils/enums";
+import { ATTENDANCE_STATUS, PROOF_UPLOAD } from "../../Common/utils/enums";
+import FileViewer from "../../Common/components/FileViewerPop";
+import LoadingSpinner from "../../Common/components/LoadingSpinner";
 
 
 const LeaveApplication = ({ isOpen, onClose }) => {
-  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, accrualLeaveBalance, compOffleaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading, myHrmsAccess } = useSelector(
+  const { loading, allExisitingLeaves, currentEmployeeDetails, setAttendanceYear, setAttendanceMonth, cdlData, cdlLoading, accrualLeaveBalance, compOffleaveBalance, compOffLeaveEligibility, compOffLeaveEligibilityLoading, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);
@@ -30,7 +37,12 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const startDateInputRef = useRef(null);
   const endDateInputRef = useRef(null);
+
+  // Access control checks (matching EditAttendanceModal RBAC model)
+  const isSuperAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
   const hasAccessToLeaveApplication = myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveApplication_write");
+  const hasAccessToEditAttendance = isSuperAdmin || myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
+  const hasAdminAccess = hasAccessToLeaveApplication || hasAccessToEditAttendance;
 
   const [formData, setFormData] = useState({
     leaveType: "",
@@ -42,8 +54,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   const [errors, setErrors] = useState({});
   const [applicationStatus, setApplicationStatus] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [validationMessages, setValidationMessages] = useState({});
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [filesToView, setFilesToView] = useState([]);
 
   // Call CDL check when form data changes and user selects dates
   useEffect(() => {
@@ -104,7 +118,9 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (formData.leaveType && formData.startDate && currentEmployeeDetails?.employeeCurrentJobDetails?.empUuid) {
       const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
-      const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+
+      const isCompOff = selectedLeave &&selectedLeave.leaveExpiresAfter !== null && selectedLeave.leaveExpiresAfter !== undefined;
+      
 
       if (isCompOff) {
         const empUuid = currentEmployeeDetails?.employeeCurrentJobDetails.empUuid;
@@ -126,7 +142,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       });
       setErrors({});
       setApplicationStatus(null);
-      setUploadedFile(null);
+      setUploadedFiles([]);
       setValidationMessages({});
     }
   }, [isOpen]);
@@ -134,8 +150,8 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   // Simplified validation function using utils
   const validateLeaveApplication = useCallback(() => {
-    return validateBulkLeave(formData, allExisitingLeaves, cdlData, allToolsAccessDetails?.[selectedToolName], hasAccessToLeaveApplication, accrualLeaveBalance);
-  }, [allToolsAccessDetails, selectedToolName, formData, allExisitingLeaves, cdlData, hasAccessToLeaveApplication, accrualLeaveBalance]);
+    return validateBulkLeave(formData, allExisitingLeaves, cdlData, allToolsAccessDetails?.[selectedToolName], hasAdminAccess, accrualLeaveBalance);
+  }, [allToolsAccessDetails, selectedToolName, formData, allExisitingLeaves, cdlData, hasAdminAccess, accrualLeaveBalance]);
   // Update validation messages when validation changes
   useEffect(() => {
     const { messages } = validateLeaveApplication();
@@ -146,16 +162,18 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   const isFormValid = useMemo(() => {
     const hasRequiredFields = formData.leaveType && formData.startDate && formData.endDate;
     const { isValid } = validateLeaveApplication();
-    const proofValidation = validationMessages.proofRequired ? !!uploadedFile : true;
+    const proofValidation = validationMessages.proofRequired ? uploadedFiles.length > 0 : true;
 
     return hasRequiredFields && isValid && proofValidation;
-  }, [formData.leaveType, formData.startDate, formData.endDate, validateLeaveApplication, uploadedFile, validationMessages]);
+  }, [formData.leaveType, formData.startDate, formData.endDate, validateLeaveApplication, uploadedFiles, validationMessages]);
 
   // Update leave balance when leave type or dates change - FIXED: Use validation data
   useEffect(() => {
     if (formData.leaveType && formData.startDate && formData.endDate) {
       const selectedLeave = allExisitingLeaves.find(leave => leave.leaveType === formData.leaveType);
-      const isCompOff = selectedLeave && (selectedLeave.leaveType?.toLowerCase().includes('comp') || selectedLeave.leaveType?.toLowerCase().includes('comp off'));
+
+      const isCompOff = selectedLeave && selectedLeave.leaveExpiresAfter !== null && selectedLeave.leaveExpiresAfter !== undefined;
+      
 
       // Use comp off eligibility if comp off is selected
       if (isCompOff && compOffLeaveEligibility) {
@@ -268,40 +286,18 @@ const LeaveApplication = ({ isOpen, onClose }) => {
 
   // Handle file upload
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      // Convert file to base64 using utility function with 10MB limit
-      const maxSizeInBytes = 10 * 1024 * 1024; // 10 MB
-      const fileData = await convertFileToBase64(file, maxSizeInBytes);
-
-      // Create a file object with base64 data
-      const processedFile = {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        lastModified: file.lastModified,
-        base64Data: fileData.base64,
-        pureBase64: fileData.pureBase64,
-        fileMetadata: fileData
-      };
-
-      setUploadedFile(processedFile);
-      setErrors({ ...errors, file: '' });
-    } catch (error) {
-      console.error('Error processing file:', error);
-      setErrors({ ...errors, file: error.message });
-      // Reset the file input on error
-      const fileInput = document.getElementById('proofFile');
-      if (fileInput) {
-        fileInput.value = '';
-      }
+    const { validFiles } = await processProofFiles(
+      e.target.files, uploadedFiles, dispatch, PROOF_UPLOAD
+    );
+    if (validFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      setErrors(prev => ({ ...prev, file: '' }));
     }
+    e.target.value = '';
   };
 
   // Handle form submission
-  const employeeType = currentEmployeeDetails?.employeeCurrentJobDetails.empType;
+  const employeeType = currentEmployeeDetails?.employeeCurrentJobDetails?.empType;
   const empGender = currentEmployeeDetails.employeeBasicDetails?.empGender || null;
 
   if (!isOpen) return null;
@@ -309,11 +305,22 @@ const LeaveApplication = ({ isOpen, onClose }) => {
   const applicableLeavesRaw = getApplicableLeaves(allExisitingLeaves, employeeType, empGender, accrualLeaveBalance);
   // Don't show comp off if total allotted is 0 (same as LeaveAvailable)
   const applicableLeaves = applicableLeavesRaw.filter((leave) => {
-    const leaveTypeLower = leave?.leaveType?.toLowerCase() || "";
-    const isCompOff = leaveTypeLower.includes("comp") || leaveTypeLower.includes("comp off");
-    if (!isCompOff) return true;
-    return compOffleaveBalance && !Array.isArray(compOffleaveBalance) && compOffleaveBalance.totalAllotted > 0;
+    
+  const isCompOff = leave.leaveExpiresAfter !== null && leave.leaveExpiresAfter !== undefined;
+
+  if (!isCompOff) return true;
+  const hasBalance = Array.isArray(compOffleaveBalance) 
+    ? compOffleaveBalance.length > 0 
+    : compOffleaveBalance?.totalAllotted > 0 || compOffleaveBalance?.compOffAccrualResults?.length > 0;
+
+  return hasBalance;
   });
+
+  // Compute proof upload visibility and mandatory status
+  // Always show proof upload when a leave type is selected
+  const showProofUpload = !!formData.leaveType;
+  // Proof is mandatory only when isProofRequired=true AND CDL is crossed
+  const isProofMandatory = !!validationMessages.proofRequired;
 
   const handleStartDateInputContainer = () => {
     startDateInputRef.current?.showPicker();
@@ -322,6 +329,8 @@ const LeaveApplication = ({ isOpen, onClose }) => {
     endDateInputRef.current?.showPicker();
   }
   const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!currentEmployeeDetails.employeeBasicDetails?.empGender) {
       dispatch({
         type: "SET_NEW_SNACKBAR_MESSAGE",
@@ -332,8 +341,6 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       });
       return;
     }
-
-    e.preventDefault();
     const validationErrors = {};
 
     if (!formData.leaveType) {
@@ -350,6 +357,10 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       (leave) => leave.leaveType === formData.leaveType
     );
 
+    if (!selectedLeaveConfig) {
+      validationErrors.leaveType = "Invalid leave type selected";
+    }
+
     if (
       checkReasonRequired(formData.leaveType, allExisitingLeaves) &&
       (!formData.reason || !formData.reason.trim())
@@ -357,14 +368,16 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       validationErrors.reason = "Reason is required";
     }
 
-    if (validationMessages.proofRequired && !uploadedFile) {
-      validationErrors.file = "Medical certificate is required for sick leave exceeding continuous limit";
+    if (validationMessages.proofRequired && uploadedFiles.length === 0) {
+      validationErrors.file = validationMessages.proofRequired === 'cdl_blocked'
+        ? `Proof is required for ${formData.leaveType} leave as continuous leave limit (CDL) is reached`
+        : `Proof is required for ${formData.leaveType} leave as continuous leave days limit is exceeded`;
     }
 
     // Balance validation for comp off and regular leaves
     if (selectedLeaveConfig && formData.startDate && formData.endDate) {
-      const isCompOff = selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') ||
-        selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off');
+
+      const isCompOff = selectedLeaveConfig.leaveExpiresAfter !== null && selectedLeaveConfig.leaveExpiresAfter !== undefined;
 
       // Calculate requested days - use totalDays from compOffLeaveEligibility if available, otherwise calculate
       let requestedDays;
@@ -401,6 +414,13 @@ const LeaveApplication = ({ isOpen, onClose }) => {
             }
 
             validationErrors.leaveType = `You have only ${availableCompOffCredit} ${availableCompOffCredit === 0.5 ? 'day' : 'days'} comp off balance. Please select "Half Day" for at least one day.${suggestion}`;
+            dispatch({
+              type: "SET_NEW_SNACKBAR_MESSAGE",
+              payload: {
+                message: validationErrors.leaveType,
+                severity: "error",
+              },
+            });
           }
           // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
         }
@@ -433,6 +453,13 @@ const LeaveApplication = ({ isOpen, onClose }) => {
               }
 
               validationErrors.leaveType = `You have only ${availableDays} ${availableDays === 0.5 ? 'day' : 'days'} ${selectedLeaveConfig.leaveType} balance. Please select "Half Day" for at least one day.${suggestion}`;
+              dispatch({
+                type: "SET_NEW_SNACKBAR_MESSAGE",
+                payload: {
+                  message: validationErrors.leaveType,
+                  severity: "error",
+                },
+              });
             }
             // If balance is not fractional (0, 1, 2, etc.) or insufficient, allow it (will be unpaid)
           }
@@ -455,26 +482,37 @@ const LeaveApplication = ({ isOpen, onClose }) => {
       });
       return;
     }
-    let fileBase64 = null;
-    if (uploadedFile) {
+    let filesBase64 = null;
+    if (uploadedFiles.length > 0) {
       try {
-        dispatch({ type: "UPLOAD_PROOF_DOCUMENTS" });
-
-        // Use base64 data from the uploaded file
-        if (uploadedFile?.base64Data) {
-          fileBase64 = uploadedFile.base64Data;
-        } else {
-          // Fallback: convert file to base64 if not already processed
-          const maxSizeInBytes = 10 * 1024 * 1024; // 10 MB
-          const fileData = await convertFileToBase64(uploadedFile, maxSizeInBytes);
-          fileBase64 = fileData.base64;
+        const processedFiles = [];
+        for (const uf of uploadedFiles) {
+          let fileBase64;
+          if (uf?.base64Data) {
+            fileBase64 = uf.base64Data;
+          } else if (uf?.isExisting && uf?.base64) {
+            fileBase64 = uf.base64;
+          } else if (uf instanceof File) {
+            const fileData = await convertFileToBase64(uf, PROOF_UPLOAD.MAX_FILE_SIZE);
+            fileBase64 = fileData.base64;
+          } else {
+            continue;
+          }
+          processedFiles.push({
+            base64: fileBase64,
+            fileName: uf.name,
+            fileType: uf.type,
+            fileSize: uf.size,
+            uploadTimestamp: new Date().toISOString()
+          });
         }
+        filesBase64 = JSON.stringify(processedFiles);
       } catch (error) {
-        console.error('Error processing file:', error);
+        console.error('Error processing files:', error);
         dispatch({
           type: "SET_NEW_SNACKBAR_MESSAGE",
           payload: {
-            message: "Error processing file. Please try again.",
+            message: "Error processing files. Please try again.",
             severity: "error",
           },
         });
@@ -495,17 +533,13 @@ const LeaveApplication = ({ isOpen, onClose }) => {
         allExisitingLeaves.find(
           (unpaid) => unpaid.leaveType.toLowerCase() === "unpaid"
         )?.leaveConfigId || "",
-      attachmentPath: fileBase64 ? JSON.stringify([{
-        base64: fileBase64,
-        fileName: uploadedFile.name,
-        fileType: uploadedFile.type,
-        fileSize: uploadedFile.size,
-        uploadTimestamp: new Date().toISOString()
-      }]) : null,
+      attachmentPath: filesBase64 || null,
     };
 
     // Check if it's a comp off leave
-    const isCompOff = selectedLeaveConfig && (selectedLeaveConfig.leaveType?.toLowerCase().includes('comp') || selectedLeaveConfig.leaveType?.toLowerCase().includes('comp off'));
+
+    const isCompOff = selectedLeaveConfig && selectedLeaveConfig.leaveExpiresAfter !== null && selectedLeaveConfig.leaveExpiresAfter !== undefined;
+    
 
     if (isCompOff) {
       dispatch(registerCompOffLeave(requestBody, setAttendanceMonth, setAttendanceYear));
@@ -533,28 +567,39 @@ const LeaveApplication = ({ isOpen, onClose }) => {
               <div className="form-group">
                 <label>Leave type (select one)*</label>
                 <div className="leave-types">
-                  {empGender ? (
+                  {cdlLoading ? <LoadingSpinner message="Loading Leave Options..." height="10vh" /> : empGender ? (
                     applicableLeaves.length > 0 ? (
-                      applicableLeaves.map((leave) => (
-                        <button
-                          key={leave.leaveConfigId}
-                          type="button"
-                          className={`leave-type-button ${formData.leaveType === leave.leaveType
-                            ? "selected"
-                            : ""
-                            }`}
-                          onClick={() =>
-                            handleInputChange({
-                              target: {
-                                name: "leaveType",
-                                value: leave.leaveType,
-                              },
-                            })
-                          }
-                        >
-                          {leave.leaveType}
-                        </button>
-                      ))
+                      applicableLeaves.map((leave) => {
+                        const cdlAllowed = cdlData[leave?.leaveConfigId];
+                        // Disable CDL-blocked leaves for non-admin users (unless isProofRequired is true)
+                        const isCdlDisabled = !formData.isHalfDay &&
+                          cdlAllowed === false &&
+                          !leave?.isProofRequired &&
+                          !isSuperAdmin && !hasAdminAccess;
+
+                        return (
+                          <button
+                            key={leave.leaveConfigId}
+                            type="button"
+                            className={`leave-type-button ${formData.leaveType === leave.leaveType
+                              ? "selected"
+                              : ""
+                              } ${isCdlDisabled ? "disabled" : ""}`}
+                            onClick={() =>
+                              handleInputChange({
+                                target: {
+                                  name: "leaveType",
+                                  value: leave.leaveType,
+                                },
+                              })
+                            }
+                            disabled={isCdlDisabled}
+                            title={isCdlDisabled ? "CDL reached - Cannot apply for this leave type" : ""}
+                          >
+                            {leave.leaveType}
+                          </button>
+                        );
+                      })
                     ) : (
                       <p className="no-leaves-message">
                         No leave types available for your employee type and
@@ -651,63 +696,99 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                 )}
               </div>
 
-              {/* File Upload for Sick Leave Proof */}
-              {validationMessages.proofRequired && (
+              {/* File Upload for Leave Proof */}
+              {showProofUpload && (
                 <div className="file_upload_container">
-                  <label >Medical Certificate*</label>
-                  <label htmlFor={!uploadedFile ? 'proofFile' : ''} className={!uploadedFile ? 'custom_file_Upload clickable' : 'custom_file_Upload'}>
-                    <input
-                      type="file"
-                      id="proofFile"
-                      name="proofFile"
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={handleFileUpload}
-                      required
-                      style={{ display: "none" }}
-                    />
-
-                    {uploadedFile ? (
-                      // Show uploaded file details
-                      <div className="uploaded-file-row">
-                        <div className="file-icon-container">
-                          {uploadedFile.type === "application/pdf" ? (
-                            <img src={PDF_icon} alt="PDF" className="file-type-icon" />
-                          ) : (
-                            <img src={Image_icon} alt="Image" className="file-type-icon" />
-                          )}
-                        </div>
-                        <div className="file-name">{uploadedFile.name}</div>
-                        <div className="file-meta">
-                          {Math.round(uploadedFile.size / 1024)} KB | {uploadedFile.type.split("/")[1]?.toUpperCase()}
-                        </div>
-                        <button
-                          type="button"
-                          className="delete-file-btn"
-                          onClick={() => setUploadedFile(null)}
-                          title="Remove file"
-                        >
-                          <img
-                            src={Delete_icon}
-                            alt="Delete"
-                            className="delete-icon"
-                          />
-                        </button>
-                      </div>
-                    ) : (
-                      // Show choose file option
-                      <label htmlFor="proofFile" className="file-upload-label">
-                        <img src={Image_icon} alt="Upload" className="upload-icon" />
-                        Choose file
-                      </label>
-                    )}
+                  <label>
+                    Proof {isProofMandatory ? '*' : ''}
+                    {isProofMandatory
+                      ? validationMessages.proofRequired === 'cdl_blocked'
+                        ? ' (Required - Continuous leave limit reached)'
+                        : ' (Required - Continuous leave days exceeded)'
+                      : ' (Optional)'}
                   </label>
+                  {uploadedFiles.length > 0 && (
+                    <small className="file-note">
+                      {uploadedFiles.length} of {PROOF_UPLOAD.MAX_FILES} file{uploadedFiles.length > 1 ? 's' : ''} uploaded
+                    </small>
+                  )}
+                  <input
+                    type="file"
+                    id="proofFile"
+                    name="proofFile"
+                    accept={PROOF_UPLOAD.ACCEPT_STRING}
+                    onChange={handleFileUpload}
+                    multiple
+                    style={{ display: "none" }}
+                  />
+
+                  {uploadedFiles.length > 0 && (
+                    <div className="custom_file_Upload">
+                      {uploadedFiles.map((file, index) => (
+                        <div className="uploaded-file-row" key={index}>
+                          <div className="file-icon-container">
+                            {isFilePDF(file) ? (
+                              <img src={PDF_icon} alt="PDF" className="file-type-icon" />
+                            ) : (
+                              <img src={Image_icon} alt="Image" className="file-type-icon" />
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            className="file-name clickable"
+                            disabled={!file.base64Data}
+                            aria-label={`Preview ${getFileDisplayName(file)}`}
+                            onClick={() => {
+                              if (file.base64Data) {
+                                setFilesToView([{
+                                  url: file.base64Data,
+                                  fileName: file.name || 'proof',
+                                  fileType: file.type || 'application/octet-stream',
+                                  isBase64: true
+                                }]);
+                                setViewerOpen(true);
+                              }
+                            }}
+                          >
+                            {getFileDisplayName(file)}
+                          </button>
+                          <div className="file-meta">
+                            {getFileDisplaySize(file)} KB | {getFileDisplayType(file)}
+                          </div>
+                          <button
+                            type="button"
+                            className="delete-file-btn"
+                            onClick={() => {
+                              setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+                            }}
+                            title="Remove file"
+                          >
+                            <img
+                              src={Delete_icon}
+                              alt="Delete"
+                              className="delete-icon"
+                            />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {uploadedFiles.length < PROOF_UPLOAD.MAX_FILES && (
+                    <label htmlFor="proofFile" className="custom_file_Upload clickable">
+                      <div className="file-upload-label">
+                        <img src={Image_icon} alt="Upload" className="upload-icon" />
+                        {uploadedFiles.length > 0 ? 'Add more files' : 'Choose file'}
+                      </div>
+                    </label>
+                  )}
 
                   {errors.file && (
                     <span className="error">{errors.file}</span>
                   )}
-                  {!uploadedFile && <small className="file-note">
-                    Upload JPG, PNG, or PDF file
-                  </small>}
+                  <small className="file-note" style={{ textAlign: 'center', display: 'block' }}>
+                    {PROOF_UPLOAD.FILE_HINT}
+                  </small>
                 </div>
               )}
 
@@ -775,7 +856,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                         </div>
                       )}
                       {validationMessages.continuousLimit && (
-                        <div className={validationMessages.proofRequired ? "status-warning" : validationMessages.cdlBlocked ? "status-warning" : "status-warning"}>
+                        <div className="status-warning">
                           {validationMessages.continuousLimit}
                         </div>
                       )}
@@ -800,7 +881,7 @@ const LeaveApplication = ({ isOpen, onClose }) => {
                 <button
                   type="submit"
                   className="apply-button"
-                  disabled={loading || !isFormValid}
+                  disabled={loading || cdlLoading || !isFormValid}
                 >
                   {loading ? "Processing..." : "Apply for Leave"}
                 </button>
@@ -809,6 +890,12 @@ const LeaveApplication = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+      <FileViewer
+        fileUrls={filesToView}
+        open={viewerOpen}
+        onClose={() => { setViewerOpen(false); setFilesToView([]); }}
+        initialIndex={0}
+      />
     </div>
   );
 };

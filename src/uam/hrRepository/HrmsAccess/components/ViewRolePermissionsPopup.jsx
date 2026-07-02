@@ -61,7 +61,7 @@ const ViewRolePermissionsPopup = ({ onClose, role }) => {
               <div className="all_permissions_container">
                 <div className="permission_category_items">
                   <div className="role_permission_item checked">
-                    <span>All Permissions</span>
+                    <span className="text-permission-item" >All Permissions</span>
                   </div>
                 </div>
               </div>
@@ -85,7 +85,7 @@ const ViewRolePermissionsPopup = ({ onClose, role }) => {
                             key={permission.permissionId} 
                             className="role_permission_item checked"
                           >
-                            <span>{permission.displayName || permission.name}</span>
+                            <span  className="text-permission-item">{permission.displayName || permission.name}</span>
                           </div>
                         ))}
                       </div>

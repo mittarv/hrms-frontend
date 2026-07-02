@@ -1,26 +1,28 @@
+@use "../../../../design/colors/customFonts" as fonts;
+@use '../../design/colors/customColors' as *;
+
 .employee-form {
-  height: calc(100vh - 64px); // Assuming navbar is 64px high
-  padding: 50px 65px;
+  padding: 0 36px 50px 36px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; // Prevent page level scroll
 
   .form-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0 20px 0;
-    flex-shrink: 0; // Prevent header from shrinking
+    padding: 20px 0px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: $WHITE;
 
     .back-button {
       background: none;
       border: none;
-      font-size: 20px;
+      font-size: fonts.$font-size-20;
       cursor: pointer;
       display: flex;
       align-items: center;
-      color: #333;
+      color: $c75;
     }
 
     .action-buttons {
@@ -31,106 +33,111 @@
         padding: 8px 16px;
         border-radius: 4px;
         cursor: pointer;
-        font-weight: 500;
+        font-weight: fonts.$font-weight-medium;
 
         &.save-button {
-          background-color: #045071;
+          background-color: $PRUSSIAN-70;
           padding: 8px 16px;
           border: none;
           border-radius: 5px;
           cursor: pointer;
 
           &:hover {
-            background-color: #033348;
+            background-color: $PRUSSIAN-80;
           }
 
           span {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: "Plus Jakarta Sans";
+            color:  $WHITE;
+            font-size: fonts.$font-size-small;
+            font-weight: fonts.$font-weight-semibold;
+            font-family: fonts.$font-family;
           }
         }
 
         &.cancel-button {
-          background-color: #f1f1f4;
+          background-color: $GREY-10;
           padding: 8px 16px;
           border: none;
           border-radius: 5px;
           cursor: pointer;
 
           &:hover {
-            background-color: #e3e4e8;
+            background-color: $GREY-20;
           }
 
           span {
-            color: #2e3038;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: "Plus Jakarta Sans";
+            color: $GREY-80;
+            font-size: fonts.$font-size-small;
+            font-weight: fonts.$font-weight-semibold;
+            font-family: fonts.$font-family;
           }
         }
       }
     }
 
-    .edit-button {
-      max-width: 88px;
-      max-height: 36px;
-      padding: 8px 16px;
-      position: relative;
+    .employee-details-action-buttons {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      border-radius: 40px;
-      background: #f1f1f4;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      gap: 20px;
 
-      &:hover {
-        background: #e3e3e7;
+      .offboarding-in-progress-status-button {
+        border: 1px solid $YELLOW-70;
+        border-radius: 32px;
+        background-color: $YELLOW-10;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-family: fonts.$font-family;
+        font-weight: fonts.$font-weight-regular;
+        font-size: fonts.$font-size-small;
+        display: flex;
       }
-      span {
-        font-family: "Plus Jakarta Sans";
-        font-weight: 600;
-        font-size: 14px;
-        color: #454754;
+      .offboarded-employee-status-button {
+        border: 1px solid $GREY-50;
+        border-radius: 32px;
+        background-color: $GREY-00;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-family: fonts.$font-family;
+        font-weight: fonts.$font-weight-regular;
+        font-size: fonts.$font-size-small;
+        display: flex;
+      }
+
+      .edit-button {
+        max-width: 88px;
+        max-height: 36px;
+        padding: 8px 16px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border-radius: 40px;
+        background: $GREY-10;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+  
+        &:hover {
+          background: $c230;
+        }
+        span {
+          font-family: fonts.$font-family;
+          font-weight: fonts.$font-weight-semibold;
+          font-size: fonts.$font-size-small;
+          color: $GREY-70;
+        }
       }
     }
   }
 
   .form-sections {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 10px; // Space for scrollbar
-
-    // Custom scrollbar styling
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-  
-    &::-webkit-scrollbar-track {
-      background:#D2D9DF;
-      border-radius: 4px;
-    }
-  
-    &::-webkit-scrollbar-thumb {
-      background: #054A68;
-      border-radius: 4px;
-  
-      &:hover {
-        background: #bbb;
-      }
-    
-    }
 
     .form-section {
-      background: white;
-      border: 1px solid #c7c9d1;
+      background: $WHITE;
+      border: 1px solid $GREY-30;
       border-radius: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 3px $c238;
 
       &:last-child {
         margin-bottom: 0;
@@ -142,7 +149,7 @@
 
         hr {
           border: none;
-          border-top: 1px solid #c7c9d1;
+          border-top: 1px solid $GREY-30;
         }
       }
 
@@ -157,20 +164,20 @@
 
         &:hover {
           border-radius: 16px;
-          background: #f5f5f5;
+          background: $c167;
         }
 
         p {
           margin: 0;
-          font-size: 22px;
-          font-weight: 600;
-          font-family: "Plus Jakarta Sans";
-          color: #2e3038;
+          font-size: fonts.$font-size-22;
+          font-weight: fonts.$font-weight-semibold;
+          font-family: fonts.$font-family;
+          color: $GREY-80;
         }
 
         .arrow {
           transition: transform 0.3s ease;
-          color: #666;
+          color: $c84;
 
           &.expanded {
             transform: rotate(180deg);
@@ -213,7 +220,7 @@
                   -webkit-appearance: none;
                   -moz-appearance: none;
                   appearance: none;
-                  border: 1.5px solid #033348;
+                  border: 1.5px solid $PRUSSIAN-80;
               }
 
               input[type="checkbox"]:not(:checked) {
@@ -255,10 +262,64 @@
             label {
               display: block;
               margin-bottom: 8px;
-              color: #131416;
-              font-size: 16px;
-              font-weight: 500;
-              font-family: "Plus Jakarta Sans";
+              color: $c239;
+              font-size: fonts.$font-size-md;
+              font-weight: fonts.$font-weight-medium;
+              font-family: fonts.$font-family;
+            }
+
+            .field_label_with_toggle {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 10px;
+
+              .inline_checkbox_control {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                color: #2e3038;
+                font-size: fonts.$font-size-15;
+                font-weight: fonts.$font-weight-medium;
+
+                input[type="checkbox"] {
+                  width: 16px !important;
+                  height: 16px !important;
+                  cursor: pointer;
+                  border-radius: 4px;
+                  -webkit-appearance: none;
+                  -moz-appearance: none;
+                  appearance: none;
+                  border: 1.5px solid #033348;
+                  background-color: #ffffff;
+                  margin: 0;
+                }
+
+                input[type="checkbox"]:not(:checked) {
+                  background-image: url("../../../../assets/icons/circle_checkbox_unchecked.svg");
+                  background-size: 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  border: none;
+                }
+
+                input[type="checkbox"]:checked {
+                  background-image: url("../../../../assets/icons/round_checkbox_checked.svg");
+                  background-size: 16px;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  border: none;
+                }
+
+                input[type="checkbox"]:disabled {
+                  cursor: not-allowed;
+                  opacity: 0.7;
+                }
+
+                span {
+                  line-height: 1;
+                }
+              }
             }
 
             input,
@@ -266,19 +327,19 @@
               width: 100%;
               height: 42px;
               padding: 8px 12px;
-              border: 0.35px solid #e3e4e8;
+              border: 0.35px solid $GREY-20;
               border-radius: 5px;
-              background: white;
-              font-size: 16px;
-              color: #033348;
+              background: $WHITE;
+              font-size: fonts.$font-size-md;
+              color: $PRUSSIAN-80;
               transition: border-color 0.2s ease;
-              font-family: "Plus Jakarta Sans";
-              font-weight: 500;
+              font-family: fonts.$font-family;
+              font-weight: fonts.$font-weight-medium;
 
               &:disabled {
-                background: #f5f5f5;
+                background: $c167;
                 cursor: not-allowed;
-                color: #666;
+                color: $c84;
               }
 
               &:focus {
@@ -297,10 +358,10 @@
 
             .field-value {
               padding: 8px 0;
-              color: #033348;
-              font-size: 16px;
-              font-weight: 600;
-              font-family: "Plus Jakarta Sans";
+              color: $PRUSSIAN-80;
+              font-size: fonts.$font-size-md;
+              font-weight: fonts.$font-weight-semibold;
+              font-family: fonts.$font-family;
             }
 
           }
@@ -309,10 +370,10 @@
             .field {
               input,
               select {
-                border-color: #bbb;
+                border-color: $c163;
 
                 &:hover:not(:disabled) {
-                  border-color: #999;
+                  border-color: $c81;
                 }
 
                 &:focus {
@@ -325,15 +386,15 @@
 
         .upcoming_conversion_date {
           padding: 8px 0;
-          color: #ffffff;
-          font-size: 14px;
-          font-weight: 600;
-          font-family: "Plus Jakarta Sans";
+          color: $WHITE;
+          font-size: fonts.$font-size-small;
+          font-weight: fonts.$font-weight-semibold;
+          font-family: fonts.$font-family;
           border-bottom: none;
           border-right: none;
           padding: 0.6rem 1rem;
           border-radius: 10px 0 0 0;
-          background-color: #045071;
+          background-color: $PRUSSIAN-70;
 
           position: absolute;
           right: 0;
@@ -370,35 +431,35 @@
 
               .leave-label {
                 margin-bottom: 8px;
-                color: #676b7e;
-                font-size: 16px;
-                font-weight: 500;
+                color: $GREY-60;
+                font-size: fonts.$font-size-md;
+                font-weight: fonts.$font-weight-medium;
               }
 
               .leave-balance {
                 padding: 8px 0;
-                color: #033348;
-                font-size: 16px;
-                font-weight: 600;            
+                color: $PRUSSIAN-80;
+                font-size: fonts.$font-size-md;
+                font-weight: fonts.$font-weight-semibold;            
               }
 
               .leave-balance-input{
                 width: 100%;
                 height: 42px;
                 padding: 8px 12px;
-                border: 0.35px solid #e3e4e8;
+                border: 0.35px solid $GREY-20;
                 border-radius: 5px;
-                background: white;
-                font-size: 16px;
-                color: #033348;
+                background: $WHITE;
+                font-size: fonts.$font-size-md;
+                color: $PRUSSIAN-80;
                 transition: border-color 0.2s ease;
-                font-family: "Plus Jakarta Sans";
-                font-weight: 500;
+                font-family: fonts.$font-family;
+                font-weight: fonts.$font-weight-medium;
 
                 &:disabled {
-                  background: #f5f5f5;
+                  background: $c167;
                   cursor: not-allowed;
-                  color: #666;
+                  color: $c84;
                 }
 
                 &:focus {
@@ -408,8 +469,8 @@
             }
 
             .gender-missing-message{
-              color: #dd787f;
-              font-size: 14px;
+              color: $RED-40;
+              font-size: fonts.$font-size-small;
               margin-top: 8px;
             }
         }
@@ -435,8 +496,8 @@
 
             
           .no-salary-data {
-            color: #dd787f;
-            font-size: 14px;     
+            color: $RED-40;
+            font-size: fonts.$font-size-small;     
           }
 
         .salary-component-field{
@@ -446,27 +507,108 @@
 
           .salary-component-label {
             margin-bottom: 8px;
-            color: #676b7e;
-            font-size: 16px;
-            font-weight: 500;
+            color: $GREY-60;
+            font-size: fonts.$font-size-md;
+            font-weight: fonts.$font-weight-medium;
           }
 
           .salary-component-input {
               padding: 8px 12px;
-              border: 0.35px solid #e3e4e8;
+              border: 0.35px solid $GREY-20;
               border-radius: 5px;
-              background: #f5f5f5;
-              font-size: 16px;
-              color: #033348;     
-              font-family: 'Plus Jakarta Sans';
+              background: $c167;
+              font-size: fonts.$font-size-md;
+              color: $PRUSSIAN-80;     
+              font-family: fonts.$font-family;
               cursor: not-allowed;
           }
 
           .salary-component-value{
-              color: #033348;
-              font-size: 16px;
-              font-weight: 600;
-              font-family: "Plus Jakarta Sans";
+              color: $PRUSSIAN-80;
+              font-size: fonts.$font-size-md;
+              font-weight: fonts.$font-weight-semibold;
+              font-family: fonts.$font-family;
+          }
+        }
+      }
+
+      .offboarding-details-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 20px;
+        font-family: "Plus Jakarta Sans";
+
+        .offboarding-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+
+          @media (max-width: 1400px) {
+            grid-template-columns: repeat(3, 1fr);
+          }
+
+          @media (max-width: 1100px) {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+          }
+
+          .no-offboarding-data {
+            color: $RED-40;
+            font-size: 14px;
+          }
+
+          .offboarding-field-item {
+            display: flex;
+            flex-direction: column;
+
+            .offboarding-label {
+              margin-bottom: 8px;
+              color: $c239;
+              font-size: fonts.$font-size-md;
+              font-weight: fonts.$font-weight-medium;
+            }
+
+            .offboarding-value {
+              padding: 8px 0;
+
+              .offboarding-checkbox-icon {
+                width: 20px;
+                height: 20px;
+              }
+            }
+
+            .offboarding-date-value {
+              padding: 8px 0;
+              color: $PRUSSIAN-80;
+              font-size: fonts.$font-size-md;
+              font-weight: fonts.$font-weight-semibold;
+            }
+
+            .offboarding-input {
+              padding: 8px 12px;
+              border: 0.35px solid $GREY-20;
+              border-radius: 5px;
+              background: $c167;
+              font-size: fonts.$font-size-md;
+              color: $PRUSSIAN-80;;
+              font-family: fonts.$font-family;
+              font-weight: fonts.$font-weight-medium;
+              cursor: not-allowed;
+            }
+
+            .offboarding-checkbox-disabled {
+              padding: 8px 0;
+              opacity: 0.5;
+              cursor: not-allowed;
+
+              .offboarding-checkbox-icon {
+                width: 20px;
+                height: 20px;
+              }
+            }
           }
         }
       }
@@ -483,43 +625,43 @@
       .multi-field-dropdown {
         flex: 0 0 150px;
         padding: 8px 12px;
-        border: 1px solid #ddd;
+        border: 1px solid $c70;
         border-radius: 4px;
-        background-color: #fff;
-        font-size: 14px;
-        font-family: "Plus Jakarta Sans";
+        background-color: $WHITE;
+        font-size: fonts.$font-size-small;
+        font-family: fonts.$font-family;
         
         &:focus {
           outline: none;
-          border-color: #045071;
+          border-color: $PRUSSIAN-70;
         }
         
         &:disabled {
-          background-color: #f5f5f5;
+          background-color: $c167;
           cursor: not-allowed;
         }
       }
       
       .multi-field-input {
         padding: 8px 12px;
-        border: 1px solid #ddd;
+        border: 1px solid $c70;
         border-radius: 4px;
-        background-color: #fff;
-        font-size: 14px;
-        font-family: "Plus Jakarta Sans";
+        background-color: $WHITE;
+        font-size: fonts.$font-size-small;
+        font-family: fonts.$font-family;
         
         &:focus {
           outline: none;
-          border-color: #045071;
+          border-color: $PRUSSIAN-70;
         }
         
         &:disabled {
-          background-color: #f5f5f5;
+          background-color: $c167;
           cursor: not-allowed;
         }
         
         &::placeholder {
-          color: #999;
+          color: $c81;
           font-style: italic;
         }
       }
@@ -546,11 +688,19 @@
 }
 
 .form_error_message{
-  color: red;
-  font-size: 14px;
-  font-family: "Plus Jakarta Sans";
-  font-weight: 500;
+  color: $c79;
+  font-size: fonts.$font-size-small;
+  font-family: fonts.$font-family;
+  font-weight: fonts.$font-weight-medium;
 }
 
+.field_helper_message {
+  display: inline-block;
+  margin-top: 6px;
+  color: #5a5e6e;
+  font-size: fonts.$font-size-xs;
+  font-family: fonts.$font-family;
+  font-weight: fonts.$font-weight-medium;
+}
 
-
+// Rewards & Recognition section uses rt_* classes from RewardsTabs.scss (imported in EmployeeDetailsPage.jsx)

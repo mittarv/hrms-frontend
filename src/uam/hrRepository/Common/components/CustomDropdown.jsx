@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Dropdown_Arrow from '../../assets/icons/dropdow_arrow.svg';
+import Tick_Icon from '../../assets/icons/tick_icon.svg';
 import '../styles/CustomDropdown.scss';
 
 const CustomDropdown = ({
@@ -12,7 +13,10 @@ const CustomDropdown = ({
   disabled = false,
   onCreateNew = null,
   searchable = false,
-  className = ""
+  className = "",
+  allowClearSelection = false,
+  clearOptionLabel = "None",
+  deselectOnReselect = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,11 +29,16 @@ const CustomDropdown = ({
   const searchInputRef = useRef(null);
 
   // Filter options based on search term
-  const filteredOptions = searchable 
-    ? options.filter(option =>
-        option.value.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = searchable
+    ? options.filter((option) =>
+        String(option?.value || "").toLowerCase().includes(searchTerm.toLowerCase())
       )
     : options;
+
+  const resolvedValue = String(value || "");
+  const renderedOptions = allowClearSelection
+    ? [{ value: clearOptionLabel, isClearOption: true }, ...filteredOptions]
+    : filteredOptions;
 
   // Calculate dropdown position and height
   const calculateDropdownPosition = () => {
@@ -151,6 +160,9 @@ const CustomDropdown = ({
 
   const handleOptionSelect = (option) => {
     if (option.disabled) return;
+
+    const shouldClearSelection =
+      option?.isClearOption || (deselectOnReselect && resolvedValue && resolvedValue === option?.value);
     
     if (option.value === "Create New Level" && onCreateNew) {
       onCreateNew();
@@ -158,7 +170,7 @@ const CustomDropdown = ({
       onChange({
         target: {
           name: fieldName,
-          value: option.value,
+          value: shouldClearSelection ? "" : option.value,
           type: 'select'
         }
       });
@@ -203,7 +215,7 @@ const CustomDropdown = ({
         e.preventDefault();
         setShouldAutoScroll(true);
         setHighlightedIndex(prev => {
-          const maxIndex = filteredOptions.length - 1;
+          const maxIndex = renderedOptions.length - 1;
           return prev < maxIndex ? prev + 1 : 0; // Loop back to first
         });
         break;
@@ -212,15 +224,15 @@ const CustomDropdown = ({
         e.preventDefault();
         setShouldAutoScroll(true);
         setHighlightedIndex(prev => {
-          const maxIndex = filteredOptions.length - 1;
+          const maxIndex = renderedOptions.length - 1;
           return prev > 0 ? prev - 1 : maxIndex; // Loop to last
         });
         break;
         
       case 'Enter':
         e.preventDefault();
-        if (highlightedIndex >= 0 && highlightedIndex < filteredOptions.length) {
-          handleOptionSelect(filteredOptions[highlightedIndex]);
+        if (highlightedIndex >= 0 && highlightedIndex < renderedOptions.length) {
+          handleOptionSelect(renderedOptions[highlightedIndex]);
         }
         break;
         
@@ -241,13 +253,14 @@ const CustomDropdown = ({
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         data-dropdown-field={fieldName}
+        data-state={isOpen ? "open" : "closed"}
         style={{
           cursor: disabled ? "not-allowed" : "pointer", 
           fontFamily: "Plus Jakarta Sans"
         }}
       >
-        <span className={value ? "selected-value" : "placeholder"}>
-          {value || placeholder}
+        <span className={resolvedValue ? "selected-value" : "placeholder"}>
+          {resolvedValue || placeholder}
         </span>
         <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>
           <img src={Dropdown_Arrow} alt="Dropdown Arrow" style={{ width: '12px', height: '12px' }} />
@@ -280,26 +293,36 @@ const CustomDropdown = ({
               maxHeight: searchable ? `${dropdownMaxHeight - 60}px` : `${dropdownMaxHeight - 20}px` 
             }}
           >
-            {!value && (
-              <div className="dropdown-option placeholder-option" style={{color: '#999', fontStyle: 'italic'}}>
-                {placeholder}
-              </div>
-            )}
-            
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => (
+            {renderedOptions.length > 0 ? (
+              renderedOptions.map((option, index) => {
+                const optionValue = String(option?.value || "");
+                const isSelected = option?.isClearOption
+                  ? !resolvedValue
+                  : resolvedValue === optionValue;
+
+                return (
                 <div
-                  key={index}
-                  className={`dropdown-option ${option?.disabled ? 'disabled' : ''} ${value === option.value ? 'selected' : ''} ${index === highlightedIndex ? 'highlighted' : ''}`}
+                  key={`${optionValue}-${index}`}
+                  className={`dropdown-option ${option?.disabled ? 'disabled' : ''} ${isSelected ? 'selected' : ''} ${index === highlightedIndex ? 'highlighted' : ''}`}
                   onClick={() => handleOptionSelect(option)}
                   onMouseEnter={() => setHighlightedIndex(index)}
                   style={{cursor: option?.disabled ? 'not-allowed' : 'pointer'}}
                   role="option"
-                  aria-selected={value === option.value}
+                  aria-selected={isSelected}
                 >
-                  {option.value}
+                  <span className="dropdown-option-label">{optionValue}</span>
+                  {isSelected ? (
+                    <img
+                      src={Tick_Icon}
+                      alt="selected"
+                      className="dropdown-option-check"
+                    />
+                  ) : (
+                    <span className="dropdown-option-check-placeholder" aria-hidden="true" />
+                  )}
                 </div>
-              ))
+              );
+            })
             ) : searchable && searchTerm ? (
               <div className="no-results">No options found</div>
             ) : null}

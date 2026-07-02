@@ -13,12 +13,17 @@ import HrmsAccess from "./HrmsAccess/HrmsAccess";
 import PolicyPage from "./policy/PolicyPage";
 import ImportantLink from "./importantLink/ImportantLink";
 import HrHome from "./HrHome";
+import RewardsRecognition from "./RewardsRecognition/RewardsRecognition";
+import VoteForNomineesPage from "./RewardsRecognition/components/VoteForNomineesPage";
+import SecondaryLocation from "./SecondaryLocation/SecondaryLocation";
 import AccessDenied from "./Common/components/AccessDenied";
 import { hrToolHomePageData } from "./constant/data";
+import exclamationMarkIcon from "./assets/icons/exclamation_mark.svg";
+import "./HrAllRoutes.scss";
 
 const HrAllRoutes = ({ isAuthenticated }) => {
   const { user, allToolsAccessDetails, loading } = useSelector((state) => state.user);
-  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+  const { myHrmsAccess, myHrmsAccessLoaded } = useSelector((state) => state.hrRepositoryReducer);
 
   const hasAdvancedAccess = (toolKey, threshold = 900) =>
     allToolsAccessDetails?.[toolKey] >= threshold;
@@ -57,6 +62,9 @@ const HrAllRoutes = ({ isAuthenticated }) => {
     { path: "/imp-link", element: <ImportantLink /> },
     { path: "/leave-attendance", element: <LeaveManagement /> },
     { path: "/payroll-reimbursements", element: <PayrollAndReimbursements /> },
+    { path: "/rewards-recognitions", element: <RewardsRecognition /> },
+    { path: "/rewards-recognitions/vote", element: <VoteForNomineesPage /> },
+    { path: "/secondary-working-location", element: <SecondaryLocation /> },
   ];
 
   // Conditional routes - require specific permissions or admin access (>= 900)
@@ -72,6 +80,12 @@ const HrAllRoutes = ({ isAuthenticated }) => {
         "ActiveEmployee_onBoarding",
         "ActiveEmployee_update",
         "EmployeeDirectoryAdmin_View",
+        "Offboarding_View",
+        "Offboarding_Initiate",
+        "Offboarding_HR_Clearance",
+        "Offboarding_Finance_Clearance",
+        "Offboarding_Approve",
+        "View_Offboarded_Employees",
       ]),
     },
     {
@@ -109,6 +123,8 @@ const HrAllRoutes = ({ isAuthenticated }) => {
         "LeaveRequest_write",
         "ExtraWorkDayRequests_read",
         "ExtraWorkDayRequests_write",
+        "SecondaryLocationRequests_read",
+        "SecondaryLocationRequests_write",
       ]),
     },
     {
@@ -129,6 +145,22 @@ const HrAllRoutes = ({ isAuthenticated }) => {
 
   if (loading) return <div className="loader">Loading...</div>;
 
+  if (user && user.isActive === false || (user?.employeeUuid === null && user?.userType !== 900)) {
+    return (
+      <div className="account_inactive_container">
+        <div className="account_inactive_content">
+          <div className="account_inactive_icon_wrapper">
+            <img src={exclamationMarkIcon} alt="" className="account_inactive_icon" />
+          </div>
+          <h2 className="account_inactive_title">Your account is not active</h2>
+          <p className="account_inactive_message">
+            Please contact your admin to proceed.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Routes>
       {baseRoutes.map(({ path, element }) => (
@@ -147,7 +179,13 @@ const HrAllRoutes = ({ isAuthenticated }) => {
         >
           <Route 
             path={path} 
-            element={condition ? element : (accessDeniedElement || <AccessDenied />)} 
+            element={
+              !myHrmsAccessLoaded && !hasAccessToAdvancedTools
+                ? <div className="loader">Loading...</div>
+                : condition 
+                  ? element 
+                  : (accessDeniedElement || <AccessDenied />)
+            } 
           />
         </Route>
       ))}

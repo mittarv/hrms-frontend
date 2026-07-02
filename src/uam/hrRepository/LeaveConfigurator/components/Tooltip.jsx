@@ -30,7 +30,7 @@ const Tooltip = ({ children, content }) => {
     >
       {children}
       {visible && (
-        <div ref={tooltipRef} className={`tooltip-box tooltip-${position}`}>
+        <div ref={tooltipRef} className={`tooltip-box tooltip-${position} text-tooltip-small`}>
           {content}
         </div>
       )}

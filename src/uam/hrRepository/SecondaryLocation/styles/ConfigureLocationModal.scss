@@ -1,0 +1,331 @@
+.sl_config_modal_overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  padding: 1rem;
+}
+
+.sl_config_modal {
+  width: 100%;
+  max-width: 28rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.18);
+}
+
+.sl_config_modal_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 1.125rem 0.75rem;
+
+  .sl_config_modal_title_block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    width: fit-content;
+
+    h3 {
+      margin: 0;
+      font-size: 1.125rem;
+      color: #2e3038;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .sl_config_title_underline {
+      width: 100%;
+      height: 0.125rem;
+      border-radius: 999px;
+      background: #3a3f4a;
+    }
+  }
+
+  button {
+    border: none;
+    background: #f1f3f6;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+  }
+}
+
+.sl_config_modal_body {
+  padding: 0.9rem 1.125rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+
+  .custom-dropdown-container {
+    .custom-dropdown-trigger {
+      font-weight: 500;
+
+      .selected-value,
+      .placeholder {
+        font-weight: 500;
+      }
+    }
+
+    .custom-dropdown-menu {
+      .dropdown-option,
+      .no-results,
+      .placeholder-option {
+        font-weight: 500;
+      }
+    }
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #2f3442;
+    font-weight: 600;
+
+    .field_label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      em {
+        color: #e84f4f;
+        font-style: normal;
+      }
+    }
+  }
+
+  input,
+  select {
+    border: 1px solid #c7c9d1;
+    border-radius: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    color: #3d4250;
+    background: #ffffff;
+    outline: none;
+
+    &:focus {
+      border-color: #2fbcbc;
+      box-shadow: 0 0 0 2px rgba(47, 188, 188, 0.16);
+    }
+  }
+
+  .input_error {
+    border-color: #e84f4f;
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(232, 79, 79, 0.16);
+      border-color: #e84f4f;
+    }
+  }
+
+  .error_text {
+    color: #d92b2b;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-top: -0.125rem;
+  }
+}
+
+.employee_type_group {
+  p {
+    margin: 0 0 0.35rem 0;
+    font-size: 0.8rem;
+    color: #2f3442;
+    font-weight: 600;
+
+    em {
+      color: #e84f4f;
+      font-style: normal;
+    }
+  }
+}
+
+.employee_type_checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.5rem;
+
+
+  .checkbox_row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: #3d4250;
+    cursor: pointer;
+    border: 1px solid #bfc4cf;
+    border-radius: 999px;
+    padding: 0.3rem 0.6rem;
+    background: #fff;
+    user-select: none;
+
+    input {
+      display: none;
+    }
+
+    .checkbox_icon {
+      width: 1rem;
+      height:1rem;
+      flex-shrink: 0;
+      border: 1px solid #454754;
+      border-radius: 0.25rem;
+      background-color: #fff;
+    }
+  }
+
+  .checkbox_row.selected {
+    color: #ffffff;
+    font-weight: 600;
+    background: #0b4f73;
+    border-color: #0b4f73;
+
+    .checkbox_icon {
+      border: none;
+      background: url("../../assets/icons/checkbox_checked_white_icon.svg") no-repeat center center;
+      background-size: contain;
+
+    }
+  }
+}
+
+.sl_config_modal_footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.125rem 1rem;
+
+  button {
+    border-radius: 0.6rem;
+    min-height: 2.25rem;
+    padding: 0 1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .cancel_btn {
+    border: 1px solid #0b4f73;
+    color: #0b4f73;
+    background: #ffffff;
+  }
+
+  .save_btn {
+    border: none;
+    background: #0b4f73;
+    color: #ffffff;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .sl_config_modal {
+    max-width: 36rem;
+  }
+
+  .sl_config_modal_header {
+    padding: 0.9rem 0.8rem 0.65rem;
+
+    .sl_config_modal_title_block {
+      h3 {
+        font-size: 1rem;
+      }
+    }
+
+    button {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+
+      img {
+        width: 0.8rem;
+        height: 0.8rem;
+      }
+    }
+  }
+
+  .sl_config_modal_body {
+    padding: 0.8rem;
+
+    label {
+      font-size: 0.875rem;
+    }
+
+    input,
+    select {
+      min-height: 2.75rem;
+      min-height: 2.1rem;
+      font-size: 0.82rem;
+      padding: 0.4rem 0.65rem;
+    }
+  }
+
+  .employee_type_group p,
+  .employee_type_checkboxes .checkbox_row,
+  .sl_config_modal_footer button {
+    font-size: 0.78rem;
+  }
+
+  .employee_type_checkboxes {
+    .checkbox_row {
+      padding: 0.28rem 0.48rem;
+
+      .checkbox_icon {
+        width: 0.72rem;
+        height: 0.72rem;
+      }
+    }
+  }
+
+  .sl_config_modal_footer {
+    padding: 0.8rem;
+
+    button {
+      min-height: 2rem;
+      padding: 0 0.85rem;
+      border-radius: 0.5rem;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .sl_config_modal_overlay {
+    padding: 0.5rem;
+  }
+
+  .sl_config_modal {
+    max-height: calc(100vh - 1rem);
+    border-radius: 0.7rem;
+  }
+
+  .sl_config_modal_footer {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

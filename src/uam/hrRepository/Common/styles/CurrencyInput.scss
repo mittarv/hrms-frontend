@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .currency-input-container {
   position: relative;
   width: 100%;
@@ -17,7 +19,7 @@
       z-index: 1;
       padding: 3px 4px;
       border-radius: 100px;
-      background-color: #f1f1f4;
+      background-color: $GREY-10;
       height: 36px;
 
       &.disabled {
@@ -30,7 +32,7 @@
         align-items: center;
         width: 28px;
         height: 28px;
-        border: 1px solid #475bae;
+        border: 1px solid $c255;
         border-radius: 50%;
         overflow: hidden;
 
@@ -45,7 +47,7 @@
       .dropdown-arrow {
         display: flex;
         align-items: center;
-        color: #676b7e;
+        color: $GREY-60;
         transition: transform 0.3s ease;
 
         &.open {
@@ -58,23 +60,23 @@
       width: 100%;
       height: 42px;
       padding: 8px 12px 8px 90px !important;
-      border: 0.35px solid #e3e4e8;
+      border: 0.35px solid $GREY-20;
       border-radius: 5px;
-      background: white;
+      background: $WHITE;
       font-size: 16px;
-      color: #033348;
+      color: $PRUSSIAN-80;
       transition: border-color 0.2s ease;
       font-family: "Plus Jakarta Sans";
       font-weight: 500;
 
       &.error {
-        border-color: #dc2626;
+        border-color: $c121;
       }
 
       &:disabled {
-        background: #f5f5f5;
+        background: $c167;
         cursor: not-allowed;
-        color: #666;
+        color: $c84;
       }
 
       &:focus {
@@ -83,7 +85,7 @@
       }
 
       &::placeholder {
-        color: #676b7e;
+        color: $GREY-60;
         opacity: 0.7;
       }
     }
@@ -95,7 +97,7 @@
       justify-content: center;
       position: absolute;
       left: 68px;
-      color: #676b7e;
+      color: $GREY-60;
       font-size: 14px;
       font-weight: 500;
       font-family: "Plus Jakarta Sans";
@@ -107,10 +109,10 @@
     left: 0;
     width: 100%;
     max-height: 200px;
-    background: white;
-    border: 1px solid #e3e4e8;
+    background: $WHITE;
+    border: 1px solid $GREY-20;
     border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px $c69;
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -127,12 +129,12 @@
 
     .currency-search-container {
       padding: 8px;
-      border-bottom: 1px solid #e3e4e8;
+      border-bottom: 1px solid $GREY-20;
 
       .currency-search-input {
         width: 100%;
         padding: 8px 12px;
-        border: 1px solid #e3e4e8;
+        border: 1px solid $GREY-20;
         border-radius: 4px;
         font-size: 14px;
         font-family: "Plus Jakarta Sans";
@@ -146,7 +148,7 @@
         }
 
         &::placeholder {
-          color: #676b7e;
+          color: $GREY-60;
           opacity: 0.7;
         }
       }
@@ -160,7 +162,7 @@
       .no-results {
         padding: 12px;
         text-align: center;
-        color: #676b7e;
+        color: $GREY-60;
         font-size: 14px;
         font-family: "Plus Jakarta Sans";
       }
@@ -170,16 +172,16 @@
       }
 
       &::-webkit-scrollbar-track {
-        background: #d2d9df;
+        background: $c7;
         border-radius: 4px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: #054a68;
+        background: $c3;
         border-radius: 4px;
 
         &:hover {
-          background: #bbb;
+          background: $c163;
         }
       }
 
@@ -203,7 +205,7 @@
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: #f5f5f5;
+        background-color: $c167;
       }
 
       .country-flag {
@@ -218,14 +220,14 @@
       }
 
       .currency-symbol {
-        color: #033348;
+        color: $PRUSSIAN-80;
         font-size: 14px;
         font-weight: 500;
         font-family: "Plus Jakarta Sans";
       }
 
       .country-name {
-        color: #033348;
+        color: $PRUSSIAN-80;
         font-size: 14px;
         font-weight: 500;
         font-family: "Plus Jakarta Sans";
@@ -233,7 +235,7 @@
       }
 
       .currency-code {
-        color: #676b7e;
+        color: $GREY-60;
         font-size: 12px;
         font-family: "Plus Jakarta Sans";
       }

@@ -41,7 +41,7 @@ const LeaveAttendance = () => {
     myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendanceAdmin_read");
   const hasAccessToEditAttendance = allToolsAccessDetails?.[selectedToolName] >= 900 || 
     myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveAttendance_write");
-  const hasAccessToLeaveAttendance = hasAccessToViewAttendance || hasAccessToEditAttendance;
+  // const hasAccessToLeaveAttendance = hasAccessToViewAttendance || hasAccessToEditAttendance;
 
   useEffect(() => {
     dispatch(getAllLeaves());
@@ -53,13 +53,11 @@ const LeaveAttendance = () => {
   // Dynamic search effect - triggers whenever search input changes
   useEffect(() => {
     if (handleEmployeeSearch.trim().length > 0) {
+      const searchTerm = handleEmployeeSearch.toLowerCase();
       const filteredEmployees = allEmployees.filter((employee) => {
         const fullName =
           `${employee.employeeFirstName} ${employee.employeeLastName}`.toLowerCase();
-        const matchesSearch = fullName.includes(
-          handleEmployeeSearch.toLowerCase()
-        );
-        return matchesSearch;
+      return fullName.split(" ").some(word => word.startsWith(searchTerm));
       });
       setFilterEmployees(filteredEmployees);
     } else {

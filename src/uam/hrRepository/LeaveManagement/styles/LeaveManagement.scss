@@ -1,3 +1,5 @@
+@use '../../design/colors/customColors' as *;
+
 .leave_management_container * {
     box-sizing: border-box;
     font-family: "Plus Jakarta Sans";
@@ -13,12 +15,12 @@
     }
     
     &::-webkit-scrollbar-track {
-        background: #D2D9DF;
+        background: $c7;
         border-radius: 4px;
     }
     
     &::-webkit-scrollbar-thumb {
-        background: #054A68;
+        background: $c3;
         border-radius: 4px;
     }
 
@@ -35,26 +37,26 @@
         }
 
         .active_tab {
-            background-color: #ebfafa;
+            background-color: $CYAN-10;
             padding: 0.75rem 0.875rem;
-            border-bottom: 0.25rem solid #28a2a2;
+            border-bottom: 0.25rem solid $CYAN-70;
             border-radius: 0.5rem 0.5rem 0rem 0rem;
             font-size: 0.875rem;
             font-weight: 700;
-            color: #2e3038;
+            color: $GREY-80;
             font-family: "Plus Jakarta Sans";
             line-height: 1.25rem;
             letter-spacing: 0.01em;
             cursor: pointer;
         }
         .inactive_tab {
-            background-color: #ebfafa;
+            background-color: $CYAN-10;
             padding: 0.75rem 0.875rem;
             border-bottom: none;
             border-radius: 0.5rem 0.5rem 0rem 0rem;
             font-size: 0.875rem;
             font-weight: 600;
-            color: #2e3038;
+            color: $GREY-80;
             font-family: "Plus Jakarta Sans";
             line-height: 1.25rem;
             letter-spacing: 0.01em;
@@ -64,7 +66,7 @@
 
     hr {
         border: none;
-        border-top: 0.5px solid #8f92a3;
+        border-top: 0.5px solid $GREY-50;
         flex-shrink: 0;
         margin: 0;
     }

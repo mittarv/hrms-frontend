@@ -14,7 +14,28 @@ import Restore_icon from "../../../assets/icons/restore_icon.svg";
 import "../styles/PayrollComponentModal.scss";
 
 // Constants
-const CURRENT_DATE = new Date().toISOString().split('T')[0];
+const formatLocalDate = (date) => {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const CURRENT_DATE = formatLocalDate(new Date());
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+];
 
 /**
  * Modal for managing payroll component adjustments (additions/deductions)
@@ -462,12 +483,40 @@ const PayrollComponentModal = () => {
     return { valid: errors.length === 0, errors };
   }, []);
 
+  const getSelectedPayrollStartDate = useCallback(() => {
+    const now = new Date();
+    const parsedYear = Number(selectedYear);
+    const year = Number.isInteger(parsedYear) && parsedYear > 0
+      ? parsedYear
+      : now.getFullYear();
+
+    let monthIndex = now.getMonth();
+    if (selectedMonth) {
+      if (typeof selectedMonth === 'number') {
+        const numericMonth = selectedMonth >= 1 && selectedMonth <= 12
+          ? selectedMonth
+          : now.getMonth() + 1;
+        monthIndex = numericMonth - 1;
+      } else {
+        const matchedIndex = MONTH_NAMES.findIndex(
+          (monthName) => monthName.toLowerCase() === String(selectedMonth).toLowerCase()
+        );
+        if (matchedIndex !== -1) {
+          monthIndex = matchedIndex;
+        }
+      }
+    }
+
+    return formatLocalDate(new Date(year, monthIndex, 1));
+  }, [selectedMonth, selectedYear]);
+
   /**
    * Prepares adjustment data for API request.
    * Only sends rows that are new, edited, or marked for deletion –
    * unchanged existing rows are not sent so the backend won't update them.
    */
   const prepareAdjustmentsForSave = useCallback((rows) => {
+    const defaultStartDate = getSelectedPayrollStartDate();
     const result = [];
 
     // Deleted: send only adjustmentId + isDeleted so backend can soft-delete
@@ -486,7 +535,7 @@ const PayrollComponentModal = () => {
       componentId: row.componentId,
       componentName: row.componentName,
       adjustedAmount: parseFloat(row.amount) || 0,
-      startDate: row.effectiveFrom || CURRENT_DATE,
+      startDate: row.effectiveFrom || defaultStartDate || CURRENT_DATE,
       endDate: row.effectiveTill || null,
       adjustedFrequency: row.frequency,
       isVariable: row.isVariable,
@@ -496,7 +545,7 @@ const PayrollComponentModal = () => {
     result.push(...adjustments);
 
     return result;
-  }, []);
+  }, [getSelectedPayrollStartDate]);
 
   /**
    * Handles save operation
