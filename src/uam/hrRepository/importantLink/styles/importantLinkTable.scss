@@ -4,14 +4,19 @@
 .important_link_tool_input_div {
   display: flex;
   align-items: center !important;
+  width: 100%;
 
   .important_link_tool_input {
     border: none;
     outline: none;
     background-color: transparent;
+    width: 100%;
     max-width: 200px;
-    resize: none;
-    overflow: hidden;
+    resize: vertical;
+    overflow-y: auto;
+    min-height: 24px;
+    height: auto;
+    word-break: break-word;
     ::placeholder {
       vertical-align: middle;
     }
@@ -21,64 +26,79 @@
     border: 1px solid Colors.$c34;
     border-radius: 10px;
     text-align: center;
+    width: 100%;
     max-width: 300px;
   }
 }
 
 .important_link_max_width_class {
+  width: 100%;
   max-width: 200px;
 }
 
 .important_link_tool_name {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .important_link_tool_link {
-  font-size: 16px;
+  font-size: clamp(14px, 1.5vw, 16px);
   color: $c18;
   font-weight: 400;
   text-decoration: none;
+  word-break: break-all;
 }
 
 .important_link_tableedit_main_div {
   width: 100%;
-  margin-bottom: 4.4709vh;
+  margin-bottom: clamp(24px, 4.4709vh, 48px);
+  overflow-x: auto;
 }
 
 .important_link_deleteButtons_section {
   display: flex;
-  margin-left: 7.4515vh;
-  margin-top: 2.9806vh;
-  gap: 2.9806vh;
+  margin-left: clamp(16px, 7.4515vh, 80px);
+  margin-top: clamp(16px, 2.9806vh, 32px);
+  gap: clamp(12px, 2.9806vh, 32px);
   align-items: center;
+  flex-wrap: wrap;
   
   .important_link_delete_button {
     border: 2px solid Colors.$c37;
-    padding: 1.0432vh 2.0864vh;
-    margin-bottom: 25px;
+    padding: clamp(8px, 1.0432vh, 12px) clamp(16px, 2.0864vh, 24px);
+    margin-bottom: clamp(16px, 2.5vh, 25px);
     background-color: transparent;
     color: Colors.$c37;
-    font-size: 2.3845vh;
+    font-size: clamp(16px, 2.3845vh, 24px);
     font-weight: 500;
     border-radius: 5px;
     cursor: pointer;
+    transition: all 0.3s ease;
     
     &:disabled {
       border: 2px solid Colors.$c32;
       color: Colors.$c32;
       cursor: not-allowed;
     }
+
+    &:hover:not(:disabled) {
+      background-color: Colors.$c37;
+      color: #fff;
+    }
   }
   
   .important_link_undo_button {
-    height: 2.98062vh;
+    height: auto;
     background-color: transparent;
     border: none;
     color: Colors.$c33;
     padding: 0;
     border-bottom: 2px solid Colors.$c33;
     cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: clamp(14px, 1.5vw, 16px);
   }
 }
 .MuiTableContainer-root::-webkit-scrollbar {
@@ -87,27 +107,33 @@
 /* Track */
 .MuiTableContainer-root::-webkit-scrollbar-track {
   background: $c308;
-  opacity: 0.13%;
+  opacity: 0.13;
 }
 /* Handle */
 .MuiTableContainer-root::-webkit-scrollbar-thumb {
   background: Colors.$c3;
+  border-radius: 4px;
 }
 
 .important_link_create_new_button {
   background-color: transparent;
-  text-align: center;
   display: flex;
   align-items: center;
-  justify-content: center;
   border: none;
   font-weight: 700;
-  font-size: 2.23546vh;
-  line-height: 2.816691vh;
+  font-size: clamp(14px, 1.5vw, 16px);
+  line-height: 24px;
   color: Colors.$c31;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
-  padding-bottom: 2.23546vh;
+  padding: 12px 0;
+  margin-top: 16px;
+  margin-left: clamp(16px, 2vw, 24px);
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .important_link_hovered_name {
@@ -115,6 +141,18 @@
 }
 
 .important_link_selected_user_tick {
-  height: 20px;
-  width: 20px;
+  height: clamp(16px, 2vw, 20px);
+  width: clamp(16px, 2vw, 20px);
+}
+
+@media (max-width: 768px) {
+  .important_link_deleteButtons_section {
+    margin-left: 16px;
+    justify-content: center;
+  }
+
+  .important_link_create_new_button {
+    margin-left: 16px;
+    justify-content: center;
+  }
 }

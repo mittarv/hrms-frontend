@@ -504,7 +504,6 @@ const ImportantEditTable = ({ isEdit, toggleOptions }) => {
         <button
           className="important_link_create_new_button"
           onClick={handleCreateNewRow}
-          style={{ float: "left !important", marginRight: "auto" }}
         >
           <img src={AddIcon} alt="right-arrow" /> Create New
         </button>
