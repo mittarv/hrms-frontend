@@ -1160,7 +1160,8 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       })
       .addCase('GET_EMPLOYEE_EXTRA_WORK_HISTORY_SUCCESS', (state, action) => {
         state.loading = false;
-        state.employeeExtraWorkHistory = action.payload;
+        state.employeeExtraWorkHistory = action.payload?.data || action.payload || [];
+        state.employeeExtraWorkPagination = action.payload?.pagination || null;
       })
       .addCase('GET_EMPLOYEE_EXTRA_WORK_HISTORY_FAILURE', (state, action) => {
         state.loading = false;

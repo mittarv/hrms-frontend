@@ -63,7 +63,7 @@ useEffect(() => {
 const processedHistory = useMemo(() => {
     if (!employeeExtraWorkHistory) return [];
 
-    let result = employeeExtraWorkHistory.filter((row) => {
+    let result = employeeExtraWorkHistory?.filter((row) => {
       const matchesSearch = !searchQuery.trim() || row.remarks?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesApproval = selectedApprovalStatus.length === 0 || selectedApprovalStatus.includes(row.approvalStatus?.toLowerCase());
       
@@ -91,7 +91,6 @@ const processedHistory = useMemo(() => {
   useEffect(() => {
     setExtraWorkCurrentPage(1);
   }, [searchQuery, currentSort, selectedApprovalStatus, selectedCompOffStatus, selectedCreditDays]);
-  const totalItems = employeeExtraWorkPagination?.totalRecords || processedHistory?.length || 0;
   const totalExtraWorkPages = employeeExtraWorkPagination?.totalPages || Math.max(
     1,
     Math.ceil((processedHistory?.length || 0) / extraWorkPageSize)
