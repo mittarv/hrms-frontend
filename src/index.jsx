@@ -27,6 +27,7 @@ const RootApp = () => {
     "/hrms-access",
     "/secondary-working-location",
     "/rewards-recognitions",
+    "/rewards-recognitions/vote",
   ].some((path) => location.pathname === path);
 
   return isHrRoute ? <HrApp /> : <App />;
