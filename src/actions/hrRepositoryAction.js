@@ -4606,13 +4606,14 @@ export const getAllOffboardedEmployees = () => async(dispatch) => {
 // ==================== Rewards & Recognition ====================
 const REWARDS_BASE = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/rewards`;
 
-export const fetchRewardsDashboard = (year) => async (dispatch) => {
+export const fetchRewardsDashboard = (month, year) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "FETCH_REWARDS_DASHBOARD" });
 
     const params = {};
     if (typeof year === "number") params.year = year;
+    if (typeof month === "number") params.month = month;
 
     const res = await axios.get(`${REWARDS_BASE}/dashboard`, {
       params,
@@ -4631,11 +4632,15 @@ export const fetchRewardsDashboard = (year) => async (dispatch) => {
   }
 };
 
-export const fetchCurrentCycle = () => async (dispatch) => {
+export const fetchCurrentCycle = (month, year) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "FETCH_CURRENT_CYCLE" });
-    const res = await axios.get(`${REWARDS_BASE}/current-cycle`, {
+    let url = `${REWARDS_BASE}/current-cycle`;
+    if (month && year) {
+      url += `?month=${month}&year=${year}`;
+    }
+    const res = await axios.get(url, {
       headers: { "Content-Type": "application/json", Authorization: token },
     });
     if (res.data?.success) {
@@ -4647,6 +4652,26 @@ export const fetchCurrentCycle = () => async (dispatch) => {
   } catch (e) {
     dispatch({ type: "FETCH_CURRENT_CYCLE_FAILED" });
     const msg = await getErrorMessage(e, "Failed to load current rewards cycle.");
+    dispatch({ type: "SET_NEW_SNACKBAR_MESSAGE", payload: { message: msg, severity: "error" } });
+  }
+};
+
+export const fetchAllCycles = () => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("token");
+    dispatch({ type: "FETCH_ALL_CYCLES" });
+    const res = await axios.get(`${REWARDS_BASE}/current-cycle?getAll=true`, {
+      headers: { "Content-Type": "application/json", Authorization: token },
+    });
+    if (res.data?.success) {
+      dispatch({ type: "FETCH_ALL_CYCLES_SUCCESS", payload: res.data.data });
+    } else {
+      dispatch({ type: "FETCH_ALL_CYCLES_FAILED" });
+      dispatch({ type: "SET_NEW_SNACKBAR_MESSAGE", payload: { message: res.data?.message || "Failed to load cycles history.", severity: "error" } });
+    }
+  } catch (e) {
+    dispatch({ type: "FETCH_ALL_CYCLES_FAILED" });
+    const msg = await getErrorMessage(e, "Failed to load cycles history.");
     dispatch({ type: "SET_NEW_SNACKBAR_MESSAGE", payload: { message: msg, severity: "error" } });
   }
 };
@@ -5035,13 +5060,13 @@ export const setAnnounceWinnersModalOpen = (open) => (dispatch) => {
   dispatch({ type: "SET_ANNOUNCE_WINNERS_MODAL_OPEN", payload: open });
 };
 
-export const announceRewardsWinners = (cycleId, employeeChoiceEmpUuid, leadershipChoiceEmpUuid, year) => async (dispatch) => {
+export const announceRewardsWinners = (cycleId, employeeChoiceEmpUuids, leadershipChoiceEmpUuids, year) => async (dispatch) => {
   try {
     const token = localStorage.getItem("token");
     dispatch({ type: "ANNOUNCE_WINNERS" });
     const res = await axios.post(
       `${REWARDS_BASE}/cycles/${cycleId}/announce-winners`,
-      { employeeChoiceEmpUuid, leadershipChoiceEmpUuid },
+      { employeeChoiceEmpUuids, leadershipChoiceEmpUuids },
       { headers: { "Content-Type": "application/json", Authorization: token } }
     );
     if (res.data?.success) {

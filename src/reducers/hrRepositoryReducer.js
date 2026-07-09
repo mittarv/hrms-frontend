@@ -1411,6 +1411,17 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
     .addCase('FETCH_CURRENT_CYCLE_FAILED', (state) => {
       state.rewardsCurrentCycleLoading = false;
     })
+    // All Cycles
+    .addCase('FETCH_ALL_CYCLES', (state) => {
+      state.rewardsAllCyclesLoading = true;
+    })
+    .addCase('FETCH_ALL_CYCLES_SUCCESS', (state, action) => {
+      state.rewardsAllCyclesLoading = false;
+      state.rewardsAllCycles = action.payload;
+    })
+    .addCase('FETCH_ALL_CYCLES_FAILED', (state) => {
+      state.rewardsAllCyclesLoading = false;
+    })
     // Cycle Nominations
     .addCase('FETCH_CYCLE_NOMINATIONS', (state) => {
       state.rewardsCycleNominationsLoading = true;

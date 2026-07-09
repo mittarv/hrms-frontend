@@ -22,8 +22,8 @@ const STEP_CONFIRM = 3;
 const AnnounceWinnersModal = ({ cycleId, onClose }) => {
   const dispatch = useDispatch();
   const [step, setStep] = useState(STEP_EMPLOYEE);
-  const [employeeChoiceEmpUuid, setEmployeeChoiceEmpUuid] = useState("");
-  const [leadershipChoiceEmpUuid, setLeadershipChoiceEmpUuid] = useState("");
+  const [employeeChoiceEmpUuids, setEmployeeChoiceEmpUuids] = useState([]);
+  const [leadershipChoiceEmpUuids, setLeadershipChoiceEmpUuids] = useState([]);
   const [citationModal, setCitationModal] = useState(null); // { empUuid, name, dept, citation, nominators }
 
   const {
@@ -50,6 +50,23 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
   const cycle =
     rewardsDashboardData?.currentCycle || rewardsDashboardData?.cycle;
   const monthYear = formatMonthYear(cycle?.month, cycle?.year);
+
+  const nomineeUuids = new Set(nominees.map((n) => n.nomineeEmpUuid || n.nominee?.empUuid));
+  const nonNominatedEmployees = (allEmployees || [])
+    .filter((emp) => !nomineeUuids.has(emp.employeeUuid))
+    .map((emp) => ({
+      nomineeEmpUuid: emp.employeeUuid,
+      nominee: {
+        empUuid: emp.employeeUuid,
+        empFirstName: emp.employeeFirstName,
+        empLastName: emp.employeeLastName,
+        empProfileImage: emp.employeeProfileImage,
+      },
+      department: emp.employeeDepartment,
+      voteCountEmployeeChoice: 0,
+      voteCountLeadershipChoice: 0,
+      citation: "",
+    }));
 
   useEffect(() => {
     if (cycleId) {
@@ -107,19 +124,19 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
   };
 
   const handleSubmit = () => {
-    if (!cycleId || !employeeChoiceEmpUuid || !leadershipChoiceEmpUuid) return;
+    if (!cycleId || employeeChoiceEmpUuids.length === 0 || leadershipChoiceEmpUuids.length === 0) return;
     dispatch(
       announceRewardsWinners(
         cycleId,
-        employeeChoiceEmpUuid,
-        leadershipChoiceEmpUuid,
+        employeeChoiceEmpUuids,
+        leadershipChoiceEmpUuids,
       ),
     );
   };
 
   const handleEndPhaseWithoutWinners = () => {
     if (!cycleId) return;
-    dispatch(announceRewardsWinners(cycleId, null, null));
+    dispatch(announceRewardsWinners(cycleId, [], []));
   };
 
   const handleClose = () => {
@@ -127,11 +144,11 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
     onClose();
   };
 
-  const employeeWinner = nominees.find(
-    (n) => n.nomineeEmpUuid === employeeChoiceEmpUuid,
+  const employeeWinners = nominees.concat(nonNominatedEmployees).filter(
+    (n) => employeeChoiceEmpUuids.includes(n.nomineeEmpUuid),
   );
-  const leadershipWinner = nominees.find(
-    (n) => n.nomineeEmpUuid === leadershipChoiceEmpUuid,
+  const leadershipWinners = nominees.concat(nonNominatedEmployees).filter(
+    (n) => leadershipChoiceEmpUuids.includes(n.nomineeEmpUuid),
   );
 
   // Find highest vote counts for each step
@@ -193,8 +210,8 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
 
   const renderNomineeRow = (
     n,
-    selectedUuid,
-    onSelect,
+    selectedUuids,
+    setSelectedUuids,
     voteCountForStep,
     maxVoteCount,
   ) => {
@@ -203,7 +220,10 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
     const photo = getNomineePhoto(n);
     const initial = (name[0] || "?").toUpperCase();
     const votes = voteCountForStep ?? 0;
-    const isSelected = selectedUuid === n.nomineeEmpUuid;
+    const isSelected = selectedUuids.includes(n.nomineeEmpUuid);
+    const onSelect = (uuid) => {
+      setSelectedUuids((prev) => prev.includes(uuid) ? prev.filter((id) => id !== uuid) : [...prev, uuid]);
+    };
     const citation = getCitation(n);
     const nominators = getNominatorNames(n);
     const isHighestVote = votes > 0 && votes === maxVoteCount;
@@ -223,10 +243,10 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
       <div
         key={n.nomineeEmpUuid}
         className={`aw_nominee_row${isSelected ? " aw_nominee_row--selected" : ""}`}
-        onClick={() => onSelect(n.nomineeEmpUuid)}
+        onClick={(e) => { e.stopPropagation(); onSelect(n.nomineeEmpUuid); }}
       >
         <input
-          type="radio"
+          type="checkbox"
           className="aw_radio"
           checked={isSelected}
           onChange={() => onSelect(n.nomineeEmpUuid)}
@@ -283,90 +303,103 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
           <p className="aw_confirm_question">
             Do you want to confirm these winners for {monthYear}?
           </p>
-          {employeeWinner && (
-            <div className="aw_confirm_winner_card aw_confirm_winner_card--employee">
-              <div className="aw_confirm_winner_badge">
-                <img
-                  src={EmployeeChoiceIcon}
-                  alt=""
-                  className="aw_badge_icon"
-                />
-                <span>Employee&apos;s Choice Winner</span>
-              </div>
-              <div className="aw_confirm_winner_info">
-                <div className="aw_avatar aw_avatar--sm">
-                  {getNomineePhoto(employeeWinner) ? (
-                    <img
-                      src={getNomineePhoto(employeeWinner)}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span className="aw_avatar_initial">
-                      {(getNomineeName(employeeWinner)[0] || "?").toUpperCase()}
-                    </span>
-                  )}
+          <div className="aw_confirm_scrollable_container" style={{ maxHeight: '380px', overflowY: 'auto', paddingRight: '8px' }}>
+            {employeeWinners.length > 0 && (
+              <div className="aw_confirm_winner_card aw_confirm_winner_card--employee" style={{marginBottom: "16px"}}>
+                <div className="aw_confirm_winner_badge" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img src={EmployeeChoiceIcon} alt="" className="aw_badge_icon" style={{ margin: 0 }} />
+                    <span>Employee&apos;s Choice Winner{employeeWinners.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', color: '#4B5563', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {employeeWinners.length} Winner{employeeWinners.length !== 1 ? 's' : ''}
+                  </div>
                 </div>
-                <div>
-                  <span className="aw_confirm_winner_name">
-                    {getNomineeName(employeeWinner)}
-                  </span>
-                  <span className="aw_confirm_winner_dept">
-                    {getNomineeDept(employeeWinner)}
-                  </span>
-                  <span className="aw_confirm_winner_votes aw_confirm_winner_votes--employee">
-                    {employeeWinner.voteCountEmployeeChoice ??
-                      employeeWinner.voteCount ??
-                      0}{" "}
-                    Vote(s)
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-          {leadershipWinner && (
-            <div className="aw_confirm_winner_card aw_confirm_winner_card--leadership">
-              <div className="aw_confirm_winner_badge">
-                <img
-                  src={LeadershipChoiceIcon}
-                  alt=""
-                  className="aw_badge_icon"
-                />
-                <span>Leadership Choice Winner</span>
-              </div>
-              <div className="aw_confirm_winner_info">
-                <div className="aw_avatar aw_avatar--sm">
-                  {getNomineePhoto(leadershipWinner) ? (
-                    <img
-                      src={getNomineePhoto(leadershipWinner)}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span className="aw_avatar_initial">
-                      {(
-                        getNomineeName(leadershipWinner)[0] || "?"
-                      ).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <span className="aw_confirm_winner_name">
-                    {getNomineeName(leadershipWinner)}
-                  </span>
-                  <span className="aw_confirm_winner_dept">
-                    {getNomineeDept(leadershipWinner)}
-                  </span>
-                  <span className="aw_confirm_winner_votes aw_confirm_winner_votes--leadership">
-                    {leadershipWinner.voteCountLeadershipChoice ??
-                      leadershipWinner.voteCount ??
-                      0}{" "}
-                    Vote(s)
-                  </span>
+                <div style={{ padding: '12px', backgroundColor: '#F9FAFB' }}>
+                  {employeeWinners.map((employeeWinner, idx) => (
+                    <div key={`emp-${employeeWinner.nomineeEmpUuid}`} className="aw_confirm_winner_info" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '12px', marginBottom: idx !== employeeWinners.length - 1 ? '8px' : '0' }}>
+                      <div className="aw_avatar aw_avatar--sm">
+                        {getNomineePhoto(employeeWinner) ? (
+                          <img
+                            src={getNomineePhoto(employeeWinner)}
+                            alt=""
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <span className="aw_avatar_initial">
+                            {(getNomineeName(employeeWinner)[0] || "?").toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="aw_confirm_winner_name">
+                          {getNomineeName(employeeWinner)}
+                        </span>
+                        <span className="aw_confirm_winner_dept">
+                          {getNomineeDept(employeeWinner)}
+                        </span>
+                        <span className="aw_confirm_winner_votes aw_confirm_winner_votes--employee">
+                          {employeeWinner.voteCountEmployeeChoice ??
+                            employeeWinner.voteCount ??
+                            0}{" "}
+                          Vote(s)
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+            
+            {leadershipWinners.length > 0 && (
+              <div className="aw_confirm_winner_card aw_confirm_winner_card--leadership" style={{marginBottom: "16px"}}>
+                <div className="aw_confirm_winner_badge" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img src={LeadershipChoiceIcon} alt="" className="aw_badge_icon" style={{ margin: 0 }} />
+                    <span>Leadership Choice Winner{leadershipWinners.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div style={{ backgroundColor: '#FFFFFF', color: '#4B5563', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {leadershipWinners.length} Winner{leadershipWinners.length !== 1 ? 's' : ''}
+                  </div>
+                </div>
+                <div style={{ padding: '12px', backgroundColor: '#F9FAFB' }}>
+                  {leadershipWinners.map((leadershipWinner, idx) => (
+                    <div key={`lead-${leadershipWinner.nomineeEmpUuid}`} className="aw_confirm_winner_info" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '12px', marginBottom: idx !== leadershipWinners.length - 1 ? '8px' : '0' }}>
+                      <div className="aw_avatar aw_avatar--sm">
+                        {getNomineePhoto(leadershipWinner) ? (
+                          <img
+                            src={getNomineePhoto(leadershipWinner)}
+                            alt=""
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <span className="aw_avatar_initial">
+                            {(
+                              getNomineeName(leadershipWinner)[0] || "?"
+                            ).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="aw_confirm_winner_name">
+                          {getNomineeName(leadershipWinner)}
+                        </span>
+                        <span className="aw_confirm_winner_dept">
+                          {getNomineeDept(leadershipWinner)}
+                        </span>
+                        <span className="aw_confirm_winner_votes aw_confirm_winner_votes--leadership">
+                          {leadershipWinner.voteCountLeadershipChoice ??
+                            leadershipWinner.voteCount ??
+                            0}{" "}
+                          Vote(s)
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <div className="aw_confirm_footer">
             <button
               type="button"
@@ -444,25 +477,64 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
                 Nominees ({nominees.length.toString().padStart(2, "0")})
               </p>
               <div className="aw_nominees_list">
-                {step === STEP_EMPLOYEE
-                  ? sortedByEmployeeChoice.map((n) =>
+                {step === STEP_EMPLOYEE && (
+                  <>
+                    {sortedByEmployeeChoice.map((n) =>
                       renderNomineeRow(
                         n,
-                        employeeChoiceEmpUuid,
-                        setEmployeeChoiceEmpUuid,
+                        employeeChoiceEmpUuids,
+                        setEmployeeChoiceEmpUuids,
                         n.voteCountEmployeeChoice,
                         maxEmployeeVotes,
-                      ),
-                    )
-                  : sortedByLeadershipChoice.map((n) =>
+                      )
+                    )}
+                    {nonNominatedEmployees.length > 0 && (
+                      <div className="aw_divider_row" style={{ display: 'flex', alignItems: 'center', margin: '16px 0', gap: '12px' }}>
+                        <span className="aw_divider_line" style={{ flex: 1, height: '1px', backgroundColor: '#E0E0E0' }} />
+                        <span className="aw_divider_text" style={{ fontSize: '12px', fontWeight: 600, color: '#757575', textTransform: 'uppercase' }}>Other</span>
+                        <span className="aw_divider_line" style={{ flex: 1, height: '1px', backgroundColor: '#E0E0E0' }} />
+                      </div>
+                    )}
+                    {nonNominatedEmployees.map((n) =>
                       renderNomineeRow(
                         n,
-                        leadershipChoiceEmpUuid,
-                        setLeadershipChoiceEmpUuid,
+                        employeeChoiceEmpUuids,
+                        setEmployeeChoiceEmpUuids,
+                        n.voteCountEmployeeChoice,
+                        0,
+                      )
+                    )}
+                  </>
+                )}
+                {step === STEP_LEADERSHIP && (
+                  <>
+                    {sortedByLeadershipChoice.map((n) =>
+                      renderNomineeRow(
+                        n,
+                        leadershipChoiceEmpUuids,
+                        setLeadershipChoiceEmpUuids,
                         n.voteCountLeadershipChoice,
                         maxLeadershipVotes,
-                      ),
+                      )
                     )}
+                    {nonNominatedEmployees.length > 0 && (
+                      <div className="aw_divider_row" style={{ display: 'flex', alignItems: 'center', margin: '16px 0', gap: '12px' }}>
+                        <span className="aw_divider_line" style={{ flex: 1, height: '1px', backgroundColor: '#E0E0E0' }} />
+                        <span className="aw_divider_text" style={{ fontSize: '12px', fontWeight: 600, color: '#757575', textTransform: 'uppercase' }}>Other</span>
+                        <span className="aw_divider_line" style={{ flex: 1, height: '1px', backgroundColor: '#E0E0E0' }} />
+                      </div>
+                    )}
+                    {nonNominatedEmployees.map((n) =>
+                      renderNomineeRow(
+                        n,
+                        leadershipChoiceEmpUuids,
+                        setLeadershipChoiceEmpUuids,
+                        n.voteCountLeadershipChoice,
+                        0,
+                      )
+                    )}
+                  </>
+                )}
               </div>
             </>
           )}
@@ -482,7 +554,7 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
               <button
                 type="button"
                 className="aw_btn_next"
-                disabled={!employeeChoiceEmpUuid}
+                disabled={employeeChoiceEmpUuids.length === 0}
                 onClick={() => setStep(STEP_LEADERSHIP)}
               >
                 Next
@@ -500,7 +572,7 @@ const AnnounceWinnersModal = ({ cycleId, onClose }) => {
               <button
                 type="button"
                 className="aw_btn_next"
-                disabled={!leadershipChoiceEmpUuid}
+                disabled={leadershipChoiceEmpUuids.length === 0}
                 onClick={() => setStep(STEP_CONFIRM)}
               >
                 Confirm Winners

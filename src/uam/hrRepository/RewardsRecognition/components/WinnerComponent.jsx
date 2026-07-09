@@ -39,13 +39,7 @@ const getCitationPreview = (citation) => {
   };
 };
 
-const WinnerCard = ({
-  winner,
-  type,
-  componentType,
-  allEmployees,
-  showCitation = false,
-}) => {
+const WinnerRow = ({ winner, type, componentType, allEmployees, showCitation }) => {
   const [isCitationModalOpen, setCitationModalOpen] = useState(false);
   const name = buildEmployeeName(winner?.employee);
   const isEmployee = type === AWARD_EMPLOYEE_CHOICE;
@@ -75,62 +69,46 @@ const WinnerCard = ({
   const citationPreview = citationText ? getCitationPreview(citationText) : null;
 
   return (
-    <div
-      className={`winner_card winner_card_${isEmployee ? "employee" : "leadership"}`}
-    >
-      <div className="winner_card_header">
-        <span className="winner_card_header_icon">
-          {isEmployee ? (
-            <img src={EmployeeChoiceIcon} alt="Employee Choice Icon" />
+    <div className="winner_card_body" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
+      <div className="winner_card_body_left">
+        <div className="winner_card_avatar">
+          {photo ? (
+            <img src={photo} alt="" referrerPolicy="no-referrer" />
           ) : (
-            <img src={LeadershipChoiceIcon} alt="Leadership Choice Icon" />
+            <span className="winner_card_avatar_initial">{initial}</span>
           )}
-        </span>
-        <span className="winner_card_header_text">
-          {isEmployee ? "Employee's Choice Winner" : "Leadership Choice Winner"}
-        </span>
+        </div>
+        <div className="winner_card_info">
+          <span className="winner_card_name">{name}</span>
+          {dept && <span className="winner_card_dept">{dept}</span>}
+          {voteText && (
+            <span
+              className={`winner_card_votes winner_card_votes--${isEmployee ? "employee" : "leadership"}`}
+            >
+              {voteText}
+            </span>
+          )}
+        </div>
       </div>
-      <div className="winner_card_body">
-        <div className="winner_card_body_left">
-          <div className="winner_card_avatar">
-            {photo ? (
-              <img src={photo} alt="" referrerPolicy="no-referrer" />
-            ) : (
-              <span className="winner_card_avatar_initial">{initial}</span>
-            )}
-          </div>
-          <div className="winner_card_info">
-            <span className="winner_card_name">{name}</span>
-            {dept && <span className="winner_card_dept">{dept}</span>}
-            {voteText && (
-              <span
-                className={`winner_card_votes winner_card_votes--${isEmployee ? "employee" : "leadership"}`}
-              >
-                {voteText}
-              </span>
+      {citationText && (
+        <div className="winner_card_citation_box" style={{ border: '1px solid #E5E7EB', borderRadius: '6px', padding: '12px', marginTop: '12px', backgroundColor: '#F9FAFB' }}>
+          <div className="winner_card_citation_text">
+            <span>&ldquo;{citationPreview.preview}&rdquo;</span>
+            {citationPreview.truncated && (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  className="winner_card_view_more_btn"
+                  onClick={() => setCitationModalOpen(true)}
+                >
+                  View more
+                </button>
+              </>
             )}
           </div>
         </div>
-        {citationText && (
-          <div className="winner_card_citation_box">
-            <div className="winner_card_citation_text">
-              <span>&ldquo;{citationPreview.preview}&rdquo;</span>
-              {citationPreview.truncated && (
-                <>
-                  {" "}
-                  <button
-                    type="button"
-                    className="winner_card_view_more_btn"
-                    onClick={() => setCitationModalOpen(true)}
-                  >
-                    View more
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
       <CitationDetailModal
         isOpen={isCitationModalOpen}
         onClose={() => setCitationModalOpen(false)}
@@ -139,6 +117,54 @@ const WinnerCard = ({
         citation={citationText}
         title="Citation"
       />
+    </div>
+  );
+};
+
+const WinnerCard = ({
+  winners,
+  type,
+  componentType,
+  allEmployees,
+  showCitation = false,
+}) => {
+  if (!winners || winners.length === 0) return null;
+  const isEmployee = type === AWARD_EMPLOYEE_CHOICE;
+
+  return (
+    <div
+      className={`winner_card winner_card_${isEmployee ? "employee" : "leadership"}`}
+    >
+      <div className="winner_card_header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <span className="winner_card_header_icon">
+            {isEmployee ? (
+              <img src={EmployeeChoiceIcon} alt="Employee Choice Icon" />
+            ) : (
+              <img src={LeadershipChoiceIcon} alt="Leadership Choice Icon" />
+            )}
+          </span>
+          <span className="winner_card_header_text">
+            {isEmployee ? "Employee's Choice Winner" : "Leadership Choice Winner"}
+            {winners.length > 1 ? "s" : ""}
+          </span>
+        </div>
+        <div style={{ backgroundColor: '#F3F4F6', color: '#4B5563', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600 }}>
+          {winners.length} Winner{winners.length !== 1 ? 's' : ''}
+        </div>
+      </div>
+      <div className="winner_card_list_container" style={{ maxHeight: '280px', overflowY: 'auto', padding: '10px 16px', backgroundColor: 'transparent' }}>
+        {winners.map((winner, idx) => (
+          <WinnerRow
+            key={idx}
+            winner={winner}
+            type={type}
+            componentType={componentType}
+            allEmployees={allEmployees}
+            showCitation={showCitation}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -204,13 +230,13 @@ const WinnerComponent = ({
         ) || null
       : null;
   const pastWinners = pastCycle?.winners || [];
-  const pastEmployeeChoice = pastWinners.find(
+  const pastEmployeeChoice = pastWinners.filter(
     (w) => w.awardType === AWARD_EMPLOYEE_CHOICE,
   );
-  const pastLeadershipChoice = pastWinners.find(
+  const pastLeadershipChoice = pastWinners.filter(
     (w) => w.awardType === AWARD_LEADERSHIP_CHOICE,
   );
-  const hasPastWinners = pastEmployeeChoice || pastLeadershipChoice;
+  const hasPastWinners = (pastEmployeeChoice && pastEmployeeChoice.length > 0) || (pastLeadershipChoice && pastLeadershipChoice.length > 0);
 
   // When showing past winners: use previous month from current cycle for label
   const monthYear = showPastWinners
@@ -220,11 +246,11 @@ const WinnerComponent = ({
     : formatMonthYear(cycle?.month, cycle?.year);
   const employeeChoice = showPastWinners
     ? pastEmployeeChoice
-    : currentCycleWinners.find((w) => w.awardType === AWARD_EMPLOYEE_CHOICE);
+    : currentCycleWinners.filter((w) => w.awardType === AWARD_EMPLOYEE_CHOICE);
   const leadershipChoice = showPastWinners
     ? pastLeadershipChoice
-    : currentCycleWinners.find((w) => w.awardType === AWARD_LEADERSHIP_CHOICE);
-  const hasWinners = employeeChoice || leadershipChoice;
+    : currentCycleWinners.filter((w) => w.awardType === AWARD_LEADERSHIP_CHOICE);
+  const hasWinners = (employeeChoice && employeeChoice.length > 0) || (leadershipChoice && leadershipChoice.length > 0);
 
   const showCitation = !showPastWinners && hasWinners;
 
@@ -300,18 +326,18 @@ const WinnerComponent = ({
 
       {hasWinners && (
         <div className="winner_component_cards">
-          {employeeChoice && (
+          {employeeChoice && employeeChoice.length > 0 && (
             <WinnerCard
-              winner={employeeChoice}
+              winners={employeeChoice}
               type={AWARD_EMPLOYEE_CHOICE}
               componentType={componentType}
               allEmployees={allEmployees}
               showCitation={showCitation}
             />
           )}
-          {leadershipChoice && (
+          {leadershipChoice && leadershipChoice.length > 0 && (
             <WinnerCard
-              winner={leadershipChoice}
+              winners={leadershipChoice}
               type={AWARD_LEADERSHIP_CHOICE}
               componentType={componentType}
               allEmployees={allEmployees}

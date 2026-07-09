@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMyCitations } from "../../../../actions/hrRepositoryAction";
 import { formatMonthYear } from "../rewardsUtils";
 import NoResultsContainer from "../../Common/components/NoResultsContainer";
 import CitationDetailModal from "./CitationDetailModal";
@@ -14,18 +13,27 @@ const ReceivedCitationsCard = ({ cycleId, month, year }) => {
   const dispatch = useDispatch();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState(null);
-  const { rewardsMyCitations, rewardsMyCitationsLoading } = useSelector(
+  const { rewardsDashboardData } = useSelector(
     (state) => state.hrRepositoryReducer,
   );
 
+  const currentCycleWinners = Array.isArray(rewardsDashboardData?.currentCycleWinners)
+    ? rewardsDashboardData.currentCycleWinners
+    : [];
+
   const monthYear = formatMonthYear(month, year);
-  const list = Array.isArray(rewardsMyCitations) ? rewardsMyCitations : [];
+  
+  const list = currentCycleWinners
+    .filter(w => w.finalCitation)
+    .map(w => ({
+      citation: w.finalCitation,
+      nominatedBy: w.employee ? `${w.employee.empFirstName || ""} ${w.employee.empLastName || ""}`.trim() : "Winner",
+      awardType: w.awardType
+    }));
   const visible = list.slice(0, MAX_VISIBLE);
   const hasMore = list.length > MAX_VISIBLE;
 
-  useEffect(() => {
-    if (cycleId) dispatch(fetchMyCitations(cycleId));
-  }, [cycleId, dispatch]);
+
 
   const getCitationPreview = (citation) => {
     const normalized = String(citation || "").trim();
@@ -69,11 +77,9 @@ const ReceivedCitationsCard = ({ cycleId, month, year }) => {
       </div>
 
       <div className="received_citations_card_content">
-        {rewardsMyCitationsLoading && list.length === 0 ? (
-          <p className="received_citations_loading">Loading citations...</p>
-        ) : list.length === 0 ? (
+        {list.length === 0 ? (
           <NoResultsContainer
-            message="No citations received for this month."
+            message="No citations found for this month's winners."
             showImage={false}
             border={false}
           />
@@ -107,7 +113,7 @@ const ReceivedCitationsCard = ({ cycleId, month, year }) => {
                       )}
                     </p>
                     <span className="received_citations_author">
-                      - {item.nominatedBy || "—"}
+                      - Citation for {item.nominatedBy || "—"}
                     </span>
                   </li>
                 );

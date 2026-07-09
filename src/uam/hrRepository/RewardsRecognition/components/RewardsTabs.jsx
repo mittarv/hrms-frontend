@@ -281,14 +281,14 @@ const WinnersForMonthModal = ({
     return raw != null ? getComponentTypeValue(raw, componentType) : null;
   };
 
-  const employeeChoice = winners.find(
+  const employeeChoice = winners.filter(
     (w) => w.awardType === AWARD_EMPLOYEE_CHOICE,
   );
-  const leadershipChoice = winners.find(
+  const leadershipChoice = winners.filter(
     (w) => w.awardType !== AWARD_EMPLOYEE_CHOICE,
   );
 
-  const renderWinnerCard = (winner, type) => {
+  const renderWinnerRow = (winner, type) => {
     if (!winner) return null;
     const isEmployee = type === AWARD_EMPLOYEE_CHOICE;
     const name = buildEmployeeName(winner.employee);
@@ -309,66 +309,51 @@ const WinnersForMonthModal = ({
 
     return (
       <div
-        className={`rt_wfm_winner_card rt_wfm_winner_card--${isEmployee ? "employee" : "leadership"}`}
+        key={winner.id || winner.employeeEmpUuid}
+        className="rt_wfm_winner_card_body"
         onClick={() => onWinnerClick && onWinnerClick(winner)}
-        style={{ cursor: onWinnerClick ? "pointer" : "default" }}
+        style={{ cursor: onWinnerClick ? "pointer" : "default", backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '16px', marginBottom: '12px', display: 'flex', flexDirection: 'column' }}
       >
-        <div className="rt_wfm_winner_card_header">
-          <span className="rt_wfm_winner_card_header_icon">
-            <img
-              src={
-                isEmployee ? EmployeeChoiceWhiteIcon : LeadershipChoiceWhiteIcon
-              }
-              alt=""
-            />
-          </span>
-          <span className="rt_wfm_winner_card_header_text">
-            {isEmployee
-              ? "Employee's Choice Winner"
-              : "Leadership Choice Winner"}
-          </span>
-        </div>
-        <div className="rt_wfm_winner_card_body">
-          <div className="rt_wfm_winner_card_body_left">
-            <div className="rt_wfm_winner_card_avatar">
-              {photo ? (
-                <img src={photo} alt="" referrerPolicy="no-referrer" />
-              ) : (
-                <span className="rt_wfm_winner_card_avatar_initial">
-                  {initial}
-                </span>
-              )}
-            </div>
-            <div className="rt_wfm_winner_card_info">
-              <span className="rt_wfm_winner_card_name">{name}</span>
-              {dept && <span className="rt_wfm_winner_card_dept">{dept}</span>}
-              {voteText && (
-                <span
-                  className={`rt_wfm_winner_card_votes rt_wfm_winner_card_votes--${isEmployee ? "employee" : "leadership"}`}
-                >
-                  {voteText}
-                </span>
-              )}
-            </div>
+        <div className="rt_wfm_winner_card_body_left" style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="rt_wfm_winner_card_avatar" style={{ marginRight: '16px' }}>
+            {photo ? (
+              <img src={photo} alt="" referrerPolicy="no-referrer" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <span className="rt_wfm_winner_card_avatar_initial" style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E5E7EB', color: '#374151', fontWeight: 600 }}>
+                {initial}
+              </span>
+            )}
           </div>
-          {citationText && (
-            <div className="rt_wfm_winner_card_citation_box">
-              <CustomTooltip
-                text={`"${citationText}"`}
-                maxWords={25}
-                fullWidth
-              />
-            </div>
-          )}
+          <div className="rt_wfm_winner_card_info" style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="rt_wfm_winner_card_name" style={{ fontWeight: 600, color: '#111827', fontSize: '14px' }}>{name}</span>
+            {dept && <span className="rt_wfm_winner_card_dept" style={{ color: '#6B7280', fontSize: '12px' }}>{dept}</span>}
+            {voteText && (
+              <span
+                className={`rt_wfm_winner_card_votes rt_wfm_winner_card_votes--${isEmployee ? "employee" : "leadership"}`}
+                style={{ fontSize: '12px', marginTop: '4px', fontWeight: 500, color: isEmployee ? '#19318B' : '#115F5F' }}
+              >
+                {voteText}
+              </span>
+            )}
+          </div>
         </div>
+        {citationText && (
+          <div className="rt_wfm_winner_card_citation_box" style={{ border: '1px solid #E5E7EB', borderRadius: '6px', padding: '12px', marginTop: '12px', backgroundColor: '#F9FAFB' }}>
+            <CustomTooltip
+              text={`"${citationText}"`}
+              maxWords={25}
+              fullWidth
+            />
+          </div>
+        )}
       </div>
     );
   };
 
   return (
     <div className="rt_citation_overlay" onClick={onClose}>
-      <div className="rt_wfm_modal" onClick={(e) => e.stopPropagation()}>
-        <div className="rt_wfm_modal_header">
+      <div className="rt_wfm_modal" onClick={(e) => e.stopPropagation()} style={{ maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="rt_wfm_modal_header" style={{ flexShrink: 0 }}>
           <div className="rt_wfm_modal_header_left">
             <span className="rt_wfm_modal_header_title">Winners For</span>
             <span className="rt_wfm_modal_header_month">{monthYear}</span>
@@ -381,10 +366,43 @@ const WinnersForMonthModal = ({
             <img src={Cross_icon} alt="close" />
           </button>
         </div>
-        <div className="rt_wfm_modal_body">
-          {renderWinnerCard(employeeChoice, AWARD_EMPLOYEE_CHOICE)}
-          {renderWinnerCard(leadershipChoice, "leadership_choice")}
-          {!employeeChoice && !leadershipChoice && (
+        
+        <div className="rt_wfm_modal_body" style={{ flex: 1, overflowY: 'auto', paddingRight: '8px' }}>
+          {employeeChoice.length > 0 && (
+            <div className="rt_wfm_winner_card rt_wfm_winner_card--employee" style={{marginBottom: "16px"}}>
+              <div className="rt_wfm_winner_card_header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src={EmployeeChoiceWhiteIcon} alt="" style={{ margin: 0 }} />
+                  <span style={{ color: 'white' }}>Employee Choice Winner{employeeChoice.length > 1 ? 's' : ''}</span>
+                </div>
+                <div style={{ backgroundColor: '#FFFFFF', color: '#4B5563', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                  {employeeChoice.length} Winner{employeeChoice.length !== 1 ? 's' : ''}
+                </div>
+              </div>
+              <div style={{ padding: '12px', backgroundColor: '#F9FAFB' ,overflowY:'scroll'}}>
+                {employeeChoice.map((winner) => renderWinnerRow(winner, AWARD_EMPLOYEE_CHOICE))}
+              </div>
+            </div>
+          )}
+          
+          {leadershipChoice.length > 0 && (
+            <div className="rt_wfm_winner_card rt_wfm_winner_card--leadership" style={{marginBottom: "16px"}}>
+              <div className="rt_wfm_winner_card_header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <img src={LeadershipChoiceWhiteIcon} alt="" style={{ margin: 0 }} />
+                  <span style={{ color: 'white' }}>Leadership Choice Winner{leadershipChoice.length > 1 ? 's' : ''}</span>
+                </div>
+                <div style={{ backgroundColor: '#FFFFFF', color: '#4B5563', padding: '4px 12px', borderRadius: '16px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                  {leadershipChoice.length} Winner{leadershipChoice.length !== 1 ? 's' : ''}
+                </div>
+              </div>
+              <div style={{ padding: '12px', backgroundColor: '#F9FAFB' ,overflowY:'scroll'}}>
+                {leadershipChoice.map((winner) => renderWinnerRow(winner, "leadership_choice"))}
+              </div>
+            </div>
+          )}
+          
+          {employeeChoice.length === 0 && leadershipChoice.length === 0 && (
             <p className="rt_wfm_no_winners">No winners for this month.</p>
           )}
         </div>
