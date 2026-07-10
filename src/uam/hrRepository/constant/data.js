@@ -77,6 +77,11 @@ export const hrRepoRouterData = [
     icon: Notepad_icon,
     path: "/hrms-access",
   },
+  {
+    title: "Organization settings",
+    icon: organization_settings,
+    path: "/employee-type-configurator",
+  },
   // {
   //   title: "Organization Settings",
   //   icon: organization_settings,      //Button is created /hello path specified for this button.

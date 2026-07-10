@@ -16,6 +16,7 @@ import HrHome from "./HrHome";
 import RewardsRecognition from "./RewardsRecognition/RewardsRecognition";
 import VoteForNomineesPage from "./RewardsRecognition/components/VoteForNomineesPage";
 import SecondaryLocation from "./SecondaryLocation/SecondaryLocation";
+import EmployeeTypeDashboard from "./EmployeeTypeConfigurator/components/EmployeeTypeDashboard";
 import AccessDenied from "./Common/components/AccessDenied";
 import { hrToolHomePageData } from "./constant/data";
 import exclamationMarkIcon from "./assets/icons/exclamation_mark.svg";
@@ -65,6 +66,7 @@ const HrAllRoutes = ({ isAuthenticated }) => {
     { path: "/rewards-recognitions", element: <RewardsRecognition /> },
     { path: "/rewards-recognitions/vote", element: <VoteForNomineesPage /> },
     { path: "/secondary-working-location", element: <SecondaryLocation /> },
+    { path: "/employee-type-configurator", element: <EmployeeTypeDashboard /> },
   ];
 
   // Conditional routes - require specific permissions or admin access (>= 900)

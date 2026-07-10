@@ -18,7 +18,7 @@ const LeaveConfiguratorTable = () => {
   const { allLeavesLoading, allExisitingLeaves, getAllComponentType, myHrmsAccess, myHrmsAccessLoaded } = useSelector(
     (state) => state.hrRepositoryReducer
   );
-  const { allToolsAccessDetails } = useSelector((state) => state.user);
+  const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
   const [filteredLeaves, setFilteredLeaves] = useState(allExisitingLeaves);
   const [searchLeaves, setSearchLeaves] = useState("");
@@ -29,11 +29,14 @@ const LeaveConfiguratorTable = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const leaveConfigId = searchParams.get("leaveConfigId");
   
-  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900;
+  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900 || user?.userType >= 900;
   
   // Check if user has read permission
   const canRead = isAdmin || 
     myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveConfigurator_Read");
+    
+  const canUpdate = isAdmin || 
+    myHrmsAccess?.permissions?.some(perm => perm.name === "LeaveConfigurator_update");
 
   const handleTooltipShow = useCallback((e, description) => {
     if (tooltipTimeoutRef.current) {
@@ -113,7 +116,7 @@ const LeaveConfiguratorTable = () => {
       dispatch(getLeaveDetails(leaveConfigId));
       setSearchParams({
         showLeaveConfiguratorForm: "true",
-        view: "true",
+        ...(canUpdate ? { edit: "true" } : { view: "true" }),
         leaveConfigId: leaveConfigId,
       });
     } else {
