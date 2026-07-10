@@ -415,6 +415,30 @@ export const getAllComponentTypes = () => async (dispatch) => {
   }
 };
 
+export const updateComponentType = (componentType, componentValue, setSuccessMsg, setFormErrors) => async (dispatch) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.put(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/updateComponentType`,
+      { componentType, componentValue },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+    if (response.data.success) {
+      if (setSuccessMsg) setSuccessMsg("Component updated successfully");
+      dispatch(getAllComponentTypes());
+    } else {
+      if (setFormErrors) setFormErrors({ global: response.data.message });
+    }
+  } catch (error) {
+    if (setFormErrors) setFormErrors({ global: await getErrorMessage(error, "An error occurred") });
+  }
+};
+
 export const getPayrollLevels = () => async (dispatch) => {
   try {
     dispatch({ type: "GET_PAYROLL_LEVELS_REQUEST" });

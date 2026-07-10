@@ -52,6 +52,8 @@ const HRMSHeader = () => {
             ? "Payroll & Reimbursements"
             : location.pathname === "/rewards-recognitions" || location.pathname === "/rewards-recognitions/vote"
             ? "Rewards & Recognitions"
+            : location.pathname === "/employee-type-configurator"
+            ? "Organization settings"
             : location.pathname === "/hrms-access"
             ? "HRMS Access"
             : location.pathname === "/secondary-working-location"
