@@ -9,27 +9,26 @@ import {
 } from '../../../../../actions/hrRepositoryAction';
 import { generateSalarySaveData } from '../utils/SaveDataGenerator';
 import { findMatchingKey } from '../../../Common/utils/helper';
+import { isLevelDisabled as isLevelDisabledConfig, hasYearOfStudy as hasYearOfStudyConfig } from '../../../Common/utils/orgSettingsConfig';
 
-// Helper functions
-const isFteOrOfteOrPte = (type) => type === 'FTE' || type === 'OFTE' || type === 'PTE';
-const isInternType = (type) => type === 'Intern' || type === 'Extended Intern';
+// Helper functions removed as we now use dynamic configs from orgSettingsConfig.js
 
-const getShouldShowReset = (opts) => {
-  if (isInternType(opts.employeeType)) {
+const getShouldShowReset = (opts, getAllComponentType) => {
+  if (hasYearOfStudyConfig(opts.employeeType, getAllComponentType)) {
     // For Intern/Extended Intern: require all 5 fields
     return opts.employeeType && opts.employeeLocation && opts.employeeLevel && opts.department && opts.yearOfStudy;
   }
-  return isFteOrOfteOrPte(opts.employeeType)
+  return !isLevelDisabledConfig(opts.employeeType, opts.department, getAllComponentType)
     ? opts.employeeType && opts.employeeLocation && opts.employeeLevel
     : opts.employeeType && opts.employeeLocation;
 };
 
-const validateRequiredFields = (opts) => {
-  if (isInternType(opts.employeeType)) {
+const validateRequiredFields = (opts, getAllComponentType) => {
+  if (hasYearOfStudyConfig(opts.employeeType, getAllComponentType)) {
     // For Intern/Extended Intern: require all 5 fields
     return opts.employeeType && opts.employeeLocation && opts.employeeLevel && opts.department && opts.yearOfStudy;
   }
-  return isFteOrOfteOrPte(opts.employeeType)
+  return !isLevelDisabledConfig(opts.employeeType, opts.department, getAllComponentType)
     ? opts.employeeType && opts.employeeLocation && opts.employeeLevel
     : opts.employeeType && opts.employeeLocation;
 };
@@ -68,10 +67,7 @@ export const useSalaryConfiguration = () => {
 
   // Level dropdown enable/disable logic and reset when employee type changes
   useEffect(() => {
-    // For Intern/Extended Intern: Level is enabled (not disabled)
-    // For FTE/OFTE/PTE: Level is enabled
-    // For others (Consultant/Contractor): Level is disabled
-    const disableLevel = !isFteOrOfteOrPte(selectedOptions.employeeType) && !isInternType(selectedOptions.employeeType);
+    const disableLevel = isLevelDisabledConfig(selectedOptions.employeeType, selectedOptions.department, getAllComponentType);
     setIsLevelDisabled(disableLevel);
     
     // Clear level when switching employee types or when level should be disabled
@@ -80,7 +76,7 @@ export const useSalaryConfiguration = () => {
     }
     
     // Clear department and year of study when switching away from Intern/Extended Intern
-    if (!isInternType(selectedOptions.employeeType)) {
+    if (!hasYearOfStudyConfig(selectedOptions.employeeType, getAllComponentType)) {
       setSelectedOptions(prev => {
         const newState = { ...prev };
         if (prev.department) delete newState.department;
@@ -88,21 +84,21 @@ export const useSalaryConfiguration = () => {
         return newState;
       });
     }
-  }, [selectedOptions.employeeType, selectedOptions.employeeLevel]);
+  }, [selectedOptions.employeeType, selectedOptions.employeeLevel, selectedOptions.department, getAllComponentType]);
 
   // Clear level when switching between FTE, OFTE, and PTE to ensure proper filtering
   useEffect(() => {
-    if (selectedOptions.employeeType === 'FTE' || selectedOptions.employeeType === 'OFTE' || selectedOptions.employeeType === 'PTE') {
+    if (!isLevelDisabledConfig(selectedOptions.employeeType, selectedOptions.department, getAllComponentType)) {
       setSelectedOptions(prev => ({ ...prev, employeeLevel: '' }));
     }
-  }, [selectedOptions.employeeType]);
+  }, [selectedOptions.employeeType, selectedOptions.department, getAllComponentType]);
 
   // Reset button visibility
   useEffect(() => {
-    const showReset = getShouldShowReset(selectedOptions);
+    const showReset = getShouldShowReset(selectedOptions, getAllComponentType);
     dispatch({ type: 'SET_SHOW_DEFAULT_TABLES', payload: showReset });
     dispatch({ type: 'SET_SHOW_RESET_BUTTON', payload: showReset });
-  }, [dispatch, selectedOptions]);
+  }, [dispatch, selectedOptions, getAllComponentType]);
 
   // Store selected options in Redux
   useEffect(() => {
@@ -112,7 +108,7 @@ export const useSalaryConfiguration = () => {
   // API call helper
   const makeApiCall = useCallback((keys) => {
     // For Intern/Extended Intern: use all 5 parameters
-    const params = isInternType(selectedOptions.employeeType) 
+    const params = hasYearOfStudyConfig(selectedOptions.employeeType, getAllComponentType) 
       ? [keys.employeeType || '', keys.location || '', keys.level || '', keys.department || '', keys.yearOfStudy || '']
       : [keys.employeeType || '', keys.location || '', keys.level || ''];
     
@@ -121,7 +117,7 @@ export const useSalaryConfiguration = () => {
       lastApiCallRef.current = callKey;
       dispatch(getSalaryComponents(...params));
     }
-  }, [dispatch, selectedOptions.employeeType]);
+  }, [dispatch, selectedOptions.employeeType, getAllComponentType]);
 
   // API call for salary data
   useEffect(() => {
@@ -131,7 +127,7 @@ export const useSalaryConfiguration = () => {
       hasInitialLoadedRef.current = true;
       return;
     }
-    if (validateRequiredFields(selectedOptions)) {
+    if (validateRequiredFields(selectedOptions, getAllComponentType)) {
       const keys = getMatchedKeys(selectedOptions, getAllComponentType);
       if (keys.employeeType && keys.location) makeApiCall(keys);
     }

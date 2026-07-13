@@ -163,59 +163,59 @@
                     letter-spacing: 0.01em;
                     margin: 0;
                 }
+            }
 
-                .employee_configurator_info_icon_wrap {
-                    position: relative;
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
+            .employee_configurator_info_icon_wrap {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
 
-                    .info_icon {
-                        width: 16px;
-                        height: 16px;
-                        cursor: pointer;
-                        opacity: 0.7;
-                        transition: opacity 0.2s;
+                .info_icon {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    opacity: 0.7;
+                    transition: opacity 0.2s;
 
-                        &:hover {
-                            opacity: 1;
-                        }
+                    &:hover {
+                        opacity: 1;
                     }
+                }
 
-                    .employee_configurator_tooltip {
+                .employee_configurator_tooltip {
+                    position: absolute;
+                    bottom: 120%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 240px;
+                    padding: 10px 14px;
+                    background-color: $PRUSSIAN-80;
+                    color: $LIGHT;
+                    text-align: center;
+                    border-radius: 6px;
+                    box-shadow: 0 4px 12px rgba(3, 51, 72, 0.15);
+                    z-index: 100;
+                    font-size: fonts.$font-size-small;
+                    font-weight: fonts.$font-weight-regular;
+                    line-height: 1.4;
+                    white-space: normal;
+                    animation: tooltipFadeIn 0.2s ease-in-out;
+
+                    &::after {
+                        content: '';
                         position: absolute;
-                        bottom: 120%;
+                        top: 100%;
                         left: 50%;
                         transform: translateX(-50%);
-                        width: 240px;
-                        padding: 10px 14px;
-                        background-color: $PRUSSIAN-80;
-                        color: $LIGHT;
-                        text-align: center;
-                        border-radius: 6px;
-                        box-shadow: 0 4px 12px rgba(3, 51, 72, 0.15);
-                        z-index: 100;
-                        font-size: fonts.$font-size-small;
-                        font-weight: fonts.$font-weight-regular;
-                        line-height: 1.4;
-                        white-space: normal;
-                        animation: tooltipFadeIn 0.2s ease-in-out;
+                        border-width: 5px;
+                        border-style: solid;
+                        border-color: $PRUSSIAN-80 transparent transparent transparent;
+                    }
 
-                        &::after {
-                            content: '';
-                            position: absolute;
-                            top: 100%;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            border-width: 5px;
-                            border-style: solid;
-                            border-color: $PRUSSIAN-80 transparent transparent transparent;
-                        }
-
-                        @keyframes tooltipFadeIn {
-                            from { opacity: 0; transform: translate(-50%, 5px); }
-                            to { opacity: 1; transform: translate(-50%, 0); }
-                        }
+                    @keyframes tooltipFadeIn {
+                        from { opacity: 0; transform: translate(-50%, 5px); }
+                        to { opacity: 1; transform: translate(-50%, 0); }
                     }
                 }
             }

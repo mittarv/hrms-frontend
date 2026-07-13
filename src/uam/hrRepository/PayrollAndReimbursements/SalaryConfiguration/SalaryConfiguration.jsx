@@ -3,6 +3,7 @@ import SalaryTablesPage from "./components/SalaryTablePage";
 import { useSalaryConfiguration } from "./hooks/useSalaryConfiguration";
 import { useDropdownOptions } from "./hooks/useDropdownOptions";
 import { useSelector } from "react-redux";
+import { hasYearOfStudy } from "../../Common/utils/orgSettingsConfig";
 import "./styles/SalaryConfiguration.scss";
 
 /**
@@ -47,8 +48,8 @@ const SalaryConfiguration = () => {
     yearOfStudyOptions
   } = useDropdownOptions(getAllComponentType, selectedOptions.employeeType);
 
-  // Check if current employee type is Intern or Extended Intern
-  const isInternType = selectedOptions.employeeType === "Intern" || selectedOptions.employeeType === "Extended Intern";
+  // Check if current employee type supports year of study (dynamic via orgSettingsConfig)
+  const isInternType = hasYearOfStudy(selectedOptions.employeeType, getAllComponentType);
 
   // If user doesn't have read permission, show access denied message
   if (!canRead) {
