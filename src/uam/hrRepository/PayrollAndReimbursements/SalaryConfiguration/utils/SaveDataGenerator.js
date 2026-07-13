@@ -1,4 +1,5 @@
 import { findMatchingKey } from "../../../Common/utils/helper";
+import { isLevelDisabled as isLevelDisabledConfig, hasYearOfStudy as hasYearOfStudyConfig } from '../../../Common/utils/orgSettingsConfig';
 import { getFrequencyKey } from "./TableConfig";
 
 /**
@@ -372,8 +373,8 @@ const buildCategoryDetails = (selectedOptions, componentTypeData) => {
     employeeLocation: findMatchingKey(componentTypeData.location_dropdown, selectedOptions.employeeLocation),
   };
 
-  // Check if it's Intern or Extended Intern
-  const isInternType = ['Intern', 'Extended Intern'].includes(selectedOptions.employeeType);
+  // Check if it requires Year of Study (e.g. Intern)
+  const isInternType = hasYearOfStudyConfig(selectedOptions.employeeType, componentTypeData);
   
   if (isInternType) {
     // For Intern/Extended Intern: add level, department, and year of study
@@ -384,9 +385,9 @@ const buildCategoryDetails = (selectedOptions, componentTypeData) => {
     categoryDetails.department = findMatchingKey(componentTypeData.department_type_dropdown, selectedOptions.department);
     categoryDetails.yearOfStudy = findMatchingKey(componentTypeData.year_of_study, selectedOptions.yearOfStudy);
   } else {
-    // Add employee level for FTE/OFTE/PTE
-    const isFteOrOfteOrPte = ['FTE', 'OFTE', 'PTE'].includes(selectedOptions.employeeType);
-    if (isFteOrOfteOrPte && selectedOptions.employeeLevel) {
+    // Add employee level if it's not disabled for this type
+    const isLevelDisabled = isLevelDisabledConfig(selectedOptions.employeeType, selectedOptions.department, componentTypeData);
+    if (!isLevelDisabled && selectedOptions.employeeLevel) {
       categoryDetails.employeeLevel = findMatchingKey(
         componentTypeData.level_dropdown, 
         selectedOptions.employeeLevel

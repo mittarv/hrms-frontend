@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { formSections, govIdTypes, sectionFieldMapping } from "../utils/EmployeeRepositoryData";
+import { hasLevel, hasYearOfStudy, getSalaryParamTier, getGovIdOptions, isLevelDisabled } from "../../Common/utils/orgSettingsConfig";
 import Back_icon from "../../assets/icons/leftEmployeeArrow.svg";
 import Dropdown_Arrow from "../../assets/icons/dropdow_arrow.svg";
 import Edit_Button from "../../assets/icons/edit_button.svg";
@@ -266,9 +267,9 @@ const EmployeeDetailsPage = () => {
     }
   }, [formData?.empType, initialFormData?.empType, isEditing])
 
-  // --- useEffect to clear and disable emp level when emp type is not "FTE", "OFTE", "PTE", "Intern", or "Extended Intern" ---
+  // --- useEffect to clear and disable emp level when emp type doesn't support it ---
   useEffect(() => {
-    if (isEditing && formData?.empType && formData?.empType !== "FTE" && formData?.empType !== "OFTE" && formData?.empType !== "PTE" && formData?.empType !== "Intern" && formData?.empType !== "Extended Intern") {
+    if (isEditing && formData?.empType && isLevelDisabled(formData.empType, formData.empDepartment, getAllComponentType)) {
       setFormData(prev => ({
         ...prev,
         empLevel: ""
@@ -280,8 +281,8 @@ const EmployeeDetailsPage = () => {
       }));
     }
 
-    // Clear year of study if employee type is not Intern or Extended Intern
-    if (isEditing && formData?.empType && formData?.empType !== "Intern" && formData?.empType !== "Extended Intern" && formData?.empYearOfStudy) {
+    // Clear year of study if employee type doesn't support it
+    if (isEditing && formData?.empType && !hasYearOfStudy(formData.empType, getAllComponentType) && formData?.empYearOfStudy) {
       setFormData(prev => ({
         ...prev,
         empYearOfStudy: ""
@@ -292,7 +293,7 @@ const EmployeeDetailsPage = () => {
         empYearOfStudy: ""
       }));
     }
-  }, [formData?.empType, isEditing, formData?.empYearOfStudy]);
+  }, [formData?.empType, isEditing, formData?.empYearOfStudy, formData?.empDepartment, getAllComponentType]);
 
   // Optimized API calls for salary components with better dependency management
   useEffect(() => {
@@ -313,21 +314,17 @@ const EmployeeDetailsPage = () => {
       yearOfStudy: findMatchingKey(getAllComponentType.year_of_study, formData?.empYearOfStudy)
     };
 
-    const isInternType = formData?.empType === "Intern" || formData?.empType === "Extended Intern";
-    const isFteOfteOrPte = formData?.empType === "FTE" || formData?.empType === "OFTE" || formData?.empType === "PTE";
+    const salaryTier = getSalaryParamTier(formData?.empType, getAllComponentType);
 
-    // Check if required fields are present based on employee type
+    // Check if required fields are present based on salary param tier
     let hasRequiredFields = false;
     
-    if (isInternType) {
-      // For Intern/Extended Intern: require all 5 fields
+    if (salaryTier === "full") {
       hasRequiredFields = formData?.empType && formData?.state && 
         formData?.empLevel && formData?.empDepartment && formData?.empYearOfStudy;
-    } else if (isFteOfteOrPte) {
-      // For FTE/OFTE/PTE: require type, location, and level
+    } else if (salaryTier === "withLevel") {
       hasRequiredFields = formData?.empType && formData?.state && formData?.empLevel;
     } else {
-      // For others (Consultant/Contractor): require type and location only
       hasRequiredFields = formData?.empType && formData?.state;
     }
 
@@ -335,14 +332,11 @@ const EmployeeDetailsPage = () => {
     if (hasRequiredFields && matchedKeys.employeeType && matchedKeys.location) {
       let params;
       
-      if (isInternType && matchedKeys.level) {
-        // For Intern/Extended Intern: send all 5 parameters
+      if (salaryTier === "full" && matchedKeys.level) {
         params = [matchedKeys.employeeType, matchedKeys.location, matchedKeys.level, matchedKeys.department, matchedKeys.yearOfStudy];
-      } else if (isFteOfteOrPte && matchedKeys.level) {
-        // For FTE/OFTE/PTE: send 3 parameters
+      } else if (salaryTier === "withLevel" && matchedKeys.level) {
         params = [matchedKeys.employeeType, matchedKeys.location, matchedKeys.level];
       } else {
-        // For others: send only 2 parameters
         params = [matchedKeys.employeeType, matchedKeys.location];
       }
       
@@ -363,11 +357,7 @@ const EmployeeDetailsPage = () => {
     formData?.empDepartment,
     formData?.empYearOfStudy,
     dispatch, 
-    getAllComponentType?.emp_type_dropdown,
-    getAllComponentType?.location_dropdown,
-    getAllComponentType?.level_dropdown,
-    getAllComponentType?.department_type_dropdown,
-    getAllComponentType?.year_of_study
+    getAllComponentType
   ]);
 
   const getEmployeeType = useCallback(
@@ -979,23 +969,20 @@ const emailValidation = (updatedFormData) => {
   const renderField = (field, sectionId) => {
     const isLeaveField = field?.name?.toLowerCase().includes("leaves");
     
-    // Check if level field should be disabled based on employee type
+    // Check if level field should be disabled based on employee type (dynamic via orgSettingsConfig)
     const isLevelFieldDisabled = field?.name === "empLevel" && 
-      formData?.empType && 
-      formData?.empType !== "FTE" && 
-      formData?.empType !== "OFTE" && 
-      formData?.empType !== "PTE" && 
-      formData?.empType !== "Intern" && 
-      formData?.empType !== "Extended Intern";
+      formData?.empType && isLevelDisabled(formData.empType, formData.empDepartment, getAllComponentType);
 
-    // Check if year of study field should be hidden based on employee type
+    // Check if year of study field should be hidden based on employee type (dynamic via orgSettingsConfig)
     const isYearOfStudyFieldHidden = field?.name === "empYearOfStudy" && 
-      formData?.empType && 
-      formData?.empType !== "Intern" && 
-      formData?.empType !== "Extended Intern";
+      formData?.empType && !hasYearOfStudy(formData.empType, getAllComponentType);
 
-    // If year of study field should be hidden, don't render it
-    if (isYearOfStudyFieldHidden) {
+    // Check if level field should be completely hidden
+    const isLevelFieldHidden = field?.name === "empLevel" &&
+      formData?.empType && !hasLevel(formData.empType, getAllComponentType);
+
+    // If year of study or level field should be hidden, don't render it
+    if (isYearOfStudyFieldHidden || isLevelFieldHidden) {
       return null;
     }
     
@@ -1152,7 +1139,7 @@ const emailValidation = (updatedFormData) => {
           </>
         );
       } else if (field.type === "multi-field") {
-        const fieldOptions = field.options || govIdTypes;
+        const fieldOptions = field.name === "empGovId" ? getGovIdOptions(getAllComponentType) : (field.options || govIdTypes);
         const currentState = multiFieldStates[field.name] || {type: "", value: ""};
         // Convert options array to the format expected by CustomDropdown
         const dropdownOptions = fieldOptions?.map((option, index) => ({
@@ -1249,7 +1236,7 @@ const emailValidation = (updatedFormData) => {
         }
         
         if (typeValue && inputValue) {
-          const fieldOptions = field.options || govIdTypes;
+          const fieldOptions = field.name === "empGovId" ? getGovIdOptions(getAllComponentType) : (field.options || govIdTypes);
           const typeLabel = fieldOptions.find(opt => opt.value === typeValue)?.label || typeValue;
           return <div className="field-value">{typeLabel}: {inputValue}</div>;
         }
@@ -1644,11 +1631,16 @@ const renderOffboardingField = () => {
                               if (isEditing && (field.name === "isManager" || field.name === "isSecondarySameAsPrimary")) {
                                 return false;
                               }
-                              // Hide year of study field if employee type is not Intern or Extended Intern
+                              // Hide year of study field if employee type doesn't support it (dynamic via orgSettingsConfig)
                               if (field.name === "empYearOfStudy" && 
                                   formData?.empType && 
-                                  formData?.empType !== "Intern" && 
-                                  formData?.empType !== "Extended Intern") {
+                                  !hasYearOfStudy(formData.empType, getAllComponentType)) {
+                                return false;
+                              }
+                              // Hide level field completely if the employee type doesn't support it
+                              const isHideLevel = formData?.empType && !hasLevel(formData.empType, getAllComponentType);
+                              console.log("Checking empLevel hide:", formData?.empType, isHideLevel, getAllComponentType?.employee_type_mapping);
+                              if (field.name === "empLevel" && isHideLevel) {
                                 return false;
                               }
                               return true;

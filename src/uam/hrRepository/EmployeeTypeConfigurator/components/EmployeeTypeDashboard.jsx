@@ -4,6 +4,8 @@ import { getAllComponentTypes, updateComponentType } from '../../../../actions/h
 import Add_icon from "../../assets/icons/add_icon_without_background.svg";
 import Info_icon from "../../assets/icons/info_icon.svg";
 import EmployeeTypeModal from './EmployeeTypeModal';
+import EmployeeTypeMappingTable from "./EmployeeTypeMappingTable";
+import DepartmentMappingTable from "./DepartmentMappingTable";
 import Snackbar from "../../Common/components/Snackbar";
 import ConfirmationPopup from "../../Common/components/ConfirmationPopup";
 import './EmployeeTypeConfigurator.scss';
@@ -16,7 +18,8 @@ const CONFIG_TABS = [
     { id: "year_of_study", label: "Year of Study", description: "Configures academic years of study, typically used for interns or fresh graduates." },
     { id: "emergency_contact_relation_dropdown", label: "Emergency Contact Relation", description: "Configures the allowed relationships for an employee's emergency contacts (e.g., Spouse, Parent, Sibling)." },
     { id: "gender_type_dropdown", label: "Gender", description: "Configures the gender options available for employees (e.g., Male, Female, Other)." },
-    { id: "marital_status_dropdown", label: "Marital Status", description: "Configures marital status options (e.g., Single, Married, Divorced)." }
+    { id: "marital_status_dropdown", label: "Marital Status", description: "Configures marital status options (e.g., Single, Married, Divorced)." },
+    { id: "government_id_type", label: "Government ID", description: "Configures supported government ID types (e.g., SSN, Aadhaar, Passport, Driver's License)." }
 ];
 
 const EmployeeTypeDashboard = () => {
@@ -25,7 +28,8 @@ const EmployeeTypeDashboard = () => {
     const { user, allToolsAccessDetails } = useSelector((state) => state.user);
     const { selectedToolName } = useSelector((state) => state.mittarvtools);
 
-    const [activeTab, setActiveTab] = useState(CONFIG_TABS[0].id);
+    const [activeTab, setActiveTab] = useState("emp_type_dropdown");
+    const [showMappingFor, setShowMappingFor] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
     const [itemToDelete, setItemToDelete] = useState(null);
@@ -112,6 +116,7 @@ const EmployeeTypeDashboard = () => {
 
     const handleTabClick = useCallback((tabId) => {
         setActiveTab(tabId);
+        setShowMappingFor(null);
     }, []);
 
     return (
@@ -122,14 +127,34 @@ const EmployeeTypeDashboard = () => {
                         <p className="employee_configurator_title">Organization settings</p>
                         <p className="employee_configurator_sub_title">Manage dropdown options used across the organization</p>
                     </div>
-                    {hasWriteAccess && (
-                        <button className="employee_configurator_add_button" onClick={() => { setEditItem(null); setIsModalOpen(true); }}>
-                            <div>
-                                <img src={Add_icon} alt="Add Icon" />
-                                <p>Add {currentTabLabel}</p>
-                            </div>
-                        </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        {hasWriteAccess && activeTab === "emp_type_dropdown" && !showMappingFor && (
+                            <button 
+                                className="employee_configurator_add_button" 
+                                style={{ backgroundColor: '#f0f0f0', color: '#333', border: '1px solid #ccc' }}
+                                onClick={() => setShowMappingFor("emp_type_dropdown")}
+                            >
+                                <p>Manage Behaviors</p>
+                            </button>
+                        )}
+                        {hasWriteAccess && activeTab === "department_type_dropdown" && !showMappingFor && (
+                            <button 
+                                className="employee_configurator_add_button" 
+                                style={{ backgroundColor: '#f0f0f0', color: '#333', border: '1px solid #ccc' }}
+                                onClick={() => setShowMappingFor("department_type_dropdown")}
+                            >
+                                <p>Manage Behaviors</p>
+                            </button>
+                        )}
+                        {hasWriteAccess && !showMappingFor && (
+                            <button className="employee_configurator_add_button" onClick={() => { setEditItem(null); setIsModalOpen(true); }}>
+                                <div>
+                                    <img src={Add_icon} alt="Add Icon" />
+                                    <p>Add {currentTabLabel}</p>
+                                </div>
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="employee_configurator_tabs" role="tablist">
@@ -147,7 +172,11 @@ const EmployeeTypeDashboard = () => {
                 <hr />
 
                 <div className="employee_configurator_tab_content">
-                    {activeItems.length === 0 ? (
+                    {showMappingFor === "emp_type_dropdown" ? (
+                        <EmployeeTypeMappingTable onBack={() => setShowMappingFor(null)} />
+                    ) : showMappingFor === "department_type_dropdown" ? (
+                        <DepartmentMappingTable onBack={() => setShowMappingFor(null)} />
+                    ) : activeItems.length === 0 ? (
                         <div className="employee_configurator_empty_state">
                             <p>No {currentTabLabel} values configured yet.</p>
                             {hasWriteAccess && (

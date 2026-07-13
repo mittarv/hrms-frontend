@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import Left_Arrow from "../../assets/icons/leftEmployeeArrow.svg";
 import { EmployeeRepositoryFormData } from "../utils/EmployeeRepositoryData";
+import { hasYearOfStudy, hasLevel, getSalaryParamTier, isLevelDisabled } from "../../Common/utils/orgSettingsConfig";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import "../styles/EmployeeOnBoardingForm.scss";
@@ -100,11 +101,13 @@ const EmployeeOnBoardingForm = () => {
 
   // Optimized form field state management
   useEffect(() => {
-    const shouldDisableLevel = (formData?.emp_type !== "FTE" && formData?.emp_type !== "OFTE" && formData?.emp_type !== "PTE" && formData?.emp_type !== "Intern" && formData?.emp_type !== "Extended Intern") || 
-      (formData?.emp_department?.toLowerCase() === "leadership" && formData?.emp_type === "FTE");
+    const shouldDisableLevel = isLevelDisabled(formData?.emp_type, formData?.emp_department, getAllComponentType);
+    
+    // Determine if level field should be completely hidden
+    const shouldShowLevel = hasLevel(formData?.emp_type, getAllComponentType);
 
-    // Determine if year of study field should be shown (only for Intern and Extended Intern)
-    const shouldShowYearOfStudy = formData?.emp_type === "Intern" || formData?.emp_type === "Extended Intern";
+    // Determine if year of study field should be shown (dynamic via orgSettingsConfig)
+    const shouldShowYearOfStudy = hasYearOfStudy(formData?.emp_type, getAllComponentType);
 
     if (shouldDisableLevel) {
       setFormData(prev => ({
@@ -118,7 +121,7 @@ const EmployeeOnBoardingForm = () => {
       }));
     }
 
-    // Clear year of study if employee type is not Intern or Extended Intern
+    // Clear year of study if employee type doesn't support it
     if (!shouldShowYearOfStudy && formData?.emp_year_of_study) {
       setFormData(prev => ({
         ...prev,
@@ -134,14 +137,14 @@ const EmployeeOnBoardingForm = () => {
     setEmpRepoFormFields(prev =>
       prev.map(field => {
         if (field.name === "emp_level") {
-          return { ...field, isDisabled: shouldDisableLevel };
+          return { ...field, isDisabled: shouldDisableLevel, isVisible: shouldShowLevel };
         } else if (field.name === "emp_year_of_study") {
           return { ...field, isVisible: shouldShowYearOfStudy };
         }
         return field;
       })
     );
-  }, [formData?.emp_type, formData?.emp_department, formData?.emp_year_of_study]);
+  }, [formData?.emp_type, formData?.emp_department, formData?.emp_year_of_study, getAllComponentType]);
 
   // Optimized API calls with better dependency management
   useEffect(() => {
@@ -157,21 +160,17 @@ const EmployeeOnBoardingForm = () => {
       yearOfStudy: findMatchingKey(getAllComponentType.year_of_study, formData?.emp_year_of_study)
     };
 
-    const isInternType = formData?.emp_type === "Intern" || formData?.emp_type === "Extended Intern";
-    const isFteOrOfteOrPte = formData?.emp_type === "FTE" || formData?.emp_type === "OFTE" || formData?.emp_type === "PTE";
+    const salaryTier = getSalaryParamTier(formData?.emp_type, getAllComponentType);
 
-    // Check if required fields are present based on employee type
+    // Check if required fields are present based on salary param tier
     let hasRequiredFields = false;
     
-    if (isInternType) {
-      // For Intern/Extended Intern: require all 5 fields
+    if (salaryTier === "full") {
       hasRequiredFields = formData?.emp_type && formData?.emp_latest_location_state && 
         formData?.emp_level && formData?.emp_department && formData?.emp_year_of_study;
-    } else if (isFteOrOfteOrPte) {
-      // For FTE/OFTE/PTE: require type, location, and level
+    } else if (salaryTier === "withLevel") {
       hasRequiredFields = formData?.emp_type && formData?.emp_latest_location_state && formData?.emp_level;
     } else {
-      // For others (Consultant/Contractor): require type and location only
       hasRequiredFields = formData?.emp_type && formData?.emp_latest_location_state;
     }
 
@@ -179,14 +178,11 @@ const EmployeeOnBoardingForm = () => {
     if (hasRequiredFields && matchedKeys.employeeType && matchedKeys.location) {
       let params;
       
-      if (isInternType && matchedKeys.level) {
-        // For Intern/Extended Intern: send all 5 parameters
+      if (salaryTier === "full" && matchedKeys.level) {
         params = [matchedKeys.employeeType, matchedKeys.location, matchedKeys.level, matchedKeys.department, matchedKeys.yearOfStudy];
-      } else if (isFteOrOfteOrPte && matchedKeys.level) {
-        // For FTE/OFTE/PTE: send 3 parameters (department and yearOfStudy will be empty strings)
+      } else if (salaryTier === "withLevel" && matchedKeys.level) {
         params = [matchedKeys.employeeType, matchedKeys.location, matchedKeys.level];
       } else {
-        // For others: send only 2 parameters
         params = [matchedKeys.employeeType, matchedKeys.location];
       }
       
@@ -206,11 +202,7 @@ const EmployeeOnBoardingForm = () => {
     formData?.emp_department,
     formData?.emp_year_of_study,
     dispatch, 
-    getAllComponentType?.emp_type_dropdown,
-    getAllComponentType?.location_dropdown,
-    getAllComponentType?.level_dropdown,
-    getAllComponentType?.department_type_dropdown,
-    getAllComponentType?.year_of_study
+    getAllComponentType
   ]);
 
   useEffect(() => {

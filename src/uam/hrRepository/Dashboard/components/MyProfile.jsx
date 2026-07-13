@@ -4,6 +4,7 @@ import { getCurrentEmployeeDetails, getAllCountriesDetails} from '../../../../ac
 import { useSelector } from 'react-redux';
 import Mittarv_logo from '../../assets/images/mittarv_logo_dark.svg'
 import { useSearchParams } from 'react-router-dom';
+import { isLevelDisabled } from '../../Common/utils/orgSettingsConfig';
 
 const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {
     const dispatch = useDispatch();
@@ -36,8 +37,9 @@ const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {
     }
 
         const currentEmployeeTypeKey = currentEmployeeDetails?.employeeCurrentJobDetails?.empType;
+        const currentEmployeeDepartmentKey = currentEmployeeDetails?.employeeCurrentJobDetails?.empDepartment;
         const currentEmployeeTypeValue = getAllComponentType?.emp_type_dropdown?.[currentEmployeeTypeKey] || currentEmployeeTypeKey;
-        const shouldShowLevel = String(currentEmployeeTypeValue || "").toUpperCase() !== "OFTE";
+        const shouldShowLevel = !isLevelDisabled(currentEmployeeTypeKey, currentEmployeeDepartmentKey, getAllComponentType);
     
   return (
     <>
