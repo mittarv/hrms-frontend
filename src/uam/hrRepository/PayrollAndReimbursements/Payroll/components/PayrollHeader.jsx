@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount, deletePayrollRecords, updatePayslipsStatus } from "../../../../../actions/hrRepositoryAction.js";
-import { Payroll_Status, CURRENCY_SYMBOL, getAllMonthsLocale } from "../utils/PayrollUtils.js";
+import { Payroll_Status, CURRENCY_SYMBOL, STATUS_OPTIONS } from "../utils/PayrollUtils.js";
 import Export_File from "../../../assets/icons/export_file_icon.svg";
 import Finalize_Icon from "../../../assets/icons/finalize_icon.svg";
 import Edit_Icon_Active from "../../../assets/icons/edit_icon_blue.svg";
@@ -14,7 +14,7 @@ import "../styles/PayrollHeader.scss";
 
 const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const dispatch = useDispatch();
-  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, netPayPayrollAmount, myHrmsAccess } = useSelector(
+  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, netPayPayrollAmount, myHrmsAccess, hasGeneratedRecords } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);
@@ -52,35 +52,6 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const currentDate = new Date();
   const monthName = currentDate.toLocaleDateString("en-US", { month: "long" });
   const year = currentDate.getFullYear();
-
-  const normalizeMonthName = (monthValue) => {
-    if (monthValue === null || monthValue === undefined || monthValue === "") {
-      return "";
-    }
-
-    if (typeof monthValue === 'number') {
-      return getAllMonthsLocale()[monthValue - 1] || "";
-    }
-
-    const numericMonth = Number(monthValue);
-    if (!Number.isNaN(numericMonth) && numericMonth >= 1 && numericMonth <= 12) {
-      return getAllMonthsLocale()[numericMonth - 1] || "";
-    }
-
-    return String(monthValue).trim();
-  };
-
-  const firstLoadedPayrollDate = payrollData?.[0]?.payrollStartDate;
-  const loadedPayrollDate = firstLoadedPayrollDate ? new Date(firstLoadedPayrollDate) : currentDate;
-  const loadedPayrollMonthName = loadedPayrollDate.toLocaleDateString("en-US", { month: "long" });
-  const loadedPayrollYear = loadedPayrollDate.getFullYear();
-
-  // Determine if current view is the current month/year
-  const resolvedSelectedMonth = selectedMonth != null ? normalizeMonthName(selectedMonth) : loadedPayrollMonthName;
-  const resolvedSelectedYear = selectedYear != null ? Number(selectedYear) : loadedPayrollYear;
-  const isCurrentMonthView =
-    String(resolvedSelectedMonth).toLowerCase() === String(monthName).toLowerCase() &&
-    Number(resolvedSelectedYear) === Number(year);
 
   // Handle finalize payroll
   const handleFinalizePayroll = async () => {
@@ -343,6 +314,151 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
     }
   };
 
+  const handleSkipPayroll = async () => {
+    if (!canEdit) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to skip payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    if (!selectedRows || selectedRows.size === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to skip payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    const selectedEmployees = payrollData.filter((emp) =>
+      selectedRows.has(emp.payslipId || emp.empUuid)
+    );
+
+    if (selectedEmployees.length === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to skip payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    setModalState({
+      isOpen: true,
+      type: 'confirm',
+      heading: 'Skip Payroll',
+      message: `Are you sure you want to skip payroll for ${selectedEmployees.length} employee(s)?`,
+      confirmText: 'Yes, Skip',
+      cancelText: 'Cancel',
+      onConfirm: () => proceedWithSkip(selectedEmployees)
+    });
+  };
+
+  const proceedWithSkip = async (selectedEmployees) => {
+    setModalState({ ...modalState, isOpen: false });
+    setIsProcessing(true);
+    try {
+      const selectedPayslipIds = selectedEmployees.map((emp) => emp.payslipId).filter(Boolean);
+      const getSalaryComponentsDataParams = {
+          currentPage,
+          pageSize,
+          selectedMonth,
+          selectedYear,
+          searchQuery
+      };
+      await dispatch(updatePayslipsStatus(selectedPayslipIds, STATUS_OPTIONS.SKIPPED, getSalaryComponentsDataParams));
+    } catch (error) {
+      console.error('Error skipping payroll:', error);
+    } finally {
+      setIsProcessing(false);
+      if (resetSelections) {
+        resetSelections();
+      }
+    }
+  };
+
+  const handleRestorePayroll = async () => {
+    if (!canEdit) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Permission Denied',
+        message: 'You don\'t have permission to restore payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    if (!selectedRows || selectedRows.size === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to restore payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    const selectedEmployees = payrollData.filter((emp) =>
+      selectedRows.has(emp.payslipId || emp.empUuid)
+    );
+
+    if (selectedEmployees.length === 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'No Selection',
+        message: 'Please select at least one employee to restore payroll',
+        onConfirm: null
+      });
+      return;
+    }
+
+    setModalState({
+      isOpen: true,
+      type: 'confirm',
+      heading: 'Restore Payroll',
+      message: `Are you sure you want to restore payroll for ${selectedEmployees.length} employee(s)?`,
+      confirmText: 'Yes, Restore',
+      cancelText: 'Cancel',
+      onConfirm: () => proceedWithRestore(selectedEmployees)
+    });
+  };
+
+  const proceedWithRestore = async (selectedEmployees) => {
+    setModalState({ ...modalState, isOpen: false });
+    setIsProcessing(true);
+    try {
+      const selectedPayslipIds = selectedEmployees.map((emp) => emp.payslipId).filter(Boolean);
+      const getSalaryComponentsDataParams = {
+          currentPage, 
+          pageSize,
+          selectedMonth,
+          selectedYear,
+          searchQuery
+      };
+      await dispatch(updatePayslipsStatus(selectedPayslipIds, STATUS_OPTIONS.PENDING, getSalaryComponentsDataParams));
+    } catch (error) {
+      console.error("Error restoring payroll:", error);
+    } finally {
+      setIsProcessing(false);
+      // Clear selection after restore attempt
+      if (resetSelections) {
+        resetSelections();
+      }
+    }
+  };
+
   const handleGeneratePayroll = () => {
     if (!canGenerate) {
       setModalState({
@@ -413,70 +529,12 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
 
   const hasSelectedRows = selectedRows && selectedRows.size > 0;
 
-  const getSalaryComponentsDataParams = {
-    currentPage,
-    pageSize,
-    selectedMonth,
-    selectedYear,
-    searchQuery
-  };
+  const selectedEmployeesList = payrollData?.filter((emp) =>
+    selectedRows?.has(emp.payslipId || emp.empUuid)
+  ) || [];
 
-  const handleSkipPayroll = async () => {
-    if (!hasSelectedRows) return;
-    
-    // Check if any selected employee is not finalized
-    const selectedEmployees = payrollData.filter((emp) =>
-      selectedRows.has(emp.payslipId || emp.empUuid)
-    );
-    const nonFinalizedCount = selectedEmployees.filter(
-      (emp) => emp.status !== Payroll_Status.PAYROLL_FINALIZED
-    ).length;
-
-    if (nonFinalizedCount > 0) {
-      setModalState({
-        isOpen: true,
-        type: 'alert',
-        heading: 'Cannot Skip',
-        message: 'No payslips with PAYROLL_FINALIZED status found. Only finalized payrolls can be skipped.',
-        onConfirm: null
-      });
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const selectedIds = Array.from(selectedRows);
-      await dispatch(updatePayslipsStatus(selectedIds, "skipped", getSalaryComponentsDataParams));
-      if (resetSelections) resetSelections();
-    } catch (error) {
-      console.error("Error skipping payroll:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleRestorePayroll = async () => {
-    if (!hasSelectedRows) return;
-    setIsProcessing(true);
-    try {
-      const selectedIds = Array.from(selectedRows);
-      // Restore means putting them back to PENDING or PAYROLL_FINALIZED
-      // As requested previously, we will set it to PENDING when 'Added' back
-      await dispatch(updatePayslipsStatus(selectedIds, Payroll_Status.PENDING, getSalaryComponentsDataParams));
-      if (resetSelections) resetSelections();
-    } catch (error) {
-      console.error("Error restoring payroll:", error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const selectedEmployees = payrollData.filter((emp) =>
-    selectedRows.has(emp.payslipId || emp.empUuid)
-  );
-  
-  const areAllSelectedSkipped = hasSelectedRows && selectedEmployees.every(emp => emp.status === "skipped");
-  const hasPendingSelected = hasSelectedRows && selectedEmployees.some(emp => emp.status === Payroll_Status.PENDING);
+  const areAllSelectedSkipped = hasSelectedRows && selectedEmployeesList.every(emp => emp.status === STATUS_OPTIONS.SKIPPED || emp.status?.toLowerCase() === 'skipped');
+  const hasPendingSelected = hasSelectedRows && selectedEmployeesList.some(emp => emp.status === Payroll_Status.PENDING || emp.status?.toLowerCase() === 'pending');
 
   return (
     <>
