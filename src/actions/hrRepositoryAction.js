@@ -2798,6 +2798,10 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
     });
 
     if (response.data.success) {
+      const hasGeneratedRecords = response.data.data.some(
+        p => p.status === 'payroll_generated' || p.status === 'Payroll Generated'
+      );
+
       dispatch({
         type: "GET_ALL_EMPLOYEE_PAYROLL_SUCCESS",
         payload: {
@@ -2805,7 +2809,8 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
           notFetchedEmployees: response.data.notFetchedEmployees || [],
           pagination: response.data.pagination,
           isAllPayrollFinalized: response.data.isAllPayrollFinalized,
-          isAllPayrollGenerated: response.data.isAllPayrollGenerated
+          isAllPayrollGenerated: response.data.isAllPayrollGenerated,
+          hasGeneratedRecords
         },
       });
     } else {
@@ -2977,6 +2982,77 @@ export const finalizePayroll = (payslipIds, getSalaryComponentsDataParams) => as
       },
     });
     return { success: false, message: await getErrorMessage(error, "Failed to finalize payroll") };
+  }
+}
+
+// Update status of payslips
+export const updatePayslipsStatus = (payslipIds, status, getSalaryComponentsDataParams) => async (dispatch) => {
+  const token = localStorage.getItem("token");
+  const {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  } = getSalaryComponentsDataParams;
+  dispatch({ type: "MARK_PAYSLIPS_AS_PENDING_REQUEST" }); // Reusing loading state
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/updatePayslipStatus`,
+      {
+        payslipIds,
+        status
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+      }
+    );
+
+    if (response.data.success) {
+      dispatch({
+        type: "MARK_PAYSLIPS_AS_PENDING_SUCCESS",
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message || `Payslips successfully marked as ${status}`,
+          severity: "success",
+        },
+      });
+      // Refresh the table data
+      dispatch(getAllEmployeePayrollDetails(currentPage, pageSize, selectedMonth, selectedYear, searchQuery));
+      return { success: true };
+    } else {
+      dispatch({
+        type: "MARK_PAYSLIPS_AS_PENDING_FAILURE",
+        payload: response.data.message,
+      });
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: response.data.message || `Failed to mark payslips as ${status}`,
+          severity: "error",
+        },
+      });
+      return { success: false, message: response.data.message };
+    }
+  } catch (error) {
+    const errorMsg = await getErrorMessage(error, `Failed to mark payslips as ${status}`);
+    dispatch({
+      type: "MARK_PAYSLIPS_AS_PENDING_FAILURE",
+      payload: errorMsg,
+    });
+    dispatch({
+      type: "SET_NEW_SNACKBAR_MESSAGE",
+      payload: {
+        message: errorMsg,
+        severity: "error",
+      },
+    });
+    return { success: false, message: errorMsg };
   }
 }
 

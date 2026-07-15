@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount, deletePayrollRecords } from "../../../../../actions/hrRepositoryAction.js";
+import { finalizePayroll, generatePayroll, markFinalizedPayslipsAsPending, exportPayrollAsCsv, getNetPayPayrollAmount, deletePayrollRecords, updatePayslipsStatus } from "../../../../../actions/hrRepositoryAction.js";
 import { Payroll_Status, CURRENCY_SYMBOL, getAllMonthsLocale } from "../utils/PayrollUtils.js";
 import Export_File from "../../../assets/icons/export_file_icon.svg";
 import Finalize_Icon from "../../../assets/icons/finalize_icon.svg";
 import Edit_Icon_Active from "../../../assets/icons/edit_icon_blue.svg";
 import Edit_Icon_Disabled from "../../../assets/icons/edit_icon_grey.svg";
 import Delete_Icon_Active from "../../../assets/icons/delete_red_icon.svg";
+import Skip_Icon from "../../../assets/icons/suspend_icon.svg";
+import Restore_Icon from "../../../assets/icons/restore_icon.svg";
 import ConfirmationPopup from "../../../Common/components/ConfirmationPopup.jsx";
 import "../styles/PayrollHeader.scss";
 
@@ -411,6 +413,71 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
 
   const hasSelectedRows = selectedRows && selectedRows.size > 0;
 
+  const getSalaryComponentsDataParams = {
+    currentPage,
+    pageSize,
+    selectedMonth,
+    selectedYear,
+    searchQuery
+  };
+
+  const handleSkipPayroll = async () => {
+    if (!hasSelectedRows) return;
+    
+    // Check if any selected employee is not finalized
+    const selectedEmployees = payrollData.filter((emp) =>
+      selectedRows.has(emp.payslipId || emp.empUuid)
+    );
+    const nonFinalizedCount = selectedEmployees.filter(
+      (emp) => emp.status !== Payroll_Status.PAYROLL_FINALIZED
+    ).length;
+
+    if (nonFinalizedCount > 0) {
+      setModalState({
+        isOpen: true,
+        type: 'alert',
+        heading: 'Cannot Skip',
+        message: 'No payslips with PAYROLL_FINALIZED status found. Only finalized payrolls can be skipped.',
+        onConfirm: null
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const selectedIds = Array.from(selectedRows);
+      await dispatch(updatePayslipsStatus(selectedIds, "skipped", getSalaryComponentsDataParams));
+      if (resetSelections) resetSelections();
+    } catch (error) {
+      console.error("Error skipping payroll:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRestorePayroll = async () => {
+    if (!hasSelectedRows) return;
+    setIsProcessing(true);
+    try {
+      const selectedIds = Array.from(selectedRows);
+      // Restore means putting them back to PENDING or PAYROLL_FINALIZED
+      // As requested previously, we will set it to PENDING when 'Added' back
+      await dispatch(updatePayslipsStatus(selectedIds, Payroll_Status.PENDING, getSalaryComponentsDataParams));
+      if (resetSelections) resetSelections();
+    } catch (error) {
+      console.error("Error restoring payroll:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const selectedEmployees = payrollData.filter((emp) =>
+    selectedRows.has(emp.payslipId || emp.empUuid)
+  );
+  
+  const areAllSelectedSkipped = hasSelectedRows && selectedEmployees.every(emp => emp.status === "skipped");
+  const hasPendingSelected = hasSelectedRows && selectedEmployees.some(emp => emp.status === Payroll_Status.PENDING);
+
   return (
     <>
       <div className="payroll_header_main_container">
@@ -440,7 +507,7 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
             <span className="download_payslip_button_text">Export</span>
           </button>
           <div className="payroll_button_container">
-            {isCurrentMonthView && (
+            {!hasGeneratedRecords && (
               <button
                 className={`delete_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit ? "disabled" : ""}`}
                 onClick={handleDeleteButton}
@@ -452,6 +519,39 @@ const PayrollHeader = ({ selectedRows, resetSelections }) => {
                   className="delete_Payroll_button_icon"
                 />
                 <span className="delete_Payroll_button_text">Delete</span>
+              </button>
+            )}
+            {!hasGeneratedRecords && areAllSelectedSkipped && (
+              <button
+                className={`skip_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit ? "disabled" : ""}`}
+                onClick={handleRestorePayroll}
+                disabled={!hasSelectedRows || isProcessing || !canEdit}
+                style={(!hasSelectedRows || isProcessing || !canEdit) ? {} : { color: '#2C8E7B', borderColor: '#2C8E7B' }}
+              >
+                <img
+                  src={Restore_Icon}
+                  alt="restore icon"
+                  className="skip_Payroll_button_icon"
+                  style={{ width: 14 }}
+                />
+                <span className="skip_Payroll_button_text">Add</span>
+              </button>
+            )}
+            {!hasGeneratedRecords && !areAllSelectedSkipped && (
+              <button
+                className={`skip_Payroll_button ${!hasSelectedRows || isProcessing || !canEdit || hasPendingSelected ? "disabled" : ""}`}
+                title={hasPendingSelected ? "Cannot skip pending employees. Please finalize them first." : ""}
+                onClick={handleSkipPayroll}
+                disabled={!hasSelectedRows || isProcessing || !canEdit || hasPendingSelected}
+                style={(!hasSelectedRows || isProcessing || !canEdit || hasPendingSelected) ? {} : { color: '#000000', borderColor: '#000000' }}
+              >
+                <img
+                  src={Skip_Icon}
+                  alt="skip icon"
+                  className="skip_Payroll_button_icon"
+                  style={{ filter: (!hasSelectedRows || isProcessing || !canEdit || hasPendingSelected) ? 'none' : 'brightness(0) saturate(100%)' }}
+                />
+                <span className="skip_Payroll_button_text">Skip</span>
               </button>
             )}
             <button

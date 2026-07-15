@@ -35,7 +35,8 @@ const PayrollTable = ({
     payrollLoading, 
     payrollFilters,
     payrollPagination,
-    myHrmsAccess
+    myHrmsAccess,
+    hasGeneratedRecords
   } = useSelector((state) => state.hrRepositoryReducer);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
@@ -59,40 +60,8 @@ const PayrollTable = ({
   } = payrollFilters;
 
   const { currentPage } = payrollPagination;
-  const currentDate = new Date();
-  const currentMonthName = getAllMonthsLocale()[currentDate.getMonth()];
-  const normalizeMonthName = (monthValue) => {
-    if (monthValue === null || monthValue === undefined || monthValue === "") {
-      return "";
-    }
 
-    if (typeof monthValue === "number") {
-      return getAllMonthsLocale()[monthValue - 1] || "";
-    }
 
-    const numericMonth = Number(monthValue);
-    if (!Number.isNaN(numericMonth) && numericMonth >= 1 && numericMonth <= 12) {
-      return getAllMonthsLocale()[numericMonth - 1] || "";
-    }
-
-    return String(monthValue).trim();
-  };
-
-  const firstLoadedPayrollDate = payrollData?.[0]?.payrollStartDate;
-  const loadedPayrollDate = firstLoadedPayrollDate ? new Date(firstLoadedPayrollDate) : currentDate;
-  const loadedPayrollMonthName = loadedPayrollDate.toLocaleDateString("en-US", { month: "long" });
-  const loadedPayrollYear = loadedPayrollDate.getFullYear();
-
-  const resolvedViewMonthName = selectedMonth != null
-    ? normalizeMonthName(selectedMonth)
-    : loadedPayrollMonthName;
-  const resolvedViewYear = selectedYear != null
-    ? Number(selectedYear)
-    : loadedPayrollYear;
-
-  const isCurrentMonthView =
-    String(resolvedViewMonthName).toLowerCase() === currentMonthName.toLowerCase() &&
-    Number(resolvedViewYear) === currentDate.getFullYear();
 
   const sortOption = selectedSortOption;
   const statusFilter = selectedStatusFilter;
@@ -569,7 +538,7 @@ const PayrollTable = ({
           <table className="payroll_table">
             <thead>
               <tr>
-                {payrollTableColumns.filter((column) => column.key !== "manage" || isCurrentMonthView).map((column) => (
+                {payrollTableColumns.filter((column) => column.key !== "manage" || !hasGeneratedRecords).map((column) => (
                   <th key={column.key} className={column.className}>
                     {column.key === "checkbox" ? (
                       <input
@@ -592,7 +561,7 @@ const PayrollTable = ({
                   key={employee.id}
                   className={isRowSelected(employee.id) ? "selected-row" : ""}
                 >
-                  {payrollTableColumns.filter((column) => column.key !== "manage" || isCurrentMonthView).map((column) => (
+                  {payrollTableColumns.filter((column) => column.key !== "manage" || !hasGeneratedRecords).map((column) => (
                     <td key={column.key} className={column.className}>
                       {renderCell(employee, column)}
                     </td>

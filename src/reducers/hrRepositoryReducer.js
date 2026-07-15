@@ -86,6 +86,7 @@ const initialState = {
   },
   isAllPayrollFinalized: false,
   isAllPayrollGenerated: false,
+  hasGeneratedRecords: false,
   payslipFilter: {
     selectedPayslipYear: null,
   },
@@ -947,6 +948,7 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.payrollPagination = action.payload.pagination;
         state.isAllPayrollFinalized = action.payload.isAllPayrollFinalized;
         state.isAllPayrollGenerated = action.payload.isAllPayrollGenerated;
+        state.hasGeneratedRecords = action.payload.hasGeneratedRecords;
         state.payrollLoading = false;
         state.payrollError = null;
       })
