@@ -23,20 +23,24 @@ import { downloadPayslipPdf } from "../../../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
 import "../styles/PayrollTable.scss";
 import Delete_icon from "../../../assets/icons/delete_red_icon.svg";
+import Skip_Icon from "../../../assets/icons/suspend_icon.svg";
+import Restore_Icon from "../../../assets/icons/restore_icon.svg";
 import ConfirmationPopup from "../../../Common/components/ConfirmationPopup.jsx";
 
 const PayrollTable = ({ 
   onSelectionChange,
   resetCounter,
-  onDeleteRow
+  onDeleteRow,
+  onSkipRow,
+  onRestoreRow
 }) => {
   const { 
     payrollData, 
     payrollLoading, 
     payrollFilters,
     payrollPagination,
-    myHrmsAccess,
-    hasGeneratedRecords
+    hasGeneratedRecords,
+    myHrmsAccess
   } = useSelector((state) => state.hrRepositoryReducer);
   const { allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
@@ -60,8 +64,40 @@ const PayrollTable = ({
   } = payrollFilters;
 
   const { currentPage } = payrollPagination;
+  // const currentDate = new Date();
+  // const currentMonthName = getAllMonthsLocale()[currentDate.getMonth()];
+  // const normalizeMonthName = (monthValue) => {
+  //   if (monthValue === null || monthValue === undefined || monthValue === "") {
+  //     return "";
+  //   }
 
+  //   if (typeof monthValue === "number") {
+  //     return getAllMonthsLocale()[monthValue - 1] || "";
+  //   }
 
+  //   const numericMonth = Number(monthValue);
+  //   if (!Number.isNaN(numericMonth) && numericMonth >= 1 && numericMonth <= 12) {
+  //     return getAllMonthsLocale()[numericMonth - 1] || "";
+  //   }
+
+  //   return String(monthValue).trim();
+  // };
+
+  // const firstLoadedPayrollDate = payrollData?.[0]?.payrollStartDate;
+  // const loadedPayrollDate = firstLoadedPayrollDate ? new Date(firstLoadedPayrollDate) : currentDate;
+  // const loadedPayrollMonthName = loadedPayrollDate.toLocaleDateString("en-US", { month: "long" });
+  // const loadedPayrollYear = loadedPayrollDate.getFullYear();
+
+  // const resolvedViewMonthName = selectedMonth != null
+  //   ? normalizeMonthName(selectedMonth)
+  //   : loadedPayrollMonthName;
+  // const resolvedViewYear = selectedYear != null
+  //   ? Number(selectedYear)
+  //   : loadedPayrollYear;
+
+  // const isCurrentMonthView =
+  //   String(resolvedViewMonthName).toLowerCase() === currentMonthName.toLowerCase() &&
+  //   Number(resolvedViewYear) === currentDate.getFullYear();
 
   const sortOption = selectedSortOption;
   const statusFilter = selectedStatusFilter;
@@ -100,6 +136,34 @@ const PayrollTable = ({
     } else {
       // No delete handler provided — just log for now
       console.log('Confirmed delete for', employee);
+    }
+  };
+
+  const handleSkipPayroll = async (employee) => {
+    // Close modal first
+    setModalState(prev => ({ ...prev, isOpen: false }));
+    if (typeof onSkipRow === 'function') {
+      try {
+        await onSkipRow(employee);
+      } catch (err) {
+        console.error('Error skipping payroll row:', err);
+      }
+    } else {
+      console.log('Confirmed skip for', employee);
+    }
+  };
+
+  const handleRestorePayroll = async (employee) => {
+    // Close modal first
+    setModalState(prev => ({ ...prev, isOpen: false }));
+    if (typeof onRestoreRow === 'function') {
+      try {
+        await onRestoreRow(employee);
+      } catch (err) {
+        console.error('Error restoring payroll row:', err);
+      }
+    } else {
+      console.log('Confirmed restore for', employee);
     }
   };
 
@@ -195,7 +259,8 @@ const PayrollTable = ({
         netPay: `${CURRENCY_SYMBOL} ${netPay.toLocaleString('en-IN')}`,
         status: employee.status === Payroll_Status.PENDING ? PAYROLL_STATUS_LABELS.PENDING : 
                 employee.status === Payroll_Status.PAYROLL_FINALIZED ? PAYROLL_STATUS_LABELS.PAYROLL_FINALIZED : 
-                employee.status === Payroll_Status.PAYROLL_GENERATED ? PAYROLL_STATUS_LABELS.PAYROLL_GENERATED : PAYROLL_STATUS_LABELS.PENDING,
+                employee.status === Payroll_Status.PAYROLL_GENERATED ? PAYROLL_STATUS_LABELS.PAYROLL_GENERATED : 
+                employee.status === Payroll_Status.SKIPPED ? PAYROLL_STATUS_LABELS.SKIPPED : PAYROLL_STATUS_LABELS.PENDING,
         // Keep original data for editing
         defaultAdditions: employee.defaultAdditions,
         defaultDeductions: employee.defaultDeductions,
@@ -385,6 +450,8 @@ const PayrollTable = ({
         return "status-finalized";
       case "payroll generated":
         return "status-generated";
+      case "skipped":
+        return "status-skipped";
       default:
         return "status-pending";
     }
@@ -489,10 +556,55 @@ const PayrollTable = ({
           </div>
         );
       }
-      case "manage":
-        return canDelete ? (
+      case "manage": {
+        const showDelete = canDelete && !hasGeneratedRecords;
+        const showSkip = employee.status === PAYROLL_STATUS_LABELS.PAYROLL_FINALIZED && !hasGeneratedRecords;
+        const showRestore = employee.status === PAYROLL_STATUS_LABELS.SKIPPED && !hasGeneratedRecords;
+
+        return showDelete || showSkip || showRestore ? (
           <div className="roles_actions_container">
-            {canDelete && (
+           
+            {showSkip && (
+              <button
+                type="button"
+                className="role_action_button delete_button"
+                style={{ color: '#8F92A3', borderBottomColor: '#8F92A3' }}
+                onClick={() => {
+                  setModalState({
+                    ...modalState,
+                    isOpen: true,
+                    type: 'confirm',
+                    heading: 'Skip Payroll',
+                    message: `Are you sure you want to skip payroll for ${employee.name}?`,
+                    onConfirm: () => handleSkipPayroll(employee)
+                  });
+                }}
+              >
+                <img src={Skip_Icon} alt="skip" style={{ filter: 'grayscale(100%)' }} />
+                <span style={{ marginLeft: 0 }}>Skip</span>
+              </button>
+            )}
+            {showRestore && (
+              <button
+                type="button"
+                className="role_action_button"
+                style={{ color: '#2C8E7B', borderBottom: '1px solid #2C8E7B' }}
+                onClick={() => {
+                  setModalState({
+                    ...modalState,
+                    isOpen: true,
+                    type: 'confirm',
+                    heading: 'Restore Payroll',
+                    message: `Are you sure you want to restore payroll for ${employee.name}?`,
+                    onConfirm: () => handleRestorePayroll(employee)
+                  });
+                }}
+              >
+                <img src={Restore_Icon} alt="restore" style={{ width: 14 }} />
+                <span style={{ marginLeft: 0 }}>Add</span>
+              </button>
+            )}
+             {showDelete && (
               <button
                 type="button"
                 className="role_action_button delete_button"
@@ -509,13 +621,15 @@ const PayrollTable = ({
                 }}
               >
                 <img src={Delete_icon} alt="Delete" />
-                <span>Delete</span>
+                <span style={{ marginLeft: 0 }}>Delete</span>
               </button>
             )}
           </div>
         ) : (
           EMPTY_VALUE
         );
+      }
+ 
       default:
         return renderEditableCell(value, column, employee);
     }
