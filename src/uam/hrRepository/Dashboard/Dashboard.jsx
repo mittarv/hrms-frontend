@@ -21,10 +21,12 @@ import {
     checkOutstandingCheckout,
     updateEmployeeOutstandingCheckout,
     getCurrentEmployeeNotifications,
+    getOrganizationDetails,
 } from "../../../actions/hrRepositoryAction";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Snackbar from "../Common/components/Snackbar";
+import SetupWarningBanner from "../Common/components/SetupWarningBanner";
 import check_in_icon from "../assets/icons/check_in_icon.svg";
 import check_out_icon from "../assets/icons/check_out_icon.svg";
 import check_in_disable_icon from "../assets/icons/check_in_disabled_icon.svg";
@@ -32,6 +34,7 @@ import check_out_disable_icon from "../assets/icons/check_out_disabled_icon.svg"
 import CheckoutPopup from "../Common/components/CheckoutPopup";
 import { useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../Common/components/LoadingSpinner";
+import AccessRestrictedPopup from "./components/AccessRestrictedPopup";
 import { hrToolHomePageData } from "../constant/data";
 
 const Dashboard = () => {
@@ -49,11 +52,16 @@ const Dashboard = () => {
         allEmployees,
         myUpdates,
         organizationUpdates,
+        organizationDetails,
     } = useSelector((state) => state.hrRepositoryReducer);
     const [searchParams, setSearchParams] = useSearchParams();
     const viewProfilePage = searchParams.get('showEmployeeDetails') === 'true';
     const employeeUuidParam = searchParams.get('employeeUuid');
-    const employeeUuid = employeeUuidParam || user.employeeUuid;
+    const targetEmployeeUuid = employeeUuidParam || user?.employeeUuid;
+    
+    const fetchedUuidRef = useRef(null);
+    const fetchedAttendanceUuidRef = useRef(null);
+
     // On Dashboard, only allow viewing own profile
     const isOwnProfile = !employeeUuidParam || employeeUuidParam === user?.employeeUuid;
     const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
@@ -64,6 +72,20 @@ const Dashboard = () => {
     const dispatch = useDispatch();
     const [checkOutPopup, setCheckOutPopup] = useState(false);
 
+    const isSuperAdmin = user?.userType === 900;
+    const [orgDetails, setOrgDetails] = useState(null);
+
+    const activeOrgData = orgDetails || organizationDetails;
+
+    useEffect(() => {
+        dispatch(getOrganizationDetails()).then(data => {
+            if (data && !data.inactive) setOrgDetails(data);
+        });
+    }, [dispatch]);
+
+    // If not super admin and no employee profile found, show "not onboarded" popup
+    const showNotOnboardedPopup = !isSuperAdmin && !targetEmployeeUuid;
+
     useEffect(() => {
         dispatch({
             type: "SET_SELECTED_TOOL_NAME",
@@ -71,14 +93,14 @@ const Dashboard = () => {
         });
     }, [dispatch]);
 
-    // Handle URL parameter updates
+    // Automatically sync employeeUuid into URL search parameters if missing
     useEffect(() => {
-        const params = new URLSearchParams(searchParams);
-        if (params.get('employeeUuid') !== employeeUuid) {
-            params.set('employeeUuid', employeeUuid);
-            setSearchParams(params);
+        if (user?.employeeUuid && !employeeUuidParam) {
+            const params = new URLSearchParams(searchParams);
+            params.set('employeeUuid', user.employeeUuid);
+            setSearchParams(params, { replace: true });
         }
-    }, [employeeUuid, setSearchParams, searchParams]);
+    }, [user?.employeeUuid, employeeUuidParam, setSearchParams, searchParams]);
     
     // Single useEffect for all data fetching to prevent multiple loading states
     useEffect(() => {
@@ -95,9 +117,18 @@ const Dashboard = () => {
                 dispatch(getAllBirthdayAndAnniversary());
             }
 
-            // Current employee details - only fetch if not already loaded
-            if (!currentEmployeeDetails || currentEmployeeDetails.employeeUuid !== user.employeeUuid) {
-                dispatch(getCurrentEmployeeDetails(user.employeeUuid));
+            // Current employee details - fetch for target employee (guarded by ref to prevent infinite retry loops)
+            const loadedEmpUuid = currentEmployeeDetails?.employeeBasicDetails?.empUuid 
+                || currentEmployeeDetails?.employeeContactDetails?.empUuid;
+
+            if (
+                targetEmployeeUuid && 
+                !currentEmployeeDetailsLoading && 
+                loadedEmpUuid !== targetEmployeeUuid && 
+                fetchedUuidRef.current !== targetEmployeeUuid
+            ) {
+                fetchedUuidRef.current = targetEmployeeUuid;
+                dispatch(getCurrentEmployeeDetails(targetEmployeeUuid));
             }
 
             // Managers data
@@ -113,30 +144,32 @@ const Dashboard = () => {
             // Countries data - only fetch if not already loaded
             dispatch(getAllCountriesDetails());
 
-            // Check-in/Check-out status
-            if (Array.isArray(checkInCheckOutStatus) && checkInCheckOutStatus.length === 0) {
-                dispatch(getCheckInCheckOutStatus(user.employeeUuid));
-            }
+            // Attendance and notification calls (guarded by ref per target UUID)
+            if (targetEmployeeUuid && fetchedAttendanceUuidRef.current !== targetEmployeeUuid) {
+                fetchedAttendanceUuidRef.current = targetEmployeeUuid;
 
-            // Outstanding checkout
-            if (Array.isArray(outStandingCheckOut) && outStandingCheckOut.length === 0) {
-                dispatch(checkOutstandingCheckout(user.employeeUuid));
+                if (Array.isArray(checkInCheckOutStatus) && checkInCheckOutStatus.length === 0) {
+                    dispatch(getCheckInCheckOutStatus(targetEmployeeUuid));
+                }
+
+                if (Array.isArray(outStandingCheckOut) && outStandingCheckOut.length === 0) {
+                    dispatch(checkOutstandingCheckout(targetEmployeeUuid));
+                }
+
+                if (!myUpdates?.length || !organizationUpdates?.length) {
+                    dispatch(getCurrentEmployeeNotifications(targetEmployeeUuid));
+                }
             }
 
             // Component types
             if (Array.isArray(getAllComponentType) && getAllComponentType.length === 0) {
                 dispatch(getAllComponentTypes());
             }
-
-            // Notifications
-            if (!myUpdates?.length || !organizationUpdates?.length) {
-                dispatch(getCurrentEmployeeNotifications(user.employeeUuid));
-            }
         };
 
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, user.employeeUuid]);
+    }, [dispatch, targetEmployeeUuid]);
 
     useEffect(() => {
         if (outStandingCheckOut && outStandingCheckOut.isShowCheckoutPopup) {
@@ -145,14 +178,14 @@ const Dashboard = () => {
     }, [outStandingCheckOut]);
 
     const handleCheckIn = () => {
-        if (user?.employeeUuid) {
-            dispatch(employeeCheckIn(user.employeeUuid))
+        if (targetEmployeeUuid) {
+            dispatch(employeeCheckIn(targetEmployeeUuid))
         }
     }
 
     const handleCheckOut = () => {
-        if (user?.employeeUuid) {
-            dispatch(employeeCheckOut(user.employeeUuid))
+        if (targetEmployeeUuid) {
+            dispatch(employeeCheckOut(targetEmployeeUuid))
         }
     }
 
@@ -161,7 +194,7 @@ const Dashboard = () => {
             attendanceDate: outStandingCheckOut?.outstandingDate,
             checkOutTime,
         }
-        dispatch(updateEmployeeOutstandingCheckout(outStandingCheckOut.attendanceId, updatedData, user.employeeUuid));
+        dispatch(updateEmployeeOutstandingCheckout(outStandingCheckOut.attendanceId, updatedData, targetEmployeeUuid));
         setCheckOutPopup(false);   
     }
     
@@ -183,6 +216,8 @@ const Dashboard = () => {
             <LoadingSpinner message="Loading dashboard..." height="40vh" />
         ) : (
         <div className="dashboard_page">
+            <SetupWarningBanner orgData={activeOrgData} />
+
             <div className="dashboard_top_section">
                 <div className="main_table_header_div_dashboard" id="top">
                     <div className="inner-div-left-section_dashboard">
@@ -216,7 +251,6 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div className="main-body-container">
@@ -258,6 +292,7 @@ const Dashboard = () => {
         isLoading={loading}
         handleOustandingCheckout={handleOustandingCheckout}
     />
+    <AccessRestrictedPopup isOpen={showNotOnboardedPopup} />
 </>)
 }
 

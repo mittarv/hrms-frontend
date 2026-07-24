@@ -426,6 +426,7 @@ const EmployeeOnBoardingForm = () => {
             disabled={field?.isDisabled}
             onCreateNew={createNewLevel}
             searchable={true}
+            showEmptyStateButton={true}
           />
         );
       }

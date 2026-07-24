@@ -38,7 +38,7 @@ const EmployeeRepo = () => {
   const { myHrmsAccess, myHrmsAccessLoaded } = useSelector((state) => state.hrRepositoryReducer);
 
   const userAccessLevel = allToolsAccessDetails?.[selectedToolName];
-  const hasAccess = userAccessLevel >= 900;
+  const hasAccess = userAccessLevel >= 900 || user?.userType === 900;
   
   // Check for Active Employee permissions (NOT including EmployeeDirectoryAdmin_View)
   const hasAccessToActiveEmployees = myHrmsAccess?.permissions?.some(perm => 

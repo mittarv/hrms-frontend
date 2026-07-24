@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Dropdown_Arrow from '../../assets/icons/dropdow_arrow.svg';
 import Tick_Icon from '../../assets/icons/tick_icon.svg';
 import '../styles/CustomDropdown.scss';
@@ -17,7 +18,10 @@ const CustomDropdown = ({
   allowClearSelection = false,
   clearOptionLabel = "None",
   deselectOnReselect = false,
+  emptyStateNavigateTo = "/employee-type-configurator",
+  showEmptyStateButton = false,
 }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [dropdownPosition, setDropdownPosition] = useState('below');
@@ -31,11 +35,16 @@ const CustomDropdown = ({
   // Filter options based on search term
   const filteredOptions = searchable
     ? options.filter((option) =>
-        String(option?.value || "").toLowerCase().includes(searchTerm.toLowerCase())
+        String(option?.label || option?.value || "").toLowerCase().includes(searchTerm.toLowerCase())
       )
     : options;
 
   const resolvedValue = String(value ?? "");
+  const isUnknownValue = resolvedValue.toLowerCase() === "unknown";
+  const selectedOption = options.find(opt => String(opt?.value) === resolvedValue);
+  
+  // If no option is selected and the value is "Unknown", fall back to empty string so placeholder is used
+  const displayLabel = selectedOption?.label || selectedOption?.value || (isUnknownValue ? "" : resolvedValue);
   const renderedOptions = allowClearSelection
     ? [{ value: clearOptionLabel, isClearOption: true }, ...filteredOptions]
     : filteredOptions;
@@ -168,7 +177,7 @@ const CustomDropdown = ({
     if (option.disabled) return;
 
     const shouldClearSelection =
-      option?.isClearOption || (deselectOnReselect && resolvedValue && resolvedValue === option?.value);
+      option?.isClearOption || (deselectOnReselect && resolvedValue && resolvedValue === String(option?.value));
     
     if (option.value === "Create New Level" && onCreateNew) {
       onCreateNew();
@@ -265,8 +274,8 @@ const CustomDropdown = ({
           fontFamily: "Plus Jakarta Sans"
         }}
       >
-        <span className={resolvedValue ? "selected-value" : "placeholder"}>
-          {resolvedValue || placeholder}
+        <span className={(resolvedValue && (!isUnknownValue || selectedOption)) ? "selected-value" : "placeholder"}>
+          {displayLabel || placeholder}
         </span>
         <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>
           <img src={Dropdown_Arrow} alt="Dropdown Arrow" style={{ width: '12px', height: '12px' }} />
@@ -316,7 +325,7 @@ const CustomDropdown = ({
                   role="option"
                   aria-selected={isSelected}
                 >
-                  <span className="dropdown-option-label">{optionValue}</span>
+                  <span className="dropdown-option-label">{option?.label || optionValue}</span>
                   {isSelected ? (
                     <img
                       src={Tick_Icon}
@@ -331,7 +340,23 @@ const CustomDropdown = ({
             })
             ) : searchable && searchTerm ? (
               <div className="no-results">No options found</div>
-            ) : null}
+            ) : (
+              <div className="dropdown-empty-state">
+                <span className="empty-state-text">No options available</span>
+                {showEmptyStateButton && (
+                  <button 
+                    type="button"
+                    className="empty-state-setup-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(emptyStateNavigateTo);
+                    }}
+                  >
+                    Configure Settings
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

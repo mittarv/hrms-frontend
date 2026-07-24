@@ -336,6 +336,8 @@ const PayrollTable = ({
     const selectedPayslip = {
       payslipItems,
       payslipId: (employee.status === PAYROLL_STATUS_LABELS.PAYROLL_GENERATED || employee.status === PAYROLL_STATUS_LABELS.PAYROLL_FINALIZED) ? employee.id : null,
+      status: employee.status,
+      payrollStatus: employee.status,
       netPay: employee.netPay.replace(/[^\d.]/g, ''), // Remove currency symbol and formatting
       payrollStartDate: new Date(validYear, validMonth, 1).toISOString(),
     };

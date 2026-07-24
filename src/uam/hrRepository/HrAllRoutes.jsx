@@ -27,7 +27,7 @@ const HrAllRoutes = ({ isAuthenticated }) => {
   const { myHrmsAccess, myHrmsAccessLoaded } = useSelector((state) => state.hrRepositoryReducer);
 
   const hasAdvancedAccess = (toolKey, threshold = 900) =>
-    allToolsAccessDetails?.[toolKey] >= threshold;
+    allToolsAccessDetails?.[toolKey] >= threshold || user?.userType === 900;
 
   // Check if user has specific permission(s) in myHrmsAccess
   // Supports both single permission (string) or multiple permissions (array) - OR logic

@@ -20,6 +20,14 @@ export const isValidField = (value, type, rowData = null, columnKey = null, tabl
       return hasAmount || hasPercentage;
     }
     
+    // Special validation for Default Deduction / Loss of Pay (auto-calculated)
+    if (rowData && (rowData.componentName?.includes("Loss of Pay") || tableTitle === "Default Deduction")) {
+      if (rowData.componentName?.includes("Loss of Pay")) {
+        return true; // Loss of Pay amount is calculated dynamically and always valid
+      }
+      return value !== null && value !== undefined && value !== "" && !isNaN(value) && parseFloat(value) >= 0;
+    }
+
     const isValidNumber = value !== null && value !== undefined && value !== "" && !isNaN(value) && parseFloat(value) > 0;
     
     // Don't validate number fields that aren't required or don't have values

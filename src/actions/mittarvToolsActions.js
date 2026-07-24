@@ -1,12 +1,13 @@
 import axios from "axios";
 import store from "../store";
+import { getToken } from "../utils/authStorage";
 
 // const userId = localStorage.getItem("userId")
 // const user = decodeUserInfo(token);
 
 export const fetchAllTools = () => async (dispatch) => {
     
-    const token = localStorage.getItem("token");
+    const token = getToken();
     try {
         dispatch({ type: "FETCH_MITTARV_TOOLS" })
         const response = await axios.get(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/uam/tools/getall`, {
@@ -37,7 +38,7 @@ export const fetchAllTools = () => async (dispatch) => {
 
 export const addNewTool = (toolsArray) => async (dispatch) => {
     const { user } = store.getState().user;
-    const token = localStorage.getItem("token");
+    const token = getToken();
     try {
         dispatch({type:"ADD_NEW_TOOL"});
         if(toolsArray.length === 0){
@@ -122,7 +123,7 @@ export const addNewTool = (toolsArray) => async (dispatch) => {
 
 export const updateExistingTool = (toolsArray) => async (dispatch) => {
     const { user } = store.getState().user;
-    const token = localStorage.getItem("token");
+    const token = getToken();
     try {
        
         dispatch({type:"UPDATE_EXISTING_TOOL"});
@@ -206,7 +207,7 @@ export const updateExistingTool = (toolsArray) => async (dispatch) => {
 
 export const deleteTools = (toolIds) => async (dispatch) =>{
     
-    const token = localStorage.getItem("token");
+    const token = getToken();
     try {
         
        

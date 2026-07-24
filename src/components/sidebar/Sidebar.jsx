@@ -2,8 +2,7 @@ import { useState } from "react";
 // import Drawer from "@mui/material/Drawer";
 import "./sidebar.scss";
 import closeIcon from "../../assets/icons/close_drawer.svg";
-import Mittarv_logo_With_Name from "../../assets/icons/mittarv_name_and_logo.svg";
-import Mittarv_logo from "../../assets/icons/mittarv_logo.svg";
+import DefaultOrganizationLogo from "../../assets/icons/default_organization.svg";
 import dropdownIcon from "../../assets/icons/dropdown_icon_white.svg";
 import {
   adminsidebarContent,
@@ -19,6 +18,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import logout from "../../assets/icons/logout.svg";
 import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../../actions/userActions";
 
 const Sidebar = () => {
   const [tooglesidebar, setToggleSidebar] = useState(true);
@@ -35,7 +35,7 @@ const Sidebar = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    dispatch({ type: "LOGOUT_USER" });
+    dispatch(logoutUser());
   };
 
   const renderLinks = (content, customClass = "") => {
@@ -114,21 +114,30 @@ const Sidebar = () => {
     }
   };
 
+  const { organizationDetails } = useSelector((state) => state.hrRepositoryReducer || {});
+  const [logoError, setLogoError] = useState(false);
+  const rawLogo = organizationDetails?.metadata?.logo || organizationDetails?.logo;
+  const validOrgLogo = (!logoError && rawLogo && typeof rawLogo === "string" && rawLogo.trim()) ? rawLogo : null;
+
   return (
     <div className={tooglesidebar ? "main_sidebar" : "toggle_sidebar"}>
       <div className="sidebar_top_section">
         {tooglesidebar ? (
           <img
-            src={Mittarv_logo_With_Name}
-            alt="logo"
+            src={validOrgLogo || DefaultOrganizationLogo}
+            alt={validOrgLogo ? "Organization logo" : "Default organization logo"}
             className="siderbar_header__logo"
+            style={validOrgLogo ? { height: "48px", maxWidth: "100%", width: "auto", objectFit: "contain", cursor: "pointer" } : { cursor: "pointer" }}
+            onError={() => setLogoError(true)}
             onClick={() => navigate("/")}
           />
         ) : (
           <img
-            src={Mittarv_logo}
+            src={validOrgLogo || DefaultOrganizationLogo}
             className="toggled_logo"
-            alt="logo"
+            alt={validOrgLogo ? "Organization logo" : "Default organization logo"}
+            style={validOrgLogo ? { height: "36px", width: "36px", objectFit: "contain", cursor: "pointer" } : { cursor: "pointer" }}
+            onError={() => setLogoError(true)}
             onClick={() => navigate("/")}
           />
         )}

@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import "./HRMSSidebar.scss";
-import Mittarv_logo_With_Name from "../assets/icons/Mittarvlogo_with_name.svg";
-import Mittarv_logo from "../assets/icons/Mittarv_Logo_new.svg";
+import DefaultOrganizationLogo from "../../../assets/icons/default_organization.svg";
 import {
   hrRepoRouterData,
   hrToolHomePageData,
@@ -10,6 +9,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import logout from "../assets/icons/logout_new.svg";
 import { useDispatch, useSelector } from "react-redux";
 import Sidebar_left from "../assets/icons/Sidebar left.svg";
+import { logoutUser } from "../../../actions/userActions";
+import { getOrganizationDetails } from "../../../actions/hrRepositoryAction";
 
 // Route permission mapping - defines what's required to access each route
 // permission can be: null, a string (single permission), or an array (multiple permissions - OR logic)
@@ -60,6 +61,11 @@ const routePermissions = {
     adminThreshold: 900,
     requireEmployee: false,
   },
+  "/user-groups": {
+    permission: null, // UAM routes are handled by UAM's own permission logic
+    adminThreshold: 900,
+    requireEmployee: false,
+  },
 };
 
 const HRMSSidebar = () => {
@@ -75,7 +81,7 @@ const HRMSSidebar = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    dispatch({ type: "LOGOUT_USER" });
+    dispatch(logoutUser());
   };
 
   // Filter the hrRepoRouterData based on route permissions
@@ -232,25 +238,63 @@ const HRMSSidebar = () => {
     });
   };
 
+  const { organizationDetails } = useSelector((state) => state.hrRepositoryReducer || {});
+  const [logoError, setLogoError] = useState(false);
+  const [isOrganizationLoading, setIsOrganizationLoading] = useState(!organizationDetails);
+  const [isOrgLogoLoaded, setIsOrgLogoLoaded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!organizationDetails) {
+      setIsOrganizationLoading(true);
+      dispatch(getOrganizationDetails()).finally(() => {
+        if (isMounted) setIsOrganizationLoading(false);
+      });
+    } else {
+      setIsOrganizationLoading(false);
+    }
+    return () => { isMounted = false; };
+  }, [dispatch, organizationDetails]);
+
+  const rawLogo = organizationDetails?.metadata?.logo || organizationDetails?.logo;
+  const validOrgLogo = !logoError && typeof rawLogo === "string" && rawLogo.trim()
+    ? rawLogo
+    : null;
+  const showLogoLoader = isOrganizationLoading || Boolean(validOrgLogo && !isOrgLogoLoaded);
+  const sidebarLogo = validOrgLogo || DefaultOrganizationLogo;
+  const organizationName = organizationDetails?.name?.trim() || "MittArv";
+
+  useEffect(() => {
+    setLogoError(false);
+    setIsOrgLogoLoaded(false);
+  }, [rawLogo]);
+
   return (
     <div className={tooglesidebar ? "hrms_main_sidebar" : "hrms_toggle_sidebar"}>
       <div className="hrms_sidebar_top_section">
         <div className="hrms_sidebar_header_container">
-          {tooglesidebar ? (
+          <div className="hrms_sidebar_brand">
+            {showLogoLoader && (
+              <span className="hrms_sidebar_logo_loader" role="status" aria-label="Loading organization logo" />
+            )}
             <img
-              src={Mittarv_logo_With_Name}
-              alt="logo"
-              className="hrms_sidebar_header_logo"
-              onClick={() => navigate("/")}
+              key={sidebarLogo}
+              src={sidebarLogo}
+              alt={validOrgLogo ? `${organizationName} logo` : "Default organization logo"}
+              className={tooglesidebar ? "hrms_sidebar_header_logo" : "hrms_toggled_logo"}
+              onLoad={() => setIsOrgLogoLoaded(true)}
+              onError={() => {
+                setLogoError(true);
+                setIsOrgLogoLoaded(true);
+              }}
+              onClick={() => navigate(tooglesidebar ? "/" : "/hr-repo")}
             />
-          ) : (
-            <img
-              src={Mittarv_logo}
-              className="hrms_toggled_logo"
-              alt="logo"
-              onClick={() => navigate("/hr-repo")}
-            />
-          )}
+            {tooglesidebar && (
+              <span className="hrms_sidebar_organization_name" title={organizationName}>
+                {organizationName}
+              </span>
+            )}
+          </div>
         </div>
         <div className="hrms_sidebar_links_container">
           {renderLinks(filteredHrRepoRouterData)}

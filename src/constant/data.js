@@ -80,28 +80,7 @@ export const userAccessManagementData = {
   header_title: "User Access Management",
 };
 
-export const adminsidebarContent = [
-  {
-    title: "User Groups",
-    icon: userGroup,
-    path: "/user-groups",
-  },
-  {
-    title: "Mitt Arv Tools",
-    icon: toolIcon,
-    path: "/mittarv-tools",
-  },
-  {
-    title: "User Permissions",
-    icon: user_permission,
-    path: "/user-permissions",
-  },
-  {
-    title: "Pending Requests",
-    icon: pending_request,
-    path: "/pending-requests",
-  },
-];
+export const adminsidebarContent = [];
 
 // hrRepoRouterData has been moved to src/uam/hrRepository/constant/data.js
 
@@ -208,36 +187,9 @@ export const notificationToolRouter = [
   // },
 ];
 
-export const userSidebarContent = [
-  {
-    title: "Mitt Arv Tools",
-    icon: toolIcon,
-    path: "/my-tools",
-  },
-  {
-    title: "User Groups",
-    icon: userGroup,
-    path: "/user-groups",
-  },
-];
+export const userSidebarContent = [];
 
-export const toolAdminSidebarContent = [
-  {
-    title: "User Groups",
-    icon: userGroup,
-    path: "/user-groups",
-  },
-  {
-    title: "Mitt Arv Tools",
-    icon: toolIcon,
-    path: "/my-tools",
-  },
-  {
-    title: "User Permissions",
-    icon: user_permission,
-    path: "/user-permissions",
-  },
-];
+export const toolAdminSidebarContent = [];
 
 export const role = {
   user: "User",

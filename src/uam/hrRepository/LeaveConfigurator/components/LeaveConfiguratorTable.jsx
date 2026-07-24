@@ -15,7 +15,7 @@ import NoResultsContainer from "../../Common/components/NoResultsContainer";
 import { createPortal } from "react-dom";
 
 const LeaveConfiguratorTable = () => {
-  const { allLeavesLoading, allExisitingLeaves, getAllComponentType, myHrmsAccess, myHrmsAccessLoaded } = useSelector(
+  const { allLeavesLoading, allExisitingLeaves, getAllComponentType, myHrmsAccess, myHrmsAccessLoaded, organizationDetails } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
@@ -94,11 +94,26 @@ const LeaveConfiguratorTable = () => {
 
   const Employee_Type_Dropdown =
     getAllComponentType && getAllComponentType?.emp_type_dropdown;
-  const getEmployeeTypeValue = (keys) => {
+  const getEmployeeTypeValue = (rawInput) => {
+    if (!rawInput) return "All";
+    let keys = rawInput;
+    if (typeof rawInput === "string") {
+      try {
+        keys = JSON.parse(rawInput);
+      } catch (e) {
+        keys = [rawInput];
+      }
+    }
+    if (keys && typeof keys === "object" && !Array.isArray(keys)) {
+      keys = keys.emp_type_dropdown || keys.employeeType || Object.values(keys).flat();
+    }
+    if (!Array.isArray(keys) || keys.length === 0) {
+      return "All";
+    }
     return keys
       .map(
         (key) =>
-          (Employee_Type_Dropdown && Employee_Type_Dropdown[key]) || "Unknown"
+          (Employee_Type_Dropdown && Employee_Type_Dropdown[key]) || key || "Unknown"
       )
       .join(", ");
   };
@@ -108,6 +123,17 @@ const LeaveConfiguratorTable = () => {
   };
 
   const handleViewRowClick = (leaveConfigId) => {
+    if (organizationDetails && organizationDetails.orgConfigure === false) {
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: "Organization settings missing. Please complete setup in Organization Settings first.",
+          severity: "warning",
+        },
+      });
+      return;
+    }
+
     const isValidLeaveConfigId = allExisitingLeaves.some(
       (leave) => leave.leaveConfigId === leaveConfigId
     );
@@ -234,7 +260,7 @@ const LeaveConfiguratorTable = () => {
                     <td>{leave.accuralFrequency}</td>
                     <td>{leave.minimumNoticePeriod}</td>
                     <td>{leave.maximumNoticePeriod}</td>
-                    <td>{getEmployeeTypeValue(JSON.parse(leave.employeeType))}</td>
+                    <td>{getEmployeeTypeValue(leave.employeeType)}</td>
                   </tr>
                 ))}
               </tbody>

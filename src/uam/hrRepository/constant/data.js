@@ -82,6 +82,7 @@ export const hrRepoRouterData = [
     icon: organization_settings,
     path: "/employee-type-configurator",
   },
+
   // {
   //   title: "Organization Settings",
   //   icon: organization_settings,      //Button is created /hello path specified for this button.

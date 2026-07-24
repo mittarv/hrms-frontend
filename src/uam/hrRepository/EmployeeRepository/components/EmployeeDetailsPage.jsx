@@ -553,7 +553,7 @@ const EmployeeDetailsPage = () => {
       });
     } else {
       // User is editing someone else's profile - require permission
-      if(isAdmin < 900 && !hasAccessToEditEmployee){
+      if(isAdmin < 900 && !hasAccessToEditEmployee && user?.userType !== 900){
         window.alert("You are not authorized to edit this employee");
         return;
       }
@@ -831,7 +831,7 @@ const emailValidation = (updatedFormData) => {
     const ApprovalFormData = {
       userType: isAdmin,
       requestedBy: user && user?.employeeUuid,
-      requestedFor: formData?.empUuid,
+      requestedFor: formData?.empUuid || employeeUuid,
       sectionChanged: sectionChanged,
     };
 
@@ -1077,6 +1077,7 @@ const emailValidation = (updatedFormData) => {
               error={!!error}
               disabled={isFieldDisabled}
               searchable={true}
+              showEmptyStateButton={true}
             />
             {error && <span className="form_error_message">{error}</span>}
           </div>
@@ -1093,6 +1094,7 @@ const emailValidation = (updatedFormData) => {
               error={!!error}
               disabled={isFieldDisabled || Boolean(formData?.isSecondarySameAsPrimary)}
               searchable={true}
+              showEmptyStateButton={true}
             />
             {formData?.isSecondarySameAsPrimary && (
               <span className="field_helper_message">Secondary location will match primary location.</span>
@@ -1159,6 +1161,7 @@ const emailValidation = (updatedFormData) => {
                 error={!!error}
                 disabled={isFieldDisabled}
                 searchable={true}
+                showEmptyStateButton={true}
               />
               <input
                 type="text"
@@ -1551,7 +1554,7 @@ const renderOffboardingField = () => {
                 </button>
               )}
               {/* Show Edit button if user is editing their own profile OR has admin access OR has permission */}
-              {currentEmployeeDetails?.employeeBasicDetails?.isActive &&(user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid || isAdmin >= 900 || hasAccessToEditEmployee) && (
+              {(user?.userType === 900 || (currentEmployeeDetails?.employeeBasicDetails?.isActive &&(user.employeeUuid === currentEmployeeDetails?.employeeBasicDetails?.empUuid || isAdmin >= 900 || hasAccessToEditEmployee))) && (
                 <button className="edit-button" onClick={handleEdit}>
                   <img src={Edit_Button} alt="Edit Button" />
                   <span className="text-btn-primary">Edit</span>
