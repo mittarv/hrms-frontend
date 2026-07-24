@@ -32,14 +32,12 @@ const LogExtraDayPopup = ({ onClose }) => {
        return Number.isFinite(expiryDays) && expiryDays > 0;
       })
     : null;
-    console.log(compOffLeave,"array")
   const getTodayLocalISO = () =>
     new Date(Date.now() - new Date().getTimezoneOffset() * 60_000)
       .toISOString()
       .split("T")[0];
  
   const todayLocalISO = getTodayLocalISO();
-      console.log(currentEmployeeDetails?.employeeBasicDetails?.empGender, currentEmployeeDetails?.employeeCurrentJobDetails?.empType,"check",compOffLeave?.appliedGender,compOffLeave?.employeeType,"compOffLeave")
      
 
   useEffect(() => {
@@ -59,7 +57,6 @@ const LogExtraDayPopup = ({ onClose }) => {
     const isEligible =
       compOffLeave.appliedGender?.includes(empGender) &&
       compOffLeave.employeeType?.includes(empType);
-      console.log(empGender,empType,"check")
     setIsEligibleForCompOff(isEligible);
   }, [currentEmployeeDetails, compOffLeave]);
 

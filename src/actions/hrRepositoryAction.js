@@ -3624,7 +3624,6 @@ export const setPayrollCurrentPage = (page) => (dispatch) => {
 
 // Payslip Filter Actions
 export const setPayslipFilterMonth = (month) => (dispatch) => {
-  console.log(month)
   dispatch({ type: "SET_PAYSLIP_FILTER_MONTH", payload: month });
 };
 
@@ -5839,48 +5838,6 @@ export const reviewSecondaryLocationRequest = (requestId, payload) => async (dis
   }
 };
 
-export const completeHrmsSetup = (payload) => async (dispatch) => {
-  try {
-    dispatch({ type: "COMPLETE_HRMS_SETUP_REQUEST" });
-    const token = getToken();
-    const domainName = extractSubdomainFromHostname();
-    const response = await axios.post(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/setup/completeSetup`, payload, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-        "x-tenant-subdomain": domainName,
-      },
-    });
-
-    if (response.data) {
-      dispatch({
-        type: "COMPLETE_HRMS_SETUP_SUCCESS",
-        payload: response.data,
-      });
-      dispatch({
-        type: "SET_NEW_SNACKBAR_MESSAGE",
-        payload: {
-          message: "HRMS Setup completed successfully!",
-          severity: "success",
-        },
-      });
-      return true;
-    }
-  } catch (error) {
-    dispatch({
-      type: "COMPLETE_HRMS_SETUP_FAILURE",
-      payload: await getErrorMessage(error, "Failed to complete HRMS setup"),
-    });
-    dispatch({
-      type: "SET_NEW_SNACKBAR_MESSAGE",
-      payload: {
-        message: await getErrorMessage(error, "Failed to complete HRMS setup"),
-        severity: "error",
-      },
-    });
-    return false;
-  }
-};
 
 export const getOrganizationDetails = () => async (dispatch) => {
   try {

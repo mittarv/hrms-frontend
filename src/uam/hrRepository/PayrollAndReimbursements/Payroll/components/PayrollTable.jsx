@@ -135,7 +135,6 @@ const PayrollTable = ({
       }
     } else {
       // No delete handler provided — just log for now
-      console.log('Confirmed delete for', employee);
     }
   };
 
@@ -149,7 +148,6 @@ const PayrollTable = ({
         console.error('Error skipping payroll row:', err);
       }
     } else {
-      console.log('Confirmed skip for', employee);
     }
   };
 
@@ -163,7 +161,6 @@ const PayrollTable = ({
         console.error('Error restoring payroll row:', err);
       }
     } else {
-      console.log('Confirmed restore for', employee);
     }
   };
 

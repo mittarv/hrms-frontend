@@ -1642,7 +1642,6 @@ const renderOffboardingField = () => {
                               }
                               // Hide level field completely if the employee type doesn't support it
                               const isHideLevel = formData?.empType && !hasLevel(formData.empType, getAllComponentType);
-                              console.log("Checking empLevel hide:", formData?.empType, isHideLevel, getAllComponentType?.employee_type_mapping);
                               if (field.name === "empLevel" && isHideLevel) {
                                 return false;
                               }

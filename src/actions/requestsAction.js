@@ -14,10 +14,7 @@ export const fetchPendingRequests = () => async (dispatch) => {
                     Authorization: `${token}`,
                 },
             })
-            console.log('API Response:', response.data)
         if(response.data.success === true){
-            console.log('Activity Logs:', response.data.activityLogs)
-            console.log('Data:', response.data.data)
             // Use data array if it exists, otherwise fallback to activityLogs
             const payload = response.data.data || response.data.activityLogs || [];
             dispatch({
@@ -36,7 +33,6 @@ export const fetchPendingRequests = () => async (dispatch) => {
 export const changeRequestStatus = (request , status) => async(dispatch) =>{
     const token = localStorage.getItem("token")
     const {user} = store.getState().user;
-    console.log("Calling")
     try {
         dispatch({type:"CHANGE_REQUEST_STATUS"});
 
