@@ -20,12 +20,15 @@ const MyProfile = ({currentEmployeeDetails, getAllManagersDetails}) => {
 
 
     const handleViewProfile = () => {
-        dispatch(getCurrentEmployeeDetails(user.employeeUuid));
+        const empUuidToUse = employeeId || user?.employeeUuid;
+        if (!empUuidToUse) return;
+        dispatch(getCurrentEmployeeDetails(empUuidToUse));
         dispatch(getAllCountriesDetails());
         setSearchParams((prev) => {
-            prev.set("showEmployeeDetails", "true");
-            prev.set("employeeUuid", employeeId);
-            return prev;
+            const next = new URLSearchParams(prev);
+            next.set("showEmployeeDetails", "true");
+            next.set("employeeUuid", empUuidToUse);
+            return next;
         });
     };
 

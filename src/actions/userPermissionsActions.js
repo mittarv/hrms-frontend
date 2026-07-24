@@ -131,9 +131,6 @@ export const updateUserAndTool = (userArr) => async (dispatch) => {
         },
       }
     );
-
-    console.log(response.data)
-
     if (response.data.success === true) {
       dispatch({
         type: "UPDATE_USER_AND_TOOL_SUCCESS",

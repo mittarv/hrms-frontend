@@ -9,8 +9,10 @@ import {
   setPayrollStatusFilter,
   setPayrollSearchQuery,
   resetPayrollFilters,
-  setPayrollCurrentPage
+  setPayrollCurrentPage,
+  updatePayslipsStatus
 } from "../../../../../actions/hrRepositoryAction.js";
+import { STATUS_OPTIONS } from "../utils/PayrollUtils.js";
 import PayrollSearch from "./PayrollSearch.jsx";
 import PayrollFilter from "./PayrollFilter.jsx";
 import PayrollTable from "./PayrollTable.jsx";
@@ -80,6 +82,28 @@ const PayrollContent = ({ onSelectionChange, resetCounter }) => {
     ));
   }, [dispatch, currentPage, pageSize, selectedMonth, selectedYear, searchQuery]);
 
+  const handleSkipRow = useCallback(async (employee) => {
+    const payslipId = employee?.id;
+    if (!payslipId) return;
+
+    await dispatch(updatePayslipsStatus(
+      [payslipId],
+      STATUS_OPTIONS.SKIPPED,
+      { currentPage, pageSize, selectedMonth, selectedYear, searchQuery }
+    ));
+  }, [dispatch, currentPage, pageSize, selectedMonth, selectedYear, searchQuery]);
+
+  const handleRestoreRow = useCallback(async (employee) => {
+    const payslipId = employee?.id;
+    if (!payslipId) return;
+
+    await dispatch(updatePayslipsStatus(
+      [payslipId],
+      STATUS_OPTIONS.PENDING,
+      { currentPage, pageSize, selectedMonth, selectedYear, searchQuery }
+    ));
+  }, [dispatch, currentPage, pageSize, selectedMonth, selectedYear, searchQuery]);
+
   const notFetchedPreview = (payrollNotFetchedEmployees || []).slice(0, 5);
 
   return (
@@ -126,6 +150,8 @@ const PayrollContent = ({ onSelectionChange, resetCounter }) => {
           onSelectionChange={onSelectionChange}
           resetCounter={resetCounter}
           onDeleteRow={handleDeleteRow}
+          onSkipRow={handleSkipRow}
+          onRestoreRow={handleRestoreRow}
         />
         <PayrollPagination
           pagination={payrollPagination}

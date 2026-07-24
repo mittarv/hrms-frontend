@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
 // import { role } from "../../constant/data";
 import "./header.scss";
@@ -10,13 +11,18 @@ import { valueRoleMap } from "../../constant/data";
 const Header = () => {
   const { user, allToolsAccessDetails } = useSelector((state) => state.user);
   const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { organizationDetails } = useSelector((state) => state.hrRepositoryReducer || {});
+  const [logoError, setLogoError] = useState(false);
+
+  const rawLogo = organizationDetails?.metadata?.logo || organizationDetails?.logo;
+  const logoSrc = (!logoError && rawLogo && typeof rawLogo === "string" && rawLogo.trim()) ? rawLogo : mittArvLogo;
 
   return (
     <div className="uam_main__header">
       <div className="uam_main__header_left">
-        <img src={mittArvLogo} alt="mitt-arv-logo" />
+        <img src={logoSrc} alt="logo" style={{ maxHeight: "36px", objectFit: "contain" }} onError={() => setLogoError(true)} />
         <p>
-          Toolbox
+          HRMS
         </p>
       </div>
       <div className="uam_main__header__right">

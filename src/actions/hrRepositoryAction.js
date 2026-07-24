@@ -1,33 +1,38 @@
 import axios from "axios";
 import store from "../store";
+import { getToken } from "../utils/authStorage";
+import { extractSubdomainFromHostname } from "../utils/domainUtils";
 
 // Helper function to extract error messages from Blob responses
 export const getErrorMessage = async (error, defaultMessage) => {
+  let messageStr = defaultMessage;
   if (error.response) {
     // Check if the error response is a Blob
     if (error.response.data instanceof Blob) {
       try {
-        // Convert Blob to text
         const text = await error.response.data.text();
-        // Parse the text as JSON
         const jsonData = JSON.parse(text);
-        // Return the message from the parsed JSON
-        return jsonData.message || defaultMessage;
+        messageStr = jsonData.message || jsonData.error || defaultMessage;
       } catch (e) {
-        // If parsing fails, return the default message
-        return defaultMessage;
+        messageStr = defaultMessage;
       }
+    } else {
+      messageStr = error.response.data?.message || error.response.data?.error || defaultMessage;
     }
-    // If not a Blob, try to get the message directly
-    return error.response.data?.message || defaultMessage;
+  } else {
+    messageStr = error?.message || defaultMessage;
   }
-  // If no response, return error message or default
-  return error.message || defaultMessage;
+
+  if (typeof messageStr === "string" && messageStr.includes("UNPAID_LEAVE_CONFIG_NOT_FOUND")) {
+    return "Unpaid Leave configuration is missing. Please configure Unpaid Leave in Leave Configurator.";
+  }
+
+  return messageStr;
 };
 
 export const fetchAllImportantLinks = () => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     dispatch({ type: "FETCH_ALL_IMPORTANT_LINKS" });
 
@@ -62,7 +67,7 @@ export const fetchAllImportantLinks = () => async (dispatch) => {
 
 export const fetchAllPolicyDocuments = () => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_ALL_POLICY_DOCUMENTS" });
 
     const response = await axios.get(
@@ -98,7 +103,7 @@ export const fetchAllPolicyDocuments = () => async (dispatch) => {
 //===============================try to main the array indexing in the same order as mentioned below============================================================
 export const addNewPolicy = (policyArray) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const { user } = store.getState().user;
     dispatch({ type: "ADD_NEW_POLICY" });
     for (let policy of policyArray) {
@@ -154,7 +159,7 @@ export const addNewPolicy = (policyArray) => async (dispatch) => {
 
 export const deletePolicy = (ids) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "DELETE_POLICY" });
     const response = await axios.patch(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrrepository/delete/policy`,
@@ -193,7 +198,7 @@ export const deletePolicy = (ids) => async (dispatch) => {
 //update existing policy function
 export const updateExistingPolicy = (policyArray) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const { user } = store.getState().user;
     dispatch({ type: "UPDATE_POLICY" });
     for (let policy of policyArray) {
@@ -244,7 +249,7 @@ export const updateExistingPolicy = (policyArray) => async (dispatch) => {
 //add new important link function
 export const addNewImportantLink = (importantLinkArray) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const { user } = store.getState().user;
     dispatch({ type: "ADD_NEW_IMPORTANT_LINK" });
     for (let tool of importantLinkArray) {
@@ -293,7 +298,7 @@ export const addNewImportantLink = (importantLinkArray) => async (dispatch) => {
 //=================================update important link function====================================================
 export const updateImportantLink = (importantLinkArray) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const { user } = store.getState().user;
     dispatch({ type: "UPDATE_IMPORTANT_LINK" });
     for (let link of importantLinkArray) {
@@ -339,7 +344,7 @@ export const updateImportantLink = (importantLinkArray) => async (dispatch) => {
 //===================================delete important link api function=================================================
 export const deleteImportantLink = (ids) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "DELETE_IMPORTANT_LINK" });
     const response = await axios.patch(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrrepository/delete/importantlink`,
@@ -386,7 +391,7 @@ export const clearStateDataLink = () => async (dispatch) => {
 export const getAllComponentTypes = () => async (dispatch) => {
   try {
     dispatch({type:"GET_ALL_COMPONENT_TYPES"});
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/getAllComponentType`,
       {
@@ -417,7 +422,7 @@ export const getAllComponentTypes = () => async (dispatch) => {
 
 export const updateComponentType = (componentType, componentValue, setSuccessMsg, setFormErrors) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const response = await axios.put(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/updateComponentType`,
       { componentType, componentValue },
@@ -431,18 +436,21 @@ export const updateComponentType = (componentType, componentValue, setSuccessMsg
     if (response.data.success) {
       if (setSuccessMsg) setSuccessMsg("Component updated successfully");
       dispatch(getAllComponentTypes());
+      return true;
     } else {
       if (setFormErrors) setFormErrors({ global: response.data.message });
+      return false;
     }
   } catch (error) {
     if (setFormErrors) setFormErrors({ global: await getErrorMessage(error, "An error occurred") });
+    return false;
   }
 };
 
 export const getPayrollLevels = () => async (dispatch) => {
   try {
     dispatch({ type: "GET_PAYROLL_LEVELS_REQUEST" });
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/getPayrollLevels`,
@@ -476,7 +484,7 @@ export const getPayrollLevels = () => async (dispatch) => {
 export const createPayrollLevel = (levelName) => async (dispatch) => {
   try {
     dispatch({ type: "CREATE_PAYROLL_LEVEL_REQUEST" });
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await axios.post(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/createPayrollLevel`,
@@ -535,7 +543,7 @@ export const createPayrollLevel = (levelName) => async (dispatch) => {
 export const updatePayrollLevel = (levelKey, levelName) => async (dispatch) => {
   try {
     dispatch({ type: "UPDATE_PAYROLL_LEVEL_REQUEST" });
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     const response = await axios.patch(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empConfig/updatePayrollLevel`,
@@ -592,7 +600,7 @@ export const updatePayrollLevel = (levelKey, levelName) => async (dispatch) => {
 };
 
 export const employeeOnboardingDetails = (updatedFormValueList) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "EMPLOYEE_ONBOARDING_DETAILS" });
   try {
     const response = await axios.post(
@@ -611,6 +619,10 @@ export const employeeOnboardingDetails = (updatedFormValueList) => async (dispat
     if (response.data.success) {
       dispatch(getAllEmployee());
       dispatch(getAllManagers());
+      // Refresh the authenticated user after self-onboarding so the newly
+      // created employee UUID and submitted profile are used immediately.
+      const { loadUserInfo } = await import("./userActions");
+      dispatch(loadUserInfo());
       dispatch({
         type: "EMPLOYEE_ONBOARDING_DETAILS_SUCCESS",
         payload: response.data.message,
@@ -660,7 +672,7 @@ export const employeeOnboardingDetails = (updatedFormValueList) => async (dispat
 //Function for getting all employees
 export const getAllEmployee = () => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({type:"GET_ALL_EMPLOYEE"});
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getAllEmployees`,
@@ -695,7 +707,7 @@ export const getAllEmployee = () => async (dispatch) => {
 //Function for getting current employee details
 export const getCurrentEmployeeDetails = (employeeUuid) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({type:"GET_CURRENT_EMPLOYEE_DETAILS"});
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getCurrentEmpDetails/${employeeUuid}`,
@@ -730,7 +742,7 @@ export const getCurrentEmployeeDetails = (employeeUuid) => async (dispatch) => {
 // Function for getting employee directory card details
 export const getEmployeeDirectoryDetails = (employeeUuid) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "GET_EMPLOYEE_DIRECTORY_DETAILS" });
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getEmployeeDirectoryDetails/${employeeUuid}`,
@@ -762,7 +774,7 @@ export const getEmployeeDirectoryDetails = (employeeUuid) => async (dispatch) =>
 
 
 export const updateEmployeeDetails = (updatedEmployeeData, employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"EMPLOYEE_DETAILS_UPDATE"});
     const response = await axios.patch(
@@ -820,7 +832,7 @@ export const updateEmployeeDetails = (updatedEmployeeData, employeeUuid) => asyn
 // to fetch all the managers list
 export const getAllManagers = () => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({type:"GET_ALL_MANAGER_DETAILS"});
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empDetails/getAllManager`,
@@ -852,7 +864,7 @@ export const getAllManagers = () => async (dispatch) => {
 
 
 export const getAllBirthdayAndAnniversary = () => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   try {
     dispatch({type:"GET_ALL_EMPLOYEE_BIRTHDAY_AND_ANNIVERSARY"});
@@ -894,7 +906,7 @@ export const getAllBirthdayAndAnniversary = () => async (dispatch) => {
 export const getAllLeaves = () => async (dispatch) => {
   try {
     dispatch({type:"GET_ALL_LEAVE_DETAILS"});
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/leaveConfig/getAllLeaves`,
       {
@@ -925,7 +937,7 @@ export const getAllLeaves = () => async (dispatch) => {
 
 
 export const createLeave = (leaveData) => async(dispatch) =>{
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"CREATE_LEAVE"});
     const response = await axios.post(
@@ -985,7 +997,7 @@ export const createLeave = (leaveData) => async(dispatch) =>{
 export const getLeaveDetails = (leaveUuid) => async (dispatch) => {
   try {
     dispatch({type:"GET_CURRENT_LEAVE_DETAILS"});
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const response = await axios.get(
       `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/leaveConfig/getLeaveDetailsByUuid/${leaveUuid}`,
       {
@@ -1016,7 +1028,7 @@ export const getLeaveDetails = (leaveUuid) => async (dispatch) => {
 };
 
 export const updateLeaveDetails = (updatedLeaveData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"UPDATED_CURRENT_LEAVE_DETAILS"});
     const response = await axios.patch(
@@ -1071,7 +1083,7 @@ export const updateLeaveDetails = (updatedLeaveData) => async (dispatch) => {
 }
 
 export const getAllCountriesDetails = () => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_ALL_COUNTRIES_DETAILS"});
     const response = await axios.get(
@@ -1107,7 +1119,7 @@ export const getAllCountriesDetails = () => async (dispatch) => {
  * This function is likely used to submit updates or changes to a workflow or approval process.
  */
 export const sendChangesToApprover = (changeRequestData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"SEND_CHANGES_TO_APPROVER"});
     const response = await axios.post(
@@ -1169,7 +1181,7 @@ export const sendChangesToApprover = (changeRequestData) => async (dispatch) => 
  * This function is likely used to get all pending requests for a user.
  */
 export const getPendingRequests = () => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_PENDING_REQUESTS"});
     const response = await axios.get(
@@ -1216,7 +1228,7 @@ export const getPendingRequests = () => async (dispatch) => {
  * This function is likely used to get all approved or rejected requests for a user.
  */
 export const getProcessedRequests = ( startDate, endDate,page = 1, pageSize = 10) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_PROCESSED_REQUESTS"});
     const response = await axios.get(
@@ -1267,7 +1279,7 @@ export const getProcessedRequests = ( startDate, endDate,page = 1, pageSize = 10
  */
 
 export const approveOrRejectRequest = (requestData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "APPROVE_OR_REJECT_REQUEST" });
     const response = await axios.post(
@@ -1322,7 +1334,7 @@ export const approveOrRejectRequest = (requestData) => async (dispatch) => {
 };
 
 export const getAllEmployeeHolidays = () => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_EMP_HOLIDAY"});
     const response = await axios.get(
@@ -1354,7 +1366,7 @@ export const getAllEmployeeHolidays = () => async (dispatch) => {
 }
 
 export const createHolidays = (holidayData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"CREATE_HOLIDAY_TYPE"});
     const response = await axios.post(
@@ -1411,7 +1423,7 @@ export const createHolidays = (holidayData) => async (dispatch) => {
 
 export const deleteHolidays = (holidayIds) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "DELETE_HOLIDAY_TYPE" });
 
     const response = await axios.delete(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empHoliday/deleteHoliday`, {
@@ -1466,7 +1478,7 @@ export const deleteHolidays = (holidayIds) => async (dispatch) => {
 };
 
 export const updateHolidays = (holidayData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"UPDATE_HOLIDAY_TYPE"});
     const response = await axios.put(
@@ -1522,7 +1534,7 @@ export const updateHolidays = (holidayData) => async (dispatch) => {
 }
 
 export const getAttendanceLogs = (month, year, employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_ATTENDANCE_LOGS"});
     const response = await axios.get(
@@ -1554,7 +1566,7 @@ export const getAttendanceLogs = (month, year, employeeUuid) => async (dispatch)
 }
 
 export const createAttendanceLog = (attendanceData, attendanceMonth, attendanceYear) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"CREATE_ATTENDANCE_LOG"});
     const response = await axios.post(
@@ -1610,7 +1622,7 @@ export const createAttendanceLog = (attendanceData, attendanceMonth, attendanceY
 }
 
 export const registerCompOffLeave = (attendanceData, attendanceMonth, attendanceYear) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"CREATE_ATTENDANCE_LOG"});
     const response = await axios.post(
@@ -1667,7 +1679,7 @@ export const registerCompOffLeave = (attendanceData, attendanceMonth, attendance
 }
 
 export const updateCompOffLeave = (attendanceData, attendanceId, month, year, employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"UPDATE_EMPLOYEE_ATTENDANCE_LOG"});
     const response = await axios.patch(
@@ -1725,7 +1737,7 @@ export const updateCompOffLeave = (attendanceData, attendanceId, month, year, em
 }
 
 export const getAllPendingLeaveRequests = (startDate, endDate) => async (dispatch) => {
-  const token =localStorage.getItem("token");
+  const token =getToken();
   dispatch({type:"GET_ALL_PENDING_LEAVE_REQUESTS"});
   try {
     const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getAllPendingLeaveRequests/?start=${startDate}&end=${endDate}`, 
@@ -1756,7 +1768,7 @@ export const getAllPendingLeaveRequests = (startDate, endDate) => async (dispatc
   }
 }
 export const getAllHistoryLeaveRequests = (startDate, endDate, page = 1, pageSize = 10) => async (dispatch) => {
-  const token =localStorage.getItem("token");
+  const token =getToken();
   dispatch({type:"GET_ALL_HISTORY_LEAVE_REQUESTS"});
   try {
     const response  = await axios.get(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/empAttendanceManagement/getAllHistoryLeaveRequests/?start=${startDate}&end=${endDate}&page=${page}&pageSize=${pageSize}`, 
@@ -1791,7 +1803,7 @@ export const getAllHistoryLeaveRequests = (startDate, endDate, page = 1, pageSiz
 }
 
 export const triggerProofRequiredForLeave = (leaveUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"TRIGGER_PROOF_REQUIRED_FOR_LEAVE"});
     const response = await axios.patch(
@@ -1846,7 +1858,7 @@ export const triggerProofRequiredForLeave = (leaveUuid) => async(dispatch) => {
 }
 
 export const getEmployeeLeaveHistory = (employeeUuid, page = 1, pageSize = 20) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_EMPLOYEE_LEAVE_HISTORY"});
     const response = await axios.get(
@@ -1882,7 +1894,7 @@ export const getEmployeeLeaveHistory = (employeeUuid, page = 1, pageSize = 20) =
 
 
 export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid) => async (dispatch) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
   try {
     dispatch({type:"UPLOAD_PROOF_DOCUMENTS"});
     const response = await axios.post(
@@ -1939,7 +1951,7 @@ export const uploadProofDocuments = (uploadedData, leaveRequestId, employeeUuid)
 
 
 export const reviewLeaveRequest = (reviewedData, employeeUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"REVIEW_LEAVE_REQUEST"});
     const response = await axios.patch(
@@ -1994,7 +2006,7 @@ export const reviewLeaveRequest = (reviewedData, employeeUuid) => async(dispatch
 }
 
 export const getEmployeeLeaveBalance = (employeeUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   if (!employeeUuid) return;
 
   try {
@@ -2029,7 +2041,7 @@ export const getEmployeeLeaveBalance = (employeeUuid) => async(dispatch) => {
 
 
 export const deleteEmployeeAttendanceLog = (attendanceId, month, year,employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"DELETE_EMPLOYEE_ATTENDANCE_LOG"});
     const response = await axios.delete(
@@ -2084,7 +2096,7 @@ export const deleteEmployeeAttendanceLog = (attendanceId, month, year,employeeUu
 }
 
 export const updateEmployeeAttendanceLog = (attendanceData, attendanceId, month, year, employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"UPDATE_EMPLOYEE_ATTENDANCE_LOG"});
     const response = await axios.patch(
@@ -2142,7 +2154,7 @@ export const updateEmployeeAttendanceLog = (attendanceData, attendanceId, month,
 }
 
 export const getEmployeeOnLeave = (startDate, endDate) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_EMPLOYEE_ON_LEAVE"});
     const response = await axios.get(
@@ -2175,7 +2187,7 @@ export const getEmployeeOnLeave = (startDate, endDate) => async (dispatch) => {
 
 export const checkOutstandingCheckout = (empUuid) => async (dispatch) => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"CHECK_OUTSTANDING_CHECKOUT"});
     const response = await axios.get(
@@ -2207,7 +2219,7 @@ export const checkOutstandingCheckout = (empUuid) => async (dispatch) => {
 }
 export const getCheckInCheckOutStatus = (empUuid) => async  (dispatch) => {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"GET_CHECK_IN_CHECK_OUT_STATUS"});
     const response = await axios.get(
@@ -2239,7 +2251,7 @@ export const getCheckInCheckOutStatus = (empUuid) => async  (dispatch) => {
 }
 
 export const employeeCheckIn = (empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   try {
     dispatch({type:"EMPLOYEE_CHECK_IN"});
@@ -2298,7 +2310,7 @@ export const employeeCheckIn = (empUuid) => async (dispatch) => {
 }
 
 export const employeeCheckOut = (empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   try {
     dispatch({type:"EMPLOYEE_CHECK_OUT"});
@@ -2357,7 +2369,7 @@ export const employeeCheckOut = (empUuid) => async (dispatch) => {
 }
 
 export const updateEmployeeOutstandingCheckout = (attendanceId, checkOutData, empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({type:"UPDATE_EMPLOYEE_OUTSTANDING_CHECKOUT"});
     const response = await axios.patch(
@@ -2415,7 +2427,7 @@ export const updateEmployeeOutstandingCheckout = (attendanceId, checkOutData, em
 
 
 export const checkCdlLimit = (empUuid, selectedDate) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "CHECK_CDL_LIMIT" });
     const response = await axios.get(
@@ -2447,7 +2459,7 @@ export const checkCdlLimit = (empUuid, selectedDate) => async (dispatch) => {
 }
 
 export const getCurrentEmployeeNotifications = (empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_CURRENT_EMPLOYEE_NOTIFICATIONS" });
     const response = await axios.get(
@@ -2479,7 +2491,7 @@ export const getCurrentEmployeeNotifications = (empUuid) => async (dispatch) => 
 }
 
 export const getLeaveBalanceWithAccrual = (empUuid, asOfDate = null) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   if (!empUuid) return;
   try {
     dispatch({ type: "GET_LEAVE_BALANCE_WITH_ACCRUAL" });
@@ -2530,7 +2542,7 @@ export const getLeaveBalanceWithAccrual = (empUuid, asOfDate = null) => async (d
 }
 
 export const getSalaryComponents = (employeeType, employeeLocation, employeeLevel, department, yearOfStudy) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({type:"GET_SALARY_CONFIG"});
   try {
     const baseUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/salaryConfigurator/getSalaryConfigDetails/`;
@@ -2594,7 +2606,7 @@ export const getSalaryComponents = (employeeType, employeeLocation, employeeLeve
 }
 
 export const createSalaryConfig = (configData, employeeType, employeeLocation, employeeLevel, department, yearOfStudy, lastApiCallRef) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({type:"CREATE_SALARY_CONFIG"});
   try {
     const response = await axios.post(
@@ -2651,7 +2663,7 @@ export const createSalaryConfig = (configData, employeeType, employeeLocation, e
 }
 
 export const updateSalaryConfig = (updateData, employeeType, employeeLocation, employeeLevel, department, yearOfStudy, lastApiCallRef) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({type:"UPDATE_SALARY_CONFIG"});
   try {
     const response = await axios.patch(
@@ -2708,7 +2720,7 @@ export const updateSalaryConfig = (updateData, employeeType, employeeLocation, e
 }
 
 export const deleteSalaryConfig = (deletedData, employeeType, employeeLocation, employeeLevel, department, yearOfStudy, lastApiCallRef) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({type:"DELETE_SALARY_CONFIG"});
   try {
     const response = await axios.delete(
@@ -2769,7 +2781,7 @@ export const deleteSalaryConfig = (deletedData, employeeType, employeeLocation, 
 // Payroll Api Actions
 // Fetch all employee payroll details
 export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMonth, selectedYear, searchQuery) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "GET_ALL_EMPLOYEE_PAYROLL_REQUEST" });
   try {
     const baseUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/GetAllEmployeePayrollDetails`;
@@ -2843,7 +2855,7 @@ export const getAllEmployeePayrollDetails = (currentPage, pageSize, selectedMont
 
 // Update payroll component adjustments (additions/deductions)
 export const updatePayrollItems = (employeeId, employeeName, payslipId, componentType, adjustments, getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "UPDATE_PAYROLL_ITEMS_REQUEST" });
   const {
     currentPage,
@@ -2917,7 +2929,7 @@ export const updatePayrollItems = (employeeId, employeeName, payslipId, componen
 
 // Finalize payroll for selected employees
 export const finalizePayroll = (payslipIds, getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const {
     currentPage,
     pageSize,
@@ -2987,7 +2999,7 @@ export const finalizePayroll = (payslipIds, getSalaryComponentsDataParams) => as
 
 // Update status of payslips
 export const updatePayslipsStatus = (payslipIds, status, getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const {
     currentPage,
     pageSize,
@@ -3058,7 +3070,7 @@ export const updatePayslipsStatus = (payslipIds, status, getSalaryComponentsData
 
 // Mark finalized payslips as pending for selected employees
 export const markFinalizedPayslipsAsPending  = (payslipIds, getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const {
     currentPage,
     pageSize,
@@ -3127,7 +3139,7 @@ export const markFinalizedPayslipsAsPending  = (payslipIds, getSalaryComponentsD
 }
 
 export const deletePayrollRecords = (payslipIds, getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const {
       currentPage,
       pageSize,
@@ -3196,7 +3208,7 @@ export const deletePayrollRecords = (payslipIds, getSalaryComponentsDataParams) 
 }
 
 export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "GENERATE_PAYROLL_REQUEST" });
   const {
     currentPage,
@@ -3274,7 +3286,7 @@ export const generatePayroll = (getSalaryComponentsDataParams) => async (dispatc
 }
 
 export const getEmployeePayslips = (employeeId, year) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "GET_EMPLOYEE_PAYSLIPS_REQUEST" });
   try {
     const baseUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/fetchEmployeePayslipsForYear`;
@@ -3323,7 +3335,7 @@ export const getEmployeePayslips = (employeeId, year) => async (dispatch) => {
 }
 
 export const exportPayrollAsCsv = (selectedMonth, selectedYear) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "EXPORT_PAYROLL_CSV_REQUEST" });
   try {
     const baseUrl = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/payroll/exportPayrollAsCSV`;
@@ -3417,7 +3429,7 @@ export const exportPayrollAsCsv = (selectedMonth, selectedYear) => async (dispat
 }
 
 export const downloadPayslipPdf = (payslipId) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "DOWNLOAD_PAYSLIP_PDF_REQUEST" });
   try {
     const response = await axios.get(
@@ -3535,7 +3547,7 @@ export const downloadPayslipPdf = (payslipId) => async (dispatch) => {
 }
 
 export const getNetPayPayrollAmount = (month, year) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   dispatch({ type: "GET_NET_PAY_PAYROLL_AMOUNT_REQUEST" });
 
   try {
@@ -3612,7 +3624,6 @@ export const setPayrollCurrentPage = (page) => (dispatch) => {
 
 // Payslip Filter Actions
 export const setPayslipFilterMonth = (month) => (dispatch) => {
-  console.log(month)
   dispatch({ type: "SET_PAYSLIP_FILTER_MONTH", payload: month });
 };
 
@@ -3621,7 +3632,7 @@ export const setPayslipFilterYear = (year) => (dispatch) => {
 };
 
 export const extraWorkLogRequest = (requestData) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "EXTRA_WORK_LOG_REQUEST" });
     const response = await axios.post(
@@ -3675,7 +3686,7 @@ export const extraWorkLogRequest = (requestData) => async (dispatch) => {
 }
 
 export const getExtraWorkLogRequests = (startDate, endDate) => async(dispatch)=> {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_EXTRA_WORK_LOG_REQUESTS" });
     const response = await axios.get(
@@ -3706,7 +3717,7 @@ export const getExtraWorkLogRequests = (startDate, endDate) => async(dispatch)=>
   }
 }
 export const getExtraWorkLogRequestsHistory = (pageNum=1,pageSize=10,startDate, endDate,) => async(dispatch)=> {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_EXTRA_WORK_LOG_REQUESTS_HISTORY" });
     const response = await axios.get(
@@ -3740,7 +3751,7 @@ export const getExtraWorkLogRequestsHistory = (pageNum=1,pageSize=10,startDate, 
   }
 }
 export const updateExtraWorkLogRequestStatus = (requestIds, action, startDate, endDate) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "UPDATE_EXTRA_WORK_LOG_REQUEST_STATUS" });
     const response = await axios.post(
@@ -3796,7 +3807,7 @@ export const updateExtraWorkLogRequestStatus = (requestIds, action, startDate, e
 
 export const getCompOffleaveBalance = (empUuid) => async(dispatch) => {
   if (!empUuid) return;
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_COMP_OFFLEAVE_BALANCE" });
     const response = await axios.get(
@@ -3829,7 +3840,7 @@ export const getCompOffleaveBalance = (empUuid) => async(dispatch) => {
 
 export const getCompOffLeaveEligibility = (empUuid, startDate, endDate, isHalfDay) => async(dispatch) => {
   if (!empUuid || !startDate) return;
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_COMP_OFF_LEAVE_ELIGIBILITY" });
     const params = new URLSearchParams({
@@ -3869,7 +3880,7 @@ export const getCompOffLeaveEligibility = (empUuid, startDate, endDate, isHalfDa
 
 export const getEmployeeExtraWorkHistory = (empUuid, page = 1, pageSize = 10000) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "GET_EMPLOYEE_EXTRA_WORK_HISTORY" });
 
     const response = await axios.get(
@@ -3897,7 +3908,7 @@ export const getEmployeeExtraWorkHistory = (empUuid, page = 1, pageSize = 10000)
 
 
 export const getAllRoles = () => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_ALL_ROLES" });
     const response = await axios.get(
@@ -3931,7 +3942,7 @@ export const getAllRoles = () => async(dispatch) => {
 }
 
 export const getAllHrmsAccessPermissions = () => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_ALL_HRMS_ACCESS_PERMISSIONS" });
     const response = await axios.get(
@@ -3963,7 +3974,7 @@ export const getAllHrmsAccessPermissions = () => async(dispatch) => {
 }
 
 export const createHrmsRole = (roleData) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "CREATE_HRMS_ROLE" });
     const response = await axios.post(
@@ -4012,7 +4023,7 @@ export const createHrmsRole = (roleData) => async(dispatch) => {
 
 export const getHrmsRoleById = (roleId) => async(dispatch) => {
   if (!roleId) return;
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_HRMS_ROLE_BY_ID" });
     const response = await axios.get(
@@ -4044,7 +4055,7 @@ export const getHrmsRoleById = (roleId) => async(dispatch) => {
 }
 
 export const updateHrmsRole = (roleId, roleData) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "UPDATE_HRMS_ROLE" });
     const response = await axios.patch(
@@ -4100,7 +4111,7 @@ export const updateHrmsRole = (roleId, roleData) => async(dispatch) => {
 }
 
 export const deleteHrmsRole = (roleId) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "DELETE_HRMS_ROLE" });
     const response = await axios.delete(
@@ -4155,7 +4166,7 @@ export const deleteHrmsRole = (roleId) => async(dispatch) => {
 }
 
 export const assignEmployeeRole = (empUuid, roleId) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "ASSIGN_EMPLOYEE_ROLE" });
     const response = await axios.post(
@@ -4210,7 +4221,7 @@ export const assignEmployeeRole = (empUuid, roleId) => async(dispatch) => {
 }
 
 export const revokeEmployeeAccess = (empUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "REVOKE_EMPLOYEE_ACCESS" });
     const response = await axios.delete(
@@ -4264,7 +4275,7 @@ export const revokeEmployeeAccess = (empUuid) => async(dispatch) => {
 }
 
 export const getEmployeeRoles = (empUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_EMPLOYEE_ROLES" });
     const response = await axios.get(
@@ -4296,7 +4307,9 @@ export const getEmployeeRoles = (empUuid) => async(dispatch) => {
 }
 
 export const getMyHrmsAccess = () => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
+  const subdomain = extractSubdomainFromHostname();
+  
   try {
     dispatch({ type: "GET_MY_HRMS_ACCESS" });
     const response = await axios.get(
@@ -4305,10 +4318,17 @@ export const getMyHrmsAccess = () => async(dispatch) => {
         headers: {
           "Content-Type": "application/json",
           Authorization: token,
+          "x-tenant-subdomain": subdomain,
         },
       }
     );
     if (response.data.success) {
+      if (response.data.employeeUuid) {
+        dispatch({
+          type: "UPDATE_USER_EMPLOYEE_UUID",
+          payload: response.data.employeeUuid,
+        });
+      }
       dispatch({
         type: "GET_MY_HRMS_ACCESS_SUCCESS",
         payload: response.data.myHrmsAccess,
@@ -4340,7 +4360,7 @@ export const getMyHrmsAccess = () => async(dispatch) => {
 
 
 export const initiateOffboarding = (empUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "INITIATE_OFFBOARDING" });
     const response = await axios.post(
@@ -4396,7 +4416,7 @@ export const initiateOffboarding = (empUuid) => async(dispatch) => {
 }
 
 export const getAllOffboardingInitiatedEmployeeDetails = () => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_ALL_OFFBOARDING_INITIATED_EMPLOYEE_DETAILS" });
     const response = await axios.get(
@@ -4435,7 +4455,7 @@ export const getAllOffboardingInitiatedEmployeeDetails = () => async(dispatch) =
 }
 
 export const hrClearanceStatus = (empUuid) => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "HR_CLEARANCE" });
     const response = await axios.post(
@@ -4490,7 +4510,7 @@ export const hrClearanceStatus = (empUuid) => async(dispatch) => {
 };
 
 export const financeClearanceStatus = (empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "FINANCE_CLEARANCE" });
     const response = await axios.post(
@@ -4545,7 +4565,7 @@ export const financeClearanceStatus = (empUuid) => async (dispatch) => {
 };
 
 export const setLastWorkingDay = (empUuid, lastWorkingDay) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   if (!lastWorkingDay || !empUuid) return;
   try {
     dispatch({ type: "SET_LAST_WORKING_DAY" });
@@ -4601,7 +4621,7 @@ export const setLastWorkingDay = (empUuid, lastWorkingDay) => async (dispatch) =
 };
 
 export const approveOffboarding = (empUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "APPROVE_OFFBOARDING" });
     const response = await axios.post(
@@ -4658,7 +4678,7 @@ export const approveOffboarding = (empUuid) => async (dispatch) => {
 };
 
 export const getAllOffboardedEmployees = () => async(dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "GET_ALL_OFFBOARDED_EMPLOYEES" });
     const response = await axios.get(
@@ -4708,7 +4728,7 @@ const REWARDS_BASE = `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/rewa
 
 export const fetchRewardsDashboard = (month, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_REWARDS_DASHBOARD" });
 
     const params = {};
@@ -4734,7 +4754,7 @@ export const fetchRewardsDashboard = (month, year) => async (dispatch) => {
 
 export const fetchCurrentCycle = (month, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_CURRENT_CYCLE" });
     let url = `${REWARDS_BASE}/current-cycle`;
     if (month && year) {
@@ -4758,7 +4778,7 @@ export const fetchCurrentCycle = (month, year) => async (dispatch) => {
 
 export const fetchAllCycles = () => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_ALL_CYCLES" });
     const res = await axios.get(`${REWARDS_BASE}/current-cycle?getAll=true`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -4780,7 +4800,7 @@ export const searchRewardsEmployees = (q) => async (dispatch) => {
   try {
     const res = await axios.get(`${REWARDS_BASE}/employees/search`, {
       params: { q: q || "" },
-      headers: { "Content-Type": "application/json", Authorization: localStorage.getItem("token") },
+      headers: { "Content-Type": "application/json", Authorization: getToken() },
     });
     if (res.data?.success) {
       dispatch({ type: "REWARDS_EMPLOYEE_SEARCH_SUCCESS", payload: res.data.data || [] });
@@ -4805,7 +4825,7 @@ export const setNominationModalOpen = (open) => (dispatch) => {
 
 export const submitRewardsNomination = (payload, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "REWARDS_NOMINATE" });
     const res = await axios.post(`${REWARDS_BASE}/nominate`, payload, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -4828,7 +4848,7 @@ export const submitRewardsNomination = (payload, year) => async (dispatch) => {
 export const fetchCycleNominations = (cycleId, forVoting = false) => async (dispatch) => {
   if (!cycleId) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_CYCLE_NOMINATIONS" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/nominations`, {
       params: forVoting ? { forVoting: "true" } : {},
@@ -4850,7 +4870,7 @@ export const fetchCycleNominations = (cycleId, forVoting = false) => async (disp
 export const fetchNomineesForVoting = (cycleId) => async (dispatch) => {
   if (!cycleId) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_NOMINEES_FOR_VOTING" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/nominees-for-voting`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -4877,7 +4897,7 @@ export const fetchNomineesForVoting = (cycleId) => async (dispatch) => {
 
 export const rewardsVote = (cycleId, nomineeEmpUuid) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const res = await axios.post(`${REWARDS_BASE}/vote`, { cycleId, nomineeEmpUuid }, {
       headers: { "Content-Type": "application/json", Authorization: token },
     });
@@ -4904,7 +4924,7 @@ export const rewardsVote = (cycleId, nomineeEmpUuid) => async (dispatch) => {
 export const fetchMyCitations = (cycleId) => async (dispatch) => {
   if (!cycleId) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_MY_CITATIONS" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/my-citations`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -4939,7 +4959,7 @@ export const fetchRewardsReceivedCitationsHistory = (year) => async (dispatch, g
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_REWARDS_RECEIVED_CITATIONS_HISTORY" });
     const res = await axios.get(`${REWARDS_BASE}/my-received-citations-history`, {
       params: requestedYear !== null ? { year: requestedYear } : {},
@@ -4979,7 +4999,7 @@ export const fetchRewardsReceivedCitationsHistory = (year) => async (dispatch, g
 export const fetchReviewNominees = (cycleId) => async (dispatch) => {
   if (!cycleId) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_REVIEW_NOMINEES" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/review-nominees`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5000,7 +5020,7 @@ export const fetchReviewNominees = (cycleId) => async (dispatch) => {
 export const fetchNomineeCitations = (cycleId, nomineeEmpUuid) => async (dispatch) => {
   if (!cycleId || !nomineeEmpUuid) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_NOMINEE_CITATIONS" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/nominees/${nomineeEmpUuid}/citations`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5023,7 +5043,7 @@ export const fetchNomineeCitations = (cycleId, nomineeEmpUuid) => async (dispatc
 
 export const upsertGroupedCitationRewards = (cycleId, nomineeEmpUuid, groupedCitation) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const res = await axios.put(
       `${REWARDS_BASE}/cycles/${cycleId}/grouped-citation`,
       { nomineeEmpUuid, groupedCitation },
@@ -5045,7 +5065,7 @@ export const upsertGroupedCitationRewards = (cycleId, nomineeEmpUuid, groupedCit
 
 export const clearGroupedCitationRewards = (cycleId, nomineeEmpUuid) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const res = await axios.put(
       `${REWARDS_BASE}/cycles/${cycleId}/grouped-citation`,
       { nomineeEmpUuid, groupedCitation: "" },
@@ -5065,7 +5085,7 @@ export const clearGroupedCitationRewards = (cycleId, nomineeEmpUuid) => async (d
 
 export const removeRewardsNomination = (nominationId, cycleId) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "REMOVE_NOMINATION" });
     const res = await axios.post(`${REWARDS_BASE}/nominations/${nominationId}/remove`, {}, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5091,7 +5111,7 @@ export const setManageCitationsModalOpen = (payload) => (dispatch) => {
 
 export const startRewardsPhase = (cycleId, phase, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "REWARDS_PHASE_ACTION" });
     const res = await axios.post(`${REWARDS_BASE}/cycles/${cycleId}/start-phase`, { phase }, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5114,7 +5134,7 @@ export const startRewardsPhase = (cycleId, phase, year) => async (dispatch) => {
 
 export const endRewardsPhase = (cycleId, phase, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "REWARDS_PHASE_ACTION" });
     const res = await axios.post(`${REWARDS_BASE}/cycles/${cycleId}/end-phase`, { phase }, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5138,7 +5158,7 @@ export const endRewardsPhase = (cycleId, phase, year) => async (dispatch) => {
 export const fetchNomineesForAnnounce = (cycleId) => async (dispatch) => {
   if (!cycleId) return;
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "FETCH_NOMINEES_FOR_ANNOUNCE" });
     const res = await axios.get(`${REWARDS_BASE}/cycles/${cycleId}/nominees-for-announce`, {
       headers: { "Content-Type": "application/json", Authorization: token },
@@ -5162,7 +5182,7 @@ export const setAnnounceWinnersModalOpen = (open) => (dispatch) => {
 
 export const announceRewardsWinners = (cycleId, employeeChoiceEmpUuids, leadershipChoiceEmpUuids, year) => async (dispatch) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     dispatch({ type: "ANNOUNCE_WINNERS" });
     const res = await axios.post(
       `${REWARDS_BASE}/cycles/${cycleId}/announce-winners`,
@@ -5187,7 +5207,7 @@ export const announceRewardsWinners = (cycleId, employeeChoiceEmpUuids, leadersh
 
 // ================================= Secondary Location =================================
 export const fetchSecondaryLocationOverview = (employeeUuid) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "FETCH_SECONDARY_LOCATION_OVERVIEW" });
     const response = await axios.get(
@@ -5232,7 +5252,7 @@ export const fetchSecondaryLocationLogs = ({
   employeeUuid,
   append = false,
 } = {}) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "FETCH_SECONDARY_LOCATION_LOGS" });
 
@@ -5301,7 +5321,7 @@ export const fetchSecondaryLocationConfigs = ({
   limit = 10,
   append = false,
 } = {}) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "FETCH_SECONDARY_LOCATION_CONFIGS" });
 
@@ -5373,7 +5393,7 @@ export const fetchSecondaryLocationConfigs = ({
 };
 
 export const createSecondaryLocationLog = (payload) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "CREATE_SECONDARY_LOCATION_LOG" });
     const response = await axios.post(
@@ -5426,7 +5446,7 @@ export const createSecondaryLocationLog = (payload) => async (dispatch) => {
 };
 
 export const updateSecondaryLocationLog = (logId, payload) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "UPDATE_SECONDARY_LOCATION_LOG" });
     const response = await axios.patch(
@@ -5479,7 +5499,7 @@ export const updateSecondaryLocationLog = (logId, payload) => async (dispatch) =
 };
 
 export const deleteSecondaryLocationLog = (logId, reason = "") => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "DELETE_SECONDARY_LOCATION_LOG" });
     const response = await axios.delete(
@@ -5532,7 +5552,7 @@ export const deleteSecondaryLocationLog = (logId, reason = "") => async (dispatc
 };
 
 export const createSecondaryLocationConfig = (payload) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "CREATE_SECONDARY_LOCATION_CONFIG" });
     const response = await axios.post(
@@ -5585,7 +5605,7 @@ export const createSecondaryLocationConfig = (payload) => async (dispatch) => {
 };
 
 export const updateSecondaryLocationConfig = (configId, payload) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "UPDATE_SECONDARY_LOCATION_CONFIG" });
     const response = await axios.patch(
@@ -5638,7 +5658,7 @@ export const updateSecondaryLocationConfig = (configId, payload) => async (dispa
 };
 
 export const deleteSecondaryLocationConfig = (configId) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "DELETE_SECONDARY_LOCATION_CONFIG" });
     const response = await axios.delete(
@@ -5701,7 +5721,7 @@ export const fetchSecondaryLocationRequests = ({
   limit = 20,
   append = false,
 } = {}) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "FETCH_SECONDARY_LOCATION_REQUESTS" });
     const response = await axios.get(
@@ -5774,7 +5794,7 @@ export const fetchSecondaryLocationRequests = ({
 };
 
 export const reviewSecondaryLocationRequest = (requestId, payload) => async (dispatch) => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   try {
     dispatch({ type: "REVIEW_SECONDARY_LOCATION_REQUEST" });
     const response = await axios.post(
@@ -5815,5 +5835,78 @@ export const reviewSecondaryLocationRequest = (requestId, payload) => async (dis
     const message = await getErrorMessage(error, "Failed to review request");
     dispatch({ type: "REVIEW_SECONDARY_LOCATION_REQUEST_FAILURE", payload: message });
     return { success: false, message };
+  }
+};
+
+
+export const getOrganizationDetails = () => async (dispatch) => {
+  try {
+    const token = getToken();
+    const response = await axios.get(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/setup/organization`,
+      { headers: { Authorization: token } }
+    );
+    if (response.data.success) {
+      if (dispatch) {
+        dispatch({ type: "SET_ORGANIZATION_DETAILS", payload: response.data.data });
+      }
+      return response.data.data;
+    }
+    return null;
+  } catch (error) {
+    if (error.response?.status === 403 && error.response?.data?.code === "TENANT_INACTIVE") {
+      return { inactive: true };
+    }
+    console.error("Error fetching organization details:", error);
+    return null;
+  }
+};
+
+export const updateOrganizationDetails = (payload) => async () => {
+  try {
+    const token = getToken();
+    const response = await axios.put(
+      `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/setup/organization`,
+      payload,
+      { headers: { Authorization: token } }
+    );
+    if (response.data.success) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error updating organization details:", error);
+    return false;
+  }
+};
+
+export const autoCompleteHrmsSetupAction = () => async (dispatch) => {
+  try {
+    dispatch({ type: "COMPLETE_HRMS_SETUP_REQUEST" });
+    const token = getToken();
+    const domainName = extractSubdomainFromHostname();
+    const response = await axios.post(`${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/hrms/setup/autoCompleteSetup`, {}, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+        "x-tenant-subdomain": domainName,
+      },
+    });
+
+    if (response.data && response.data.success) {
+      dispatch({
+        type: "COMPLETE_HRMS_SETUP_SUCCESS",
+        payload: response.data,
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error during auto setup:", error);
+    dispatch({
+      type: "COMPLETE_HRMS_SETUP_FAILURE",
+      payload: await getErrorMessage(error, "Failed to auto-complete HRMS setup"),
+    });
+    return false;
   }
 };

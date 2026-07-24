@@ -27,7 +27,7 @@ const EmployeeRepositoryDashboard = () => {
   const allToolsAccessDetails = useSelector(state => state.user.allToolsAccessDetails);
   const selectedToolName = useSelector(state => state.mittarvtools.selectedToolName);
   const userAccessLevel = allToolsAccessDetails?.[selectedToolName];
-  const hasAccess=userAccessLevel>=900;
+  const hasAccess=userAccessLevel>=900 || user?.userType === 900;
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
   const showEmployeeOnBOardingForm =

@@ -12,6 +12,8 @@ import SalaryConfiguration from "./SalaryConfiguration/SalaryConfiguration";
 import Payroll from "./Payroll/Payroll";
 import PaySlip from "./Payslip/Payslip";
 import PayrollLevelManagement from "./PayrollLevelManagement/PayrollLevelManagement";
+import { getOrganizationDetails } from "../../../actions/hrRepositoryAction";
+import SetupWarningBanner from "../Common/components/SetupWarningBanner";
 import Snackbar from "../Common/components/Snackbar";
 import "./PayrollAndReimbursements.scss";
 
@@ -212,9 +214,18 @@ const PayrollAndReimbursements = () => {
     );
   }, [activeTab, handleTabClick]);
 
+  const { organizationDetails } = useSelector((state) => state.hrRepositoryReducer);
+
+  useEffect(() => {
+    if (!organizationDetails) {
+      dispatch(getOrganizationDetails());
+    }
+  }, [dispatch, organizationDetails]);
+
   return (
     <>
       <div className="payroll_reimbursements_container">
+        <SetupWarningBanner orgData={organizationDetails} />
         <div className="payroll_reimbursements_tabs" data-active={activeTab} role="tablist">
           {availableTabs.map(renderTab)}
         </div>

@@ -15,6 +15,7 @@ import LeaveConfiguratorForm from "./components/LeaveConfiguratorForm";
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { AddNewLeaveTypePopUp, LeaveCreatedSuccess } from "./components/LeaveConfiguratorPopup";
+import SetupWarningBanner from "../Common/components/SetupWarningBanner";
 import Snackbar from "../Common/components/Snackbar";
 import CheckoutPopup from "../Common/components/CheckoutPopup";
 import { hrToolHomePageData } from "../constant/data";
@@ -27,10 +28,9 @@ const LeaveConfiguratorDashboard = () => {
     allExisitingLeaves,
     leaveCreatedSuccess,
     leaveUpdateSuccess,
-    checkInCheckOutStatus,
     outStandingCheckOut, 
-    getAllComponentType,
     myHrmsAccess,
+    organizationDetails,
   } = useSelector((state) => state.hrRepositoryReducer);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showLeaveDropwon, setShowLeaveDropwon] = useState(false);
@@ -50,7 +50,6 @@ const LeaveConfiguratorDashboard = () => {
   };
 
   const canCreate = hasPermission("LeaveConfigurator_Create");
-  const canRead = hasPermission("LeaveConfigurator_Read");
   const canUpdate = hasPermission("LeaveConfigurator_update");
   
   const hasWriteAccess = allToolsAccessDetails?.[selectedToolName] >= 900 || 
@@ -58,6 +57,20 @@ const LeaveConfiguratorDashboard = () => {
       perm.name === "LeaveConfigurator_Create" || 
       perm.name === "LeaveConfigurator_update"
     );
+
+  const checkOrgConfigured = () => {
+    if (organizationDetails && organizationDetails.orgConfigure === false) {
+      dispatch({
+        type: "SET_NEW_SNACKBAR_MESSAGE",
+        payload: {
+          message: "Organization settings missing. Please complete setup in Organization Settings first.",
+          severity: "warning",
+        },
+      });
+      return false;
+    }
+    return true;
+  };
 
   // Fetch data only once on mount — no state dependencies to avoid re-fetching
   useEffect(() => {
@@ -143,12 +156,23 @@ const LeaveConfiguratorDashboard = () => {
   const toggleDropdown = (event) => {
     if (!hasWriteAccess) return;
     event.stopPropagation();
+    if (!checkOrgConfigured()) return;
     setShowLeaveDropwon((prev) => !prev);
   };
 
   return (
     <>
       <div className="leave_configurator_container">
+        {!showLeaveConfiguratorForm && (
+          <SetupWarningBanner
+            orgData={organizationDetails}
+            showLeaveWarningOverride={organizationDetails?.orgConfigure !== false && allExisitingLeaves?.length <= 1}
+            onConfigureLeave={() => {
+              if (checkOrgConfigured()) setSearchParams({ showAddLeaveForm: true });
+            }}
+            canCreateLeave={canCreate}
+          />
+        )}
         {showLeaveConfiguratorForm ? (
           <LeaveConfiguratorForm />
         ) : (

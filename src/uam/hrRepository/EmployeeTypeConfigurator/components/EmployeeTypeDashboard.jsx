@@ -1,16 +1,19 @@
 import  { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllComponentTypes, updateComponentType } from '../../../../actions/hrRepositoryAction';
+import { getAllComponentTypes, updateComponentType, getOrganizationDetails } from '../../../../actions/hrRepositoryAction';
 import Add_icon from "../../assets/icons/add_icon_without_background.svg";
 import Info_icon from "../../assets/icons/info_icon.svg";
 import EmployeeTypeModal from './EmployeeTypeModal';
 import EmployeeTypeMappingTable from "./EmployeeTypeMappingTable";
 import DepartmentMappingTable from "./DepartmentMappingTable";
+import OrgDetailsTab from "./OrgDetailsTab";
 import Snackbar from "../../Common/components/Snackbar";
+import SetupWarningBanner from "../../Common/components/SetupWarningBanner";
 import ConfirmationPopup from "../../Common/components/ConfirmationPopup";
 import './EmployeeTypeConfigurator.scss';
 
 const CONFIG_TABS = [
+    { id: "org_details", label: "Organization Details", description: "Manage organization profile and logo." },
     { id: "emp_type_dropdown", label: "Employee Type", description: "Configures employment types (e.g., Full-Time, Part-Time, Contract). Used across the HRMS for employee categorization." },
     { id: "department_type_dropdown", label: "Department", description: "Configures the departments in the organization (e.g., Engineering, HR, Sales). Used for organizational grouping." },
     { id: "level_dropdown", label: "Level", description: "Configures hierarchical levels or grades for employees (e.g., L1, L2, Junior, Senior)." },
@@ -24,11 +27,14 @@ const CONFIG_TABS = [
 
 const EmployeeTypeDashboard = () => {
     const dispatch = useDispatch();
-    const { getAllComponentType, myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+    const { getAllComponentType, myHrmsAccess, organizationDetails } = useSelector((state) => state.hrRepositoryReducer);
     const { user, allToolsAccessDetails } = useSelector((state) => state.user);
     const { selectedToolName } = useSelector((state) => state.mittarvtools);
 
-    const [activeTab, setActiveTab] = useState("emp_type_dropdown");
+    const [activeTab, setActiveTab] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('tab') || "org_details";
+    });
     const [showMappingFor, setShowMappingFor] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editItem, setEditItem] = useState(null);
@@ -119,9 +125,16 @@ const EmployeeTypeDashboard = () => {
         setShowMappingFor(null);
     }, []);
 
+    useEffect(() => {
+        if (!organizationDetails) {
+            dispatch(getOrganizationDetails());
+        }
+    }, [dispatch, organizationDetails]);
+
     return (
         <>
             <div className="employee_configurator_container">
+                <SetupWarningBanner orgData={organizationDetails} />
                 <div className="employee_configurator_heading">
                     <div className="employee_configurator_title_container">
                         <p className="employee_configurator_title">Organization settings</p>
@@ -146,7 +159,7 @@ const EmployeeTypeDashboard = () => {
                                 <p>Manage Behaviors</p>
                             </button>
                         )}
-                        {hasWriteAccess && !showMappingFor && (
+                        {hasWriteAccess && activeTab !== "org_details" && !showMappingFor && (
                             <button className="employee_configurator_add_button" onClick={() => { setEditItem(null); setIsModalOpen(true); }}>
                                 <div>
                                     <img src={Add_icon} alt="Add Icon" />
@@ -155,6 +168,7 @@ const EmployeeTypeDashboard = () => {
                             </button>
                         )}
                     </div>
+                    
                 </div>
 
                 <div className="employee_configurator_tabs" role="tablist">
@@ -172,7 +186,9 @@ const EmployeeTypeDashboard = () => {
                 <hr />
 
                 <div className="employee_configurator_tab_content">
-                    {showMappingFor === "emp_type_dropdown" ? (
+                    {activeTab === "org_details" ? (
+                        <OrgDetailsTab />
+                    ) : showMappingFor === "emp_type_dropdown" ? (
                         <EmployeeTypeMappingTable onBack={() => setShowMappingFor(null)} />
                     ) : showMappingFor === "department_type_dropdown" ? (
                         <DepartmentMappingTable onBack={() => setShowMappingFor(null)} />

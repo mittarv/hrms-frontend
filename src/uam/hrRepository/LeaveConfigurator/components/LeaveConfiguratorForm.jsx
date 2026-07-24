@@ -95,13 +95,35 @@ const LeaveConfiguratorForm = () => {
   useEffect(() => {
     if ((isViewMode || isEditMode) && currentLeaveDetails) {
 
-      const employeeType = 
-        currentLeaveDetails.employeeType ? 
-        JSON.parse(currentLeaveDetails.employeeType) : [];
+      let rawEmpType = currentLeaveDetails.employeeType;
+      let employeeType = [];
+      if (rawEmpType) {
+        try {
+          const parsed = typeof rawEmpType === 'string' ? JSON.parse(rawEmpType) : rawEmpType;
+          if (Array.isArray(parsed)) {
+            employeeType = parsed;
+          } else if (parsed && typeof parsed === 'object') {
+            employeeType = parsed.emp_type_dropdown || parsed.employeeType || Object.values(parsed).flat();
+          } else {
+            employeeType = [parsed];
+          }
+        } catch (e) {
+          employeeType = [rawEmpType];
+        }
+      }
+      if (!Array.isArray(employeeType)) employeeType = [];
       
-      const appliedGender = 
-        currentLeaveDetails.appliedGender ? 
-        JSON.parse(currentLeaveDetails.appliedGender) : [];
+      let rawGender = currentLeaveDetails.appliedGender;
+      let appliedGender = [];
+      if (rawGender) {
+        try {
+          const parsed = typeof rawGender === 'string' ? JSON.parse(rawGender) : rawGender;
+          appliedGender = Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+          appliedGender = [rawGender];
+        }
+      }
+      if (!Array.isArray(appliedGender)) appliedGender = [];
       
       // Map the keys to display values if needed
       const mappedEmployeeType = employeeType.map(key => {

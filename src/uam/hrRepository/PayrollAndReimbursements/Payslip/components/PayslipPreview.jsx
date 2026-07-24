@@ -1,5 +1,4 @@
 // import { X } from 'lucide-react';
-import Mitt_Arv_Logo from "../../../assets/icons/mittar_payroll_logo.svg";
 import walletIcon from "../../../assets/icons/wallet_icon.svg";
 import walletIconDark from "../../../assets/icons/wallet_icon_dark.svg";
 import subtarctIconGrey from "../../../assets/icons/subtract_icon_grey.svg";
@@ -9,18 +8,44 @@ import equalIconGrey from "../../../assets/icons/equal_icon_grey.svg";
 import closeIcon from "../../../assets/icons/cross_icon.svg";
 import "../styles/PayslipPreview.scss";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { getCurrentEmployeeDetails, downloadPayslipPdf } from "../../../../../actions/hrRepositoryAction";
+import { useEffect, useState } from "react";
+import { getCurrentEmployeeDetails, downloadPayslipPdf, getOrganizationDetails } from "../../../../../actions/hrRepositoryAction";
 import { getComponentTypeValue } from "../../../Common/utils/helper";
 import LoadingSpinner from "../../../Common/components/LoadingSpinner";
 import addIconGrey from "../../../assets/icons/add_icon_grey.svg";
 import downloadIconBlue from "../../../assets/icons/download_icon_blue.svg";
 
 const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
-  const {currentEmployeeDetails, loading, currentEmployeeDetailsLoading,  getAllComponentType} = useSelector((state) => state.hrRepositoryReducer);
+  const {currentEmployeeDetails, loading, currentEmployeeDetailsLoading, getAllComponentType, organizationDetails} = useSelector((state) => state.hrRepositoryReducer);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const userEmployeeId = employeeId || user?.employeeUuid;
+  const [organizationLogoError, setOrganizationLogoError] = useState(false);
+  const metadataObj = typeof organizationDetails?.metadata === 'string'
+    ? (() => { try { return JSON.parse(organizationDetails.metadata); } catch(e) { return {}; } })()
+    : (organizationDetails?.metadata || {});
+
+  const rawOrganizationLogo = metadataObj?.logo || organizationDetails?.logo;
+  const organizationLogo = !organizationLogoError && typeof rawOrganizationLogo === "string" && rawOrganizationLogo.trim()
+    ? rawOrganizationLogo
+    : null;
+
+  const rawAddress = metadataObj?.address || organizationDetails?.address;
+  const companyAddress = typeof rawAddress === 'string'
+    ? rawAddress
+    : (typeof rawAddress === 'object' && rawAddress !== null
+        ? Object.values(rawAddress).filter(Boolean).join(', ')
+        : "");
+
+  useEffect(() => {
+    if (!organizationDetails) {
+      dispatch(getOrganizationDetails());
+    }
+  }, [dispatch, organizationDetails]);
+
+  useEffect(() => {
+    setOrganizationLogoError(false);
+  }, [rawOrganizationLogo]);
 
   useEffect(()=>{
     if (userEmployeeId) {
@@ -87,12 +112,15 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
     }
   };
 
+  const statusStr = (selectedPayslip?.status || selectedPayslip?.payrollStatus || "").toString().toLowerCase();
+  const isPayrollGenerated = !!selectedPayslip?.payslipId || statusStr === "payroll_generated" || statusStr === "payroll generated" || statusStr === "payroll_finalized" || statusStr === "payroll finalized" || statusStr === "generated";
+
   if (!isOpen) return null;
   return (
     <div className="payslip-modal-overlay" onClick={onClose}>
       {(loading  || currentEmployeeDetailsLoading) ? <LoadingSpinner  message="Loading payslip"/> : <div className="payslip-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header-actions">
-          {selectedPayslip?.payslipId && (
+          {selectedPayslip?.payslipId && isPayrollGenerated && (
             <button className="download-button" onClick={handleDownload} title="Download Payslip">
               <img src={downloadIconBlue} alt="Download" />
               <span>Download</span>
@@ -106,14 +134,18 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
         <div className="payslip-content">
           <header className="payslip-header">
             <div className="payslip_addr_logo_container">
-              <p>
-                Ashoka Bhopal Chambers, 205, Above Standard Chartered Bank,
-                <br />
-                Sindhi Colony, Begumpet, Secunderabad, Hyderabad, Telangana 500003
+              <p style={{ whiteSpace: 'pre-line' }}>
+                {companyAddress}
               </p>
-              <div className="company_logo">
-                <img src={Mitt_Arv_Logo} alt="Mitt Arv Logo" />
-              </div>
+              {organizationLogo && (
+                <div className="company_logo">
+                  <img
+                    src={organizationLogo}
+                    alt="Organization logo"
+                    onError={() => setOrganizationLogoError(true)}
+                  />
+                </div>
+              )}
             </div>
             <div className="payslip_title_container">
               <img

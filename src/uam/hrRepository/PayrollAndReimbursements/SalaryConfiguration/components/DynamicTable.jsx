@@ -402,8 +402,6 @@ export default function DynamicTable({
         rowData.componentName === "Loss of Payper day)" || 
         rowData.componentName.includes("Loss of Pay")
       );
-      console.log(fieldValue)
-      
       return isSalaryConfigEditing ? (
         <input
           type="text"

@@ -14,7 +14,7 @@ import "../styles/PayrollHeader.scss";
 
 const PayrollHeader = ({ selectedRows, resetSelections }) => {
   const dispatch = useDispatch();
-  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, netPayPayrollAmount, myHrmsAccess, hasGeneratedRecords } = useSelector(
+  const { payrollData, payrollPagination, payrollFilters, isAllPayrollFinalized, isAllPayrollGenerated, hasGeneratedRecords, netPayPayrollAmount, myHrmsAccess } = useSelector(
     (state) => state.hrRepositoryReducer
   );
   const { allToolsAccessDetails } = useSelector((state) => state.user);

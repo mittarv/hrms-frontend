@@ -1,5 +1,10 @@
 import { createReducer } from "@reduxjs/toolkit";
-const initialState = {};
+import { setToken, clearAuth } from "../utils/authStorage";
+
+const initialState = {
+  loading: true,
+  isAuthenticated: false,
+};
 
 export const userReducer = createReducer(initialState, (builder) => {
   builder
@@ -9,9 +14,9 @@ export const userReducer = createReducer(initialState, (builder) => {
     .addCase('GOOGLE_LOGIN_SUCCESS', (state, action) => {
       state.loading = false;
       state.isAuthenticated = true;
-      localStorage.setItem("token", action.payload.token);
-      //we don't need to store the userId in the local storage
-      // localStorage.setItem("userId", action.payload.user.userId);
+      state.redirectSubdomain = action.payload.redirectSubdomain;
+      state.isGuest = action.payload.isGuest;
+      setToken(action.payload.token);
     })
     .addCase('GOOGLE_LOGIN_FAIL', (state, action) => {
       state.loading = false;
@@ -28,9 +33,7 @@ export const userReducer = createReducer(initialState, (builder) => {
     .addCase('CREATE_TMS_USER_SUCCESS', (state, action) => {
       state.loading = false;
       state.isAuthenticated = true;
-      // state.user = action.payload.user;
-      localStorage.setItem("token", action.payload.token);
-      // localStorage.setItem("userId", action.payload.user.userId);
+      setToken(action.payload.token);
     })
     .addCase('CREATE_TMS_USER_FAIL', (state, action) => {
       state.loading = false;
@@ -46,17 +49,27 @@ export const userReducer = createReducer(initialState, (builder) => {
       state.loading = false;
       state.isAuthenticated = true;
       state.user = action.payload;
-      state.allToolsAccessDetails = action.payload.toolsAccess
+      state.allToolsAccessDetails = action.payload.toolsAccess;
+      if (action.payload.redirectSubdomain) {
+        state.redirectSubdomain = action.payload.redirectSubdomain;
+      }
     })
     .addCase('LOAD_USER_INFO_FAIL', (state, action) => {
       state.loading = false;
       state.error = action.payload;
       state.isAuthenticated = false;
     })
+    .addCase('UPDATE_USER_EMPLOYEE_UUID', (state, action) => {
+      if (state.user) {
+        state.user.employeeUuid = action.payload;
+      }
+    })
 
     .addCase('LOGOUT_USER', (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      localStorage.removeItem("token");
+      state.redirectSubdomain = null;
+      state.isGuest = false;
+      clearAuth();
     });
 });

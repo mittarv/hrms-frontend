@@ -428,3 +428,170 @@
         }
     }
 }
+
+.org_profile_tab_container {
+  padding: 16px 0 32px 0;
+  
+  .org_profile_header {
+    margin-bottom: 32px;
+    
+    .org_profile_title {
+      color: #033348;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    
+    .org_profile_subtitle {
+      color: #64748b;
+      font-size: 14px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+  }
+
+  .org_profile_content {
+    display: flex;
+    gap: 32px;
+    align-items: stretch;
+    flex-wrap: wrap;
+
+    .org_details_card {
+      flex: 1 1 350px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+
+      .org_detail_group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .detail_label {
+          color: #64748b;
+          font-size: 13px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-family: "Plus Jakarta Sans", sans-serif;
+        }
+
+        .detail_value {
+          color: #0f172a;
+          font-size: 16px;
+          font-weight: 600;
+          font-family: "Plus Jakarta Sans", sans-serif;
+
+          &.id_badge {
+            background-color: #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            width: fit-content;
+            font-family: monospace;
+          }
+        }
+      }
+    }
+
+    .org_logo_card {
+      flex: 0 1 320px;
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      
+      .logo_card_title {
+        color: #0f172a;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      .logo_card_subtitle {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 24px;
+        line-height: 1.4;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+
+      .logo_preview_container {
+        width: 140px;
+        height: 140px;
+        border: 2px dashed #cbd5e1;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 24px;
+        background-color: #f8fafc;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: #94a3b8;
+        }
+
+        .logo_preview_image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .logo_placeholder {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: #94a3b8;
+          font-size: 12px;
+          font-weight: 500;
+          padding: 20px;
+          text-align: center;
+          font-family: "Plus Jakarta Sans", sans-serif;
+        }
+      }
+
+      .logo_actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        margin-bottom: 16px;
+        
+        .change_logo_btn {
+          width: 100%;
+        }
+
+        .save_logo_btn {
+          width: 100%;
+        }
+      }
+
+      .logo_hint {
+        color: #94a3b8;
+        font-size: 12px;
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .org_profile_content {
+      flex-direction: column;
+      
+      .org_logo_card {
+        flex: 1 1 100%;
+      }
+    }
+  }
+}

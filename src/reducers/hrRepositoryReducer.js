@@ -1,6 +1,7 @@
 import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
+  organizationDetails: null,
   allEmployees: [],
   allEmployeesLoading: false,
   getAllComponentType: [],
@@ -617,8 +618,13 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.error = action.payload;
       })
       .addCase('SET_NEW_SNACKBAR_MESSAGE', (state, action) => {
-        state.message = action.payload.message || action.payload;
-        state.severity = action.payload.severity || "info";
+        if (action.payload && typeof action.payload === 'object') {
+          state.message = action.payload.message || "An unexpected error occurred";
+          state.severity = action.payload.severity || "info";
+        } else {
+          state.message = action.payload || "An unexpected error occurred";
+          state.severity = "info";
+        }
         state.isOpen = true;
       })
       .addCase('CLEAR_NEW_SNACKBAR_MESSAGE', (state) => {
@@ -1719,5 +1725,8 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
     .addCase('DELETE_SECONDARY_LOCATION_CONFIG_FAILURE', (state, action) => {
       state.secondaryLocationLoading = false;
       state.secondaryLocationError = action.payload;
+    })
+    .addCase('SET_ORGANIZATION_DETAILS', (state, action) => {
+      state.organizationDetails = action.payload;
     });
 });

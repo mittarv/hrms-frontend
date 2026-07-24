@@ -74,6 +74,7 @@ const SalaryConfiguration = () => {
             placeholder="Select Employee Type"
             onChange={(e) => handleDropdownChange('employeeType', e.target.value)}
             searchable={true}
+            showEmptyStateButton={true}
           />
           <CustomDropdown
             options={employeeLocationOptions}
@@ -81,6 +82,7 @@ const SalaryConfiguration = () => {
             placeholder="Select Location Type"
             onChange={(e) => handleDropdownChange('employeeLocation', e.target.value)}
             searchable={true}
+            showEmptyStateButton={true}
           />
           <CustomDropdown
             options={employeeLevelOptions}
@@ -89,6 +91,7 @@ const SalaryConfiguration = () => {
             onChange={(e) => handleDropdownChange('employeeLevel', e.target.value)}
             searchable={true}
             disabled={isLevelDisabled}
+            showEmptyStateButton={true}
           />
           {isInternType && (
             <>
@@ -98,6 +101,7 @@ const SalaryConfiguration = () => {
                 placeholder="Select Department"
                 onChange={(e) => handleDropdownChange('department', e.target.value)}
                 searchable={true}
+                showEmptyStateButton={true}
               />
               <CustomDropdown
                 options={yearOfStudyOptions}
@@ -105,6 +109,7 @@ const SalaryConfiguration = () => {
                 placeholder="Select Year of Study"
                 onChange={(e) => handleDropdownChange('yearOfStudy', e.target.value)}
                 searchable={true}
+                showEmptyStateButton={true}
               />
             </>
           )}
