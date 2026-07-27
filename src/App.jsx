@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, Routes, Route } from "react-router-dom";
 
@@ -11,9 +11,10 @@ import useDynamicTitle from "./hooks/useDynamicTitle";
 import { loadUserInfo } from "./actions/userActions";
 import { getOrganizationDetails } from "./actions/hrRepositoryAction";
 
-import ToolHome from "./tools/toolHome/ToolHome";
-import { clearAuth } from "./utils/authStorage";
-import { getRootHost } from "./utils/domainUtils";
+// import ToolHome from "./tools/toolHome/ToolHome";
+import { clearAuth, getToken, setToken } from "./utils/authStorage";
+import { getRootHost, extractSubdomainFromHostname } from "./utils/domainUtils";
+import axios from "axios";
 
 import mittArvLogo from "./assets/images/mittarv_logo_dark.svg";
 
@@ -67,19 +68,51 @@ const App = () => {
     dispatch(getOrganizationDetails());
   }, [dispatch]);
 
-  // Auto-redirect to org subdomain when authenticated on the central domain
-  useEffect(() => {
-    if (isAuthenticated && redirectSubdomain) {
-      const hostname = window.location.hostname;
-      const isLocalhost = hostname === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+  // Handles redirecting to primary tenant or switching tenant when on wrong subdomain
+  const handleTenantRedirect = useCallback(async () => {
+    if (!isAuthenticated || !redirectSubdomain) return;
 
-      if (!isLocalhost && !hostname.startsWith(`${redirectSubdomain}.`)) {
-        const protocol = window.location.protocol;
-        const rootHost = getRootHost();
-        window.location.href = `${protocol}//${redirectSubdomain}.${rootHost}/`;
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
+
+    if (isLocalhost || hostname.startsWith(`${redirectSubdomain}.`)) return;
+
+    const currentSubdomain = extractSubdomainFromHostname(hostname);
+    const envDomain = import.meta.env.VITE_AUTH_DOMAIN;
+    const centralDomain = envDomain ? envDomain.replace(/^\./, "") : getRootHost();
+    const protocol = window.location.protocol;
+
+    // On central domain or no subdomain → redirect to primary tenant
+    if (hostname === centralDomain || !currentSubdomain) {
+      window.location.href = `${protocol}//${redirectSubdomain}.${centralDomain}/`;
+      return;
+    }
+
+    // On a different tenant subdomain → attempt to switch tenant
+    try {
+      const token = getToken();
+      const response = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_HOSTED_URL}/api/tms/users/switch-tenant`,
+        { targetSubdomain: currentSubdomain },
+        { headers: { Authorization: token } }
+      );
+
+      if (response.data.success && response.data.token) {
+        setToken(response.data.token);
+        window.location.reload();
       }
+    } catch (error) {
+      console.error("Failed to switch tenant:", error);
+      // No access to this tenant → redirect to primary org
+      window.location.href = `${protocol}//${redirectSubdomain}.${centralDomain}/`;
     }
   }, [isAuthenticated, redirectSubdomain]);
+
+  // Auto-redirect or switch tenant when authenticated on a different domain
+  useEffect(() => {
+    handleTenantRedirect();
+  }, [handleTenantRedirect]);
+
 
   const isHeaderlessRoute = useMemo(() => {
     const noHeaderPaths = [
