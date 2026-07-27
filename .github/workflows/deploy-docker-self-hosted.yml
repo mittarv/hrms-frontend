@@ -49,6 +49,7 @@ jobs:
           VITE_REACT_APP_HOSTED_URL: ${{ vars.VITE_REACT_APP_HOSTED_URL }}
           VITE_ENCRYPTION_KEY: ${{ secrets.VITE_ENCRYPTION_KEY }}
           VITE_ALLOWED_EMAIL_DOMAIN: ${{ vars.VITE_ALLOWED_EMAIL_DOMAIN }}
+          VITE_AUTH_DOMAIN: ${{ vars.VITE_AUTH_DOMAIN }}
           HOST_PORT: ${{ vars.HOST_PORT }}
         run: |
           @"
@@ -57,6 +58,7 @@ jobs:
           VITE_REACT_APP_HOSTED_URL=$env:VITE_REACT_APP_HOSTED_URL
           VITE_ENCRYPTION_KEY=$env:VITE_ENCRYPTION_KEY
           VITE_ALLOWED_EMAIL_DOMAIN=$env:VITE_ALLOWED_EMAIL_DOMAIN
+          VITE_AUTH_DOMAIN=$env:VITE_AUTH_DOMAIN
           HOST_PORT=$env:HOST_PORT
           "@ | Set-Content .env
 
