@@ -9,6 +9,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useDispatch, useSelector } from "react-redux";
 import { googleLogin } from "../../actions/userActions";
 import Snackbar from "../../uam/hrRepository/Common/components/Snackbar";
+import { getLoginHost } from "../../utils/domainUtils";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -29,13 +30,12 @@ const Login = () => {
     // Skip if localhost or IP address
     if (hostname === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) return;
 
-    const envDomain = import.meta.env.VITE_AUTH_DOMAIN;
-    const centralDomain = envDomain ? envDomain.replace(/^\./, "") : hostname.split('.').slice(-2).join('.');
+    const loginHost = getLoginHost();
+    const loginHostname = loginHost.split(":")[0];
     
-    // If the user is on a subdomain (e.g., hora4.local.themsarena.online), redirect them to the central domain (local.themsarena.online) for Google OAuth.
-    if (hostname !== centralDomain) {
-      const port = window.location.port ? `:${window.location.port}` : '';
-      window.location.replace(`${window.location.protocol}//${centralDomain}${port}/login`);
+    // If the user is on a subdomain, redirect them to the central login domain for Google OAuth.
+    if (hostname !== loginHostname) {
+      window.location.replace(`${window.location.protocol}//${loginHost}/login`);
     }
   }, []);
 

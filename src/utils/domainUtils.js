@@ -13,16 +13,44 @@ export const extractSubdomainFromHostname = (hostname = window.location.hostname
 };
 
 /**
- * Extract root host for domain redirects.
+ * Extract root host for domain redirects (includes port).
  */
 export const getRootHost = (host = window.location.host, envDomain = import.meta.env.VITE_AUTH_DOMAIN) => {
+  if (envDomain) {
+    const cleanEnvDomain = envDomain.replace(/^\./, "");
+    const parts = cleanEnvDomain.split('.');
+    const parentDomain = parts.length > 2 ? parts.slice(1).join('.') : cleanEnvDomain;
+    const portStr = window.location.port ? `:${window.location.port}` : "";
+    return parentDomain + portStr;
+  }
+  const parts = host.split('.');
+  return parts.length >= 2 ? parts.slice(-2).join('.') : host;
+};
+
+/**
+ * Extract root domain (no port, no login subdomain).
+ */
+export const getRootDomain = (envDomain = import.meta.env.VITE_AUTH_DOMAIN) => {
+  if (envDomain) {
+    const cleanEnvDomain = envDomain.replace(/^\./, "");
+    const parts = cleanEnvDomain.split('.');
+    return parts.length > 2 ? parts.slice(1).join('.') : cleanEnvDomain;
+  }
+  const hostname = window.location.hostname;
+  const parts = hostname.split('.');
+  return parts.length >= 2 ? parts.slice(-2).join('.') : hostname;
+};
+
+/**
+ * Extract full login host with port.
+ */
+export const getLoginHost = (envDomain = import.meta.env.VITE_AUTH_DOMAIN) => {
   if (envDomain) {
     const cleanEnvDomain = envDomain.replace(/^\./, "");
     const portStr = window.location.port ? `:${window.location.port}` : "";
     return cleanEnvDomain + portStr;
   }
-  const parts = host.split('.');
-  return parts.length >= 2 ? parts.slice(-2).join('.') : host;
+  return window.location.host;
 };
 
 /**

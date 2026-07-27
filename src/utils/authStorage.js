@@ -33,6 +33,8 @@
  * - In development, it auto-detects from hostname
  */
 
+import { getRootDomain as getParentDomain } from "./domainUtils";
+
 const TOKEN_KEY = "auth_token";
 
 /**
@@ -43,7 +45,7 @@ const TOKEN_KEY = "auth_token";
  * 2. Auto-detect from hostname (development fallback)
  *
  * Examples:
- *   env VITE_AUTH_DOMAIN="yourhrms.com"  →  ".yourhrms.com"
+ *   env VITE_AUTH_DOMAIN="hrms.dev.mitarv.com"  →  ".dev.mitarv.com"
  *   hostname "hora4.lvh.me"             →  ".lvh.me"
  *   hostname "localhost"                 →  "" (no domain attr)
  */
@@ -55,12 +57,10 @@ const getRootDomain = () => {
     return "";
   }
 
-  // Use env var only if current hostname belongs to that domain
-  const envDomain = import.meta.env.VITE_AUTH_DOMAIN;
-  if (envDomain) {
-    const cleanEnvDomain = envDomain.replace(/^\./, "");
-    if (hostname === cleanEnvDomain || hostname.endsWith(`.${cleanEnvDomain}`)) {
-      return `.${cleanEnvDomain}`;
+  const parentDomain = getParentDomain();
+  if (parentDomain) {
+    if (hostname === parentDomain || hostname.endsWith(`.${parentDomain}`)) {
+      return `.${parentDomain}`;
     }
   }
 
