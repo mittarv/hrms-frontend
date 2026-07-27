@@ -11,17 +11,12 @@ import axios from "axios";
 import { getToken } from "./utils/authStorage";
 import { extractSubdomainFromHostname } from "./utils/domainUtils";
 
-// Setup global axios interceptor — attaches auth token and tenant header to every request
+// Setup global axios interceptor — attaches auth token to every request
 axios.interceptors.request.use((config) => {
   // Auth token from shared cookie
   const token = getToken();
   if (token) {
     config.headers["Authorization"] = token;
-  }
-  // Tenant subdomain from hostname (e.g., "hora4.lvh.me" → "hora4")
-  const subdomain = extractSubdomainFromHostname();
-  if (subdomain) {
-    config.headers["x-tenant-subdomain"] = subdomain;
   }
   return config;
 });
