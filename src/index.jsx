@@ -9,7 +9,6 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { pdfjs } from "react-pdf";
 import axios from "axios";
 import { getToken } from "./utils/authStorage";
-import { extractSubdomainFromHostname } from "./utils/domainUtils";
 
 // Setup global axios interceptor — attaches auth token to every request
 axios.interceptors.request.use((config) => {
