@@ -13,7 +13,7 @@ import { getOrganizationDetails } from "./actions/hrRepositoryAction";
 
 // import ToolHome from "./tools/toolHome/ToolHome";
 import { clearAuth, getToken, setToken } from "./utils/authStorage";
-import { getRootHost, extractSubdomainFromHostname } from "./utils/domainUtils";
+import { getRootDomain, extractSubdomainFromHostname } from "./utils/domainUtils";
 import axios from "axios";
 
 import mittArvLogo from "./assets/images/mittarv_logo_dark.svg";
@@ -79,12 +79,16 @@ const App = () => {
 
     const currentSubdomain = extractSubdomainFromHostname(hostname);
     const envDomain = import.meta.env.VITE_AUTH_DOMAIN;
-    const centralDomain = envDomain ? envDomain.replace(/^\./, "") : getRootHost();
+    const rootDomain = getRootDomain();
+    const cleanEnvDomain = envDomain ? envDomain.replace(/^\./, "") : "";
+    const loginSubdomain = cleanEnvDomain.split('.')[0];
     const protocol = window.location.protocol;
+    const port = window.location.port ? `:${window.location.port}` : '';
 
-    // On central domain or no subdomain → redirect to primary tenant
-    if (hostname === centralDomain || !currentSubdomain) {
-      window.location.href = `${protocol}//${redirectSubdomain}.${centralDomain}/`;
+    // On central domain, login subdomain, or no subdomain → redirect to primary tenant
+    const isCentralHost = hostname === rootDomain || hostname === cleanEnvDomain || !currentSubdomain || (loginSubdomain && currentSubdomain === loginSubdomain);
+    if (isCentralHost) {
+      window.location.href = `${protocol}//${redirectSubdomain}.${rootDomain}${port}/`;
       return;
     }
 
@@ -104,7 +108,7 @@ const App = () => {
     } catch (error) {
       console.error("Failed to switch tenant:", error);
       // No access to this tenant → redirect to primary org
-      window.location.href = `${protocol}//${redirectSubdomain}.${centralDomain}/`;
+      window.location.href = `${protocol}//${redirectSubdomain}.${rootDomain}${port}/`;
     }
   }, [isAuthenticated, redirectSubdomain]);
 
