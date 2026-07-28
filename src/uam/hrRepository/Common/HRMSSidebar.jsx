@@ -66,6 +66,11 @@ const routePermissions = {
     adminThreshold: 900,
     requireEmployee: false,
   },
+  "/employee-type-configurator": {
+    permission: ["Organization_read", "Organization_write"],
+    adminThreshold: 900,
+    requireEmployee: false,
+  },
 };
 
 const HRMSSidebar = () => {

@@ -27,16 +27,78 @@ export default function DynamicTable({
     const mergedRows = mergeRowData(defaultRows, apiRows);
     
     // Auto-calculate Loss of Pay amount after merging data from API
-    const updatedRows = mergedRows.map(row => {
+    let updatedRows = mergedRows.map(row => {
       if (title === "Default Deduction" && row.componentName === "Loss of Pay(per day)") {
-        const calculatedAmount = calculateLossOfPayAmount(mergedRows, row._originalData?.amount || row.amount);
+        const defaultAdditionRows = typeof window !== 'undefined' && window.defaultAdditionTableData
+          ? window.defaultAdditionTableData
+          : mergedRows;
+        const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows, row._originalData?.amount || row.amount);
+        const originalAmount = row._originalData ? parseFloat(row._originalData.amount ?? 0) : null;
         return {
           ...row,
-          amount: calculatedAmount
+          amount: calculatedAmount,
+          _isModified: originalAmount !== null && calculatedAmount !== originalAmount ? true : row._isModified
         };
       }
       return row;
     });
+
+    // Always show Loss of Pay in Default Deduction when creating/editing if it's missing
+    if (title === "Default Deduction") {
+      const hasLop = updatedRows.some(row => 
+        row.componentName === "Loss of Pay(per day)" || 
+        row.componentName === "Loss of Payper day)" || 
+        row.componentName.includes("Loss of Pay")
+      );
+      if (!hasLop) {
+        const calculatedAmount = typeof window !== 'undefined' && window.defaultAdditionTableData
+          ? calculateLossOfPayAmount(window.defaultAdditionTableData, 0)
+          : 0;
+        updatedRows.push({
+          componentId: "loss-of-pay-default-temp",
+          componentName: "Loss of Pay(per day)",
+          componentType: "defaultDeduction",
+          amount: calculatedAmount,
+          percentageOfBasicSalary: null,
+          thresholdAmount: null,
+          frequency: "",
+          variable: false,
+          includeinLop: false,
+          effectiveFrom: "",
+          isVariable: false,
+          isDefault: true,
+          _isDeleted: false,
+          _isModified: false,
+          isNewRow: true
+        });
+      }
+    }
+
+    // Always show Basic Salary in Default Addition when creating/editing if it's missing
+    if (title === "Default Addition") {
+      const hasBasic = updatedRows.some(row => 
+        row.componentName === "Basic Salary"
+      );
+      if (!hasBasic) {
+        updatedRows.push({
+          componentId: "basic-salary-default-temp",
+          componentName: "Basic Salary",
+          componentType: "defaultAddition",
+          amount: null,
+          percentageOfBasicSalary: null,
+          thresholdAmount: null,
+          frequency: "",
+          variable: false,
+          includeinLop: false,
+          effectiveFrom: "",
+          isVariable: false,
+          isDefault: true,
+          _isDeleted: false,
+          _isModified: false,
+          isNewRow: true
+        });
+      }
+    }
     
     setTableRows(updatedRows);
     setShowValidationErrors(false);
@@ -209,10 +271,11 @@ export default function DynamicTable({
           const updatedRows = prevRows.map(row => {
             if (row.componentName === "Loss of Pay(per day)" || row.componentName === "Loss of Payper day)" || row.componentName.includes("Loss of Pay")) {
               const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows, row._originalData?.amount || row.amount);
+              const originalAmount = row._originalData ? parseFloat(row._originalData.amount ?? 0) : null;
               return {
                 ...row,
                 amount: calculatedAmount,
-                _isModified: row._originalData ? true : row._isModified
+                _isModified: originalAmount !== null && calculatedAmount !== originalAmount ? true : row._isModified
               };
             }
             return row;
@@ -232,7 +295,7 @@ export default function DynamicTable({
       const updatedRows = [...prevRows];
       const rowToDelete = updatedRows[rowIndex];
       
-      if (rowToDelete.isDefault) {
+      if (rowToDelete.isDefault && !rowToDelete.componentName.includes("Loss of Pay") && !rowToDelete.componentName.includes("Basic Salary")) {
         return prevRows;
       }
       
@@ -579,9 +642,9 @@ export default function DynamicTable({
 
     if (columnConfig.type === "actions" && isSalaryConfigEditing && !isDisabled) {
       if (!rowData._isDeleted) {
-        // Don't show delete button for default items from backend and Loss of Pay component
-        if ((rowData.isNewRow || rowData._originalData?.componentId) && !rowData.isDefault && 
-            !rowData.componentName.includes("Loss of Pay")) {
+        // Don't show delete button for default items from backend, except Loss of Pay and Basic Salary components
+        const isDeletable = !rowData.isDefault || rowData.componentName.includes("Loss of Pay") || rowData.componentName.includes("Basic Salary");
+        if ((rowData.isNewRow || rowData._originalData?.componentId) && isDeletable) {
           return (
             <button 
               className="salary_delete_btn" 
@@ -678,6 +741,105 @@ export default function DynamicTable({
           </tbody>
         </table>
       </div>
+      {title === "Default Deduction" && isSalaryConfigEditing && !isDisabled && (
+        <div className="default-deduction-options-block" style={{ marginTop: '16px', padding: '12px', border: '1px dashed #007bff', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontWeight: '500', fontSize: '14px' }}>Default Deduction Options:</span>
+          <button
+            type="button"
+            className="add-default-deduction-btn"
+            disabled={tableRows.some(row => !row._isDeleted && row.componentName.includes("Loss of Pay"))}
+            onClick={() => {
+              // Check if there is a deleted Loss of Pay row, if so, restore it
+              const deletedLopIdx = tableRows.findIndex(row => row._isDeleted && row.componentName.includes("Loss of Pay"));
+              if (deletedLopIdx !== -1) {
+                handleUndoDelete(deletedLopIdx);
+              } else {
+                // Otherwise add a new one
+                const calculatedAmount = typeof window !== 'undefined' && window.defaultAdditionTableData
+                  ? calculateLossOfPayAmount(window.defaultAdditionTableData, 0)
+                  : 0;
+                const lopRow = {
+                  componentId: "loss-of-pay-default-temp-" + Date.now(),
+                  componentName: "Loss of Pay(per day)",
+                  componentType: "defaultDeduction",
+                  amount: calculatedAmount,
+                  percentageOfBasicSalary: null,
+                  thresholdAmount: null,
+                  frequency: "",
+                  variable: false,
+                  includeinLop: false,
+                  effectiveFrom: "",
+                  isVariable: false,
+                  isDefault: true,
+                  _isDeleted: false,
+                  _isModified: false,
+                  isNewRow: true
+                };
+                setTableRows(prev => [...prev, lopRow]);
+              }
+            }}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: tableRows.some(row => !row._isDeleted && row.componentName.includes("Loss of Pay")) ? '#ccc' : '#007bff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: tableRows.some(row => !row._isDeleted && row.componentName.includes("Loss of Pay")) ? 'not-allowed' : 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            + Add Loss of Pay (per day)
+          </button>
+        </div>
+      )}
+      {title === "Default Addition" && isSalaryConfigEditing && !isDisabled && (
+        <div className="default-addition-options-block" style={{ marginTop: '16px', padding: '12px', border: '1px dashed #007bff', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontWeight: '500', fontSize: '14px' }}>Default Addition Options:</span>
+          <button
+            type="button"
+            className="add-default-addition-btn"
+            disabled={tableRows.some(row => !row._isDeleted && row.componentName === "Basic Salary")}
+            onClick={() => {
+              // Check if there is a deleted Basic Salary row, if so, restore it
+              const deletedBasicIdx = tableRows.findIndex(row => row._isDeleted && row.componentName === "Basic Salary");
+              if (deletedBasicIdx !== -1) {
+                handleUndoDelete(deletedBasicIdx);
+              } else {
+                // Otherwise add a new one
+                const basicRow = {
+                  componentId: "basic-salary-default-temp-" + Date.now(),
+                  componentName: "Basic Salary",
+                  componentType: "defaultAddition",
+                  amount: null,
+                  percentageOfBasicSalary: null,
+                  thresholdAmount: null,
+                  frequency: "",
+                  variable: false,
+                  includeinLop: false,
+                  effectiveFrom: "",
+                  isVariable: false,
+                  isDefault: true,
+                  _isDeleted: false,
+                  _isModified: false,
+                  isNewRow: true
+                };
+                setTableRows(prev => [...prev, basicRow]);
+              }
+            }}
+            style={{
+              padding: '6px 12px',
+              backgroundColor: tableRows.some(row => !row._isDeleted && row.componentName === "Basic Salary") ? '#ccc' : '#007bff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: tableRows.some(row => !row._isDeleted && row.componentName === "Basic Salary") ? 'not-allowed' : 'pointer',
+              fontSize: '13px'
+            }}
+          >
+            + Add Basic Salary
+          </button>
+        </div>
+      )}
     </div>
   );
 }
