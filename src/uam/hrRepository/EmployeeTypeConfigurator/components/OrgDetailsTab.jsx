@@ -1,11 +1,15 @@
 import { useEffect, useState, useRef, } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getOrganizationDetails, updateOrganizationDetails } from "../../../../actions/hrRepositoryAction";
 import { Button, CircularProgress } from "@mui/material";
 import Snackbar from "../../Common/components/Snackbar";
 
 const OrgDetailsTab = () => {
   const dispatch = useDispatch();
+  const { allToolsAccessDetails, user } = useSelector((state) => state.user);
+  const { selectedToolName } = useSelector((state) => state.mittarvtools);
+  const { myHrmsAccess } = useSelector((state) => state.hrRepositoryReducer);
+
   const [orgDetails, setOrgDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -17,6 +21,11 @@ const OrgDetailsTab = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const fileInputRef = useRef(null);
+
+  const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900 || user?.userType >= 900;
+  const canWriteOrg = isAdmin || myHrmsAccess?.permissions?.some(
+    perm => perm.name === "Organization_write"
+  );
 
   useEffect(() => {
     const fetchOrgDetails = async () => {
@@ -38,6 +47,7 @@ const OrgDetailsTab = () => {
   }, [dispatch]);
 
   const handleFileChange = (e) => {
+    if (!canWriteOrg) return;
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
@@ -54,6 +64,10 @@ const OrgDetailsTab = () => {
   };
 
   const handleSave = async () => {
+    if (!canWriteOrg) {
+      setErrorMsg("You do not have permission to modify organization settings.");
+      return;
+    }
     setIsSaving(true);
     const payload = {
       empCompanyId: orgDetails?.empCompanyId || orgDetails?.id,
@@ -83,16 +97,18 @@ const OrgDetailsTab = () => {
   return (
     <div className="org_profile_tab_container">
 
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
-        <Button 
-          variant="contained" 
-          onClick={handleSave}
-          disabled={isSaving || (!addressModified && !logoFileBase64)}
-          sx={{ textTransform: 'none', backgroundColor: '#033348', fontWeight: 600, '&:hover': { backgroundColor: '#002231' } }}
-        >
-          {isSaving ? <CircularProgress size={20} color="inherit" /> : "Save Changes"}
-        </Button>
-      </div>
+      {canWriteOrg && (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+          <Button 
+            variant="contained" 
+            onClick={handleSave}
+            disabled={isSaving || (!addressModified && !logoFileBase64)}
+            sx={{ textTransform: 'none', backgroundColor: '#033348', fontWeight: 600, '&:hover': { backgroundColor: '#002231' } }}
+          >
+            {isSaving ? <CircularProgress size={20} color="inherit" /> : "Save Changes"}
+          </Button>
+        </div>
+      )}
 
       <div className="org_profile_content">
         <div className="org_details_card">
@@ -135,26 +151,30 @@ const OrgDetailsTab = () => {
             )}
           </div>
           
-          <input 
-            type="file" 
-            accept="image/*" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            style={{ display: "none" }} 
-            id="org-logo-upload"
-          />
-          
-          <div className="logo_actions">
-            <Button 
-              variant="outlined" 
-              onClick={() => fileInputRef.current.click()}
-              className="change_logo_btn"
-              sx={{ textTransform: 'none', color: '#033348', borderColor: '#dbe4eb', fontWeight: 600, '&:hover': { borderColor: '#033348', backgroundColor: '#f9fbff' } }}
-            >
-              Choose Image
-            </Button>
-          </div>
-          <p className="logo_hint">Supported formats: PNG, JPG, JPEG (Max 2MB)</p>
+          {canWriteOrg && (
+            <>
+              <input 
+                type="file" 
+                accept="image/*" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                style={{ display: "none" }} 
+                id="org-logo-upload"
+              />
+              
+              <div className="logo_actions">
+                <Button 
+                  variant="outlined" 
+                  onClick={() => fileInputRef.current.click()}
+                  className="change_logo_btn"
+                  sx={{ textTransform: 'none', color: '#033348', borderColor: '#dbe4eb', fontWeight: 600, '&:hover': { borderColor: '#033348', backgroundColor: '#f9fbff' } }}
+                >
+                  Choose Image
+                </Button>
+              </div>
+              <p className="logo_hint">Supported formats: PNG, JPG, JPEG (Max 2MB)</p>
+            </>
+          )}
         </div>
 
         {/* Company Address Section */}
@@ -168,8 +188,9 @@ const OrgDetailsTab = () => {
               setAddress(e.target.value);
               setAddressModified(true);
             }}
+            disabled={!canWriteOrg}
             placeholder="e.g. Ashoka Bhopal Chambers, 205, Above Standard Chartered Bank, Begumpet, Secunderabad, Hyderabad, Telangana 500003"
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem', fontFamily: 'inherit', boxSizing: 'border-box', backgroundColor: !canWriteOrg ? '#f1f5f9' : '#ffffff' }}
           />
         </div>
       </div>

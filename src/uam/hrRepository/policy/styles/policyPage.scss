@@ -3,25 +3,25 @@
 
 * { box-sizing: border-box; }
 
-.imp_link_page {
+.policy_page {
   width: 100%;
   max-width: 100%;
   padding: 40px 3.5rem;
   font-family: 'Plus Jakarta Sans', sans-serif;
 
   // ── Header ────────────────────────────────────────────────────────────────
-  .imp_link_header {
+  .policy_header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 28px;
 
-    .imp_link_header_left {
+    .policy_header_left {
       display: flex;
       flex-direction: column;
       gap: 4px;
 
-      .imp_link_title {
+      .policy_title {
         font-size: 22px;
         font-weight: 700;
         color: $GREY-80;
@@ -31,9 +31,8 @@
         line-height: 1.3;
       }
 
-      .imp_link_subtitle {
+      .policy_subtitle {
         font-size: 14px;
-        font-weight: 400;
         color: $GREY-50;
         font-family: 'Plus Jakarta Sans', sans-serif;
         margin: 0;
@@ -42,7 +41,7 @@
   }
 
   // ── CTA button (shared between header and empty state) ───────────────────
-  .imp_link_add_btn {
+  .policy_add_btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -64,7 +63,7 @@
   }
 
   // ── Section label ─────────────────────────────────────────────────────────
-  .imp_link_section_label {
+  .policy_section_label {
     font-size: 14px;
     font-weight: 600;
     color: $GREY-60;
@@ -74,7 +73,7 @@
   }
 
   // ── Full-width tile list ──────────────────────────────────────────────────
-  .imp_link_list {
+  .policy_list {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -84,7 +83,7 @@
   }
 
   // ── Single tile row ───────────────────────────────────────────────────────
-  .imp_link_tile {
+  .policy_tile {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -94,7 +93,6 @@
     transition: background-color 0.15s ease;
 
     &:last-child { border-bottom: none; }
-
     &:hover { background-color: $GREY-00; }
 
     // icon column
@@ -112,7 +110,7 @@
       svg { width: 18px; height: 18px; }
     }
 
-    // main info column - grows
+    // main info - grows
     .tile_info {
       flex: 1;
       min-width: 0;
@@ -141,14 +139,37 @@
         text-decoration: none;
         font-family: 'Plus Jakarta Sans', sans-serif;
         transition: color 0.15s ease;
+        max-width: 100%;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 100%;
 
         svg { width: 11px; height: 11px; flex-shrink: 0; }
         &:hover { color: $PRUSSIAN-80; text-decoration: underline; }
       }
+
+      .tile_remarks {
+        font-size: 11px;
+        color: $GREY-50;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    // version badge
+    .tile_badge {
+      background: $PRUSSIAN-10;
+      color: $PRUSSIAN-70;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.02em;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      flex-shrink: 0;
     }
 
     // meta column (admin only)
@@ -181,7 +202,7 @@
       }
     }
 
-    // actions column
+    // actions
     .tile_actions {
       display: flex;
       gap: 4px;
@@ -216,7 +237,7 @@
   }
 
   // ── Empty state ───────────────────────────────────────────────────────────
-  .imp_link_empty {
+  .policy_empty {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -257,8 +278,8 @@
   }
 }
 
-// ── Custom popup overlay (matches CreateRolePopup pattern) ────────────────────
-.imp_link_popup_overlay {
+// ── Popup overlay (matches CreateRolePopup pattern) ───────────────────────────
+.policy_popup_overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -270,11 +291,11 @@
   align-items: center;
   z-index: 1000;
 
-  .imp_link_popup {
+  .policy_popup {
     background-color: $WHITE;
     border-radius: 16px;
     width: 100%;
-    max-width: 520px;
+    max-width: 560px;
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);

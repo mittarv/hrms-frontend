@@ -91,9 +91,11 @@ const isSecure = () => window.location.protocol === "https:";
  */
 const setCookie = (name, value) => {
   const domain = getCachedRootDomain();
+  const maxAge = 30 * 24 * 60 * 60; // 30 days
   const parts = [
     `${name}=${encodeURIComponent(value)}`,
     "path=/",
+    `max-age=${maxAge}`,
     "SameSite=Lax",
   ];
   if (domain) parts.push(`domain=${domain}`);

@@ -68,13 +68,33 @@ const EmployeeTypeDashboard = () => {
         return [];
     }, [getAllComponentType, activeTab]);
 
+    const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900 || user?.userType >= 900;
+
     const hasWriteAccess = (() => {
-        const isAdmin = allToolsAccessDetails?.[selectedToolName] >= 900 || user?.userType >= 900;
         const hasUamPerm = myHrmsAccess?.permissions?.some(
             perm => perm.name === "ActiveEmployee_update" || perm.name === "EmployeeRepository_update"
         );
         return isAdmin || hasUamPerm;
     })();
+
+    const canReadOrg = isAdmin || myHrmsAccess?.permissions?.some(
+        perm => perm.name === "Organization_read" || perm.name === "Organization_write"
+    );
+
+    const filteredTabs = useMemo(() => {
+        return CONFIG_TABS.filter(tab => {
+            if (tab.id === "org_details") {
+                return canReadOrg;
+            }
+            return true;
+        });
+    }, [canReadOrg]);
+
+    useEffect(() => {
+        if (activeTab === "org_details" && !canReadOrg) {
+            setActiveTab("emp_type_dropdown");
+        }
+    }, [activeTab, canReadOrg]);
 
     const handleSave = async (newKey, newLabel) => {
         if (!hasWriteAccess) {
@@ -118,7 +138,7 @@ const EmployeeTypeDashboard = () => {
         setItemToDelete(null);
     };
 
-    const currentTabLabel = CONFIG_TABS.find(t => t.id === activeTab)?.label || "Configuration";
+    const currentTabLabel = filteredTabs.find(t => t.id === activeTab)?.label || "Configuration";
 
     const handleTabClick = useCallback((tabId) => {
         setActiveTab(tabId);
@@ -172,7 +192,7 @@ const EmployeeTypeDashboard = () => {
                 </div>
 
                 <div className="employee_configurator_tabs" role="tablist">
-                    {CONFIG_TABS.map((tab) => (
+                    {filteredTabs.map((tab) => (
                         <span
                             key={tab.id}
                             onClick={() => handleTabClick(tab.id)}
@@ -213,7 +233,7 @@ const EmployeeTypeDashboard = () => {
                                         />
                                         {showTooltip && (
                                             <div className="employee_configurator_tooltip">
-                                                {CONFIG_TABS.find(t => t.id === activeTab)?.description}
+                                                {filteredTabs.find(t => t.id === activeTab)?.description}
                                             </div>
                                         )}
                                     </div>
