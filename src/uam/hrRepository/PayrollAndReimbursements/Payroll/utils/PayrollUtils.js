@@ -55,14 +55,16 @@ export const STATUS_OPTIONS = {
   ALL: 'all',
   PENDING: 'pending',
   PAYROLL_FINALIZED: 'payroll_finalized',
-  PAYROLL_GENERATED: 'payroll_generated'
+  PAYROLL_GENERATED: 'payroll_generated',
+  SKIPPED: 'skipped'
 };
 
 export const STATUS_DISPLAY_OPTIONS = [
   { value: STATUS_OPTIONS.ALL, label: 'All Status' },
   { value: STATUS_OPTIONS.PENDING, label: 'Pending' },
   { value: STATUS_OPTIONS.PAYROLL_FINALIZED, label: 'Payroll Finalized' },
-  { value: STATUS_OPTIONS.PAYROLL_GENERATED, label: 'Payroll Generated' }
+  { value: STATUS_OPTIONS.PAYROLL_GENERATED, label: 'Payroll Generated' },
+  { value: STATUS_OPTIONS.SKIPPED, label: 'Skipped' }
 ];
 
 // Utility function to convert monetary string to number for sorting
@@ -128,6 +130,9 @@ export const applyStatusFilterToData = (data, statusFilter) => {
       
       case STATUS_OPTIONS.PAYROLL_GENERATED:
         return employeeStatus === 'payroll generated';
+
+      case STATUS_OPTIONS.SKIPPED:
+        return employeeStatus === 'skipped';
       
       default:
         return true;
