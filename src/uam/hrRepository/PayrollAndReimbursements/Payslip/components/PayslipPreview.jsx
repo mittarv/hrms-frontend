@@ -113,7 +113,7 @@ const PayslipModal = ({ isOpen, onClose, selectedPayslip, employeeId }) => {
   };
 
   const statusStr = (selectedPayslip?.status || selectedPayslip?.payrollStatus || "").toString().toLowerCase();
-  const isPayrollGenerated = !!selectedPayslip?.payslipId || statusStr === "payroll_generated" || statusStr === "payroll generated" || statusStr === "payroll_finalized" || statusStr === "payroll finalized" || statusStr === "generated";
+  const isPayrollGenerated = statusStr === "payroll_generated" || statusStr === "payroll generated" || statusStr === "generated";
 
   if (!isOpen) return null;
   return (

@@ -534,7 +534,7 @@ const PayrollTable = ({
           </span>
         );
       case "netPay": {
-        const canDownload = (employee.status === PAYROLL_STATUS_LABELS.PAYROLL_GENERATED || employee.status === PAYROLL_STATUS_LABELS.PAYROLL_FINALIZED) && hasPayrollAccess;
+        const canDownload = employee.status === PAYROLL_STATUS_LABELS.PAYROLL_GENERATED && hasPayrollAccess;
         return (
           <div className="net-pay-cell-container">
             <span 
