@@ -1,9 +1,5 @@
 // this file will include all the String and Object data that will be used in the application
 // whatever data that will be used in the application will be included here as object
-import userGroup from "../assets/icons/userGroup.svg";
-import toolIcon from "../assets/icons/tool_icon.svg";
-import pending_request from "../assets/icons/pending_request.svg";
-import user_permission from "../assets/icons/user_permission.svg";
 import policy from "../assets/icons/policies.svg";
 import partnerOnboard from "../assets/icons/partnerOnboard.svg";
 import partnerMonetizationTool from "../assets/icons/partnerMonetizationTool.svg";
@@ -13,7 +9,7 @@ import ReferralAnalytics from "../assets/icons/referral_Analytics.svg";
 
 export const loginPageData = {
   loginPageTitle: "Log in to",
-  toolboxTitle: "Toolbox",
+  toolboxTitle: "HRMS",
   googleLoginButton: "Continue with Google",
 };
 
