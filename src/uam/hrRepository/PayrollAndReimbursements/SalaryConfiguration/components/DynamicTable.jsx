@@ -266,20 +266,46 @@ export default function DynamicTable({
     if (title === "Default Deduction" && typeof window !== 'undefined') {
       const handleLossOfPayUpdate = (event) => {
         const { defaultAdditionRows } = event.detail;
+        const hasAnyLopAddition = defaultAdditionRows?.some(r => !r._isDeleted && r.includeinLop);
         
         setTableRows(prevRows => {
+          let foundLop = false;
           const updatedRows = prevRows.map(row => {
             if (row.componentName === "Loss of Pay(per day)" || row.componentName === "Loss of Payper day)" || row.componentName.includes("Loss of Pay")) {
+              foundLop = true;
               const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows, row._originalData?.amount || row.amount);
               const originalAmount = row._originalData ? parseFloat(row._originalData.amount ?? 0) : null;
               return {
                 ...row,
+                _isDeleted: hasAnyLopAddition ? false : row._isDeleted,
                 amount: calculatedAmount,
                 _isModified: originalAmount !== null && calculatedAmount !== originalAmount ? true : row._isModified
               };
             }
             return row;
           });
+
+          if (hasAnyLopAddition && !foundLop) {
+            const calculatedAmount = calculateLossOfPayAmount(defaultAdditionRows, 0);
+            updatedRows.push({
+              componentId: "loss-of-pay-default-temp-" + Date.now(),
+              componentName: "Loss of Pay(per day)",
+              componentType: "defaultDeduction",
+              amount: calculatedAmount,
+              percentageOfBasicSalary: null,
+              thresholdAmount: null,
+              frequency: "",
+              variable: false,
+              includeinLop: false,
+              effectiveFrom: "",
+              isVariable: false,
+              isDefault: true,
+              _isDeleted: false,
+              _isModified: true,
+              isNewRow: true
+            });
+          }
+
           return updatedRows;
         });
       };
