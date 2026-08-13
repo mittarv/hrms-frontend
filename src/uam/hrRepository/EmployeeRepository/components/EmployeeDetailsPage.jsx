@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { formatDate } from "../utils/EmployeeRepositoryData";
 import {
   sendChangesToApprover,
+  updateEmployeeDetails,
   getCurrentEmployeeDetails,
   getAllComponentTypes,
   getAllManagers,
@@ -828,16 +829,34 @@ const emailValidation = (updatedFormData) => {
       return acc;
     }, []);
   
-    const ApprovalFormData = {
-      userType: isAdmin,
-      requestedBy: user && user?.employeeUuid,
-      requestedFor: formData?.empUuid || employeeUuid,
-      sectionChanged: sectionChanged,
-    };
+    const targetEmployeeUuid = formData?.empUuid || employeeUuid;
 
-    dispatch(sendChangesToApprover(ApprovalFormData));
+    // Leave flow asks users to fill mandatory profile fields (e.g. gender).
+    // Those must be applied immediately — approval-only leaves empGender null
+    // and keeps blocking leave actions.
+    if (fromAttendance) {
+      const flatUpdates = sectionChanged.reduce((acc, sectionObj) => {
+        const fields = Object.values(sectionObj)[0] || {};
+        return { ...acc, ...fields };
+      }, {});
+
+      dispatch(updateEmployeeDetails(flatUpdates, targetEmployeeUuid));
+    } else {
+      const ApprovalFormData = {
+        userType: isAdmin,
+        requestedBy: user && user?.employeeUuid,
+        requestedFor: targetEmployeeUuid,
+        sectionChanged: sectionChanged,
+      };
+
+      dispatch(sendChangesToApprover(ApprovalFormData));
+    }
+
     setSearchParams((prev) => {
       prev.delete("isEditing");
+      if (fromAttendance) {
+        prev.delete("fromAttendance");
+      }
       return prev;
     });
     setExpandedSections({});
