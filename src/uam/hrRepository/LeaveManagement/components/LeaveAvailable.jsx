@@ -153,27 +153,6 @@ const applicableLeaves = useMemo(() => {
   }).filter(leave => leave.totalAllocated > 0);
 }, [baseLeaves, dynamicLeaves]);
 
-const leaveDebugRows = useMemo(() => {
-  if (!baseLeaves.length) return [];
-
-  return baseLeaves.map((leave) => {
-    const dynamicUpdate = dynamicLeaves.find(
-      (d) => d.leaveConfigId === leave.leaveConfigId
-    );
-    const { totalAllocated, accruedLeaves, totalUsed, availableLeaves } = buildLeaveMetrics(leave, dynamicUpdate);
-
-    return {
-      leaveType: leave.leaveType,
-      leaveConfigId: leave.leaveConfigId,
-      hasDynamicUpdate: Boolean(dynamicUpdate),
-      totalAllocated,
-      accruedLeaves,
-      totalUsed,
-      availableLeaves,
-    };
-  });
-}, [baseLeaves, dynamicLeaves]);
-
 // Find the name of the leave that has an expiry (Comp Off)
 const compOffLeaveName = useMemo(() => {
   const compLeave = applicableLeaves.find(leave => leave.hasExpiry);
@@ -214,19 +193,18 @@ const getFiscalYear = () => {
      return '';
    }
 
-   const startFiscalYear = empFiscalYear;
+   const startFiscalYear = Number(
+     typeof empFiscalYear === 'object' && empFiscalYear !== null
+       ? empFiscalYear.fiscalYear
+       : empFiscalYear
+   );
    
    // Check if startFiscalYear exists
-   if (!startFiscalYear) {
+   if (!startFiscalYear || Number.isNaN(startFiscalYear)) {
      return '';
    }
 
    const endFiscalYear = startFiscalYear + 1;
- 
-   // Check if endFiscalYear is valid
-   if (!endFiscalYear) {
-     return '';
-   }
    
    return `(${startFiscalMonth} ${startFiscalYear} - ${endFiscalMonth} ${endFiscalYear})`;
 };
@@ -256,28 +234,6 @@ const getFiscalYear = () => {
       <div className="leaves-table-container">
         <p className="leaves-title">Leaves Available {getFiscalYear()}</p>
         <p>No leave data available for this employee.</p>
-        <div className="leave-debug-panel">
-          <p className="leave-debug-title">Debug Snapshot</p>
-          <p>Accrual API rows: {baseLeaves.length}</p>
-          <p>Comp-off API rows: {dynamicLeaves.length}</p>
-          <p>
-            Rows passing filter (totalAllocated &gt; 0): {
-              leaveDebugRows.filter((row) => Number(row.totalAllocated) > 0).length
-            }
-          </p>
-          <details>
-            <summary>Computed rows (first 8)</summary>
-            <pre>{JSON.stringify(leaveDebugRows.slice(0, 8), null, 2)}</pre>
-          </details>
-          <details>
-            <summary>Accrual payload (first 5)</summary>
-            <pre>{JSON.stringify(baseLeaves.slice(0, 5), null, 2)}</pre>
-          </details>
-          <details>
-            <summary>Comp-off payload (first 5)</summary>
-            <pre>{JSON.stringify(dynamicLeaves.slice(0, 5), null, 2)}</pre>
-          </details>
-        </div>
       </div>
     );
   }

@@ -732,8 +732,16 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
       })
       .addCase('GET_EMPLOYEE_LEAVE_BALANCE_SUCCESS', (state, action) => {
         state.loading = false;
-        state.balanceDetails = action.payload.balanceDetails;
-        state.empFiscalYear = action.payload || "";
+        const payload = action.payload;
+        // Support both shapes:
+        // - getEmployeeLeaveBalance -> { balanceDetails, fiscalYear }
+        // - getLeaveBalanceWithAccrual -> fiscalYear number
+        if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+          state.balanceDetails = payload.balanceDetails;
+          state.empFiscalYear = payload.fiscalYear ?? "";
+        } else {
+          state.empFiscalYear = payload ?? "";
+        }
       })
       .addCase('GET_EMPLOYEE_LEAVE_BALANCE_FAILURE', (state, action) => {
         state.loading = false;
@@ -860,6 +868,9 @@ export const hrRepositoryReducer = createReducer(initialState, (builder) => {
         state.accrualLeaveBalanceLoading = false;
         state.accrualLeaveBalance = action.payload.leaveBalance;
         state.accrualFiscalYearInfo = action.payload.fiscalYearInfo;
+        if (action.payload.fiscalYearInfo?.fiscalYear != null) {
+          state.empFiscalYear = action.payload.fiscalYearInfo.fiscalYear;
+        }
       })
       .addCase('GET_LEAVE_BALANCE_WITH_ACCRUAL_FAILURE', (state, action) => {
         state.accrualLeaveBalanceLoading = false;
